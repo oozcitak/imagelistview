@@ -1,0 +1,13 @@
+#Introduction to ImageListView
+
+= Introduction =
+
+ImageListView is a .NET control for displaying a list of image files. It looks and operates similar to the standard !ListView control. Image thumbnails are loaded asynchronously with a separate background thread.
+
+= Features =
+
+  * Asynchronously loaded thumbnails
+  * Customizable renderers
+  * Drag&drop support
+  * Details view: filename, type, size, path, dimensions, resolution, ...
+  * Fast thumbnail extractor for embedded Exif thumbnails
