@@ -2,7 +2,7 @@
 
 = Introduction =
 
-ImageListView is a .NET control for displaying a list of image files. It looks and operates similar to the standard !ListView control. Image thumbnails are loaded asynchronously with a separate background thread.
+ImageListView is a .NET control for displaying a list of image files. It looks and operates similar to the standard !ListView control. Image thumbnails are loaded asynchronously with a separate background thread. ImageListView requires the .NET framework 2.0.
 
 = Features =
 
