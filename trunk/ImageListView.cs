@@ -15,7 +15,7 @@ using System.Windows.Forms.Design;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ImageListViewDemo
+namespace Manina.Windows.Forms
 {
     /// <summary>
     /// Represents an image list view control.
