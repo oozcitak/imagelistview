@@ -11,3 +11,5 @@ ImageListView is a .NET control for displaying a list of image files. It looks a
   * Drag&drop support
   * Details view: filename, type, size, path, dimensions, resolution, ...
   * Fast thumbnail extractor for embedded Exif thumbnails
+
+http://imagelistview.googlecode.com/svn/wiki/ImageListView.demo.jpg
