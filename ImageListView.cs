@@ -219,9 +219,12 @@ namespace Manina.Windows.Forms
             }
             set
             {
-                mUseEmbeddedThumbnails = value;
-                cacheManager.Clean();
-                mRenderer.Refresh();
+                if (mUseEmbeddedThumbnails != value)
+                {
+                    mUseEmbeddedThumbnails = value;
+                    cacheManager.Clean();
+                    mRenderer.Refresh();
+                }
             }
         }
         /// <summary>
@@ -565,10 +568,10 @@ namespace Manina.Windows.Forms
         /// Determines whether the specified item is visible on the screen.
         /// </summary>
         /// <param name="item">The Guid of the item to test.</param>
-        /// <returns>An ItemVisibility value.</returns>
-        internal ItemVisibility IsItemVisible(Guid guid)
+        /// <returns>true if the item is visible or partially visible; otherwise false.</returns>
+        internal bool IsItemVisible(Guid guid)
         {
-            return IsItemVisible(mItems.IndexOf(guid));
+            return layoutManager.IsItemVisible(guid);
         }
         /// <summary>
         /// Determines whether the specified item is visible on the screen.
@@ -2023,6 +2026,11 @@ namespace Manina.Windows.Forms
                         case ColumnType.DateModified:
                             result = DateTime.Compare(x.DateModified, y.DateModified);
                             break;
+                        case ColumnType.Dimension:
+                            long ax = x.Dimension.Width * x.Dimension.Height;
+                            long ay = y.Dimension.Width * y.Dimension.Height;
+                            result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
+                            break;
                         case ColumnType.FileName:
                             result = string.Compare(x.FileName, y.FileName, StringComparison.InvariantCultureIgnoreCase);
                             break;
@@ -2037,6 +2045,11 @@ namespace Manina.Windows.Forms
                             break;
                         case ColumnType.Name:
                             result = string.Compare(x.Text, y.Text, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.Resolution:
+                            float rx = x.Resolution.Width * x.Resolution.Height;
+                            float ry = y.Resolution.Width * y.Resolution.Height;
+                            result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
                             break;
                         default:
                             result = 0;
@@ -3142,7 +3155,33 @@ namespace Manina.Windows.Forms
             private ImageListView mImageListView;
             private Thread mThread;
 
-            private Dictionary<int, ImageListViewItem> toCache;
+            private Queue<CacheItem> toCache;
+            #endregion
+
+            #region Private Classes
+            /// <summary>
+            /// Represents an item in the item cache.
+            /// </summary>
+            private class CacheItem
+            {
+                private ImageListViewItem mItem;
+                private string mFileName;
+
+                /// <summary>
+                /// Gets the item.
+                /// </summary>
+                public ImageListViewItem Item { get { return mItem; } }
+                /// <summary>
+                /// Gets the name of the image file.
+                /// </summary>
+                public string FileName { get { return mFileName; } }
+
+                public CacheItem(ImageListViewItem item)
+                {
+                    mItem = item;
+                    mFileName = item.FileName;
+                }
+            }
             #endregion
 
             #region Properties
@@ -3161,7 +3200,7 @@ namespace Manina.Windows.Forms
             {
                 mImageListView = owner;
 
-                toCache = new Dictionary<int, ImageListViewItem>();
+                toCache = new Queue<CacheItem>();
 
                 mThread = new Thread(new ParameterizedThreadStart(DoWork));
                 mThread.IsBackground = true;
@@ -3193,20 +3232,13 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void AddToCache(ImageListViewItem item)
             {
-                lock (item)
+                if (!item.isDirty)
+                    return;
+
+                lock (toCache)
                 {
-                    if (item.isDirty)
-                    {
-                        lock (toCache)
-                        {
-                            int key = toCache.Count;
-                            if (!toCache.ContainsKey(key))
-                            {
-                                toCache.Add(key, item);
-                                Monitor.Pulse(toCache);
-                            }
-                        }
-                    }
+                    toCache.Enqueue(new CacheItem(item));
+                    Monitor.Pulse(toCache);
                 }
             }
             #endregion
@@ -3221,8 +3253,7 @@ namespace Manina.Windows.Forms
 
                 while (true)
                 {
-                    ImageListViewItem item = null;
-                    string filename = "";
+                    CacheItem item = null;
                     lock (owner.toCache)
                     {
                         // Wait until we have items waiting to be cached
@@ -3230,43 +3261,31 @@ namespace Manina.Windows.Forms
                             Monitor.Wait(owner.toCache);
 
                         // Get an item from the queue
-                        item = owner.toCache[owner.toCache.Count - 1];
-                        filename = item.FileName;
+                        item = owner.toCache.Dequeue();
                     }
                     // Read file info
+                    string filename = item.FileName;
                     Utility.ShellFileInfo info = new Utility.ShellFileInfo(filename);
                     string path = Path.GetDirectoryName(filename);
                     string name = Path.GetFileName(filename);
                     Size dimension;
                     SizeF resolution;
-                    SizeF pdimension;
                     using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                     {
                         using (Image img = Image.FromStream(stream, false, false))
                         {
                             dimension = img.Size;
                             resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
-                            pdimension = img.PhysicalDimension;
                         }
                     }
                     // Update file info
-                    lock (item)
+
+                    if (!info.Error)
                     {
-                        if (item.isDirty)
+                        lock (item.Item)
                         {
-                            item.isDirty = false;
-                            if (!info.Error)
-                            {
-                                item.mDateAccessed = info.LastAccessTime;
-                                item.mDateCreated = info.CreationTime;
-                                item.mDateModified = info.LastWriteTime;
-                                item.mFileSize = info.Size;
-                                item.mFileType = info.TypeName;
-                                item.mFilePath = path;
-                                item.defaultText = name;
-                                item.mDimension = dimension;
-                                item.mResolution = resolution;
-                            }
+                            item.Item.UpdateDetailsInternal(info.LastAccessTime, info.CreationTime, info.LastWriteTime,
+                            info.Size, info.TypeName, path, name, dimension, resolution);
                         }
                     }
                 }
@@ -3305,6 +3324,7 @@ namespace Manina.Windows.Forms
                 private Size mSize;
                 private Image mImage;
                 private CacheState mState;
+                private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
 
                 /// <summary>
                 /// Gets the name of the image file.
@@ -3322,18 +3342,23 @@ namespace Manina.Windows.Forms
                 /// Gets the state of the cache item.
                 /// </summary>
                 public CacheState State { get { return mState; } }
+                /// <summary>
+                /// Gets embedded thumbnail extraction behavior.
+                /// </summary>
+                public UseEmbeddedThumbnails UseEmbeddedThumbnails { get { return mUseEmbeddedThumbnails; } }
 
-                public CacheItem(string filename, Size size, Image image)
-                    : this(filename, size, image, CacheState.Unknown)
-                {
-                    ;
-                }
                 public CacheItem(string filename, Size size, Image image, CacheState state)
                 {
                     mFileName = filename;
                     mSize = size;
                     mImage = image;
                     mState = state;
+                }
+
+                public CacheItem(string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
+                    : this(filename, size, image, state)
+                {
+                    mUseEmbeddedThumbnails = useEmbeddedThumbnails;
                 }
             }
             #endregion
@@ -3426,6 +3451,7 @@ namespace Manina.Windows.Forms
             public void AddToCache(Guid guid, string filename)
             {
                 Size thumbSize = mImageListView.ThumbnailSize;
+                UseEmbeddedThumbnails useEmbeddedThumbnails = mImageListView.UseEmbeddedThumbnails;
 
                 bool isCached = false;
                 lock (thumbCache)
@@ -3444,7 +3470,7 @@ namespace Manina.Windows.Forms
                     {
                         if (!toCache.ContainsKey(guid))
                         {
-                            toCache.Add(guid, new CacheItem(filename, thumbSize, null, CacheState.InQueue));
+                            toCache.Add(guid, new CacheItem(filename, thumbSize, null, CacheState.InQueue, useEmbeddedThumbnails));
                             Monitor.Pulse(toCache);
                         }
                     }
@@ -3523,6 +3549,7 @@ namespace Manina.Windows.Forms
                                 CacheItem request = pair.Value;
                                 filename = request.FileName;
                                 thumbsize = request.Size;
+                                useEmbedded = request.UseEmbeddedThumbnails;
                                 break;
                             }
                             owner.toCache.Remove(guid);
@@ -3545,12 +3572,9 @@ namespace Manina.Windows.Forms
                     // Is it outside visible area?
                     if (filename != "")
                     {
-                        lock (owner.mImageListView)
-                        {
-                            useEmbedded = owner.mImageListView.mUseEmbeddedThumbnails;
-                            if (owner.mImageListView.IsItemVisible(guid) == ItemVisibility.NotVisible)
-                                filename = "";
-                        }
+                        bool isvisible = (bool)owner.ImageListView.Invoke(new CheckItemVisibleInternal(owner.mImageListView.IsItemVisible), guid);
+                        if (!isvisible)
+                            filename = "";
                     }
 
                     // Proceed if we have a filename
@@ -3582,13 +3606,7 @@ namespace Manina.Windows.Forms
                                             iguid = item.Key;
                                             break;
                                         }
-                                        bool isvisible = false;
-                                        lock (owner.mImageListView.mItems)
-                                        {
-                                            int index = owner.mImageListView.mItems.IndexOf(iguid);
-                                            if (index != -1)
-                                                isvisible = (owner.mImageListView.IsItemVisible(owner.mImageListView.mItems[index]) == ItemVisibility.Visible);
-                                        }
+                                        bool isvisible = (bool)owner.ImageListView.Invoke(new CheckItemVisibleInternal(owner.mImageListView.IsItemVisible), guid);
                                         if (!isvisible)
                                         {
                                             owner.thumbCache.Remove(iguid);
@@ -3715,6 +3733,7 @@ namespace Manina.Windows.Forms
             private int cachedItemCount;
             private Size cachedItemSize;
             private int cachedHeaderHeight;
+            private Dictionary<Guid, bool> cachedVisibleItems;
             #endregion
 
             #region Properties
@@ -3810,6 +3829,7 @@ namespace Manina.Windows.Forms
             public ImageListViewLayoutManager(ImageListView owner)
             {
                 mImageListView = owner;
+                cachedVisibleItems = new Dictionary<Guid, bool>();
                 Update();
             }
             #endregion
@@ -3865,6 +3885,7 @@ namespace Manina.Windows.Forms
                 cachedItemCount = mImageListView.Items.Count;
                 cachedItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
                 cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
+                cachedVisibleItems.Clear();
 
                 // Calculate drawing area
                 mClientArea = mImageListView.ClientRectangle;
@@ -3996,6 +4017,25 @@ namespace Manina.Windows.Forms
                 if (mFirstVisible > mImageListView.Items.Count - 1) mFirstVisible = mImageListView.Items.Count - 1;
                 if (mLastVisible < 0) mLastVisible = 0;
                 if (mLastVisible > mImageListView.Items.Count - 1) mLastVisible = mImageListView.Items.Count - 1;
+
+                // Cache visible items
+                if (mFirstPartiallyVisible >= 0 &&
+                    mLastPartiallyVisible >= 0 &&
+                    mFirstPartiallyVisible <= mImageListView.Items.Count - 1 &&
+                    mLastPartiallyVisible <= mImageListView.Items.Count - 1)
+                {
+                    for (int i = mFirstPartiallyVisible; i <= mLastPartiallyVisible; i++)
+                        cachedVisibleItems.Add(mImageListView.Items[i].Guid, false);
+                }
+            }
+            /// <summary>
+            /// Determines whether the item with the given guid is
+            /// (partially) visible.
+            /// </summary>
+            /// <param name="guid">The guid of the item to check.</param>
+            public bool IsItemVisible(Guid guid)
+            {
+                return cachedVisibleItems.ContainsKey(guid);
             }
             #endregion
         }
@@ -4956,6 +4996,24 @@ namespace Manina.Windows.Forms
                     throw new ArgumentException("Unknown column type", "type");
             }
         }
+        /// <summary>
+        /// Invoked by the worker thread to update item details.
+        /// </summary>
+        internal void UpdateDetailsInternal(DateTime dateAccessed, DateTime dateCreated, DateTime dateModified,
+            long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution)
+        {
+            if (!isDirty) return;
+            isDirty = false;
+            mDateAccessed = dateAccessed;
+            mDateCreated = dateCreated;
+            mDateModified = dateModified;
+            mFileSize = fileSize;
+            mFileType = fileType;
+            mFilePath = filePath;
+            defaultText = name;
+            mDimension = dimension;
+            mResolution = resolution;
+        }
         #endregion
     }
     #endregion
@@ -5006,6 +5064,11 @@ namespace Manina.Windows.Forms
     /// Represents the method that will handle the Refresh event. 
     /// </summary>
     internal delegate void RefreshEventHandlerInternal();
+    /// <summary>
+    /// Determines if the given item is visible.
+    /// </summary>
+    /// <param name="guid">The guid of the item to check visibility.</param>
+    internal delegate bool CheckItemVisibleInternal(Guid guid);
     #endregion
 
     #region Event Arguments
