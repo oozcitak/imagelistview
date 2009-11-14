@@ -7,7 +7,7 @@
 
 = 0.6 (12 November 2009) =
 
-Project ported to Google Code.
+Project moved to Google Code.
 
 == Previous Release Notes ==
 
@@ -20,9 +20,9 @@ Project ported to Google Code.
   * Fixed a bug where right clicking on the control when the item collection is empty threw an exception.
   * Fixed a bug where removing items while iterating through the selected item collection threw an exception.
   * Fixed a visual glitch where removing all items from the control at once did not set the scroll coordinates to 0, 0.
-  * Added drag&drop support. Image files recognized by the .NET framework (whatever Image.FromStream accepts) can now be dragged on to the control. Also image thumbnails can now be dragged from the control as files. Drag&drop behavior can be customized using the AllowDrag and AllowDrop properties.
-  * Added a new option for detecting duplicate filenames. When AllowDuplicateFileNames property is set to false, the control will silently refuse to add an image file, if it already exists in the items collection. Comparison is made between filenames as case-insensitive ordinal string comparison.
+  * Added drag&drop support. Image files recognized by the .NET framework (whatever Image.!FromStream accepts) can now be dragged on to the control. Also image thumbnails can now be dragged from the control as files. Drag&drop behavior can be customized using the !AllowDrag and !AllowDrop properties.
+  * Added a new option for detecting duplicate filenames. When !AllowDuplicateFileNames property is set to false, the control will silently refuse to add an image file, if it already exists in the items collection. Comparison is made between filenames as case-insensitive ordinal string comparison.
   * Fixed a bug where right clicking on selected items cleared the selection.
   * Fixed a glitch where the control's Text (hidden property) was serialized as null.
-  * ImageListView can now extract embedded EXIF thumbnails. A new property (UseEmbeddedThumbnails) is added to customize this behavior. It has three settings. UseEmbeddedThumbnails.Never: Does not extract embedded thumbnails. Thumbnails are always created from the image file. UseEmbeddedThumbnails.Always: Always reads embedded thumbnails even if the thumbnail size is larger than the embedded image. UseEmbeddedThumbnails.Auto: Uses embedded images if thumbnail size is close to embedded image size, creates thumbnails otherwise.
-  * Index property is added to the ImageListViewItem class.
+  * !ImageListView can now extract embedded EXIF thumbnails. A new property (!UseEmbeddedThumbnails) is added to customize this behavior.
+  * A public Index property is added to the !ImageListViewItem class.
