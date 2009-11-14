@@ -1660,14 +1660,12 @@ namespace Manina.Windows.Forms
             private List<ImageListViewItem> mItems;
             internal ImageListView mImageListView;
             private ImageListViewItem mFocused;
-            private Dictionary<ImageListViewItem, int> indexCache;
             #endregion
 
             #region Constructors
             public ImageListViewItemCollection(ImageListView owner)
             {
                 mItems = new List<ImageListViewItem>();
-                indexCache = new Dictionary<ImageListViewItem, int>();
                 mFocused = null;
                 mImageListView = owner;
             }
@@ -1725,6 +1723,7 @@ namespace Manina.Windows.Forms
                 {
                     bool oldSelected = mItems[index].Selected;
                     mItems[index] = value;
+                    mItems[index].mIndex = index;
                     if (mImageListView != null)
                     {
                         mImageListView.itemCacheManager.AddToCache(mItems[index]);
@@ -1762,6 +1761,7 @@ namespace Manina.Windows.Forms
                         return;
                 }
                 item.owner = this;
+                item.mIndex = mItems.Count;
                 mItems.Add(item);
                 if (mImageListView != null)
                 {
@@ -1825,7 +1825,6 @@ namespace Manina.Windows.Forms
             public void Clear()
             {
                 mItems.Clear();
-                indexCache.Clear();
                 if (mImageListView != null)
                 {
                     mImageListView.SelectedItems.Clear();
@@ -1874,8 +1873,10 @@ namespace Manina.Windows.Forms
             public void Insert(int index, ImageListViewItem item)
             {
                 item.owner = this;
+                item.mIndex = index;
+                for (int i = index; i < mItems.Count; i++)
+                    mItems[i].mIndex++;
                 mItems.Insert(index, item);
-                indexCache.Clear();
                 if (mImageListView != null)
                 {
                     item.mImageListView = this.mImageListView;
@@ -1894,8 +1895,9 @@ namespace Manina.Windows.Forms
             /// </returns>
             public bool Remove(ImageListViewItem item)
             {
+                for (int i = item.mIndex; i < mItems.Count; i++)
+                    mItems[i].mIndex--;
                 bool ret = mItems.Remove(item);
-                indexCache.Clear();
                 if (mImageListView != null)
                 {
                     if (item.Selected)
@@ -1913,8 +1915,9 @@ namespace Manina.Windows.Forms
             /// </exception>
             public void RemoveAt(int index)
             {
+                for (int i = index; i < mItems.Count; i++)
+                    mItems[i].mIndex--;
                 mItems.RemoveAt(index);
-                indexCache.Clear();
                 if (mImageListView != null)
                 {
                     if (mItems[index].Selected)
@@ -1931,6 +1934,7 @@ namespace Manina.Windows.Forms
             internal void AddInternal(ImageListViewItem item)
             {
                 item.owner = this;
+                item.mIndex = mItems.Count;
                 mItems.Add(item);
                 if (mImageListView != null)
                 {
@@ -1944,8 +1948,10 @@ namespace Manina.Windows.Forms
             internal void InsertInternal(int index, ImageListViewItem item)
             {
                 item.owner = this;
+                item.mIndex = index;
+                for (int i = index; i < mItems.Count; i++)
+                    mItems[i].mIndex++;
                 mItems.Insert(index, item);
-                indexCache.Clear();
                 if (mImageListView != null)
                 {
                     item.mImageListView = this.mImageListView;
@@ -1957,20 +1963,16 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void RemoveInternal(ImageListViewItem item)
             {
+                for (int i = item.mIndex; i < mItems.Count; i++)
+                    mItems[i].mIndex--;
                 bool ret = mItems.Remove(item);
-                indexCache.Clear();
             }
             /// <summary>
             /// Returns the index of the specified item.
             /// </summary>
             internal int IndexOf(ImageListViewItem item)
             {
-                int index = -1;
-                if (indexCache.TryGetValue(item, out index))
-                    return index;
-                index = mItems.IndexOf(item);
-                indexCache.Add(item, index);
-                return index;
+                return item.Index;
             }
             /// <summary>
             /// Returns the index of the item with the specified Guid.
@@ -1989,7 +1991,6 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null || mImageListView.SortOrder == SortOrder.None)
                     return;
                 mItems.Sort(new ImageListViewItemComparer(mImageListView.SortColumn, mImageListView.SortOrder));
-                indexCache.Clear();
             }
             #endregion
 
@@ -4654,6 +4655,7 @@ namespace Manina.Windows.Forms
     public class ImageListViewItem
     {
         #region Member Variables
+        internal int mIndex;
         private Color mBackColor;
         private Color mForeColor;
         private Guid mGuid;
@@ -4758,7 +4760,7 @@ namespace Manina.Windows.Forms
         /// Gets the index of the item.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the index of the item."), EditorBrowsable(EditorBrowsableState.Advanced)]
-        public int Index { get { return owner.IndexOf(this); } }
+        public int Index { get { return mIndex; } }
         /// <summary>
         /// Gets or sets a value determining if the item is selected.
         /// </summary>
@@ -4915,6 +4917,7 @@ namespace Manina.Windows.Forms
         #region Constructors
         public ImageListViewItem()
         {
+            mIndex = -1;
             owner = null;
 
             mBackColor = Color.Transparent;
