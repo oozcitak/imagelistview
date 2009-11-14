@@ -1,3 +1,4 @@
+#labels Phase-Implementation,Featured
 #Release notes for !ImageListView
 
 = 0.7 (14 November 2009) =
