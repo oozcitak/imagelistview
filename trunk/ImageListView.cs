@@ -613,8 +613,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnDragOver(DragEventArgs e)
         {
-            base.OnDragOver(e);
-
             if (AllowItemDrag && nav.SelfDragging)
             {
                 e.Effect = DragDropEffects.Move;
@@ -651,31 +649,33 @@ namespace Manina.Windows.Forms
             }
             else
                 e.Effect = DragDropEffects.None;
+
+            base.OnDragOver(e);
         }
         /// <summary>
         /// Handles the DragEnter event.
         /// </summary>
         protected override void OnDragEnter(DragEventArgs e)
         {
-            base.OnDragEnter(e);
-
             if (!nav.SelfDragging && e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effect = DragDropEffects.Copy;
             else
                 e.Effect = DragDropEffects.None;
+
+            base.OnDragEnter(e);
         }
         /// <summary>
         /// Handles the DragLeave event.
         /// </summary>
         protected override void OnDragLeave(EventArgs e)
         {
-            base.OnDragLeave(e);
-
             if (AllowItemDrag && nav.SelfDragging)
             {
                 nav.DragIndex = -1;
                 mRenderer.Refresh(true);
             }
+
+            base.OnDragLeave(e);
         }
 
         /// <summary>
@@ -683,8 +683,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnDragDrop(DragEventArgs e)
         {
-            base.OnDragDrop(e);
-
             mRenderer.SuspendPaint();
 
             if (nav.SelfDragging)
@@ -735,6 +733,8 @@ namespace Manina.Windows.Forms
             nav.SelfDragging = false;
 
             mRenderer.ResumePaint();
+
+            base.OnDragDrop(e);
         }
         /// <summary>
         /// Handles the Scroll event of the vScrollBar control.
