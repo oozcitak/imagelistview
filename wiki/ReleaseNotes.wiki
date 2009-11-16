@@ -1,6 +1,11 @@
 #labels Phase-Implementation,Featured
 #Release notes for !ImageListView
 
+= 0.8 (16 November 2009) =
+
+  * Fixed a bug in the OnDragDrop handler. The base class method was being called at the
+start of the function. It is now called at the end, after the drop operation is completed.
+
 = 0.7 (14 November 2009) =
 
   * Reduced the number of locks in worker threads.
