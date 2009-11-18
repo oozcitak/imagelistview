@@ -3,7 +3,7 @@
 
 = 0.9 (18 November 2009) =
 
-  * Fixed a curious bug in the layout code. It appears that Control.Visible returns not what you set in code, but whether the control is actually visible (its parent is visible and it is not under another control, ...) This resulted in a StackOverflow exception if the layout code was called before !ImageListView became visible. Visible property of child scrollbars always returned false because their parent was not visible. It was quite hard to identify the issue, although the fix was straightforward (keep separate variables for scrollbars visible properties).
+  * Fixed a curious bug in the layout code. It appears that Control.Visible returns not what you set in code, but whether the control is actually visible (its parent is visible and it is not under another control, ...) This resulted in a !StackOverflow exception if the layout code was called before !ImageListView became visible. Visible property of child scrollbars always returned false because their parent was not visible. It was quite hard to identify the issue, although the fix was straightforward (keep separate variables for scrollbars visible properties).
 
 = 0.8 (16 November 2009) =
 
