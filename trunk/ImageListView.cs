@@ -2656,31 +2656,34 @@ namespace Manina.Windows.Forms
                     (mImageListView.View == View.Thumbnails ||
                     (mImageListView.View == View.Details && mImageListView.Columns.GetUIColumns().Count != 0)))
                 {
-                    for (int i = mImageListView.layoutManager.FirstPartiallyVisible; i <= mImageListView.layoutManager.LastPartiallyVisible; i++)
+                    if (mImageListView.layoutManager.FirstPartiallyVisible != -1 && mImageListView.layoutManager.LastPartiallyVisible != -1)
                     {
-                        ImageListViewItem item = mImageListView.Items[i];
-
-                        ItemState state = ItemState.None;
-                        bool isSelected;
-                        if (mImageListView.nav.Highlight.TryGetValue(item, out isSelected))
+                        for (int i = mImageListView.layoutManager.FirstPartiallyVisible; i <= mImageListView.layoutManager.LastPartiallyVisible; i++)
                         {
-                            if (isSelected)
+                            ImageListViewItem item = mImageListView.Items[i];
+
+                            ItemState state = ItemState.None;
+                            bool isSelected;
+                            if (mImageListView.nav.Highlight.TryGetValue(item, out isSelected))
+                            {
+                                if (isSelected)
+                                    state |= ItemState.Selected;
+                            }
+                            else if (item.Selected)
                                 state |= ItemState.Selected;
+
+                            if (item.Hovered && mImageListView.nav.Dragging == false)
+                                state |= ItemState.Hovered;
+
+                            if (item.Focused)
+                                state |= ItemState.Focused;
+
+                            Rectangle bounds = mImageListView.layoutManager.GetItemBounds(i);
+                            Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ItemAreaBounds);
+                            g.SetClip(clip);
+
+                            DrawItem(g, item, state, bounds);
                         }
-                        else if (item.Selected)
-                            state |= ItemState.Selected;
-
-                        if (item.Hovered && mImageListView.nav.Dragging == false)
-                            state |= ItemState.Hovered;
-
-                        if (item.Focused)
-                            state |= ItemState.Focused;
-
-                        Rectangle bounds = mImageListView.layoutManager.GetItemBounds(i);
-                        Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ItemAreaBounds);
-                        g.SetClip(clip);
-
-                        DrawItem(g, item, state, bounds);
                     }
                 }
 
@@ -3735,6 +3738,9 @@ namespace Manina.Windows.Forms
             private Size cachedItemSize;
             private int cachedHeaderHeight;
             private Dictionary<Guid, bool> cachedVisibleItems;
+
+            private bool vScrollVisible;
+            private bool hScrollVisible;
             #endregion
 
             #region Properties
@@ -3831,6 +3837,10 @@ namespace Manina.Windows.Forms
             {
                 mImageListView = owner;
                 cachedVisibleItems = new Dictionary<Guid, bool>();
+
+                vScrollVisible = false;
+                hScrollVisible = false;
+
                 Update();
             }
             #endregion
@@ -3944,8 +3954,9 @@ namespace Manina.Windows.Forms
 
                 // Check if we need the horizontal scroll bar
                 bool hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mItemSizeWithMargin.Width);
-                if (hScrollRequired != mImageListView.hScrollBar.Visible)
+                if (hScrollRequired != hScrollVisible)
                 {
+                    hScrollVisible = hScrollRequired;
                     mImageListView.hScrollBar.Visible = hScrollRequired;
                     Update(true);
                     return;
@@ -3953,8 +3964,9 @@ namespace Manina.Windows.Forms
 
                 // Check if we need the vertical scroll bar
                 bool vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
-                if (vScrollRequired != mImageListView.vScrollBar.Visible)
+                if (vScrollRequired != vScrollVisible)
                 {
+                    vScrollVisible = vScrollRequired;
                     mImageListView.vScrollBar.Visible = vScrollRequired;
                     Update(true);
                     return;
