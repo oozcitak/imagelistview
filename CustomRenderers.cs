@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 namespace Manina.Windows.Forms
 {
     /// <summary>
-    /// Mimics Windows XP.
+    /// Mimics Windows XP appearance.
     /// </summary>
     public class XPRenderer : ImageListView.ImageListViewRenderer
     {
@@ -28,7 +28,7 @@ namespace Manina.Windows.Forms
                 // Calculate item size
                 Size itemPadding = new Size(4, 4);
                 itemSize = mImageListView.ThumbnailSize + itemPadding + itemPadding;
-                itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3)+itemPadding.Height ; // textHeight / 3 = vertical space between thumbnail and text
+                itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3) + itemPadding.Height; // textHeight / 3 = vertical space between thumbnail and text
                 return itemSize;
             }
             else
@@ -43,15 +43,15 @@ namespace Manina.Windows.Forms
         /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
         public override void DrawItem(System.Drawing.Graphics g, ImageListViewItem item, ItemState state, System.Drawing.Rectangle bounds)
         {
+            // Paint background
+            using (Brush bItemBack = new SolidBrush(item.BackColor))
+            {
+                g.FillRectangle(bItemBack, bounds);
+            }
+
             if (mImageListView.View == View.Thumbnails)
             {
                 Size itemPadding = new Size(4, 4);
-
-                // Paint background
-                using (Brush bItemBack = new SolidBrush(item.BackColor))
-                {
-                    g.FillRectangle(bItemBack, bounds);
-                }
 
                 // Draw the image
                 Image img = item.ThumbnailImage;
@@ -119,7 +119,41 @@ namespace Manina.Windows.Forms
                 }
             }
             else
-                base.DrawItem(g, item, state, bounds);
+            {
+                if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                {
+                    g.FillRectangle(SystemBrushes.Highlight, bounds);
+                }
+                else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                {
+                    g.FillRectangle(SystemBrushes.GrayText, bounds);
+                }
+
+                Size offset = new Size(2, (bounds.Height - mImageListView.Font.Height) / 2);
+                StringFormat sf = new StringFormat();
+                sf.FormatFlags = StringFormatFlags.NoWrap;
+                sf.Alignment = StringAlignment.Near;
+                sf.LineAlignment = StringAlignment.Center;
+                sf.Trimming = StringTrimming.EllipsisCharacter;
+                // Sub text
+                List<Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
+                RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
+                foreach (Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader column in uicolumns)
+                {
+                    rt.Width = column.Width - 2 * offset.Width;
+                    using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                    {
+                        if ((state & ItemState.Selected)== ItemState.None)
+                            g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                        else
+                            g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                    }
+                    rt.X += column.Width;
+                }
+            }
+
+            if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                ControlPaint.DrawFocusRectangle(g, bounds);
         }
     }
 }
