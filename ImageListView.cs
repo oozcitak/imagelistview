@@ -29,7 +29,6 @@ namespace Manina.Windows.Forms
     [Docking(DockingBehavior.Ask)]
     public class ImageListView : Control
     {
-
         #region Constants
         /// <summary>
         /// Default width of column headers in pixels.
@@ -2979,9 +2978,7 @@ namespace Manina.Windows.Forms
                 {
                     Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, (mImageListView.View == View.Details ? 2 : 4));
                 }
-                if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
-                    ControlPaint.DrawFocusRectangle(g, bounds);
-                else if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
                     {
@@ -3009,6 +3006,12 @@ namespace Manina.Windows.Forms
                     {
                         Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
+                }
+
+                // Focus rectangle
+                if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                {
+                    ControlPaint.DrawFocusRectangle(g, bounds);
                 }
             }
             /// <summary>
