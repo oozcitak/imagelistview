@@ -1,6 +1,10 @@
 #labels Phase-Implementation,Featured
 #Release notes for !ImageListView
 
+= 0.11 (21 November 2009) =
+
+  * Added the Clip property and the !InitializeGraphics virtual function to !ImageListViewRenderer.
+
 = 0.10 (19 November 2009) =
 
   * Fixed an issue where the item border was not drawn if the item had the focus.
