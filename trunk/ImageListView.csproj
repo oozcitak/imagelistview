@@ -41,11 +41,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColumnHeaderCollectionEditor.cs" />
+    <Compile Include="ColumnHeaderCollectionTypeConverter.cs" />
     <Compile Include="CustomRenderers.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Events.cs" />
+    <Compile Include="HitInfo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ImageListView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ImageListViewCacheManager.cs" />
+    <Compile Include="ImageListViewColumnHeader.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageListViewColumnHeaderCollection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageListViewDesigner.cs" />
+    <Compile Include="ImageListViewItem.cs" />
+    <Compile Include="ImageListViewItemCacheManager.cs" />
+    <Compile Include="ImageListViewItemCollection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageListViewLayoutManager.cs">
+    </Compile>
+    <Compile Include="ImageListViewRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageListViewSelectedItemCollection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageListViewSerializer.cs" />
+    <Compile Include="NavInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
