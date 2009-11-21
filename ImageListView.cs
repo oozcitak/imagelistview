@@ -2505,6 +2505,7 @@ namespace Manina.Windows.Forms
         public class ImageListViewRenderer : IDisposable
         {
             #region Member Variables
+            private bool mClip;
             internal ImageListView mImageListView;
             private BufferedGraphicsContext bufferContext;
             private BufferedGraphics bufferGraphics;
@@ -2518,6 +2519,11 @@ namespace Manina.Windows.Forms
             /// Gets the ImageListView owning this item.
             /// </summary>
             public ImageListView ImageListView { get { return mImageListView; } }
+            /// <summary>
+            /// Gets or sets whether the graphics is clipped to the bounds of 
+            /// drawing elements.
+            /// </summary>
+            public bool Clip { get { return mClip; } set { mClip = value; } }
             #endregion
 
             #region Constructors
@@ -2526,6 +2532,7 @@ namespace Manina.Windows.Forms
                 disposed = false;
                 suspendCount = 0;
                 needsPaint = true;
+                mClip = true;
             }
             #endregion
 
@@ -2625,8 +2632,11 @@ namespace Manina.Windows.Forms
                             state |= ColumnState.SeparatorSelected;
 
                         Rectangle bounds = new Rectangle(x, y, column.Width, h);
-                        Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ClientArea);
-                        g.SetClip(clip);
+                        if (mClip)
+                        {
+                            Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ClientArea);
+                            g.SetClip(clip);
+                        }
                         DrawColumnHeader(g, column, state, bounds);
                         x += column.Width;
                         lastX = bounds.Right;
@@ -2638,14 +2648,16 @@ namespace Manina.Windows.Forms
                         if (lastX < mImageListView.layoutManager.ItemAreaBounds.Right)
                         {
                             Rectangle extender = new Rectangle(lastX, mImageListView.layoutManager.ColumnHeaderBounds.Top, mImageListView.layoutManager.ItemAreaBounds.Right - lastX, mImageListView.layoutManager.ColumnHeaderBounds.Height);
-                            g.SetClip(extender);
+                            if (mClip)
+                                g.SetClip(extender);
                             DrawColumnExtender(g, extender);
                         }
                     }
                     else
                     {
                         Rectangle extender = mImageListView.layoutManager.ColumnHeaderBounds;
-                        g.SetClip(extender);
+                        if (mClip)
+                            g.SetClip(extender);
                         DrawColumnExtender(g, extender);
                     }
                 }
@@ -2678,9 +2690,11 @@ namespace Manina.Windows.Forms
                                 state |= ItemState.Focused;
 
                             Rectangle bounds = mImageListView.layoutManager.GetItemBounds(i);
-                            Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ItemAreaBounds);
-                            g.SetClip(clip);
-
+                            if (mClip)
+                            {
+                                Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ItemAreaBounds);
+                                g.SetClip(clip);
+                            }
                             DrawItem(g, item, state, bounds);
                         }
                     }
@@ -2695,14 +2709,18 @@ namespace Manina.Windows.Forms
                     DrawScrollBarFiller(g, filler);
                 }
 
+                g.ResetClip();
                 // Draw the selection rectangle
                 if (mImageListView.nav.Dragging)
                 {
                     Rectangle sel = new Rectangle(System.Math.Min(mImageListView.nav.SelStart.X, mImageListView.nav.SelEnd.X), System.Math.Min(mImageListView.nav.SelStart.Y, mImageListView.nav.SelEnd.Y), System.Math.Abs(mImageListView.nav.SelStart.X - mImageListView.nav.SelEnd.X), System.Math.Abs(mImageListView.nav.SelStart.Y - mImageListView.nav.SelEnd.Y));
                     if (sel.Height > 0 && sel.Width > 0)
                     {
-                        Rectangle selclip = new Rectangle(sel.Left, sel.Top, sel.Width + 1, sel.Height + 1);
-                        g.SetClip(selclip);
+                        if (mClip)
+                        {
+                            Rectangle selclip = new Rectangle(sel.Left, sel.Top, sel.Width + 1, sel.Height + 1);
+                            g.SetClip(selclip);
+                        }
                         g.ExcludeClip(mImageListView.layoutManager.ColumnHeaderBounds);
                         DrawSelectionRectangle(g, sel);
                     }
@@ -2717,7 +2735,8 @@ namespace Manina.Windows.Forms
                         bounds.Offset(mImageListView.layoutManager.ItemSizeWithMargin.Width, 0);
                     bounds.Offset(-mImageListView.ItemMargin.Width, 0);
                     bounds.Width = mImageListView.ItemMargin.Width;
-                    g.SetClip(bounds);
+                    if (mClip)
+                        g.SetClip(bounds);
                     DrawInsertionCaret(g, bounds);
                 }
 
@@ -2742,6 +2761,8 @@ namespace Manina.Windows.Forms
 
                 if (bufferGraphics != null) bufferGraphics.Dispose();
                 bufferGraphics = bufferContext.Allocate(mImageListView.CreateGraphics(), new Rectangle(0, 0, width, height));
+
+                InitializeGraphics(bufferGraphics.Graphics);
             }
             /// <summary>
             /// Releases buffered graphics objects.
@@ -2757,6 +2778,15 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Virtual Methods
+            /// <summary>
+            /// Initializes the System.Drawing.Graphics used to draw
+            /// control elements.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            public virtual void InitializeGraphics(Graphics g)
+            {
+                ;
+            }
             /// <summary>
             /// Returns the height of column headers.
             /// </summary>
