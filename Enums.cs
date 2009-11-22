@@ -85,4 +85,26 @@ namespace Manina.Windows.Forms
         SeparatorHovered = 2,
         SeparatorSelected = 4,
     }
+    /// <summary>
+    /// Represents the order by which items are drawn.
+    /// </summary>
+    public enum ItemDrawOrder
+    {
+        ItemIndex,
+        Normal,
+        Selected,
+        Hovered,
+        NormalSelected,
+        NormalHovered,
+        SelectedNormal,
+        SelectedHovered,
+        HoveredNormal,
+        HoveredSelected,
+        NormalSelectedHovered,
+        NormalHoveredSelected,
+        SelectedNormalHovered,
+        SelectedHoveredNormal,
+        HoveredNormalSelected,
+        HoveredSelectedNormal,
+    }
 }

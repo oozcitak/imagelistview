@@ -21,6 +21,7 @@ namespace Manina.Windows.Forms
             private bool disposed;
             private int suspendCount;
             private bool needsPaint;
+            private ItemDrawOrder mItemDrawOrder;
             #endregion
 
             #region Properties
@@ -33,6 +34,10 @@ namespace Manina.Windows.Forms
             /// drawing elements.
             /// </summary>
             public bool Clip { get { return mClip; } set { mClip = value; } }
+            /// <summary>
+            /// Gets or sets the order by which items are drawn.
+            /// </summary>
+            public ItemDrawOrder ItemDrawOrder { get { return mItemDrawOrder; } set { mItemDrawOrder = value; } }
             #endregion
 
             #region Constructors
@@ -42,6 +47,259 @@ namespace Manina.Windows.Forms
                 suspendCount = 0;
                 needsPaint = true;
                 mClip = true;
+                mItemDrawOrder = ItemDrawOrder.ItemIndex;
+            }
+            #endregion
+
+            #region DrawItemParams
+            /// <summary>
+            /// Represents the paramaters required to draw an item.
+            /// </summary>
+            private struct DrawItemParams
+            {
+                public ImageListViewItem Item;
+                public ItemState State;
+                public Rectangle Bounds;
+
+                public DrawItemParams(ImageListViewItem item, ItemState state, Rectangle bounds)
+                {
+                    Item = item;
+                    State = state;
+                    Bounds = bounds;
+                }
+            }
+            #endregion
+
+            #region ItemDrawOrderComparer
+            /// <summary>
+            /// Compares items by the draw order.
+            /// </summary>
+            private class ItemDrawOrderComparer : IComparer<DrawItemParams>
+            {
+                private ItemDrawOrder mDrawOrder;
+
+                public ItemDrawOrderComparer(ItemDrawOrder drawOrder)
+                {
+                    mDrawOrder = drawOrder;
+                }
+
+                /// <summary>
+                /// Compares items by the draw order.
+                /// </summary>
+                /// <param name="param1">First item to compare.</param>
+                /// <param name="param2">Second item to compare.</param>
+                /// <returns>1 if the first item should be drawn first, 
+                /// -1 if the second item should be drawn first,
+                /// 0 if the two items can be drawn in any order.</returns>
+                public int Compare(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if (ReferenceEquals(param1, param2))
+                        return 0;
+                    if (ReferenceEquals(param1.Item, param2.Item))
+                        return 0;
+
+                    int comparison = 0;
+
+                    if (mDrawOrder == ItemDrawOrder.ItemIndex)
+                    {
+                        comparison = CompareByIndex(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.Normal)
+                    {
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.Selected)
+                    {
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.Hovered)
+                    {
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.NormalSelected)
+                    {
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.NormalHovered)
+                    {
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.SelectedNormal)
+                    {
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.SelectedHovered)
+                    {
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.HoveredNormal)
+                    {
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.HoveredSelected)
+                    {
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.NormalSelectedHovered)
+                    {
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.NormalHoveredSelected)
+                    {
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.SelectedNormalHovered)
+                    {
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.SelectedHoveredNormal)
+                    {
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.HoveredNormalSelected)
+                    {
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+                    else if (mDrawOrder == ItemDrawOrder.HoveredSelectedNormal)
+                    {
+                        comparison = CompareByHovered(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareBySelected(param1, param2);
+                        if (comparison != 0) return comparison;
+                        comparison = CompareByNormal(param1, param2);
+                        if (comparison != 0) return comparison;
+                    }
+
+                    // Compare by zorder
+                    comparison = CompareByZOrder(param1, param2);
+                    if (comparison != 0) return comparison;
+
+                    // Finally compare by index
+                    comparison = CompareByIndex(param1, param2);
+                    return comparison;
+                }
+
+                /// <summary>
+                /// Compares items by their index property.
+                /// </summary>
+                private int CompareByIndex(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if (param1.Item.Index < param2.Item.Index)
+                        return -1;
+                    else if (param1.Item.Index > param2.Item.Index)
+                        return 1;
+                    else
+                        return 0;
+                }
+                /// <summary>
+                /// Compares items by their zorder property.
+                /// </summary>
+                private int CompareByZOrder(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if (param1.Item.ZOrder < param2.Item.ZOrder)
+                        return -1;
+                    else if (param1.Item.ZOrder > param2.Item.ZOrder)
+                        return 1;
+                    else
+                        return 0;
+                }
+                /// <summary>
+                /// Compares items by their neutral state.
+                /// </summary>
+                private int CompareByNormal(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if (param1.State == ItemState.None && param2.State != ItemState.None)
+                        return -1;
+                    else if (param1.State != ItemState.None && param2.State == ItemState.None)
+                        return 1;
+                    else
+                        return 0;
+                }
+                /// <summary>
+                /// Compares items by their selected state.
+                /// </summary>
+                private int CompareBySelected(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if ((param1.State & ItemState.Selected) == ItemState.Selected &&
+                        (param2.State & ItemState.Selected) != ItemState.Selected)
+                        return -1;
+                    else if ((param1.State & ItemState.Selected) != ItemState.Selected &&
+                        (param2.State & ItemState.Selected) == ItemState.Selected)
+                        return 1;
+                    else
+                        return 0;
+                }
+                /// <summary>
+                /// Compares items by their hovered state.
+                /// </summary>
+                private int CompareByHovered(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if ((param1.State & ItemState.Hovered) == ItemState.Hovered)
+                        return -1;
+                    else if ((param2.State & ItemState.Hovered) == ItemState.Hovered)
+                        return 1;
+                    else
+                        return 0;
+                }
+                /// <summary>
+                /// Compares items by their focused state.
+                /// </summary>
+                private int CompareByFocused(DrawItemParams param1, DrawItemParams param2)
+                {
+                    if ((param1.State & ItemState.Focused) == ItemState.Focused)
+                        return -1;
+                    else if ((param2.State & ItemState.Focused) == ItemState.Focused)
+                        return 1;
+                    else
+                        return 0;
+                }
             }
             #endregion
 
@@ -174,40 +432,54 @@ namespace Manina.Windows.Forms
                 // Draw items
                 if (mImageListView.Items.Count > 0 &&
                     (mImageListView.View == View.Thumbnails ||
-                    (mImageListView.View == View.Details && mImageListView.Columns.GetUIColumns().Count != 0)))
+                    (mImageListView.View == View.Details && mImageListView.Columns.GetUIColumns().Count != 0)) &&
+                    mImageListView.layoutManager.FirstPartiallyVisible != -1 &&
+                    mImageListView.layoutManager.LastPartiallyVisible != -1)
                 {
-                    if (mImageListView.layoutManager.FirstPartiallyVisible != -1 && mImageListView.layoutManager.LastPartiallyVisible != -1)
+                    List<DrawItemParams> drawItemParams = new List<DrawItemParams>();
+                    for (int i = mImageListView.layoutManager.FirstPartiallyVisible; i <= mImageListView.layoutManager.LastPartiallyVisible; i++)
                     {
-                        for (int i = mImageListView.layoutManager.FirstPartiallyVisible; i <= mImageListView.layoutManager.LastPartiallyVisible; i++)
+                        ImageListViewItem item = mImageListView.Items[i];
+
+                        // Determine item state
+                        ItemState state = ItemState.None;
+                        bool isSelected;
+                        if (mImageListView.nav.Highlight.TryGetValue(item, out isSelected))
                         {
-                            ImageListViewItem item = mImageListView.Items[i];
-
-                            ItemState state = ItemState.None;
-                            bool isSelected;
-                            if (mImageListView.nav.Highlight.TryGetValue(item, out isSelected))
-                            {
-                                if (isSelected)
-                                    state |= ItemState.Selected;
-                            }
-                            else if (item.Selected)
+                            if (isSelected)
                                 state |= ItemState.Selected;
-
-                            if (item.Hovered && mImageListView.nav.Dragging == false)
-                                state |= ItemState.Hovered;
-
-                            if (item.Focused)
-                                state |= ItemState.Focused;
-
-                            Rectangle bounds = mImageListView.layoutManager.GetItemBounds(i);
-                            if (mClip)
-                            {
-                                Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ItemAreaBounds);
-                                g.SetClip(clip);
-                            }
-                            DrawItem(g, item, state, bounds);
                         }
+                        else if (item.Selected)
+                            state |= ItemState.Selected;
+
+                        if (item.Hovered && mImageListView.nav.Dragging == false)
+                            state |= ItemState.Hovered;
+
+                        if (item.Focused)
+                            state |= ItemState.Focused;
+
+                        // Get item bounds
+                        Rectangle bounds = mImageListView.layoutManager.GetItemBounds(i);
+
+                        // Add to params to be sorted and drawn
+                        drawItemParams.Add(new DrawItemParams(item, state, bounds));
+                    }
+
+                    // Sort items by draw order
+                    drawItemParams.Sort(new ItemDrawOrderComparer(mItemDrawOrder));
+
+                    // Draw items
+                    foreach (DrawItemParams param in drawItemParams)
+                    {
+                        if (mClip)
+                        {
+                            Rectangle clip = Rectangle.Intersect(param.Bounds, mImageListView.layoutManager.ItemAreaBounds);
+                            g.SetClip(clip);
+                        }
+                        DrawItem(g, param.Item, param.State, param.Bounds);
                     }
                 }
+
 
                 // Scrollbar filler
                 if (mImageListView.hScrollBar.Visible && mImageListView.vScrollBar.Visible)
