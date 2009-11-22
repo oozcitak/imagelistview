@@ -18,6 +18,7 @@ namespace Manina.Windows.Forms
         internal ImageListView mImageListView;
         protected internal bool mSelected;
         private string mText;
+        private int mZOrder;
         internal string defaultText;
         // File info
         internal DateTime mDateAccessed;
@@ -204,6 +205,11 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets the draw order of the item.
+        /// </summary>
+        [Category("Appearance"), Browsable(true), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
+        public int ZOrder { get { return mZOrder; } set { mZOrder = value; } }
+        /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>
         [Category("Data"), Browsable(false), Description("Gets the last access date of the image file represented by this item.")]
@@ -278,6 +284,7 @@ namespace Manina.Windows.Forms
 
             mBackColor = Color.Transparent;
             mForeColor = SystemColors.WindowText;
+            mZOrder = 0;
 
             Guid = Guid.NewGuid();
             ImageListView = null;

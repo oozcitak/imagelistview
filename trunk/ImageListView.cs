@@ -365,6 +365,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void SetRenderer(ImageListViewRenderer renderer)
         {
+            if (mRenderer != null)
+                mRenderer.Dispose();
             mRenderer = renderer;
             mRenderer.mImageListView = this;
         }
@@ -1264,6 +1266,9 @@ namespace Manina.Windows.Forms
         {
             itemCacheManager.Stop();
             cacheManager.Stop();
+
+            if (mRenderer != null)
+                mRenderer.Dispose();
 
             base.OnHandleDestroyed(e);
         }
