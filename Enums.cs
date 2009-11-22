@@ -91,15 +91,7 @@ namespace Manina.Windows.Forms
     public enum ItemDrawOrder
     {
         ItemIndex,
-        Normal,
-        Selected,
-        Hovered,
-        NormalSelected,
-        NormalHovered,
-        SelectedNormal,
-        SelectedHovered,
-        HoveredNormal,
-        HoveredSelected,
+        ZOrder,
         NormalSelectedHovered,
         NormalHoveredSelected,
         SelectedNormalHovered,

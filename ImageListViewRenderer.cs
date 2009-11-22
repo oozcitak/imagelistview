@@ -102,65 +102,11 @@ namespace Manina.Windows.Forms
 
                     if (mDrawOrder == ItemDrawOrder.ItemIndex)
                     {
-                        comparison = CompareByIndex(param1, param2);
-                        if (comparison != 0) return comparison;
+                        return CompareByIndex(param1, param2);
                     }
-                    else if (mDrawOrder == ItemDrawOrder.Normal)
+                    else if (mDrawOrder == ItemDrawOrder.ZOrder)
                     {
-                        comparison = CompareByNormal(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.Selected)
-                    {
-                        comparison = CompareBySelected(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.Hovered)
-                    {
-                        comparison = CompareByHovered(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.NormalSelected)
-                    {
-                        comparison = CompareByNormal(param1, param2);
-                        if (comparison != 0) return comparison;
-                        comparison = CompareBySelected(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.NormalHovered)
-                    {
-                        comparison = CompareByNormal(param1, param2);
-                        if (comparison != 0) return comparison;
-                        comparison = CompareByHovered(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.SelectedNormal)
-                    {
-                        comparison = CompareBySelected(param1, param2);
-                        if (comparison != 0) return comparison;
-                        comparison = CompareByNormal(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.SelectedHovered)
-                    {
-                        comparison = CompareBySelected(param1, param2);
-                        if (comparison != 0) return comparison;
-                        comparison = CompareByHovered(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.HoveredNormal)
-                    {
-                        comparison = CompareByHovered(param1, param2);
-                        if (comparison != 0) return comparison;
-                        comparison = CompareByNormal(param1, param2);
-                        if (comparison != 0) return comparison;
-                    }
-                    else if (mDrawOrder == ItemDrawOrder.HoveredSelected)
-                    {
-                        comparison = CompareByHovered(param1, param2);
-                        if (comparison != 0) return comparison;
-                        comparison = CompareBySelected(param1, param2);
-                        if (comparison != 0) return comparison;
+                        return CompareByZOrder(param1, param2);
                     }
                     else if (mDrawOrder == ItemDrawOrder.NormalSelectedHovered)
                     {
