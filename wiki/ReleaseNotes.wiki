@@ -3,7 +3,7 @@
 
 = 0.12 (22 November 2009) =
 
-  * Renderers can now draw items in a specific order using the new !ImageListViewRenderer.!ItemDrawOrder property. A finer control is also possible using the new !ImageListView.ZOrder property.
+  * Renderers can now draw items in a specific order using the new !ImageListViewRenderer.!ItemDrawOrder property. A finer control is also possible using the new !ImageListViewItem.ZOrder property.
   * The previous renderer is now properly disposed when !ImageListView.!SetRenderer is called.
 
 = 0.11 (21 November 2009) =
@@ -16,7 +16,7 @@
 
 = 0.9 (18 November 2009) =
 
-  * Fixed a curious bug in the layout code. It appears that Control.Visible returns not what you set in code, but whether the control is actually visible (the control and its parent are visible) This resulted in a !StackOverflow exception if the layout code was called before !ImageListView became visible. Visible property of child scrollbars always returned false because their parent was not visible. It was quite hard to identify the issue, although the fix was straightforward (keep separate variables for scrollbars visible properties).
+  * Fixed a curious bug in the layout code. It appears that Control.Visible returns not what you set in code, but whether the control is actually visible (the control and its parent are visible) This resulted in a stack overflow if the layout code was called before !ImageListView became visible. Visible property of child scrollbars always returned false because their parent was not visible. It was quite hard to identify the issue, although the fix was straightforward (keep separate variables for scrollbars visible properties).
 
 = 0.8 (16 November 2009) =
 
@@ -36,7 +36,7 @@ Project moved to Google Code.
   * The framework requirement is droppped down to .NET 2.0. This version is identical to previous 3.5 version both feature-wise and performance-wise.
   * Item properties are read by a background thread to speed up item addition.
   * Items can now be reordered by dragging them in the control.
-  * Item details added for Image Dimensions and Resolution.
+  * Item details added for image dimensions and resolution.
   * Fixed a bug while iterating the selected item collection threw an exception.
   * Item file types are now cached. Adding items should be much faster.
   * Fixed a bug where right clicking on the control when the item collection is empty threw an exception.
@@ -45,6 +45,6 @@ Project moved to Google Code.
   * Added drag&drop support. Image files recognized by the .NET framework (whatever Image.!FromStream accepts) can now be dragged on to the control. Also image thumbnails can now be dragged from the control as files. Drag&drop behavior can be customized using the !AllowDrag and !AllowDrop properties.
   * Added a new option for detecting duplicate filenames. When !AllowDuplicateFileNames property is set to false, the control will silently refuse to add an image file, if it already exists in the items collection. Comparison is made between filenames as case-insensitive ordinal string comparison.
   * Fixed a bug where right clicking on selected items cleared the selection.
-  * Fixed a glitch where the control's Text (hidden property) was serialized as null.
+  * Fixed a glitch where the control's text (hidden property) was serialized as null.
   * !ImageListView can now extract embedded EXIF thumbnails. A new property (!UseEmbeddedThumbnails) is added to customize this behavior.
   * A public Index property is added to the !ImageListViewItem class.
