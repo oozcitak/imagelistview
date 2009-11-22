@@ -3,7 +3,7 @@
 
 = 0.12 (22 November 2009) =
 
-  * Renderers can now draw items in a specific order using the new !ImageListViewRenderer.!ItemDrawOrder property. A finer control is also possible using the new !ImageListView.!ZOrder property.
+  * Renderers can now draw items in a specific order using the new !ImageListViewRenderer.!ItemDrawOrder property. A finer control is also possible using the new !ImageListView.ZOrder property.
   * The previous renderer is now properly disposed when !ImageListView.!SetRenderer is called.
 
 = 0.11 (21 November 2009) =
