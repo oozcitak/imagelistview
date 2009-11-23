@@ -1,5 +1,5 @@
+#summary Introduction to ImageListView
 #labels Phase-Design,Featured
-#Introduction to !ImageListView
 
 = Introduction =
 
