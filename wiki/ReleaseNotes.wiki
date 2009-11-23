@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 0.14 (23 November 2009) =
+
+  * !ZoomingRenderer is now threaded. 
+  * Organized custom renderers in a static !ImageListViewRenderers class.
+
 = 0.13 (23 November 2009) =
 
   * Fixed a bug in rendering draw order. 
