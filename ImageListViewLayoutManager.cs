@@ -247,7 +247,7 @@ namespace Manina.Windows.Forms
             if (mRows < 1) mRows = 1;
 
             // Check if we need the horizontal scroll bar
-            bool hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mItemSizeWithMargin.Width);
+            bool hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mCols * mItemSizeWithMargin.Width);
             if (hScrollRequired != hScrollVisible)
             {
                 hScrollVisible = hScrollRequired;
@@ -270,7 +270,7 @@ namespace Manina.Windows.Forms
             mImageListView.hScrollBar.SmallChange = 1;
             mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
             mImageListView.hScrollBar.Minimum = 0;
-            mImageListView.hScrollBar.Maximum = mItemSizeWithMargin.Width;
+            mImageListView.hScrollBar.Maximum = mCols * mItemSizeWithMargin.Width;
             if (mImageListView.ViewOffset.X > mImageListView.hScrollBar.Maximum - mImageListView.hScrollBar.LargeChange + 1)
             {
                 mImageListView.hScrollBar.Value = mImageListView.hScrollBar.Maximum - mImageListView.hScrollBar.LargeChange + 1;

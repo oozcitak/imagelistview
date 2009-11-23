@@ -300,6 +300,50 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region Instance Methods
+        /// <summary>
+        /// Gets the item image.
+        /// </summary>
+        /// <returns>The item image.</returns>
+        public Image GetImage()
+        {
+            return Image.FromFile(mFileName);
+        }
+        /// <summary>
+        /// Returns the sub item item text corresponding to the specified column type.
+        /// </summary>
+        /// <param name="type">The type of information to return.</param>
+        /// <returns>Formatted text for the given column type.</returns>
+        public string GetSubItemText(ColumnType type)
+        {
+            switch (type)
+            {
+                case ColumnType.DateAccessed:
+                    return DateAccessed.ToString("g");
+                case ColumnType.DateCreated:
+                    return DateCreated.ToString("g");
+                case ColumnType.DateModified:
+                    return DateModified.ToString("g");
+                case ColumnType.FileName:
+                    return FileName;
+                case ColumnType.Name:
+                    return Text;
+                case ColumnType.FilePath:
+                    return FilePath;
+                case ColumnType.FileSize:
+                    return Utility.FormatSize(FileSize);
+                case ColumnType.FileType:
+                    return FileType;
+                case ColumnType.Dimension:
+                    return string.Format("{0} x {1}", Dimension.Width, Dimension.Height);
+                case ColumnType.Resolution:
+                    return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
+                default:
+                    throw new ArgumentException("Unknown column type", "type");
+            }
+        }
+        #endregion
+
         #region Helper Methods
         /// <summary>
         /// Updates file info for the image file represented by this item.
@@ -327,39 +371,6 @@ namespace Manina.Windows.Forms
                     mDimension = img.Size;
                     mResolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
                 }
-            }
-        }
-        /// <summary>
-        /// Return the sub item item text corresponding to the specified column type.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        protected internal string GetSubItemText(ColumnType type)
-        {
-            switch (type)
-            {
-                case ColumnType.DateAccessed:
-                    return DateAccessed.ToString("g");
-                case ColumnType.DateCreated:
-                    return DateCreated.ToString("g");
-                case ColumnType.DateModified:
-                    return DateModified.ToString("g");
-                case ColumnType.FileName:
-                    return FileName;
-                case ColumnType.Name:
-                    return Text;
-                case ColumnType.FilePath:
-                    return FilePath;
-                case ColumnType.FileSize:
-                    return Utility.FormatSize(FileSize);
-                case ColumnType.FileType:
-                    return FileType;
-                case ColumnType.Dimension:
-                    return string.Format("{0} x {1}", Dimension.Width, Dimension.Height);
-                case ColumnType.Resolution:
-                    return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
-                default:
-                    throw new ArgumentException("Unknown column type", "type");
             }
         }
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.ComponentModel;
 
 
 namespace Manina.Windows.Forms
@@ -12,50 +13,59 @@ namespace Manina.Windows.Forms
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
     /// <param name="e">A ColumnClickEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ColumnClickEventHandler(object sender, ColumnClickEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ColumnWidthChanged event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
     /// <param name="e">A ColumnEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ColumnWidthChangedEventHandler(object sender, ColumnEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ItemClick event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
     /// <param name="e">A ItemClickEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ItemClickEventHandler(object sender, ItemClickEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ItemDoubleClick event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
     /// <param name="e">A ItemClickEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ItemDoubleClickEventHandler(object sender, ItemClickEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ThumbnailCaching event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
     /// <param name="e">A ItemEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ThumbnailCachingEventHandler(object sender, ItemEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ThumbnailCached event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
     /// <param name="e">A ItemEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ThumbnailCachedEventHandler(object sender, ItemEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ThumbnailCached event. 
     /// </summary>
     /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid);
     /// <summary>
     /// Represents the method that will handle the Refresh event. 
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void RefreshEventHandlerInternal();
     /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
     /// <param name="guid">The guid of the item to check visibility.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate bool CheckItemVisibleInternal(Guid guid);
     #endregion
 

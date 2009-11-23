@@ -66,13 +66,13 @@ namespace Manina.Windows.Forms
                     new ImageListViewColumnHeader(ColumnType.Name),
                     new ImageListViewColumnHeader(ColumnType.FileSize),
                     new ImageListViewColumnHeader(ColumnType.DateModified),
+                    new ImageListViewColumnHeader(ColumnType.Dimension),
+                    new ImageListViewColumnHeader(ColumnType.Resolution),
                     new ImageListViewColumnHeader(ColumnType.FilePath),
                     new ImageListViewColumnHeader(ColumnType.FileType),
                     new ImageListViewColumnHeader(ColumnType.FileName),
                     new ImageListViewColumnHeader(ColumnType.DateCreated),
                     new ImageListViewColumnHeader(ColumnType.DateAccessed),
-                    new ImageListViewColumnHeader(ColumnType.Dimension),
-                    new ImageListViewColumnHeader(ColumnType.Resolution),
                };
                 for (int i = 0; i < mItems.Length; i++)
                 {
