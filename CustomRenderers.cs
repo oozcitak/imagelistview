@@ -91,38 +91,38 @@ namespace Manina.Windows.Forms
                 // Paint background
                 using (Brush bBack = new SolidBrush(mImageListView.BackColor))
                 {
-                    Utility.FillRoundedRectangle(g, bBack, bounds, 4);
+                    Utility.FillRoundedRectangle(g, bBack, bounds, 5);
                 }
                 using (Brush bItemBack = new SolidBrush(item.BackColor))
                 {
-                    Utility.FillRoundedRectangle(g, bItemBack, bounds, 4);
+                    Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
                 }
                 if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                     {
-                        Utility.FillRoundedRectangle(g, bSelected, bounds, 4);
+                        Utility.FillRoundedRectangle(g, bSelected, bounds, 5);
                     }
                 }
                 else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
                     {
-                        Utility.FillRoundedRectangle(g, bGray64, bounds, 4);
+                        Utility.FillRoundedRectangle(g, bGray64, bounds, 5);
                     }
                 }
                 if (((state & ItemState.Hovered) != ItemState.None))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(8, SystemColors.Highlight), Color.FromArgb(32, SystemColors.Highlight), LinearGradientMode.Vertical))
                     {
-                        Utility.FillRoundedRectangle(g, bHovered, bounds, 4);
+                        Utility.FillRoundedRectangle(g, bHovered, bounds, 5);
                     }
                 }
 
                 // Draw the image
                 g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
                 // Draw image border
-                if (img.Width > 32)
+                if (imageWidth > 32)
                 {
                     using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                     {
