@@ -1,6 +1,13 @@
 #labels Phase-Implementation,Featured
 #Release notes for !ImageListView
 
+= 0.13 (23 November 2009) =
+
+  * Fixed a bug in rendering draw order. 
+  * Added the !GetImage() method to !ImageListViewItem. 
+  * Added !ItemAreaBounds and !ColumnHeaderBounds properties to !ImageListViewRenderer.
+  * Added new custom renderers.
+
 = 0.12 (22 November 2009) =
 
   * Renderers can now draw items in a specific order using the new !ImageListViewRenderer.!ItemDrawOrder property. A finer control is also possible using the new !ImageListViewItem.ZOrder property.
