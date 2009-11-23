@@ -30,10 +30,20 @@ namespace Manina.Windows.Forms
             private Image cachedImage = null;
             private object lockObject = new object();
             private Thread cacheThread;
+            private float mZoomRatio;
 
             public ZoomingRenderer()
+                : this(0.5f)
+            {
+                ;
+            }
+
+            public ZoomingRenderer(float zoomRatio)
                 : base()
             {
+                if (zoomRatio < 0.0f) zoomRatio = 0.0f;
+                if (zoomRatio > 1.0f) zoomRatio = 1.0f;
+                mZoomRatio = zoomRatio;
                 cacheThread = new Thread(new ParameterizedThreadStart(DoWork));
                 cacheThread.IsBackground = true;
                 cacheThread.Start(this);
