@@ -38,6 +38,14 @@ namespace Manina.Windows.Forms
             /// Gets or sets the order by which items are drawn.
             /// </summary>
             public ItemDrawOrder ItemDrawOrder { get { return mItemDrawOrder; } set { mItemDrawOrder = value; } }
+            /// <summary>
+            /// Gets the rectangle bounding the item display area.
+            /// </summary>
+            public Rectangle ItemAreaBounds { get { return mImageListView.layoutManager.ItemAreaBounds; } }
+            /// <summary>
+            /// Gets the rectangle bounding the column headers.
+            /// </summary>
+            public Rectangle ColumnHeaderBounds { get { return mImageListView.layoutManager.ColumnHeaderBounds; } }
             #endregion
 
             #region Constructors
@@ -110,56 +118,56 @@ namespace Manina.Windows.Forms
                     }
                     else if (mDrawOrder == ItemDrawOrder.NormalSelectedHovered)
                     {
-                        comparison = CompareByNormal(param1, param2);
+                        comparison = -CompareByHovered(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareBySelected(param1, param2);
+                        comparison = -CompareBySelected(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByHovered(param1, param2);
+                        comparison = -CompareByNormal(param1, param2);
                         if (comparison != 0) return comparison;
                     }
                     else if (mDrawOrder == ItemDrawOrder.NormalHoveredSelected)
                     {
-                        comparison = CompareByNormal(param1, param2);
+                        comparison = -CompareBySelected(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByHovered(param1, param2);
+                        comparison = -CompareByHovered(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareBySelected(param1, param2);
+                        comparison = -CompareByNormal(param1, param2);
                         if (comparison != 0) return comparison;
                     }
                     else if (mDrawOrder == ItemDrawOrder.SelectedNormalHovered)
                     {
-                        comparison = CompareBySelected(param1, param2);
+                        comparison = -CompareByHovered(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByNormal(param1, param2);
+                        comparison = -CompareByNormal(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByHovered(param1, param2);
+                        comparison = -CompareBySelected(param1, param2);
                         if (comparison != 0) return comparison;
                     }
                     else if (mDrawOrder == ItemDrawOrder.SelectedHoveredNormal)
                     {
-                        comparison = CompareBySelected(param1, param2);
+                        comparison = -CompareByNormal(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByHovered(param1, param2);
+                        comparison = -CompareByHovered(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByNormal(param1, param2);
+                        comparison = -CompareBySelected(param1, param2);
                         if (comparison != 0) return comparison;
                     }
                     else if (mDrawOrder == ItemDrawOrder.HoveredNormalSelected)
                     {
-                        comparison = CompareByHovered(param1, param2);
+                        comparison = -CompareBySelected(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByNormal(param1, param2);
+                        comparison = -CompareByNormal(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareBySelected(param1, param2);
+                        comparison = -CompareByHovered(param1, param2);
                         if (comparison != 0) return comparison;
                     }
                     else if (mDrawOrder == ItemDrawOrder.HoveredSelectedNormal)
                     {
-                        comparison = CompareByHovered(param1, param2);
+                        comparison = -CompareByNormal(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareBySelected(param1, param2);
+                        comparison = -CompareBySelected(param1, param2);
                         if (comparison != 0) return comparison;
-                        comparison = CompareByNormal(param1, param2);
+                        comparison = -CompareByHovered(param1, param2);
                         if (comparison != 0) return comparison;
                     }
 
@@ -322,6 +330,8 @@ namespace Manina.Windows.Forms
 
                 // Draw Border
                 g.ResetClip();
+                Rectangle rc = mImageListView.ClientRectangle;
+
                 if (mImageListView.BorderStyle == BorderStyle.FixedSingle)
                     ControlPaint.DrawBorder3D(g, mImageListView.ClientRectangle, Border3DStyle.Flat);
                 else if (mImageListView.BorderStyle == BorderStyle.Fixed3D)
@@ -350,6 +360,8 @@ namespace Manina.Windows.Forms
                             Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ClientArea);
                             g.SetClip(clip);
                         }
+                        else
+                            g.SetClip(mImageListView.DisplayRectangle);
                         DrawColumnHeader(g, column, state, bounds);
                         x += column.Width;
                         lastX = bounds.Right;
@@ -363,6 +375,8 @@ namespace Manina.Windows.Forms
                             Rectangle extender = new Rectangle(lastX, mImageListView.layoutManager.ColumnHeaderBounds.Top, mImageListView.layoutManager.ItemAreaBounds.Right - lastX, mImageListView.layoutManager.ColumnHeaderBounds.Height);
                             if (mClip)
                                 g.SetClip(extender);
+                            else
+                                g.SetClip(mImageListView.DisplayRectangle);
                             DrawColumnExtender(g, extender);
                         }
                     }
@@ -371,10 +385,12 @@ namespace Manina.Windows.Forms
                         Rectangle extender = mImageListView.layoutManager.ColumnHeaderBounds;
                         if (mClip)
                             g.SetClip(extender);
+                        else
+                            g.SetClip(mImageListView.DisplayRectangle);
                         DrawColumnExtender(g, extender);
                     }
                 }
-
+                
                 // Draw items
                 if (mImageListView.Items.Count > 0 &&
                     (mImageListView.View == View.Thumbnails ||
@@ -422,6 +438,8 @@ namespace Manina.Windows.Forms
                             Rectangle clip = Rectangle.Intersect(param.Bounds, mImageListView.layoutManager.ItemAreaBounds);
                             g.SetClip(clip);
                         }
+                        else
+                            g.SetClip(mImageListView.DisplayRectangle);
                         DrawItem(g, param.Item, param.State, param.Bounds);
                     }
                 }
@@ -448,6 +466,8 @@ namespace Manina.Windows.Forms
                             Rectangle selclip = new Rectangle(sel.Left, sel.Top, sel.Width + 1, sel.Height + 1);
                             g.SetClip(selclip);
                         }
+                        else
+                            g.SetClip(mImageListView.DisplayRectangle);
                         g.ExcludeClip(mImageListView.layoutManager.ColumnHeaderBounds);
                         DrawSelectionRectangle(g, sel);
                     }
@@ -464,6 +484,8 @@ namespace Manina.Windows.Forms
                     bounds.Width = mImageListView.ItemMargin.Width;
                     if (mClip)
                         g.SetClip(bounds);
+                    else
+                        g.SetClip(mImageListView.DisplayRectangle);
                     DrawInsertionCaret(g, bounds);
                 }
 
@@ -501,6 +523,8 @@ namespace Manina.Windows.Forms
 
                 if (bufferGraphics != null)
                     bufferGraphics.Dispose();
+
+                OnDispose();
             }
             #endregion
 
@@ -535,14 +559,14 @@ namespace Manina.Windows.Forms
                 // Reference text height
                 int textHeight = mImageListView.Font.Height;
 
-                if (mImageListView.View == View.Thumbnails)
+                if (view == View.Thumbnails)
                 {
                     // Calculate item size
                     Size itemPadding = new Size(4, 4);
                     itemSize = mImageListView.ThumbnailSize + itemPadding + itemPadding;
                     itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3); // textHeight / 3 = vertical space between thumbnail and text
                 }
-                else if (mImageListView.View == View.Details)
+                else if (view == View.Details)
                 {
                     // Calculate total column width
                     int colWidth = 0;
@@ -787,7 +811,7 @@ namespace Manina.Windows.Forms
                 sf.Trimming = StringTrimming.EllipsisCharacter;
 
                 // Paint background
-                if (mImageListView.Focused && column.Hovered)
+                if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                     {
@@ -887,6 +911,13 @@ namespace Manina.Windows.Forms
                     bounds.Width = 2;
                     g.FillRectangle(b, bounds);
                 }
+            }
+            /// <summary>
+            /// Releases managed resources.
+            /// </summary>
+            public virtual void OnDispose()
+            {
+                ;
             }
             #endregion
         }
