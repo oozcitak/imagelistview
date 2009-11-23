@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 0.15 (24 November 2009) =
+
+  * Zoom percentage can now be specified in the constructor of !ZoomingRenderer.
+
 = 0.14 (23 November 2009) =
 
   * !ZoomingRenderer is now threaded. 
