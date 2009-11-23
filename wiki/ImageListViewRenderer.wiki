@@ -25,7 +25,7 @@ _The default renderer in action. Item states from left-to-right: selected, focus
 
 http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.xp.jpg
 
-_A renderer mimicking the Windos XP look. Item states from left-to-right: selected, focused._
+_A renderer mimicking the Windows XP look. Item states from left-to-right: selected, focused._
 
 === !TilesRenderer ===
 
