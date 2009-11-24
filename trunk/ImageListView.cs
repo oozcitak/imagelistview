@@ -97,12 +97,6 @@ namespace Manina.Windows.Forms
         [Category("Appearance"), Description("Gets or sets the border style of the control."), DefaultValue(typeof(BorderStyle), "Fixed3D")]
         public BorderStyle BorderStyle { get { return mBorderStyle; } set { mBorderStyle = value; mRenderer.Refresh(); } }
         /// <summary>
-        /// Gets ot sets the maximum number of thumbnail images to cache.
-        /// A value of 0 will disable the cache size limit.
-        /// </summary>
-        [Category("Behavior"), DesignOnly(true), Description("Gets ot sets the maximum number of thumbnail images to cache. A value of 0 will disable the cache size limit."), DefaultValue(1000)]
-        public int CacheSize { get { return cacheManager.CacheSize; } set { cacheManager.CacheSize = value; } }
-        /// <summary>
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
         [Category("Appearance"), Description("Gets the collection of columns of the image list view."), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -289,7 +283,7 @@ namespace Manina.Windows.Forms
 
             nav = new NavInfo();
 
-            cacheManager = new ImageListViewCacheManager(this, 1000);
+            cacheManager = new ImageListViewCacheManager(this);
             cacheManager.Start();
             itemCacheManager = new ImageListViewItemCacheManager(this);
             itemCacheManager.Start();
@@ -369,6 +363,7 @@ namespace Manina.Windows.Forms
                 mRenderer.Dispose();
             mRenderer = renderer;
             mRenderer.mImageListView = this;
+            mRenderer.Refresh(true);
         }
         /// <summary>
         /// Sorts the items.

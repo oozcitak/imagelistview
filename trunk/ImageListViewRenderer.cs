@@ -312,6 +312,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void Render(Graphics graphics)
             {
+                if (disposed)
+                    return;
+
                 if (bufferGraphics == null)
                     RecreateBuffer();
 
@@ -390,7 +393,7 @@ namespace Manina.Windows.Forms
                         DrawColumnExtender(g, extender);
                     }
                 }
-                
+
                 // Draw items
                 if (mImageListView.Items.Count > 0 &&
                     (mImageListView.View == View.Thumbnails ||
