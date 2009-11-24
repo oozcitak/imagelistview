@@ -268,11 +268,11 @@ When set to `true`, Graphics are not clipped when drawing elements. !ZoomingRend
 
 Used to set a particular draw order. Possible values are:
 
-  * !ItemIndex: Draw order is determined by item insertion index. (Default)
-  * ZOrder: Draw order is determined by the ZOrder properties of items.
-  * !NormalSelectedHovered: Normal (neither selected nor hovered) items are drawn first, followed by selected items and hovered items.
-  * !NormalHoveredSelected: Normal items are drawn first, followed by hovered items and selected items.
-  * !SelectedNormalHovered: Selected items are drawn first, followed by normal items and hovered items.
-  * !SelectedHoveredNormal: Selected items are drawn first, followed by hovered items and normal items.
-  * !HoveredNormalSelected: Hovered items are drawn first, followed by normal items and selected items.
-  * !HoveredSelectedNormal: Hovered items are drawn first, followed by selected items and normal items.
+  * `ItemIndex`: Draw order is determined by item insertion index. (Default)
+  * `ZOrder`: Draw order is determined by the ZOrder properties of items.
+  * `NormalSelectedHovered`: Normal (neither selected nor hovered) items are drawn first, followed by selected items and hovered items.
+  * `NormalHoveredSelected`: Normal items are drawn first, followed by hovered items and selected items.
+  * `SelectedNormalHovered`: Selected items are drawn first, followed by normal items and hovered items.
+  * `SelectedHoveredNormal`: Selected items are drawn first, followed by hovered items and normal items.
+  * `HoveredNormalSelected`: Hovered items are drawn first, followed by normal items and selected items.
+  * `HoveredSelectedNormal`: Hovered items are drawn first, followed by selected items and normal items.
