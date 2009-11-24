@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 0.16 (24 November 2009) =
+
+  * Caption font of !ZoomingRenderer is now disposed properly. 
+  * Removed the !CacheSize property from !ImageListView and !ImageListViewCacheManager. It wasn't properly implemented and resulted in deadlocks. 
+  * Added a check to !ImageListViewRenderer.Render() to return immediately if the renderer is disposed.
+
 = 0.15 (24 November 2009) =
 
   * Zoom percentage can now be specified in the constructor of !ZoomingRenderer.
