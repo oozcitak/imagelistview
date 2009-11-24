@@ -21,7 +21,6 @@ namespace Manina.Windows.Forms
 
         #region Member Variables
         private ImageListView mImageListView;
-        private int mCacheSize;
         private Thread mThread;
 
         private Dictionary<Guid, CacheItem> toCache;
@@ -79,10 +78,6 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
-        /// Gets or sets the cache limit. A value of 0 disables the limit.
-        /// </summary>
-        public int CacheSize { get { return mCacheSize; } set { mCacheSize = value; } }
-        /// <summary>
         /// Gets the owner image list view.
         /// </summary>
         public ImageListView ImageListView { get { return mImageListView; } }
@@ -93,10 +88,9 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructor
-        public ImageListViewCacheManager(ImageListView owner, int cacheSize)
+        public ImageListViewCacheManager(ImageListView owner)
         {
             mImageListView = owner;
-            mCacheSize = cacheSize;
 
             toCache = new Dictionary<Guid, CacheItem>();
             thumbCache = new Dictionary<Guid, CacheItem>();
@@ -306,30 +300,6 @@ namespace Manina.Windows.Forms
                             else
                                 owner.thumbCache.Add(guid, new CacheItem(filename, thumbsize, thumb, CacheState.Cached));
                             thumbnailCreated = true;
-
-                            // Do some cleanup if we exceeded the cache limit
-                            int itemsremoved = 0;
-                            int cachesize = owner.mCacheSize;
-                            if (cachesize != 0 && owner.thumbCache.Count > cachesize)
-                            {
-                                for (int i = owner.thumbCache.Count - 1; i >= 0; i--)
-                                {
-                                    Guid iguid = Guid.Empty;
-                                    foreach (KeyValuePair<Guid, CacheItem> item in owner.thumbCache)
-                                    {
-                                        iguid = item.Key;
-                                        break;
-                                    }
-                                    bool isvisible = (bool)owner.ImageListView.Invoke(new CheckItemVisibleInternal(owner.mImageListView.IsItemVisible), guid);
-                                    if (!isvisible)
-                                    {
-                                        owner.thumbCache.Remove(iguid);
-                                        itemsremoved++;
-                                        if (itemsremoved >= cachesize / 2)
-                                            break;
-                                    }
-                                }
-                            }
                         }
                     }
                     if (thumbnailCreated)

@@ -16,6 +16,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class DefaultRenderer : ImageListView.ImageListViewRenderer
         {
+            public DefaultRenderer()
+                : base()
+            {
+                ;
+            }
         }
         #endregion
 
@@ -284,23 +289,39 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class TilesRenderer : ImageListView.ImageListViewRenderer
         {
-            private Font font = null;
+            private Font font;
             private int tileSize;
             private int textHeight;
 
             public TilesRenderer()
                 : this(180)
             {
+                ;
             }
 
             public TilesRenderer(int tileWidth)
+                : base()
             {
                 tileSize = tileWidth;
             }
 
             public override void OnDispose()
             {
-                font.Dispose();
+                if (font != null)
+                    font.Dispose();
+            }
+
+            /// <summary>
+            /// Initializes the System.Drawing.Graphics used to draw
+            /// control elements.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            public override void InitializeGraphics(Graphics g)
+            {
+                base.InitializeGraphics(g);
+
+                if (font == null)
+                    font = new Font(mImageListView.Font, FontStyle.Bold);
             }
 
             /// <summary>
@@ -312,8 +333,6 @@ namespace Manina.Windows.Forms
                 if (view == View.Thumbnails)
                 {
                     Size itemSize = new Size();
-                    if (font == null)
-                        font = new Font(mImageListView.Font, FontStyle.Bold);
                     textHeight = (int)(5.8f * (float)font.Height);
 
                     // Calculate item size
