@@ -43,6 +43,14 @@ _Tiles renderer displays items with more details. Item states from top-to-bottom
 
 === !ZoomingRenderer ===
 
+You can set the zoom factor in the constructor.
+
+{{{
+// Create a new ZoomingRenderer and set the
+// zoom factor to 50%
+myImageListView.SetRenderer(new ImageListViewRenderers.ZoomingRenderer(0.5f));
+}}}
+
 http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.zooming.jpg
 
 _Zooming renderer displays large items on mouse over._
