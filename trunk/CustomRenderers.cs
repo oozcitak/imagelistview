@@ -124,7 +124,7 @@ namespace Manina.Windows.Forms
                     // Zoom on mouse over
                     if ((state & ItemState.Hovered) != ItemState.None)
                     {
-                        bounds.Inflate((int)(bounds.Width * 0.5f), (int)(bounds.Height * 0.5f));
+                        bounds.Inflate((int)(bounds.Width * mZoomRatio), (int)(bounds.Height * mZoomRatio));
                         if (bounds.Bottom > ItemAreaBounds.Bottom)
                             bounds.Y = ItemAreaBounds.Bottom - bounds.Height;
                         if (bounds.Top < ItemAreaBounds.Top)
