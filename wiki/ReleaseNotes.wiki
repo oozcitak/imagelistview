@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 0.17 (26 November 2009) =
+
+  * Maximum size of the thumbnail cache can now be (approximately) set by the user. Added the !ImageListView.!CacheLimit property for this purpose. 
+  * Removing items now correctly removes associated thumbnails from the cache. To decrease the number of locks, deleted item thumbnails are removed from the cache in batches of 25% of !ImageListView.!CacheLimit.
+
 = 0.16 (24 November 2009) =
 
   * Caption font of !TiesRenderer is now disposed properly. 
