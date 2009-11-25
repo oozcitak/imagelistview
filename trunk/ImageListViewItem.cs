@@ -193,13 +193,13 @@ namespace Manina.Windows.Forms
                         return img;
                     else
                     {
-                        mImageListView.cacheManager.AddToCache(Guid, FileName);
+                        mImageListView.cacheManager.Add(Guid, FileName);
                         return mImageListView.DefaultImage;
                     }
                 }
                 else
                 {
-                    mImageListView.cacheManager.AddToCache(Guid, FileName);
+                    mImageListView.cacheManager.Add(Guid, FileName);
                     return mImageListView.DefaultImage;
                 }
             }
@@ -247,9 +247,9 @@ namespace Manina.Windows.Forms
                     isDirty = true;
                     if (mImageListView != null)
                     {
-                        mImageListView.itemCacheManager.AddToCache(this);
-                        if (mImageListView.cacheManager.RemoveFromCache(Guid))
-                            mImageListView.Refresh();
+                        mImageListView.cacheManager.Remove(Guid);
+                        mImageListView.itemCacheManager.Add(this);
+                        mImageListView.Refresh();
                     }
                 }
             }

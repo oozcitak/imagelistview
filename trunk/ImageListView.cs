@@ -29,6 +29,8 @@ namespace Manina.Windows.Forms
 
         #region Member Variables
         private BorderStyle mBorderStyle;
+        private int mCacheLimitAsItemCount;
+        private long mCacheLimitAsMemory;
         private ImageListViewColumnHeaderCollection mColumns;
         private Image mDefaultImage;
         private Image mErrorImage;
@@ -96,6 +98,44 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border style of the control."), DefaultValue(typeof(BorderStyle), "Fixed3D")]
         public BorderStyle BorderStyle { get { return mBorderStyle; } set { mBorderStyle = value; mRenderer.Refresh(); } }
+        /// <summary>
+        /// Gets or sets the cache limit as either the count of thumbnail images or the memory allocated for cache (e.g. 10MB).
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets the cache limit as either the count of thumbnail images or the memory allocated for cache (e.g. 10MB)."), DefaultValue("20MB")]
+        public string CacheLimit
+        {
+            get
+            {
+                if (mCacheLimitAsMemory != 0)
+                    return (mCacheLimitAsMemory / 1024 / 1024).ToString() + "MB";
+                else
+                    return mCacheLimitAsItemCount.ToString();
+            }
+            set
+            {
+                string slimit = value;
+                int limit = 0;
+                if ((slimit.EndsWith("MB", StringComparison.OrdinalIgnoreCase) &&
+                    int.TryParse(slimit.Substring(0, slimit.Length - 2).Trim(), out limit)) ||
+                    (slimit.EndsWith("MiB", StringComparison.OrdinalIgnoreCase) &&
+                    int.TryParse(slimit.Substring(0, slimit.Length - 3).Trim(), out limit)))
+                {
+                    mCacheLimitAsItemCount = 0;
+                    mCacheLimitAsMemory = limit * 1024 * 1024;
+                    if (cacheManager != null)
+                        cacheManager.CacheLimitAsMemory = mCacheLimitAsMemory;
+                }
+                else if (int.TryParse(slimit, out limit))
+                {
+                    mCacheLimitAsMemory = 0;
+                    mCacheLimitAsItemCount = limit;
+                    if (cacheManager != null)
+                        cacheManager.CacheLimitAsItemCount = mCacheLimitAsItemCount;
+                }
+                else
+                    throw new ArgumentException("Cache limit must be specified as either the count of thumbnail images or the memory allocated for cache (eg 10MB)", "value");
+            }
+        }
         /// <summary>
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
@@ -186,7 +226,7 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
-                    cacheManager.Clean();
+                    cacheManager.Clear();
                     mRenderer.Refresh();
                 }
             }
@@ -206,7 +246,7 @@ namespace Manina.Windows.Forms
                 if (mUseEmbeddedThumbnails != value)
                 {
                     mUseEmbeddedThumbnails = value;
-                    cacheManager.Clean();
+                    cacheManager.Clear();
                     mRenderer.Refresh();
                 }
             }
@@ -250,6 +290,8 @@ namespace Manina.Windows.Forms
             AllowItemDrag = false;
             BackColor = SystemColors.Window;
             mBorderStyle = BorderStyle.Fixed3D;
+            mCacheLimitAsItemCount = 0;
+            mCacheLimitAsMemory = 20 * 1024 * 1024;
             mColumns = new ImageListViewColumnHeaderCollection(this);
             DefaultImage = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAdRJREFUOE+lk81LG1EUxeufVXFVUcSNlFIJ6ErUjaQUtYrfxrgQQewq2NKWVpN0nKdGRV1ELZRWdO9ClMyorUnTmMxnzAxicnrfWKIxUUEHfsN83Dn3zH3nlQF48qiDCzT0iROubhavdgtaeWsJmunZNSrbBO15pzDpNOcnVw/7G5HlnGGaMNMWDEInVAcbimkjZdg4dbAQV3TUvhbVvADvrBsmGj0+dH0KYuCLH72fGXqnw+ifCWPQH8ZwcB1eYQMtw5NI6Baq3EzLC1SQbd7Z41/DfMTAonyGkGQgJGcQOrSwdGRj+fgcK78vMMa+Ia6WEOCW+cvVaA6rJ9lb4TV/1Aw5EAsd8P/1BtawKJ2RA+ospcmNDnZgYo5g+wYWDlSMBlYQU9LFAopp4ZXvAz5uxzC19Qu+n4cY29zBSPgE3v+8+76LvvcBxFIlHKRouvVDQXSI8iWzEjoECe1fIwW8HPAXC/C1T9JkXSNzeDMfvRNeE73pgAucao8QeNoc1JIk8KzJ47i4C14TTWZQ2XZtFcodgQz24lkidw9ZErAKBWrcwnEiqUCjQWoUW9WBYkz3ShE2Ek6U2VWUX3SK43Xt7AcPB7d2H7QPNPrmbT7K/OKh/ANGwthSNAtyCAAAAABJRU5ErkJggg==");
             ErrorImage = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAnpJREFUOE+lk/9LE3EYx+tf0TDtCyERhD9ofkHMvhg780t6zE3nZi2njExqN/dNckWihphEqJlDISiwgkpNJCQijLKIuozUbmtufpl3zpsF7+4+cDeViKAHnoODz/v1fp7n83x2AtjxXyEDNuev5rOJG54aJuYysusOA79mr+R5m46NXNIyyxfpxO3nt4glIRVzmfxL7loIvg6ID3tJ8r52BBkTQtZSf7C+iNoMUQExt4kSndVCpMuDn6NDEPuvIuo9R1K848XGyCDCHU34btYIczUFKoQARKcxIdpk4Fa63ES85qokqQRv14G3VSD2xIeF65fxtSqfY/V5CWR+8kfq0x52muNipx6CQ68CpP6x0qjFcgMN8dEAZupofKSz7SpAOsDKfYp9LUSoOCoEWbhkLUe4rgyRGy6Eb3rxriSdVQGLDWVR8XEfBI+RlKo4KgBZGKo9gwVzKYIWLSKDtzBFpUVVQLC+OLo+3ItVh0EtVXbc+DRNGLLwR00JAsZiBMw0IgPdeFVwKA7gzmvYlZ5WCN0etVTZMXK7Dfx9HxH6DUXg9KcR8jIItDdjMj813sKs6aT9m7UC68N31VJlRyVk4byuEHNaCqtDPXirO4WJ3P3xIX6pPJrwuSKX87c0Yu1Bv+q42OGV7r6FCGdpDRHPMBaM5+zlxrJS4tcoD+NDeRY1XZohzHsuQLjXh/A1aWmM5ZivLsPCFUYanCS2WfA8O0UYzdy9dZGU1XxTmEa91hz2v6/SINAmzaO3E4s9neBa3Ziij2M0M9n/LCPpz6usQF6eOJg4eSyVeZF3gJ3I3ceP5+zhx7KS2ZEjSczT9F1/f0zbX9q//P8GR0WnSFUgshMAAAAASUVORK5CYII=");
@@ -293,6 +335,13 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Instance Methods
+        /// <summary>
+        /// Clears the thumbnail cache.
+        /// </summary>
+        public void ClearThumbnailCache()
+        {
+            cacheManager.Clear();
+        }
         /// <summary>
         /// Temporarily suspends the layout logic for the control.
         /// </summary>
@@ -591,6 +640,28 @@ namespace Manina.Windows.Forms
             /// collection editor.
             mColumns = columns;
             mRenderer.Refresh();
+        }
+        /// <summary>
+        /// Gets the guids of visible items.
+        /// </summary>
+        internal Dictionary<Guid, bool> GetVisibleItems()
+        {
+            Dictionary<Guid, bool> visible = new Dictionary<Guid, bool>();
+            if (layoutManager.FirstPartiallyVisible != -1 && layoutManager.LastPartiallyVisible != -1)
+            {
+                int start = layoutManager.FirstPartiallyVisible;
+                int end = layoutManager.LastPartiallyVisible;
+
+                start -= layoutManager.Cols * layoutManager.Rows;
+                end += layoutManager.Cols * layoutManager.Rows;
+
+                start = Math.Min(mItems.Count - 1, Math.Max(0, start));
+                end = Math.Min(mItems.Count - 1, Math.Max(0, end));
+
+                for (int i = start; i <= end; i++)
+                    visible.Add(mItems[i].Guid, false);
+            }
+            return visible;
         }
         #endregion
 

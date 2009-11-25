@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 
 namespace Manina.Windows.Forms
@@ -61,12 +62,20 @@ namespace Manina.Windows.Forms
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void RefreshEventHandlerInternal();
+    #endregion
+
+    #region Internal Delegates
     /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
     /// <param name="guid">The guid of the item to check visibility.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate bool CheckItemVisibleInternal(Guid guid);
+    /// <summary>
+    /// Gets the guids of visible items.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate Dictionary<Guid,bool> GetVisibleItemsInternal();
     #endregion
 
     #region Event Arguments

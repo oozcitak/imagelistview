@@ -555,6 +555,7 @@ namespace Manina.Windows.Forms
                             {
                                 using (Pen pen = new Pen(SystemColors.GrayText, 3))
                                 {
+                                    pen.Alignment = PenAlignment.Center;
                                     g.DrawRectangle(pen, imageBounds);
                                 }
                             }
@@ -577,7 +578,10 @@ namespace Manina.Windows.Forms
                     sf.FormatFlags = StringFormatFlags.NoWrap;
                     sf.LineAlignment = StringAlignment.Center;
                     sf.Trimming = StringTrimming.EllipsisCharacter;
-                    rt.Inflate(0, 2);
+                    rt.Width += 1;
+                    rt.Inflate(1, 2);
+                    if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                        rt.Inflate(-1, -1);
                     if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         g.FillRectangle(SystemBrushes.Highlight, rt);
