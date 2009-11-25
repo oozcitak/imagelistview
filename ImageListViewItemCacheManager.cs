@@ -90,7 +90,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Adds the item to the cache queue.
         /// </summary>
-        public void AddToCache(ImageListViewItem item)
+        public void Add(ImageListViewItem item)
         {
             if (!item.isDirty)
                 return;

@@ -82,7 +82,7 @@ namespace Manina.Windows.Forms
                     mItems[index].mIndex = index;
                     if (mImageListView != null)
                     {
-                        mImageListView.itemCacheManager.AddToCache(mItems[index]);
+                        mImageListView.itemCacheManager.Add(mItems[index]);
                         if (mItems[index].Selected != oldSelected)
                             mImageListView.OnSelectionChangedInternal();
                     }
@@ -122,7 +122,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
-                    mImageListView.itemCacheManager.AddToCache(item);
+                    mImageListView.itemCacheManager.Add(item);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.mRenderer.Refresh();
@@ -183,6 +183,7 @@ namespace Manina.Windows.Forms
                 mItems.Clear();
                 if (mImageListView != null)
                 {
+                    mImageListView.cacheManager.Clear();
                     mImageListView.SelectedItems.Clear();
                     mImageListView.mRenderer.Refresh();
                 }
@@ -209,16 +210,6 @@ namespace Manina.Windows.Forms
                 return mItems.GetEnumerator();
             }
             /// <summary>
-            /// Returns an enumerator that iterates through a collection.
-            /// </summary>
-            /// <returns>
-            /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
-            /// </returns>
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                return mItems.GetEnumerator();
-            }
-            /// <summary>
             /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
             /// </summary>
             /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
@@ -236,7 +227,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     item.mImageListView = this.mImageListView;
-                    mImageListView.itemCacheManager.AddToCache(item);
+                    mImageListView.itemCacheManager.Add(item);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.mRenderer.Refresh();
@@ -256,6 +247,7 @@ namespace Manina.Windows.Forms
                 bool ret = mItems.Remove(item);
                 if (mImageListView != null)
                 {
+                    mImageListView.cacheManager.Remove(item.Guid);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.mRenderer.Refresh();
@@ -273,9 +265,11 @@ namespace Manina.Windows.Forms
             {
                 for (int i = index; i < mItems.Count; i++)
                     mItems[i].mIndex--;
+                Guid iguid = mItems[index].Guid;
                 mItems.RemoveAt(index);
                 if (mImageListView != null)
                 {
+                    mImageListView.cacheManager.Remove(iguid);
                     if (mItems[index].Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.mRenderer.Refresh();
@@ -295,7 +289,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
-                    mImageListView.itemCacheManager.AddToCache(item);
+                    mImageListView.itemCacheManager.Add(item);
                 }
             }
             /// <summary>
@@ -311,7 +305,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     item.mImageListView = this.mImageListView;
-                    mImageListView.itemCacheManager.AddToCache(item);
+                    mImageListView.itemCacheManager.Add(item);
                 }
             }
             /// <summary>
@@ -321,6 +315,8 @@ namespace Manina.Windows.Forms
             {
                 for (int i = item.mIndex; i < mItems.Count; i++)
                     mItems[i].mIndex--;
+                if (mImageListView != null)
+                    mImageListView.cacheManager.Remove(item.Guid);
                 bool ret = mItems.Remove(item);
             }
             /// <summary>
@@ -482,6 +478,16 @@ namespace Manina.Windows.Forms
                 if (!(value is ImageListViewItem))
                     throw new ArgumentException("An object of type ImageListViewItem is required.", "value");
                 return mItems.Contains((ImageListViewItem)value);
+            }
+            /// <summary>
+            /// Returns an enumerator that iterates through a collection.
+            /// </summary>
+            /// <returns>
+            /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+            /// </returns>
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return mItems.GetEnumerator();
             }
             /// <summary>
             /// Determines the index of a specific item in the <see cref="T:System.Collections.IList"/>.
