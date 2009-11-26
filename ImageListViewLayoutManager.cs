@@ -235,6 +235,11 @@ namespace Manina.Windows.Forms
             }
             if (mItemAreaBounds.Height < 1 || mItemAreaBounds.Height < 1) return;
 
+            // Let the calculated bounds modified by the renderer
+            LayoutEventArgs eLayout = new LayoutEventArgs(mItemAreaBounds);
+            mImageListView.mRenderer.OnLayout(eLayout);
+            mItemAreaBounds = eLayout.ItemAreaBounds;
+
             // Item size
             mItemSize = cachedItemSize;
             mItemSizeWithMargin = mItemSize + AdjustedItemMargin;
@@ -243,8 +248,6 @@ namespace Manina.Windows.Forms
             mCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
             mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
             if (mImageListView.View == View.Details) mCols = 1;
-            if (mCols < 1) mCols = 1;
-            if (mRows < 1) mRows = 1;
 
             // Check if we need the horizontal scroll bar
             bool hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mCols * mItemSizeWithMargin.Width);
