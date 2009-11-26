@@ -341,6 +341,7 @@ namespace Manina.Windows.Forms
         public void ClearThumbnailCache()
         {
             cacheManager.Clear();
+            mRenderer.Refresh();
         }
         /// <summary>
         /// Temporarily suspends the layout logic for the control.
