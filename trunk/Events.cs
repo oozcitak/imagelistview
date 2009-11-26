@@ -75,12 +75,12 @@ namespace Manina.Windows.Forms
     /// Gets the guids of visible items.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate Dictionary<Guid,bool> GetVisibleItemsInternal();
+    internal delegate Dictionary<Guid, bool> GetVisibleItemsInternal();
     #endregion
 
     #region Event Arguments
     /// <summary>
-    /// Represents the event arguments for the column related events.
+    /// Represents the event arguments for column related events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class ColumnEventArgs
@@ -98,7 +98,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for the column related events.
+    /// Represents the event arguments for column related events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class ColumnClickEventArgs
@@ -136,7 +136,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for the item related events.
+    /// Represents the event arguments for item related events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class ItemEventArgs
@@ -154,7 +154,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for the item related events.
+    /// Represents the event arguments for item related events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class ItemClickEventArgs
@@ -189,6 +189,22 @@ namespace Manina.Windows.Forms
             mItem = item;
             mLocation = location;
             mButtons = buttons;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments related to control layout.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class LayoutEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the rectangle bounding the item area.
+        /// </summary>
+        public Rectangle ItemAreaBounds { get; set; }
+
+        public LayoutEventArgs(Rectangle itemAreaBounds)
+        {
+            ItemAreaBounds = itemAreaBounds;
         }
     }
     #endregion

@@ -325,16 +325,13 @@ namespace Manina.Windows.Forms
                 Graphics g = bufferGraphics.Graphics;
                 g.ResetClip();
 
-                // Erase background
-                g.SetClip(mImageListView.layoutManager.ColumnHeaderBounds);
-                g.Clear(mImageListView.BackColor);
-                g.SetClip(mImageListView.layoutManager.ItemAreaBounds);
-                DrawBackground(g, mImageListView.layoutManager.ItemAreaBounds);
+                // Draw background
+                g.SetClip(mImageListView.layoutManager.ClientArea);
+                DrawBackground(g, mImageListView.layoutManager.ClientArea);
 
                 // Draw Border
                 g.ResetClip();
                 Rectangle rc = mImageListView.ClientRectangle;
-
                 if (mImageListView.BorderStyle == BorderStyle.FixedSingle)
                     ControlPaint.DrawBorder3D(g, mImageListView.ClientRectangle, Border3DStyle.Flat);
                 else if (mImageListView.BorderStyle == BorderStyle.Fixed3D)
@@ -364,7 +361,7 @@ namespace Manina.Windows.Forms
                             g.SetClip(clip);
                         }
                         else
-                            g.SetClip(mImageListView.DisplayRectangle);
+                            g.SetClip(mImageListView.layoutManager.ClientArea);
                         DrawColumnHeader(g, column, state, bounds);
                         x += column.Width;
                         lastX = bounds.Right;
@@ -373,13 +370,17 @@ namespace Manina.Windows.Forms
                     // Extender column
                     if (mImageListView.Columns.Count != 0)
                     {
-                        if (lastX < mImageListView.layoutManager.ItemAreaBounds.Right)
+                        if (lastX < mImageListView.layoutManager.ClientArea.Right)
                         {
-                            Rectangle extender = new Rectangle(lastX, mImageListView.layoutManager.ColumnHeaderBounds.Top, mImageListView.layoutManager.ItemAreaBounds.Right - lastX, mImageListView.layoutManager.ColumnHeaderBounds.Height);
+                            Rectangle extender = new Rectangle(
+                                lastX, 
+                                mImageListView.layoutManager.ColumnHeaderBounds.Top,
+                                mImageListView.layoutManager.ClientArea.Right - lastX, 
+                                mImageListView.layoutManager.ColumnHeaderBounds.Height);
                             if (mClip)
                                 g.SetClip(extender);
                             else
-                                g.SetClip(mImageListView.DisplayRectangle);
+                                g.SetClip(mImageListView.layoutManager.ClientArea);
                             DrawColumnExtender(g, extender);
                         }
                     }
@@ -389,7 +390,7 @@ namespace Manina.Windows.Forms
                         if (mClip)
                             g.SetClip(extender);
                         else
-                            g.SetClip(mImageListView.DisplayRectangle);
+                            g.SetClip(mImageListView.layoutManager.ClientArea);
                         DrawColumnExtender(g, extender);
                     }
                 }
@@ -442,7 +443,7 @@ namespace Manina.Windows.Forms
                             g.SetClip(clip);
                         }
                         else
-                            g.SetClip(mImageListView.DisplayRectangle);
+                            g.SetClip(mImageListView.layoutManager.ClientArea);
                         DrawItem(g, param.Item, param.State, param.Bounds);
                     }
                 }
@@ -451,7 +452,7 @@ namespace Manina.Windows.Forms
                 // Scrollbar filler
                 if (mImageListView.hScrollBar.Visible && mImageListView.vScrollBar.Visible)
                 {
-                    Rectangle bounds = mImageListView.layoutManager.ItemAreaBounds;
+                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     Rectangle filler = new Rectangle(bounds.Right, bounds.Bottom, mImageListView.vScrollBar.Width, mImageListView.hScrollBar.Height);
                     g.SetClip(filler);
                     DrawScrollBarFiller(g, filler);
@@ -461,7 +462,11 @@ namespace Manina.Windows.Forms
                 // Draw the selection rectangle
                 if (mImageListView.nav.Dragging)
                 {
-                    Rectangle sel = new Rectangle(System.Math.Min(mImageListView.nav.SelStart.X, mImageListView.nav.SelEnd.X), System.Math.Min(mImageListView.nav.SelStart.Y, mImageListView.nav.SelEnd.Y), System.Math.Abs(mImageListView.nav.SelStart.X - mImageListView.nav.SelEnd.X), System.Math.Abs(mImageListView.nav.SelStart.Y - mImageListView.nav.SelEnd.Y));
+                    Rectangle sel = new Rectangle(
+                        System.Math.Min(mImageListView.nav.SelStart.X, mImageListView.nav.SelEnd.X), 
+                        System.Math.Min(mImageListView.nav.SelStart.Y, mImageListView.nav.SelEnd.Y), 
+                        System.Math.Abs(mImageListView.nav.SelStart.X - mImageListView.nav.SelEnd.X), 
+                        System.Math.Abs(mImageListView.nav.SelStart.Y - mImageListView.nav.SelEnd.Y));
                     if (sel.Height > 0 && sel.Width > 0)
                     {
                         if (mClip)
@@ -470,7 +475,7 @@ namespace Manina.Windows.Forms
                             g.SetClip(selclip);
                         }
                         else
-                            g.SetClip(mImageListView.DisplayRectangle);
+                            g.SetClip(mImageListView.layoutManager.ClientArea);
                         g.ExcludeClip(mImageListView.layoutManager.ColumnHeaderBounds);
                         DrawSelectionRectangle(g, sel);
                     }
@@ -488,7 +493,7 @@ namespace Manina.Windows.Forms
                     if (mClip)
                         g.SetClip(bounds);
                     else
-                        g.SetClip(mImageListView.DisplayRectangle);
+                        g.SetClip(mImageListView.layoutManager.ClientArea);
                     DrawInsertionCaret(g, bounds);
                 }
 
@@ -919,6 +924,14 @@ namespace Manina.Windows.Forms
             /// Releases managed resources.
             /// </summary>
             public virtual void OnDispose()
+            {
+                ;
+            }
+            /// <summary>
+            /// Sets the layout of the control.
+            /// </summary>
+            /// <param name="e">A LayoutEventArgs that contains event data.</param>
+            public virtual void OnLayout(LayoutEventArgs e)
             {
                 ;
             }

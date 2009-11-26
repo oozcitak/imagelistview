@@ -24,265 +24,6 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region ZoomingRenderer
-        /// <summary>
-        /// Zooms items on mouse over.
-        /// </summary>
-        public class ZoomingRenderer : ImageListView.ImageListViewRenderer
-        {
-            private string requestedFileName = null;
-            private string cachedFileName = null;
-            private Image cachedImage = null;
-            private object lockObject = new object();
-            private Thread cacheThread;
-            private float mZoomRatio;
-
-            public ZoomingRenderer()
-                : this(0.5f)
-            {
-                ;
-            }
-
-            public ZoomingRenderer(float zoomRatio)
-                : base()
-            {
-                if (zoomRatio < 0.0f) zoomRatio = 0.0f;
-                if (zoomRatio > 1.0f) zoomRatio = 1.0f;
-                mZoomRatio = zoomRatio;
-                cacheThread = new Thread(new ParameterizedThreadStart(DoWork));
-                cacheThread.IsBackground = true;
-                cacheThread.Start(this);
-                while (!cacheThread.IsAlive) ;
-            }
-
-            private static void DoWork(object sender)
-            {
-                ZoomingRenderer renderer = (ZoomingRenderer)sender;
-                while (true)
-                {
-                    lock (renderer.lockObject)
-                    {
-                        Monitor.Wait(renderer.lockObject);
-                        if (renderer.requestedFileName != renderer.cachedFileName)
-                        {
-                            renderer.cachedImage = Image.FromFile(renderer.requestedFileName);
-                            renderer.cachedFileName = renderer.requestedFileName;
-                        }
-                    }
-
-                    renderer.mImageListView.BeginInvoke(new RefreshEventHandlerInternal(renderer.mImageListView.OnRefreshInternal));
-                }
-            }
-
-            public override void OnDispose()
-            {
-                base.OnDispose();
-
-                if (cacheThread.IsAlive)
-                {
-                    cacheThread.Abort();
-                    cacheThread.Join();
-                }
-            }
-
-            /// <summary>
-            /// Initializes the System.Drawing.Graphics used to draw
-            /// control elements.
-            /// </summary>
-            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
-            public override void InitializeGraphics(System.Drawing.Graphics g)
-            {
-                base.InitializeGraphics(g);
-
-                Clip = false;
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                ItemDrawOrder = ItemDrawOrder.NormalSelectedHovered;
-            }
-            /// <summary>
-            /// Returns item size for the given view mode.
-            /// </summary>
-            /// <param name="view">The view mode for which the item measurement should be made.</param>
-            /// <returns></returns>
-            public override Size MeasureItem(View view)
-            {
-                if (view == View.Thumbnails)
-                    return mImageListView.ThumbnailSize + new Size(8, 8);
-                else
-                    return base.MeasureItem(view);
-            }
-            /// <summary>
-            /// Draws the specified item on the given graphics.
-            /// </summary>
-            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
-            /// <param name="item">The ImageListViewItem to draw.</param>
-            /// <param name="state">The current view state of item.</param>
-            /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
-            public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
-            {
-                if (ImageListView.View == View.Thumbnails)
-                {
-                    // Zoom on mouse over
-                    if ((state & ItemState.Hovered) != ItemState.None)
-                    {
-                        bounds.Inflate((int)(bounds.Width * mZoomRatio), (int)(bounds.Height * mZoomRatio));
-                        if (bounds.Bottom > ItemAreaBounds.Bottom)
-                            bounds.Y = ItemAreaBounds.Bottom - bounds.Height;
-                        if (bounds.Top < ItemAreaBounds.Top)
-                            bounds.Y = ItemAreaBounds.Top;
-                        if (bounds.Right > ItemAreaBounds.Right)
-                            bounds.X = ItemAreaBounds.Right - bounds.Width;
-                        if (bounds.Left < ItemAreaBounds.Left)
-                            bounds.X = ItemAreaBounds.Left;
-                    }
-
-                    // Get item image
-                    Image img = null;
-                    img = item.ThumbnailImage;
-                    if ((state & ItemState.Hovered) == ItemState.Hovered)
-                    {
-                        lock (lockObject)
-                        {
-                            if (cachedFileName == item.FileName)
-                                img = cachedImage;
-                            else
-                            {
-                                requestedFileName = item.FileName;
-                                Monitor.Pulse(lockObject);
-                            }
-                        }
-                    }
-
-                    // Calculate image bounds
-                    float xscale = ((float)bounds.Width - 8.0f) / (float)img.Width;
-                    float yscale = ((float)bounds.Height - 8.0f) / (float)img.Height;
-                    float scale = Math.Min(xscale, yscale);
-                    if (scale > 1.0f) scale = 1.0f;
-                    int imageWidth = (int)((float)img.Width * scale);
-                    int imageHeight = (int)((float)img.Height * scale);
-                    int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
-                    int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
-
-                    // Allocate space for item text
-                    if ((state & ItemState.Hovered) != ItemState.None &&
-                        (bounds.Height - imageHeight) / 2 < mImageListView.Font.Height + 8)
-                    {
-                        int delta = (mImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
-                        bounds.Height += 2 * delta;
-                        imageY += delta;
-                    }
-
-                    // Paint background
-                    using (Brush bBack = new SolidBrush(mImageListView.BackColor))
-                    {
-                        Utility.FillRoundedRectangle(g, bBack, bounds, 5);
-                    }
-                    using (Brush bItemBack = new SolidBrush(item.BackColor))
-                    {
-                        Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
-                    }
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
-                    {
-                        using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
-                        {
-                            Utility.FillRoundedRectangle(g, bSelected, bounds, 5);
-                        }
-                    }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
-                    {
-                        using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
-                        {
-                            Utility.FillRoundedRectangle(g, bGray64, bounds, 5);
-                        }
-                    }
-                    if (((state & ItemState.Hovered) != ItemState.None))
-                    {
-                        using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(8, SystemColors.Highlight), Color.FromArgb(32, SystemColors.Highlight), LinearGradientMode.Vertical))
-                        {
-                            Utility.FillRoundedRectangle(g, bHovered, bounds, 5);
-                        }
-                    }
-
-                    // Draw the image
-                    g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
-                    // Draw image border
-                    if (imageWidth > 32)
-                    {
-                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
-                        {
-                            g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
-                        }
-                        if (System.Math.Min(imageWidth, imageHeight) > 32)
-                        {
-                            using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                            {
-                                g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
-                            }
-                        }
-                    }
-
-                    // Draw item text
-                    if ((state & ItemState.Hovered) != ItemState.None)
-                    {
-                        RectangleF rt;
-                        StringFormat sf = new StringFormat();
-                        rt = new RectangleF(bounds.Left + 4, bounds.Top + 4, bounds.Width - 8, (bounds.Height - imageHeight) / 2 - 8);
-                        sf.Alignment = StringAlignment.Center;
-                        sf.FormatFlags = StringFormatFlags.NoWrap;
-                        sf.LineAlignment = StringAlignment.Center;
-                        sf.Trimming = StringTrimming.EllipsisCharacter;
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
-                        {
-                            g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
-                        }
-                        rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
-                        using (Brush bGrayText = new SolidBrush(Color.Gray))
-                        {
-                            g.DrawString(string.Format("{0} pixels, {1}", item.GetSubItemText(ColumnType.Dimension), item.GetSubItemText(ColumnType.FileSize)),
-                                mImageListView.Font, bGrayText, rt, sf);
-                        }
-                    }
-
-                    // Item border
-                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                    {
-                        Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
-                    }
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
-                    {
-                        using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
-                        {
-                            Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
-                        }
-                    }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
-                    {
-                        using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
-                        {
-                            Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
-                        }
-                    }
-                    else if ((state & ItemState.Selected) == ItemState.None)
-                    {
-                        using (Pen pGray64 = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
-                        {
-                            Utility.DrawRoundedRectangle(g, pGray64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
-                        }
-                    }
-
-                    if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
-                    {
-                        using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
-                        {
-                            Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
-                        }
-                    }
-                }
-                else
-                    base.DrawItem(g, item, state, bounds);
-            }
-        }
-        #endregion
-
         #region TilesRenderer
         /// <summary>
         /// Displays items with large tiles.
@@ -645,6 +386,265 @@ namespace Manina.Windows.Forms
                     if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                         ControlPaint.DrawFocusRectangle(g, bounds);
                 }
+            }
+        }
+        #endregion
+
+        #region ZoomingRenderer
+        /// <summary>
+        /// Zooms items on mouse over.
+        /// </summary>
+        public class ZoomingRenderer : ImageListView.ImageListViewRenderer
+        {
+            private string requestedFileName = null;
+            private string cachedFileName = null;
+            private Image cachedImage = null;
+            private object lockObject = new object();
+            private Thread cacheThread;
+            private float mZoomRatio;
+
+            public ZoomingRenderer()
+                : this(0.5f)
+            {
+                ;
+            }
+
+            public ZoomingRenderer(float zoomRatio)
+                : base()
+            {
+                if (zoomRatio < 0.0f) zoomRatio = 0.0f;
+                if (zoomRatio > 1.0f) zoomRatio = 1.0f;
+                mZoomRatio = zoomRatio;
+                cacheThread = new Thread(new ParameterizedThreadStart(DoWork));
+                cacheThread.IsBackground = true;
+                cacheThread.Start(this);
+                while (!cacheThread.IsAlive) ;
+            }
+
+            private static void DoWork(object sender)
+            {
+                ZoomingRenderer renderer = (ZoomingRenderer)sender;
+                while (true)
+                {
+                    lock (renderer.lockObject)
+                    {
+                        Monitor.Wait(renderer.lockObject);
+                        if (renderer.requestedFileName != renderer.cachedFileName)
+                        {
+                            renderer.cachedImage = Image.FromFile(renderer.requestedFileName);
+                            renderer.cachedFileName = renderer.requestedFileName;
+                        }
+                    }
+
+                    renderer.mImageListView.BeginInvoke(new RefreshEventHandlerInternal(renderer.mImageListView.OnRefreshInternal));
+                }
+            }
+
+            public override void OnDispose()
+            {
+                base.OnDispose();
+
+                if (cacheThread.IsAlive)
+                {
+                    cacheThread.Abort();
+                    cacheThread.Join();
+                }
+            }
+
+            /// <summary>
+            /// Initializes the System.Drawing.Graphics used to draw
+            /// control elements.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            public override void InitializeGraphics(System.Drawing.Graphics g)
+            {
+                base.InitializeGraphics(g);
+
+                Clip = false;
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                ItemDrawOrder = ItemDrawOrder.NormalSelectedHovered;
+            }
+            /// <summary>
+            /// Returns item size for the given view mode.
+            /// </summary>
+            /// <param name="view">The view mode for which the item measurement should be made.</param>
+            /// <returns></returns>
+            public override Size MeasureItem(View view)
+            {
+                if (view == View.Thumbnails)
+                    return mImageListView.ThumbnailSize + new Size(8, 8);
+                else
+                    return base.MeasureItem(view);
+            }
+            /// <summary>
+            /// Draws the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="state">The current view state of item.</param>
+            /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
+            public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
+            {
+                if (ImageListView.View == View.Thumbnails)
+                {
+                    // Zoom on mouse over
+                    if ((state & ItemState.Hovered) != ItemState.None)
+                    {
+                        bounds.Inflate((int)(bounds.Width * mZoomRatio), (int)(bounds.Height * mZoomRatio));
+                        if (bounds.Bottom > ItemAreaBounds.Bottom)
+                            bounds.Y = ItemAreaBounds.Bottom - bounds.Height;
+                        if (bounds.Top < ItemAreaBounds.Top)
+                            bounds.Y = ItemAreaBounds.Top;
+                        if (bounds.Right > ItemAreaBounds.Right)
+                            bounds.X = ItemAreaBounds.Right - bounds.Width;
+                        if (bounds.Left < ItemAreaBounds.Left)
+                            bounds.X = ItemAreaBounds.Left;
+                    }
+
+                    // Get item image
+                    Image img = null;
+                    img = item.ThumbnailImage;
+                    if ((state & ItemState.Hovered) == ItemState.Hovered)
+                    {
+                        lock (lockObject)
+                        {
+                            if (cachedFileName == item.FileName)
+                                img = cachedImage;
+                            else
+                            {
+                                requestedFileName = item.FileName;
+                                Monitor.Pulse(lockObject);
+                            }
+                        }
+                    }
+
+                    // Calculate image bounds
+                    float xscale = ((float)bounds.Width - 8.0f) / (float)img.Width;
+                    float yscale = ((float)bounds.Height - 8.0f) / (float)img.Height;
+                    float scale = Math.Min(xscale, yscale);
+                    if (scale > 1.0f) scale = 1.0f;
+                    int imageWidth = (int)((float)img.Width * scale);
+                    int imageHeight = (int)((float)img.Height * scale);
+                    int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
+                    int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
+
+                    // Allocate space for item text
+                    if ((state & ItemState.Hovered) != ItemState.None &&
+                        (bounds.Height - imageHeight) / 2 < mImageListView.Font.Height + 8)
+                    {
+                        int delta = (mImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
+                        bounds.Height += 2 * delta;
+                        imageY += delta;
+                    }
+
+                    // Paint background
+                    using (Brush bBack = new SolidBrush(mImageListView.BackColor))
+                    {
+                        Utility.FillRoundedRectangle(g, bBack, bounds, 5);
+                    }
+                    using (Brush bItemBack = new SolidBrush(item.BackColor))
+                    {
+                        Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
+                    }
+                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    {
+                        using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
+                        {
+                            Utility.FillRoundedRectangle(g, bSelected, bounds, 5);
+                        }
+                    }
+                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    {
+                        using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
+                        {
+                            Utility.FillRoundedRectangle(g, bGray64, bounds, 5);
+                        }
+                    }
+                    if (((state & ItemState.Hovered) != ItemState.None))
+                    {
+                        using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(8, SystemColors.Highlight), Color.FromArgb(32, SystemColors.Highlight), LinearGradientMode.Vertical))
+                        {
+                            Utility.FillRoundedRectangle(g, bHovered, bounds, 5);
+                        }
+                    }
+
+                    // Draw the image
+                    g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+                    // Draw image border
+                    if (imageWidth > 32)
+                    {
+                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                        {
+                            g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                        }
+                        if (System.Math.Min(imageWidth, imageHeight) > 32)
+                        {
+                            using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                            {
+                                g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                            }
+                        }
+                    }
+
+                    // Draw item text
+                    if ((state & ItemState.Hovered) != ItemState.None)
+                    {
+                        RectangleF rt;
+                        StringFormat sf = new StringFormat();
+                        rt = new RectangleF(bounds.Left + 4, bounds.Top + 4, bounds.Width - 8, (bounds.Height - imageHeight) / 2 - 8);
+                        sf.Alignment = StringAlignment.Center;
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        {
+                            g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                        }
+                        rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
+                        using (Brush bGrayText = new SolidBrush(Color.Gray))
+                        {
+                            g.DrawString(string.Format("{0} pixels, {1}", item.GetSubItemText(ColumnType.Dimension), item.GetSubItemText(ColumnType.FileSize)),
+                                mImageListView.Font, bGrayText, rt, sf);
+                        }
+                    }
+
+                    // Item border
+                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                    {
+                        Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
+                    }
+                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    {
+                        using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
+                        {
+                            Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
+                        }
+                    }
+                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    {
+                        using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
+                        {
+                            Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
+                        }
+                    }
+                    else if ((state & ItemState.Selected) == ItemState.None)
+                    {
+                        using (Pen pGray64 = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
+                        {
+                            Utility.DrawRoundedRectangle(g, pGray64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
+                        }
+                    }
+
+                    if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
+                    {
+                        using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
+                        {
+                            Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
+                        }
+                    }
+                }
+                else
+                    base.DrawItem(g, item, state, bounds);
             }
         }
         #endregion
