@@ -329,14 +329,6 @@ namespace Manina.Windows.Forms
                 g.SetClip(mImageListView.layoutManager.ClientArea);
                 DrawBackground(g, mImageListView.layoutManager.ClientArea);
 
-                // Draw Border
-                g.ResetClip();
-                Rectangle rc = mImageListView.ClientRectangle;
-                if (mImageListView.BorderStyle == BorderStyle.FixedSingle)
-                    ControlPaint.DrawBorder3D(g, mImageListView.ClientRectangle, Border3DStyle.Flat);
-                else if (mImageListView.BorderStyle == BorderStyle.Fixed3D)
-                    ControlPaint.DrawBorder3D(g, mImageListView.ClientRectangle, Border3DStyle.SunkenInner);
-
                 // Draw column headers
                 if (mImageListView.View == View.Details)
                 {
