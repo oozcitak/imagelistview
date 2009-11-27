@@ -6,6 +6,9 @@
   * Control border is now drawn by the framework.
   * Fixed a bug in layout manager where number of visible columns or rows could be zero when the control is sized too small.
   * Added the new overridable method, !OnLayout to the !ImageListViewRenderer. It can be used to modify the item area by custom renderers.
+  * Added the new !PanelRenderer. 
+  * Fixed a bug in !TilesRenderer where the caption font was requested before being created. 
+  * Fixed the !ImageListView.HitTest method to work with the new !ImageListViewRenderer.!OnLayout method.
 
 = 0.17 (26 November 2009) =
 
