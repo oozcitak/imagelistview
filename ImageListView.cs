@@ -25,6 +25,8 @@ namespace Manina.Windows.Forms
         /// Default width of column headers in pixels.
         /// </summary>
         internal const int DefaultColumnWidth = 100;
+        private const int WS_BORDER = 0x00800000;
+        private const int WS_EX_CLIENTEDGE = 0x00000200;
         #endregion
 
         #region Member Variables
@@ -97,7 +99,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the border style of the control.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border style of the control."), DefaultValue(typeof(BorderStyle), "Fixed3D")]
-        public BorderStyle BorderStyle { get { return mBorderStyle; } set { mBorderStyle = value; mRenderer.Refresh(); } }
+        public BorderStyle BorderStyle { get { return mBorderStyle; } set { mBorderStyle = value; UpdateStyles(); } }
         /// <summary>
         /// Gets or sets the cache limit as either the count of thumbnail images or the memory allocated for cache (e.g. 10MB).
         /// </summary>
@@ -276,6 +278,25 @@ namespace Manina.Windows.Forms
         /// Gets or sets the scroll offset.
         /// </summary>
         internal Point ViewOffset { get { return mViewOffset; } set { mViewOffset = value; } }
+        /// <summary>
+        /// Gets the required creation parameters when the control handle is created.
+        /// </summary>
+        /// <value></value>
+        /// <returns>A CreateParams that contains the required creation parameters.</returns>
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams p = base.CreateParams;
+                p.Style &= ~WS_BORDER;
+                p.ExStyle &= ~WS_EX_CLIENTEDGE;
+                if (mBorderStyle == BorderStyle.Fixed3D)
+                    p.ExStyle |= WS_EX_CLIENTEDGE;
+                else if (mBorderStyle == BorderStyle.FixedSingle)
+                    p.Style |= WS_BORDER;
+                return p;
+            }
+        }
         #endregion
 
         #region Constructor
@@ -467,7 +488,7 @@ namespace Manina.Windows.Forms
             hitInfo.ColumnSeparator = (ColumnType)(-1);
             int headerHeight = mRenderer.MeasureColumnHeaderHeight();
 
-            if (View == View.Details && pt.Y <= headerHeight + (BorderStyle == BorderStyle.None ? 0 : 1))
+            if (View == View.Details && pt.Y <= headerHeight )
             {
                 hitInfo.InHeaderArea = true;
                 int i = 0;

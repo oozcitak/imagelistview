@@ -24,7 +24,6 @@ namespace Manina.Windows.Forms
         private int mFirstVisible;
         private int mLastVisible;
 
-        private BorderStyle cachedBorderStyle;
         private View cachedView;
         private Point cachedViewOffset;
         private Size cachedSize;
@@ -93,13 +92,11 @@ namespace Manina.Windows.Forms
         {
             get
             {
-                if (mImageListView.BorderStyle != cachedBorderStyle)
-                    return true;
-                else if (mImageListView.View != cachedView)
+                if (mImageListView.View != cachedView)
                     return true;
                 else if (mImageListView.ViewOffset != cachedViewOffset)
                     return true;
-                else if (mImageListView.Size != cachedSize)
+                else if (mImageListView.ClientSize != cachedSize)
                     return true;
                 else if (mImageListView.Items.Count != cachedItemCount)
                     return true;
@@ -147,8 +144,6 @@ namespace Manina.Windows.Forms
         {
             Point location = new Point();
             Size itemMargin = AdjustedItemMargin;
-            if (mImageListView.BorderStyle != BorderStyle.None)
-                location.Offset(1, 1);
             location.X += itemMargin.Width / 2 + (itemIndex % mCols) * (mItemSize.Width + itemMargin.Width) - mImageListView.ViewOffset.X;
             location.Y += itemMargin.Height / 2 + (itemIndex / mCols) * (mItemSize.Height + itemMargin.Height) - mImageListView.ViewOffset.Y;
             if (mImageListView.View == View.Details)
@@ -183,10 +178,9 @@ namespace Manina.Windows.Forms
             if (mImageListView.ClientRectangle.Width == 0 || mImageListView.ClientRectangle.Height == 0) return;
             if (!forceUpdate && !UpdateRequired) return;
             // Cache current properties to determine if we will need an update later
-            cachedBorderStyle = mImageListView.BorderStyle;
             cachedView = mImageListView.View;
             cachedViewOffset = mImageListView.ViewOffset;
-            cachedSize = mImageListView.Size;
+            cachedSize = mImageListView.ClientSize;
             cachedItemCount = mImageListView.Items.Count;
             cachedItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
             cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
@@ -195,13 +189,6 @@ namespace Manina.Windows.Forms
             // Calculate drawing area
             mClientArea = mImageListView.ClientRectangle;
             mItemAreaBounds = mImageListView.ClientRectangle;
-
-            // Allocate space for border
-            if (mImageListView.BorderStyle != BorderStyle.None)
-            {
-                mClientArea.Inflate(-1, -1);
-                mItemAreaBounds.Inflate(-1, -1);
-            }
 
             // Allocate space for scrollbars
             if (mImageListView.hScrollBar.Visible)
@@ -306,13 +293,13 @@ namespace Manina.Windows.Forms
             }
 
             // Horizontal scrollbar position
-            mImageListView.hScrollBar.Left = (mImageListView.BorderStyle == BorderStyle.None ? 0 : 1);
-            mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom - (mImageListView.BorderStyle == BorderStyle.None ? 0 : 1) - mImageListView.hScrollBar.Height;
-            mImageListView.hScrollBar.Width = mImageListView.ClientRectangle.Width - (mImageListView.BorderStyle == BorderStyle.None ? 0 : 2) - (mImageListView.vScrollBar.Visible ? mImageListView.vScrollBar.Width : 0);
+            mImageListView.hScrollBar.Left = 0;
+            mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom -  mImageListView.hScrollBar.Height;
+            mImageListView.hScrollBar.Width = mImageListView.ClientRectangle.Width - (mImageListView.vScrollBar.Visible ? mImageListView.vScrollBar.Width : 0);
             // Vertical scrollbar position
-            mImageListView.vScrollBar.Left = mImageListView.ClientRectangle.Right - (mImageListView.BorderStyle == BorderStyle.None ? 0 : 1) - mImageListView.vScrollBar.Width;
-            mImageListView.vScrollBar.Top = (mImageListView.BorderStyle == BorderStyle.None ? 0 : 1);
-            mImageListView.vScrollBar.Height = mImageListView.ClientRectangle.Height - (mImageListView.BorderStyle == BorderStyle.None ? 0 : 2) - (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
+            mImageListView.vScrollBar.Left = mImageListView.ClientRectangle.Right -  mImageListView.vScrollBar.Width;
+            mImageListView.vScrollBar.Top = 0;
+            mImageListView.vScrollBar.Height = mImageListView.ClientRectangle.Height -  (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
 
             // Find the first and last partially visible items
             mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
