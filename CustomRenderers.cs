@@ -17,7 +17,6 @@ namespace Manina.Windows.Forms
         public class DefaultRenderer : ImageListView.ImageListViewRenderer
         {
             public DefaultRenderer()
-                : base()
             {
                 ;
             }
@@ -30,9 +29,19 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class TilesRenderer : ImageListView.ImageListViewRenderer
         {
-            private Font font;
-            private int tileSize;
-            private int textHeight;
+            private Font mCaptionFont;
+            private int mTileWidth;
+            private int mTextHeight;
+
+            private Font CaptionFont
+            {
+                get
+                {
+                    if (mCaptionFont == null)
+                        mCaptionFont = new Font(mImageListView.Font, FontStyle.Bold);
+                    return mCaptionFont;
+                }
+            }
 
             public TilesRenderer()
                 : this(180)
@@ -43,26 +52,13 @@ namespace Manina.Windows.Forms
             public TilesRenderer(int tileWidth)
                 : base()
             {
-                tileSize = tileWidth;
+                mTileWidth = tileWidth;
             }
 
             public override void OnDispose()
             {
-                if (font != null)
-                    font.Dispose();
-            }
-
-            /// <summary>
-            /// Initializes the System.Drawing.Graphics used to draw
-            /// control elements.
-            /// </summary>
-            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
-            public override void InitializeGraphics(Graphics g)
-            {
-                base.InitializeGraphics(g);
-
-                if (font == null)
-                    font = new Font(mImageListView.Font, FontStyle.Bold);
+                if (mCaptionFont != null)
+                    mCaptionFont.Dispose();
             }
 
             /// <summary>
@@ -74,12 +70,12 @@ namespace Manina.Windows.Forms
                 if (view == View.Thumbnails)
                 {
                     Size itemSize = new Size();
-                    textHeight = (int)(5.8f * (float)font.Height);
+                    mTextHeight = (int)(5.8f * (float)CaptionFont.Height);
 
                     // Calculate item size
                     Size itemPadding = new Size(4, 4);
-                    itemSize.Width = mImageListView.ThumbnailSize.Width + 4 * itemPadding.Width + tileSize;
-                    itemSize.Height = Math.Max(textHeight, mImageListView.ThumbnailSize.Height) + itemPadding.Height;
+                    itemSize.Width = mImageListView.ThumbnailSize.Width + 4 * itemPadding.Width + mTileWidth;
+                    itemSize.Height = Math.Max(mTextHeight, mImageListView.ThumbnailSize.Height) + itemPadding.Height;
                     return itemSize;
                 }
                 else
@@ -149,19 +145,19 @@ namespace Manina.Windows.Forms
                         }
 
                         // Draw item text
-                        int lineHeight = font.Height;
+                        int lineHeight = CaptionFont.Height;
                         RectangleF rt;
                         StringFormat sf = new StringFormat();
                         rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + mImageListView.ThumbnailSize.Width,
-                            bounds.Top + itemPadding.Height + (Math.Max(mImageListView.ThumbnailSize.Height, textHeight) - textHeight) / 2,
-                            tileSize, lineHeight);
+                            bounds.Top + itemPadding.Height + (Math.Max(mImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
+                            mTileWidth, lineHeight);
                         sf.Alignment = StringAlignment.Near;
                         sf.FormatFlags = StringFormatFlags.NoWrap;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (Brush bItemFore = new SolidBrush(item.ForeColor))
                         {
-                            g.DrawString(item.Text, font, bItemFore, rt, sf);
+                            g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
                         }
                         using (Brush bItemDetails = new SolidBrush(Color.Gray))
                         {
@@ -645,6 +641,192 @@ namespace Manina.Windows.Forms
                 }
                 else
                     base.DrawItem(g, item, state, bounds);
+            }
+        }
+        #endregion
+
+        #region PanelRenderer
+        /// <summary>
+        /// Shows detailed image information on a fixed panel.
+        /// </summary>
+        public class PanelRenderer : ImageListView.ImageListViewRenderer
+        {
+            private int mPanelWidth;
+            private bool mPanelVisible;
+            private string mDefaultText;
+            private Font mCaptionFont;
+
+            private Font CaptionFont
+            {
+                get
+                {
+                    if (mCaptionFont == null)
+                        mCaptionFont = new Font(mImageListView.Font, FontStyle.Bold);
+                    return mCaptionFont;
+                }
+            }
+
+            public PanelRenderer()
+                : this(180)
+            {
+                ;
+            }
+
+            public PanelRenderer(int panelWidth)
+                : this(panelWidth, "Select an image to display its properties here.")
+            {
+                ;
+            }
+
+            public PanelRenderer(int panelWidth, string defaultText)
+            {
+                mPanelWidth = panelWidth;
+                mDefaultText = defaultText;
+            }
+
+            /// <summary>
+            /// Sets the layout of the control.
+            /// </summary>
+            /// <param name="e">A LayoutEventArgs that contains event data.</param>
+            public override void OnLayout(LayoutEventArgs e)
+            {
+                mPanelVisible = false;
+                // Allocate space for the panel
+                int iwidth = this.MeasureItem(View.Thumbnails).Width + mImageListView.ItemMargin.Width;
+                if (mImageListView.View == View.Thumbnails && e.ItemAreaBounds.Width > mPanelWidth + iwidth)
+                {
+                    Rectangle r = e.ItemAreaBounds;
+                    r.X += mPanelWidth;
+                    r.Width -= mPanelWidth;
+                    e.ItemAreaBounds = r;
+                    mPanelVisible = true;
+                }
+            }
+            /// <summary>
+            /// Initializes the System.Drawing.Graphics used to draw
+            /// control elements.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            public override void InitializeGraphics(Graphics g)
+            {
+                base.InitializeGraphics(g);
+
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+            }
+            /// <summary>
+            /// Releases managed resources.
+            /// </summary>
+            public override void OnDispose()
+            {
+                if (mCaptionFont != null)
+                    mCaptionFont.Dispose();
+            }
+            /// <summary>
+            /// Draws the background of the control.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="bounds">The client coordinates of the item area.</param>
+            public override void DrawBackground(Graphics g, Rectangle bounds)
+            {
+                base.DrawBackground(g, bounds);
+                if (!mPanelVisible) return;
+
+                // Draw the panel
+                Rectangle rect = bounds;
+                rect.Width = mPanelWidth - 6;
+                using (Brush bBack = new LinearGradientBrush(rect, Color.White, Color.FromArgb(220, 220, 220), LinearGradientMode.Vertical))
+                {
+                    g.FillRectangle(bBack, rect);
+                }
+                using (Brush bBorder = new LinearGradientBrush(rect, Color.FromArgb(220, 220, 220), Color.White, LinearGradientMode.Vertical))
+                {
+                    g.FillRectangle(bBorder, rect.Right, rect.Top, 2, rect.Height);
+                }
+
+                rect.Inflate(-4, -4);
+                StringFormat sf = new StringFormat();
+                sf.Alignment = StringAlignment.Center;
+                sf.LineAlignment = StringAlignment.Center;
+
+                if (mImageListView.Items.FocusedItem == null)
+                {
+                    // Default text
+                    g.DrawString(mDefaultText, mImageListView.Font, Brushes.Black, rect, sf);
+                }
+                else
+                {
+                    ImageListViewItem item = mImageListView.Items.FocusedItem;
+                    rect.Inflate(-4, -4);
+                    // Draw selected image
+                    using (Image img = item.GetImage())
+                    {
+                        // Calculate image bounds
+                        float xscale = (float)rect.Width / (float)img.Width;
+                        float yscale = (float)rect.Height / (float)img.Height;
+                        float scale = Math.Min(xscale, yscale);
+                        if (scale > 1.0f) scale = 1.0f;
+                        int imageWidth = (int)((float)img.Width * scale);
+                        int imageHeight = (int)((float)img.Height * scale);
+                        int imageX = rect.Left + (rect.Width - imageWidth) / 2;
+                        int imageY = rect.Top;
+                        // Draw image
+                        g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+                        // Draw image border
+                        if (img.Width > 32)
+                        {
+                            using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                            {
+                                g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                            }
+                            if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
+                            {
+                                using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                                {
+                                    g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                                }
+                            }
+                        }
+                        rect.Y = imageHeight + 16;
+                        rect.Height -= imageHeight + 16;
+                    }
+                    // Image information
+                    sf.Alignment = StringAlignment.Near;
+                    sf.LineAlignment = StringAlignment.Near;
+                    sf.Trimming = StringTrimming.EllipsisCharacter;
+                    sf.FormatFlags = StringFormatFlags.NoWrap;
+                    g.DrawString(item.Text, CaptionFont, Brushes.Black, rect, sf);
+
+                    int textHeight = (int)CaptionFont.GetHeight() * 2;
+                    rect.Y += textHeight;
+                    rect.Height -= textHeight;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine(item.FileType);
+
+                    sb.Append("Dimension: ");
+                    sb.Append(item.GetSubItemText(ColumnType.Dimension));
+                    sb.AppendLine();
+
+                    sb.Append("Resolution: ");
+                    sb.Append(item.Resolution.Width);
+                    sb.AppendLine(" dpi");
+
+                    sb.Append("Size: ");
+                    sb.Append(item.GetSubItemText(ColumnType.FileSize));
+                    sb.AppendLine();
+
+                    sb.Append("Modified: ");
+                    sb.Append(item.GetSubItemText(ColumnType.DateModified));
+                    sb.AppendLine();
+
+                    sb.Append("Created: ");
+                    sb.Append(item.GetSubItemText(ColumnType.DateCreated));
+                    sb.AppendLine();
+                    sb.AppendLine();
+
+                    g.DrawString(sb.ToString(), mImageListView.Font, Brushes.Black, rect, sf);
+                }
             }
         }
         #endregion

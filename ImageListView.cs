@@ -434,6 +434,8 @@ namespace Manina.Windows.Forms
                 mRenderer.Dispose();
             mRenderer = renderer;
             mRenderer.mImageListView = this;
+            if (layoutManager != null)
+                layoutManager.Update(true);
             mRenderer.Refresh(true);
         }
         /// <summary>
@@ -488,7 +490,7 @@ namespace Manina.Windows.Forms
             hitInfo.ColumnSeparator = (ColumnType)(-1);
             int headerHeight = mRenderer.MeasureColumnHeaderHeight();
 
-            if (View == View.Details && pt.Y <= headerHeight )
+            if (View == View.Details && pt.Y <= headerHeight)
             {
                 hitInfo.InHeaderArea = true;
                 int i = 0;
@@ -519,19 +521,22 @@ namespace Manina.Windows.Forms
                 pt.X -= layoutManager.ItemAreaBounds.Left;
                 pt.Y -= layoutManager.ItemAreaBounds.Top;
 
-                int col = pt.X / layoutManager.ItemSizeWithMargin.Width;
-                int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
-
-                if (col <= layoutManager.Cols)
+                if (pt.X > 0 && pt.Y > 0)
                 {
-                    int index = row * layoutManager.Cols + col;
-                    if (index >= 0 && index < Items.Count)
+                    int col = pt.X / layoutManager.ItemSizeWithMargin.Width;
+                    int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
+
+                    if (col <= layoutManager.Cols)
                     {
-                        Rectangle bounds = layoutManager.GetItemBounds(index);
-                        if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                        int index = row * layoutManager.Cols + col;
+                        if (index >= 0 && index < Items.Count)
                         {
-                            hitInfo.ItemHit = true;
-                            hitInfo.ItemIndex = index;
+                            Rectangle bounds = layoutManager.GetItemBounds(index);
+                            if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                            {
+                                hitInfo.ItemHit = true;
+                                hitInfo.ItemIndex = index;
+                            }
                         }
                     }
                 }
@@ -1117,21 +1122,35 @@ namespace Manina.Windows.Forms
                 nav.SelEnd = e.Location;
                 Rectangle sel = new Rectangle(System.Math.Min(nav.SelStart.X, nav.SelEnd.X), System.Math.Min(nav.SelStart.Y, nav.SelEnd.Y), System.Math.Abs(nav.SelStart.X - nav.SelEnd.X), System.Math.Abs(nav.SelStart.Y - nav.SelEnd.Y));
                 nav.Highlight.Clear();
-                int startRow = (Math.Min(nav.SelStart.Y, nav.SelEnd.Y) + ViewOffset.Y - (mView == View.Details ? mRenderer.MeasureColumnHeaderHeight() : 0)) / layoutManager.ItemSizeWithMargin.Height;
-                int endRow = (Math.Max(nav.SelStart.Y, nav.SelEnd.Y) + ViewOffset.Y - (mView == View.Details ? mRenderer.MeasureColumnHeaderHeight() : 0)) / layoutManager.ItemSizeWithMargin.Height;
-                int startCol = (Math.Min(nav.SelStart.X, nav.SelEnd.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                int endCol = (Math.Max(nav.SelStart.X, nav.SelEnd.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                if (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1)
+                Point pt1 = nav.SelStart;
+                Point pt2 = nav.SelEnd;
+                // Normalize to item area coordinates
+                pt1.X -= layoutManager.ItemAreaBounds.Left;
+                pt1.Y -= layoutManager.ItemAreaBounds.Top;
+                pt2.X -= layoutManager.ItemAreaBounds.Left;
+                pt2.Y -= layoutManager.ItemAreaBounds.Top;
+                if (pt1.X > 0 || pt2.X > 0)
                 {
-                    startCol = Math.Min(layoutManager.Cols - 1, startCol);
-                    endCol = Math.Min(layoutManager.Cols - 1, endCol);
-                    for (int row = startRow; row <= endRow; row++)
+                    if (pt1.X < 0) pt1.X = 0;
+                    if (pt1.Y < 0) pt1.Y = 0;
+                    if (pt2.X < 0) pt2.X = 0;
+                    if (pt2.Y < 0) pt2.Y = 0;
+                    int startRow = (Math.Min(pt1.Y, pt2.Y) + ViewOffset.Y - (mView == View.Details ? mRenderer.MeasureColumnHeaderHeight() : 0)) / layoutManager.ItemSizeWithMargin.Height;
+                    int endRow = (Math.Max(pt1.Y, pt2.Y) + ViewOffset.Y - (mView == View.Details ? mRenderer.MeasureColumnHeaderHeight() : 0)) / layoutManager.ItemSizeWithMargin.Height;
+                    int startCol = (Math.Min(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
+                    int endCol = (Math.Max(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
+                    if (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1)
                     {
-                        for (int col = startCol; col <= endCol; col++)
+                        startCol = Math.Min(layoutManager.Cols - 1, startCol);
+                        endCol = Math.Min(layoutManager.Cols - 1, endCol);
+                        for (int row = startRow; row <= endRow; row++)
                         {
-                            int i = row * layoutManager.Cols + col;
-                            if (i >= 0 && i <= mItems.Count - 1 && !nav.Highlight.ContainsKey(mItems[i]))
-                                nav.Highlight.Add(mItems[i], (nav.ControlDown ? !Items[i].Selected : true));
+                            for (int col = startCol; col <= endCol; col++)
+                            {
+                                int i = row * layoutManager.Cols + col;
+                                if (i >= 0 && i <= mItems.Count - 1 && !nav.Highlight.ContainsKey(mItems[i]))
+                                    nav.Highlight.Add(mItems[i], (nav.ControlDown ? !Items[i].Selected : true));
+                            }
                         }
                     }
                 }
