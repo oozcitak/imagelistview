@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 0.18 (27 November 2009) =
+
+  * Control border is now drawn by the framework.
+  * Fixed a bug in layout manager where number of visible columns or rows could be zero when the control is sized too small.
+  * Added the new overridable method, !OnLayout to the !ImageListViewRenderer. It can be used to modify the item area by custom renderers.
+
 = 0.17 (26 November 2009) =
 
   * Maximum size of the thumbnail cache can now be (approximately) set by the user using the new !ImageListView.!CacheLimit property. 
