@@ -45,7 +45,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets or sets the focused item.
             /// </summary>
-            internal ImageListViewItem FocusedItem
+            public ImageListViewItem FocusedItem
             {
                 get
                 {

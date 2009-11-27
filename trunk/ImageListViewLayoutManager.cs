@@ -144,10 +144,8 @@ namespace Manina.Windows.Forms
         {
             Point location = new Point();
             Size itemMargin = AdjustedItemMargin;
-            location.X += itemMargin.Width / 2 + (itemIndex % mCols) * (mItemSize.Width + itemMargin.Width) - mImageListView.ViewOffset.X;
-            location.Y += itemMargin.Height / 2 + (itemIndex / mCols) * (mItemSize.Height + itemMargin.Height) - mImageListView.ViewOffset.Y;
-            if (mImageListView.View == View.Details)
-                location.Y += mImageListView.mRenderer.MeasureColumnHeaderHeight();
+            location.X += mItemAreaBounds.Left + itemMargin.Width / 2 + (itemIndex % mCols) * (mItemSize.Width + itemMargin.Width) - mImageListView.ViewOffset.X;
+            location.Y += mItemAreaBounds.Top + itemMargin.Height / 2 + (itemIndex / mCols) * (mItemSize.Height + itemMargin.Height) - mImageListView.ViewOffset.Y;
             return new Rectangle(location, mItemSize);
         }
         /// <summary>
@@ -294,12 +292,12 @@ namespace Manina.Windows.Forms
 
             // Horizontal scrollbar position
             mImageListView.hScrollBar.Left = 0;
-            mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom -  mImageListView.hScrollBar.Height;
+            mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom - mImageListView.hScrollBar.Height;
             mImageListView.hScrollBar.Width = mImageListView.ClientRectangle.Width - (mImageListView.vScrollBar.Visible ? mImageListView.vScrollBar.Width : 0);
             // Vertical scrollbar position
-            mImageListView.vScrollBar.Left = mImageListView.ClientRectangle.Right -  mImageListView.vScrollBar.Width;
+            mImageListView.vScrollBar.Left = mImageListView.ClientRectangle.Right - mImageListView.vScrollBar.Width;
             mImageListView.vScrollBar.Top = 0;
-            mImageListView.vScrollBar.Height = mImageListView.ClientRectangle.Height -  (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
+            mImageListView.vScrollBar.Height = mImageListView.ClientRectangle.Height - (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
 
             // Find the first and last partially visible items
             mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
