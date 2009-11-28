@@ -279,6 +279,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         internal Point ViewOffset { get { return mViewOffset; } set { mViewOffset = value; } }
         /// <summary>
+        /// Gets the scroll orientation.
+        /// </summary>
+        internal ScrollOrientation ScrollOrientation { get { return (mView == View.Gallery ? ScrollOrientation.HorizontalScroll : ScrollOrientation.VerticalScroll); } }
+        /// <summary>
         /// Gets the required creation parameters when the control handle is created.
         /// </summary>
         /// <value></value>
@@ -514,7 +518,7 @@ namespace Manina.Windows.Forms
                     i++;
                 }
             }
-            else if (View == View.Details || View == View.Thumbnails)
+            else if (ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
                 hitInfo.InItemArea = true;
                 // Normalize to item area coordinates
@@ -541,7 +545,7 @@ namespace Manina.Windows.Forms
                     }
                 }
             }
-            else if (View == View.Gallery)
+            else if (ScrollOrientation == ScrollOrientation.HorizontalScroll)
             {
                 hitInfo.InItemArea = true;
                 // Normalize to item area coordinates
@@ -1089,17 +1093,27 @@ namespace Manina.Windows.Forms
                 nav.SelSeperator = (ColumnType)(-1);
             }
 
-            if (nav.Dragging && e.Y > ClientRectangle.Bottom && !scrollTimer.Enabled)
+            if (nav.Dragging && ScrollOrientation == ScrollOrientation.VerticalScroll && e.Y > ClientRectangle.Bottom && !scrollTimer.Enabled)
             {
                 scrollTimer.Tag = -120;
                 scrollTimer.Enabled = true;
             }
-            else if (nav.Dragging && e.Y < ClientRectangle.Top && !scrollTimer.Enabled)
+            else if (nav.Dragging && ScrollOrientation == ScrollOrientation.VerticalScroll && e.Y < ClientRectangle.Top && !scrollTimer.Enabled)
             {
                 scrollTimer.Tag = 120;
                 scrollTimer.Enabled = true;
             }
-            else if (scrollTimer.Enabled && e.Y >= ClientRectangle.Top && e.Y <= ClientRectangle.Bottom)
+            else if (nav.Dragging && ScrollOrientation == ScrollOrientation.HorizontalScroll && e.X > ClientRectangle.Right && !scrollTimer.Enabled)
+            {
+                scrollTimer.Tag = -120;
+                scrollTimer.Enabled = true;
+            }
+            else if (nav.Dragging && ScrollOrientation == ScrollOrientation.HorizontalScroll && e.X < ClientRectangle.Left && !scrollTimer.Enabled)
+            {
+                scrollTimer.Tag = 120;
+                scrollTimer.Enabled = true;
+            }
+            else if (scrollTimer.Enabled && ClientRectangle.Contains(e.Location))
             {
                 scrollTimer.Enabled = false;
             }
@@ -1153,8 +1167,8 @@ namespace Manina.Windows.Forms
                 pt1.Y -= layoutManager.ItemAreaBounds.Top;
                 pt2.X -= layoutManager.ItemAreaBounds.Left;
                 pt2.Y -= layoutManager.ItemAreaBounds.Top;
-                if ((View == View.Gallery && (pt1.Y > 0 || pt2.Y > 0)) ||
-                    (View != View.Gallery && (pt1.X > 0 || pt2.X > 0)))
+                if ((ScrollOrientation == ScrollOrientation.HorizontalScroll && (pt1.Y > 0 || pt2.Y > 0)) ||
+                    (ScrollOrientation == ScrollOrientation.VerticalScroll && (pt1.X > 0 || pt2.X > 0)))
                 {
                     if (pt1.X < 0) pt1.X = 0;
                     if (pt1.Y < 0) pt1.Y = 0;
@@ -1164,7 +1178,8 @@ namespace Manina.Windows.Forms
                     int endRow = (Math.Max(pt1.Y, pt2.Y) + ViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
                     int startCol = (Math.Min(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
                     int endCol = (Math.Max(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                    if (View == View.Gallery)
+                    if (ScrollOrientation == ScrollOrientation.HorizontalScroll &&
+                        (startRow <= layoutManager.Rows - 1 || endRow <= layoutManager.Rows - 1))
                     {
                         for (int row = startRow; row <= endRow; row++)
                         {
@@ -1176,7 +1191,8 @@ namespace Manina.Windows.Forms
                             }
                         }
                     }
-                    else if (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1)
+                    else if (ScrollOrientation == ScrollOrientation.VerticalScroll &&
+                        (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1))
                     {
                         startCol = Math.Min(layoutManager.Cols - 1, startCol);
                         endCol = Math.Min(layoutManager.Cols - 1, endCol);
@@ -1220,19 +1236,38 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            int newYOffset = mViewOffset.Y - (e.Delta / 120) * vScrollBar.SmallChange;
-            if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
-                newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
-            if (newYOffset < 0)
-                newYOffset = 0;
-            int delta = newYOffset - mViewOffset.Y;
-            if (newYOffset < vScrollBar.Minimum) newYOffset = vScrollBar.Minimum;
-            if (newYOffset > vScrollBar.Maximum) newYOffset = vScrollBar.Maximum;
-            mViewOffset.Y = newYOffset;
-            hScrollBar.Value = 0;
-            vScrollBar.Value = newYOffset;
-            if (nav.Dragging)
-                nav.SelStart = new Point(nav.SelStart.X, nav.SelStart.Y - delta);
+            if (ScrollOrientation == ScrollOrientation.VerticalScroll)
+            {
+                int newYOffset = mViewOffset.Y - (e.Delta / 120) * vScrollBar.SmallChange;
+                if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
+                    newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
+                if (newYOffset < 0)
+                    newYOffset = 0;
+                int delta = newYOffset - mViewOffset.Y;
+                if (newYOffset < vScrollBar.Minimum) newYOffset = vScrollBar.Minimum;
+                if (newYOffset > vScrollBar.Maximum) newYOffset = vScrollBar.Maximum;
+                mViewOffset.Y = newYOffset;
+                hScrollBar.Value = 0;
+                vScrollBar.Value = newYOffset;
+                if (nav.Dragging)
+                    nav.SelStart = new Point(nav.SelStart.X, nav.SelStart.Y - delta);
+            }
+            else
+            {
+                int newXOffset = mViewOffset.X - (e.Delta / 120) * hScrollBar.SmallChange;
+                if (newXOffset > hScrollBar.Maximum - hScrollBar.LargeChange + 1)
+                    newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;
+                if (newXOffset < 0)
+                    newXOffset = 0;
+                int delta = newXOffset - mViewOffset.X;
+                if (newXOffset < hScrollBar.Minimum) newXOffset = hScrollBar.Minimum;
+                if (newXOffset > hScrollBar.Maximum) newXOffset = hScrollBar.Maximum;
+                mViewOffset.X = newXOffset;
+                vScrollBar.Value = 0;
+                hScrollBar.Value = newXOffset;
+                if (nav.Dragging)
+                    nav.SelStart = new Point(nav.SelStart.X - delta, nav.SelStart.Y);
+            }
 
             mRenderer.Refresh();
 
