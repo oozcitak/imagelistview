@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 1.0 (28 November 2009) =
+  * Added the Gallery view mode. 
+  * Modified the hit testing, scrolling and the custom renderers to work with the Gallery view mode.
+
 = 0.18 (27 November 2009) =
 
   * Control border is now drawn by the framework.
