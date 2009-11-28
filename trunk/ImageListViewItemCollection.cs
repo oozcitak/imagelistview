@@ -379,9 +379,9 @@ namespace Manina.Windows.Forms
                         case ColumnType.DateModified:
                             result = DateTime.Compare(x.DateModified, y.DateModified);
                             break;
-                        case ColumnType.Dimension:
-                            long ax = x.Dimension.Width * x.Dimension.Height;
-                            long ay = y.Dimension.Width * y.Dimension.Height;
+                        case ColumnType.Dimensions:
+                            long ax = x.Dimensions.Width * x.Dimensions.Height;
+                            long ay = y.Dimensions.Width * y.Dimensions.Height;
                             result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
                             break;
                         case ColumnType.FileName:
