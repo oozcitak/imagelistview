@@ -240,7 +240,9 @@ namespace Manina.Windows.Forms
                 // Reference text height
                 int textHeight = mImageListView.Font.Height;
 
-                if (view == View.Thumbnails)
+                if (view == View.Details)
+                    return base.MeasureItem(view);
+                else
                 {
                     // Calculate item size
                     Size itemPadding = new Size(4, 4);
@@ -248,8 +250,6 @@ namespace Manina.Windows.Forms
                     itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3) + itemPadding.Height; // textHeight / 3 = vertical space between thumbnail and text
                     return itemSize;
                 }
-                else
-                    return base.MeasureItem(view);
             }
             /// <summary>
             /// Draws the specified item on the given graphics.
@@ -266,7 +266,7 @@ namespace Manina.Windows.Forms
                     g.FillRectangle(bItemBack, bounds);
                 }
 
-                if (mImageListView.View == View.Thumbnails)
+                if (mImageListView.View == View.Thumbnails || mImageListView.View== View.Gallery)
                 {
                     Size itemPadding = new Size(4, 4);
 
@@ -381,6 +381,35 @@ namespace Manina.Windows.Forms
 
                     if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                         ControlPaint.DrawFocusRectangle(g, bounds);
+                }
+            }
+            /// <summary>
+            /// Draws the large preview image of the focused item in Gallery mode.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the preview area.</param>
+            public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                Image img = item.GetImage();
+                // Calculate image bounds
+                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)img.Width;
+                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)img.Height;
+                float scale = Math.Min(xscale, yscale);
+                if (scale > 1.0f) scale = 1.0f;
+                int imageWidth = (int)((float)img.Width * scale);
+                int imageHeight = (int)((float)img.Height * scale);
+                int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
+                int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
+                // Draw image
+                g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+                // Draw image border
+                if (img.Width > 32)
+                {
+                    using (Pen pGray128 = new Pen(Color.FromArgb(128,SystemColors.GrayText)))
+                    {
+                        g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                    }
                 }
             }
         }

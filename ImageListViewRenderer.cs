@@ -441,15 +441,23 @@ namespace Manina.Windows.Forms
                 }
 
                 // Draw the large preview image in Gallery mode
-                if (mImageListView.View == View.Gallery && mImageListView.Items.FocusedItem != null)
+                if (mImageListView.View == View.Gallery && mImageListView.Items.Count != 0)
                 {
+                    ImageListViewItem item = null;
+                    if (mImageListView.Items.FocusedItem != null)
+                        item = mImageListView.Items.FocusedItem;
+                    else if (mImageListView.SelectedItems.Count != 0)
+                        item = mImageListView.SelectedItems[0];
+                    else
+                        item = mImageListView.Items[0];
+
                     Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
                     if (mClip)
                         g.SetClip(bounds);
                     else
                         g.SetClip(mImageListView.layoutManager.ClientArea);
-                    DrawGalleryImage(g, mImageListView.Items.FocusedItem, bounds);
+                    DrawGalleryImage(g, item, bounds);
                 }
 
                 // Scrollbar filler
