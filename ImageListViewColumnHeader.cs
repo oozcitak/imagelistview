@@ -49,8 +49,8 @@ namespace Manina.Windows.Forms
                             return "Size";
                         case ColumnType.FileType:
                             return "Type";
-                        case ColumnType.Dimension:
-                            return "Dimension";
+                        case ColumnType.Dimensions:
+                            return "Dimensions";
                         case ColumnType.Resolution:
                             return "Resolution";
                         default:

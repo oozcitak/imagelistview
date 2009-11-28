@@ -28,7 +28,7 @@ namespace Manina.Windows.Forms
         private string mFileName;
         internal string mFilePath;
         internal long mFileSize;
-        internal Size mDimension;
+        internal Size mDimensions;
         internal SizeF mResolution;
 
         internal ImageListView.ImageListViewItemCollection owner;
@@ -268,7 +268,7 @@ namespace Manina.Windows.Forms
         /// Gets image dimensions.
         /// </summary>
         [Category("Data"), Browsable(false), Description("Gets image dimensions.")]
-        public Size Dimension { get { UpdateFileInfo(); return mDimension; } }
+        public Size Dimensions { get { UpdateFileInfo(); return mDimensions; } }
         /// <summary>
         /// Gets image resolution in pixels per inch.
         /// </summary>
@@ -334,8 +334,8 @@ namespace Manina.Windows.Forms
                     return Utility.FormatSize(FileSize);
                 case ColumnType.FileType:
                     return FileType;
-                case ColumnType.Dimension:
-                    return string.Format("{0} x {1}", Dimension.Width, Dimension.Height);
+                case ColumnType.Dimensions:
+                    return string.Format("{0} x {1}", Dimensions.Width, Dimensions.Height);
                 case ColumnType.Resolution:
                     return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
                 default:
@@ -368,7 +368,7 @@ namespace Manina.Windows.Forms
             {
                 using (Image img = Image.FromStream(stream, false, false))
                 {
-                    mDimension = img.Size;
+                    mDimensions = img.Size;
                     mResolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
                 }
             }
@@ -388,7 +388,7 @@ namespace Manina.Windows.Forms
             mFileType = fileType;
             mFilePath = filePath;
             defaultText = name;
-            mDimension = dimension;
+            mDimensions = dimension;
             mResolution = resolution;
         }
         #endregion

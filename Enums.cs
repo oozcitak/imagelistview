@@ -28,6 +28,7 @@ namespace Manina.Windows.Forms
     {
         Details,
         Thumbnails,
+        Gallery,
     }
     /// <summary>
     /// Represents the type of information displayed in an image list view column.
@@ -42,7 +43,7 @@ namespace Manina.Windows.Forms
         FileName,
         FilePath,
         FileSize,
-        Dimension,
+        Dimensions,
         Resolution,
     }
     /// <summary>

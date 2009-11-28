@@ -514,7 +514,7 @@ namespace Manina.Windows.Forms
                     i++;
                 }
             }
-            else
+            else if (View == View.Details || View == View.Thumbnails)
             {
                 hitInfo.InItemArea = true;
                 // Normalize to item area coordinates
@@ -523,13 +523,13 @@ namespace Manina.Windows.Forms
 
                 if (pt.X > 0 && pt.Y > 0)
                 {
-                    int col = pt.X / layoutManager.ItemSizeWithMargin.Width;
+                    int col = (pt.X + mViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
                     int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
 
                     if (col <= layoutManager.Cols)
                     {
                         int index = row * layoutManager.Cols + col;
-                        if (index >= 0 && index < Items.Count)
+                        if (index >= 0 && index <= Items.Count - 1)
                         {
                             Rectangle bounds = layoutManager.GetItemBounds(index);
                             if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
@@ -537,6 +537,30 @@ namespace Manina.Windows.Forms
                                 hitInfo.ItemHit = true;
                                 hitInfo.ItemIndex = index;
                             }
+                        }
+                    }
+                }
+            }
+            else if (View == View.Gallery)
+            {
+                hitInfo.InItemArea = true;
+                // Normalize to item area coordinates
+                pt.X -= layoutManager.ItemAreaBounds.Left;
+                pt.Y -= layoutManager.ItemAreaBounds.Top;
+
+                if (pt.X > 0 && pt.Y > 0)
+                {
+                    int col = (pt.X + mViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
+                    int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
+
+                    int index = row * layoutManager.Cols + col;
+                    if (index >= 0 && index < Items.Count)
+                    {
+                        Rectangle bounds = layoutManager.GetItemBounds(index);
+                        if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                        {
+                            hitInfo.ItemHit = true;
+                            hitInfo.ItemIndex = index;
                         }
                     }
                 }
@@ -1129,17 +1153,30 @@ namespace Manina.Windows.Forms
                 pt1.Y -= layoutManager.ItemAreaBounds.Top;
                 pt2.X -= layoutManager.ItemAreaBounds.Left;
                 pt2.Y -= layoutManager.ItemAreaBounds.Top;
-                if (pt1.X > 0 || pt2.X > 0)
+                if ((View == View.Gallery && (pt1.Y > 0 || pt2.Y > 0)) ||
+                    (View != View.Gallery && (pt1.X > 0 || pt2.X > 0)))
                 {
                     if (pt1.X < 0) pt1.X = 0;
                     if (pt1.Y < 0) pt1.Y = 0;
                     if (pt2.X < 0) pt2.X = 0;
                     if (pt2.Y < 0) pt2.Y = 0;
-                    int startRow = (Math.Min(pt1.Y, pt2.Y) + ViewOffset.Y - (mView == View.Details ? mRenderer.MeasureColumnHeaderHeight() : 0)) / layoutManager.ItemSizeWithMargin.Height;
-                    int endRow = (Math.Max(pt1.Y, pt2.Y) + ViewOffset.Y - (mView == View.Details ? mRenderer.MeasureColumnHeaderHeight() : 0)) / layoutManager.ItemSizeWithMargin.Height;
+                    int startRow = (Math.Min(pt1.Y, pt2.Y) + ViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
+                    int endRow = (Math.Max(pt1.Y, pt2.Y) + ViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
                     int startCol = (Math.Min(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
                     int endCol = (Math.Max(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                    if (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1)
+                    if (View == View.Gallery)
+                    {
+                        for (int row = startRow; row <= endRow; row++)
+                        {
+                            for (int col = startCol; col <= endCol; col++)
+                            {
+                                int i = row * layoutManager.Cols + col;
+                                if (i >= 0 && i <= mItems.Count - 1 && !nav.Highlight.ContainsKey(mItems[i]))
+                                    nav.Highlight.Add(mItems[i], (nav.ControlDown ? !Items[i].Selected : true));
+                            }
+                        }
+                    }
+                    else if (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1)
                     {
                         startCol = Math.Min(layoutManager.Cols - 1, startCol);
                         endCol = Math.Min(layoutManager.Cols - 1, endCol);

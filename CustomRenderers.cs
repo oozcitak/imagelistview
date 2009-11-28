@@ -165,7 +165,7 @@ namespace Manina.Windows.Forms
                             g.DrawString(item.GetSubItemText(ColumnType.FileType),
                                 mImageListView.Font, bItemDetails, rt, sf);
                             rt.Offset(0, 1.1f * lineHeight);
-                            g.DrawString(string.Format("{0} pixels, {1} dpi", item.GetSubItemText(ColumnType.Dimension), item.Resolution.Width),
+                            g.DrawString(string.Format("{0} pixels, {1} dpi", item.GetSubItemText(ColumnType.Dimensions), item.Resolution.Width),
                                 mImageListView.Font, bItemDetails, rt, sf);
                             rt.Offset(0, 1.1f * lineHeight);
                             g.DrawString(item.GetSubItemText(ColumnType.FileSize),
@@ -599,7 +599,7 @@ namespace Manina.Windows.Forms
                         rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
                         using (Brush bGrayText = new SolidBrush(Color.Gray))
                         {
-                            g.DrawString(string.Format("{0} pixels, {1}", item.GetSubItemText(ColumnType.Dimension), item.GetSubItemText(ColumnType.FileSize)),
+                            g.DrawString(string.Format("{0} pixels, {1}", item.GetSubItemText(ColumnType.Dimensions), item.GetSubItemText(ColumnType.FileSize)),
                                 mImageListView.Font, bGrayText, rt, sf);
                         }
                     }
@@ -804,8 +804,8 @@ namespace Manina.Windows.Forms
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine(item.FileType);
 
-                    sb.Append("Dimension: ");
-                    sb.Append(item.GetSubItemText(ColumnType.Dimension));
+                    sb.Append("Dimensions: ");
+                    sb.Append(item.GetSubItemText(ColumnType.Dimensions));
                     sb.AppendLine();
 
                     sb.Append("Resolution: ");

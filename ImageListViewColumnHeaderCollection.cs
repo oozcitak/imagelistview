@@ -66,7 +66,7 @@ namespace Manina.Windows.Forms
                     new ImageListViewColumnHeader(ColumnType.Name),
                     new ImageListViewColumnHeader(ColumnType.FileSize),
                     new ImageListViewColumnHeader(ColumnType.DateModified),
-                    new ImageListViewColumnHeader(ColumnType.Dimension),
+                    new ImageListViewColumnHeader(ColumnType.Dimensions),
                     new ImageListViewColumnHeader(ColumnType.Resolution),
                     new ImageListViewColumnHeader(ColumnType.FilePath),
                     new ImageListViewColumnHeader(ColumnType.FileType),
