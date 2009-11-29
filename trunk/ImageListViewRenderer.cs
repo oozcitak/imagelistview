@@ -21,6 +21,7 @@ namespace Manina.Windows.Forms
             private BufferedGraphicsContext bufferContext;
             private BufferedGraphics bufferGraphics;
             private bool disposed;
+            private bool suspended;
             private int suspendCount;
             private bool needsPaint;
             private ItemDrawOrder mItemDrawOrder;
@@ -58,6 +59,7 @@ namespace Manina.Windows.Forms
             public ImageListViewRenderer()
             {
                 disposed = false;
+                suspended = false;
                 suspendCount = 0;
                 needsPaint = true;
                 mClip = true;
@@ -291,6 +293,31 @@ namespace Manina.Windows.Forms
             }
             /// <summary>
             /// Suspends painting until a matching ResumePaint call is made.
+            /// Used by the parent control as part of SuspendLayout.
+            /// </summary>
+            internal void SuspendPaint(bool ispublic)
+            {
+                if (ispublic)
+                    suspended = true;
+                else
+                    SuspendPaint();
+            }
+            /// <summary>
+            /// Resumes painting. This call must be matched by a prior SuspendPaint call.
+            /// Used by the parent control as part of ResumeLayout.
+            /// </summary>
+            internal void ResumePaint(bool ispublic)
+            {
+                if (ispublic)
+                {
+                    suspended = false;
+                    if (needsPaint) Refresh();
+                }
+                else
+                    SuspendPaint();
+            }
+            /// <summary>
+            /// Suspends painting until a matching ResumePaint call is made.
             /// </summary>
             internal void SuspendPaint()
             {
@@ -317,7 +344,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal bool CanPaint()
             {
-                return (suspendCount == 0);
+                return (suspended == false && suspendCount == 0);
             }
             /// <summary>
             /// Renders the control.
