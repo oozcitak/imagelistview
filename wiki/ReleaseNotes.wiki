@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 1.1 (29 November 2009) =
+  * Fixed !ImageListView.!EnsureVisible to work with the Gallery mode.
+  * !ImageListViewCacheManager now properly zeroes out the memory used when it clears the cache. 
+  * The preview image is now loaded by a background thread in Gallery view mode. 
+  * Threaded renderers now use a !BackgroundWorker.
+
 = 1.0 (28 November 2009) =
   * Added the Gallery view mode. 
   * Modified the hit testing, scrolling and the custom renderers to work with the Gallery view mode.
