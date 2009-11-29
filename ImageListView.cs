@@ -374,7 +374,7 @@ namespace Manina.Windows.Forms
         public new void SuspendLayout()
         {
             base.SuspendLayout();
-            mRenderer.SuspendPaint();
+            mRenderer.SuspendPaint(true);
         }
         /// <summary>
         /// Resumes usual layout logic.
@@ -391,7 +391,7 @@ namespace Manina.Windows.Forms
         {
             base.ResumeLayout(performLayout);
             if (performLayout) mRenderer.Refresh();
-            mRenderer.ResumePaint();
+            mRenderer.ResumePaint(true);
         }
         /// <summary>
         /// Sets the properties of the specified column header.
