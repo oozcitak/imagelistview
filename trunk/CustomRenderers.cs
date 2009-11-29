@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Threading;
+using System.ComponentModel;
 
 namespace Manina.Windows.Forms
 {
@@ -266,7 +267,7 @@ namespace Manina.Windows.Forms
                     g.FillRectangle(bItemBack, bounds);
                 }
 
-                if (mImageListView.View == View.Thumbnails || mImageListView.View== View.Gallery)
+                if (mImageListView.View == View.Thumbnails || mImageListView.View == View.Gallery)
                 {
                     Size itemPadding = new Size(4, 4);
 
@@ -406,7 +407,7 @@ namespace Manina.Windows.Forms
                 // Draw image border
                 if (img.Width > 32)
                 {
-                    using (Pen pGray128 = new Pen(Color.FromArgb(128,SystemColors.GrayText)))
+                    using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
                     {
                         g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
                     }
@@ -421,12 +422,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class ZoomingRenderer : ImageListView.ImageListViewRenderer
         {
-            private string requestedFileName = null;
-            private string cachedFileName = null;
-            private Image cachedImage = null;
-            private object lockObject = new object();
-            private Thread cacheThread;
             private float mZoomRatio;
+
+            BackgroundWorker worker;
+            private string cachedFileName;
+            private Image cachedImage;
 
             public ZoomingRenderer()
                 : this(0.5f)
@@ -440,40 +440,26 @@ namespace Manina.Windows.Forms
                 if (zoomRatio < 0.0f) zoomRatio = 0.0f;
                 if (zoomRatio > 1.0f) zoomRatio = 1.0f;
                 mZoomRatio = zoomRatio;
-                cacheThread = new Thread(new ParameterizedThreadStart(DoWork));
-                cacheThread.IsBackground = true;
-                cacheThread.Start(this);
-                while (!cacheThread.IsAlive) ;
+
+                cachedFileName = null;
+                cachedImage = null;
+                worker = new BackgroundWorker();
+                worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+                worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
             }
 
-            private static void DoWork(object sender)
+            void worker_DoWork(object sender, DoWorkEventArgs e)
             {
-                ZoomingRenderer renderer = (ZoomingRenderer)sender;
-                while (true)
-                {
-                    lock (renderer.lockObject)
-                    {
-                        Monitor.Wait(renderer.lockObject);
-                        if (renderer.requestedFileName != renderer.cachedFileName)
-                        {
-                            renderer.cachedImage = Image.FromFile(renderer.requestedFileName);
-                            renderer.cachedFileName = renderer.requestedFileName;
-                        }
-                    }
-
-                    renderer.mImageListView.BeginInvoke(new RefreshEventHandlerInternal(renderer.mImageListView.OnRefreshInternal));
-                }
+                string requestedGalleryFile = (string)e.Argument;
+                e.Result = new KeyValuePair<string, Image>(requestedGalleryFile, Image.FromFile(requestedGalleryFile));
             }
 
-            public override void OnDispose()
+            void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
             {
-                base.OnDispose();
-
-                if (cacheThread.IsAlive)
-                {
-                    cacheThread.Abort();
-                    cacheThread.Join();
-                }
+                KeyValuePair<string, Image> result = (KeyValuePair<string, Image>)e.Result;
+                cachedFileName = result.Key;
+                cachedImage = result.Value;
+                mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
             /// <summary>
@@ -531,16 +517,13 @@ namespace Manina.Windows.Forms
                     img = item.ThumbnailImage;
                     if ((state & ItemState.Hovered) == ItemState.Hovered)
                     {
-                        lock (lockObject)
+                        if (cachedImage == null || cachedFileName == null || string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
                         {
-                            if (cachedFileName == item.FileName)
-                                img = cachedImage;
-                            else
-                            {
-                                requestedFileName = item.FileName;
-                                Monitor.Pulse(lockObject);
-                            }
+                            if (!worker.IsBusy)
+                                worker.RunWorkerAsync(item.FileName);
                         }
+                        else
+                            img = cachedImage;
                     }
 
                     // Calculate image bounds

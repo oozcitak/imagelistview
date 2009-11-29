@@ -107,6 +107,15 @@ namespace Manina.Windows.Forms
             get { return mCacheLimitAsMemory; }
             set { mCacheLimitAsMemory = value; mCacheLimitAsItemCount = 0; }
         }
+        /// <summary>
+        /// Gets the approximate amount of memory used by the cache.
+        /// </summary>
+        public long MemoryUsed { get { return memoryUsed; } }
+        /// <summary>
+        /// Returns the count of items in the cache.
+        /// Requires a cache lock, use sparingly.
+        /// </summary>
+        public long CacheSize { get { lock (thumbCache) { return thumbCache.Count; } } }
         #endregion
 
         #region Constructor
@@ -352,13 +361,18 @@ namespace Manina.Windows.Forms
                         Dictionary<Guid, bool> visible = (Dictionary<Guid, bool>)owner.mImageListView.Invoke(new GetVisibleItemsInternal(owner.mImageListView.GetVisibleItems));
                         lock (owner.thumbCache)
                         {
+                            long memoryUsed = 0;
                             Dictionary<Guid, CacheItem> newCache = new Dictionary<Guid, CacheItem>();
                             foreach (Guid vguid in visible.Keys)
                             {
                                 if (owner.thumbCache.ContainsKey(vguid))
+                                {
                                     newCache.Add(vguid, owner.thumbCache[vguid]);
+                                    memoryUsed += owner.thumbCache[vguid].Size.Width * owner.thumbCache[vguid].Size.Height * 24 / 8;
+                                }
                             }
                             owner.thumbCache = newCache;
+                            owner.memoryUsed = memoryUsed;
                         }
                     }
 
