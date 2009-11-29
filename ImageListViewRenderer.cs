@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Threading;
+using System.ComponentModel;
 
 namespace Manina.Windows.Forms
 {
@@ -22,6 +24,10 @@ namespace Manina.Windows.Forms
             private int suspendCount;
             private bool needsPaint;
             private ItemDrawOrder mItemDrawOrder;
+
+            BackgroundWorker galleryWorker;
+            private Image lastGalleryImage;
+            private string lastGalleryFile;
             #endregion
 
             #region Properties
@@ -56,6 +62,12 @@ namespace Manina.Windows.Forms
                 needsPaint = true;
                 mClip = true;
                 mItemDrawOrder = ItemDrawOrder.ItemIndex;
+
+                lastGalleryImage = null;
+                lastGalleryFile = null;
+                galleryWorker = new BackgroundWorker();
+                galleryWorker.DoWork += new DoWorkEventHandler(galleryWorker_DoWork);
+                galleryWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(galleryWorker_RunWorkerCompleted);
             }
             #endregion
 
@@ -546,6 +558,9 @@ namespace Manina.Windows.Forms
                 if (bufferGraphics != null)
                     bufferGraphics.Dispose();
 
+                if (galleryWorker != null)
+                    galleryWorker.Dispose();
+
                 OnDispose();
             }
             #endregion
@@ -882,7 +897,17 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the preview area.</param>
             public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Rectangle bounds)
             {
-                Image img = item.GetImage();
+                Image img = lastGalleryImage;
+                if (lastGalleryImage == null || lastGalleryFile == null || string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
+                {
+                    img = mImageListView.DefaultImage;
+                    if (!galleryWorker.IsBusy)
+                        galleryWorker.RunWorkerAsync(item.FileName);
+                }
+
+                if (img == null)
+                    img = mImageListView.DefaultImage;
+
                 // Calculate image bounds
                 float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)img.Width;
                 float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)img.Height;
@@ -895,18 +920,15 @@ namespace Manina.Windows.Forms
                 // Draw image
                 g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
                 // Draw image border
-                if (img.Width > 32)
+                if (Math.Min(imageWidth, imageHeight) > 32)
                 {
                     using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                     {
                         g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
                     }
-                    if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
+                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
                     {
-                        using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                        {
-                            g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
-                        }
+                        g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
                     }
                 }
             }
@@ -993,6 +1015,27 @@ namespace Manina.Windows.Forms
             public virtual void OnLayout(LayoutEventArgs e)
             {
                 ;
+            }
+            #endregion
+
+            #region Gallery Image Worker Thread
+            /// <summary>
+            /// Handles the DoWork event of the galleryWorker.
+            /// </summary>
+            void galleryWorker_DoWork(object sender, DoWorkEventArgs e)
+            {
+                string requestedGalleryFile = (string)e.Argument;
+                e.Result = new KeyValuePair<string, Image>(requestedGalleryFile, Image.FromFile(requestedGalleryFile));
+            }
+            /// <summary>
+            /// Handles the RunWorkerCompleted event of the galleryWorker.
+            /// </summary>
+            void galleryWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+            {
+                KeyValuePair<string, Image> result = (KeyValuePair<string, Image>)e.Result;
+                lastGalleryFile = result.Key;
+                lastGalleryImage = result.Value;
+                mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
             #endregion
         }
