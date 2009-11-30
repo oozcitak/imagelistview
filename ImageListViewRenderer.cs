@@ -28,6 +28,7 @@ namespace Manina.Windows.Forms
 
             BackgroundWorker galleryWorker;
             private Image lastGalleryImage;
+            private Size lastGalleryImageSize;
             private string lastGalleryFile;
             #endregion
 
@@ -314,7 +315,7 @@ namespace Manina.Windows.Forms
                     if (needsPaint) Refresh();
                 }
                 else
-                    SuspendPaint();
+                    ResumePaint();
             }
             /// <summary>
             /// Suspends painting until a matching ResumePaint call is made.
@@ -492,11 +493,23 @@ namespace Manina.Windows.Forms
 
                     Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
+
+                    Image image = item.ThumbnailImage;
+                    if (lastGalleryImage == null || lastGalleryFile == null ||
+                        string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) != 0 ||
+                        lastGalleryImageSize != bounds.Size)
+                    {
+                        if (!galleryWorker.IsBusy)
+                            galleryWorker.RunWorkerAsync(new Utility.Pair<string, Size>(item.FileName, bounds.Size));
+                    }
+                    else
+                        image = lastGalleryImage;
+
                     if (mClip)
                         g.SetClip(bounds);
                     else
                         g.SetClip(mImageListView.layoutManager.ClientArea);
-                    DrawGalleryImage(g, item, bounds);
+                    DrawGalleryImage(g, item, image, bounds);
                 }
 
                 // Scrollbar filler
@@ -600,7 +613,8 @@ namespace Manina.Windows.Forms
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             public virtual void InitializeGraphics(Graphics g)
             {
-                ;
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.InterpolationMode = InterpolationMode.High;
             }
             /// <summary>
             /// Returns the height of column headers.
@@ -921,31 +935,21 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="image">The image to draw.</param>
             /// <param name="bounds">The bounding rectangle of the preview area.</param>
-            public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Rectangle bounds)
+            public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
-                Image img = lastGalleryImage;
-                if (lastGalleryImage == null || lastGalleryFile == null || string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
-                {
-                    img = mImageListView.DefaultImage;
-                    if (!galleryWorker.IsBusy)
-                        galleryWorker.RunWorkerAsync(item.FileName);
-                }
-
-                if (img == null)
-                    img = mImageListView.DefaultImage;
-
                 // Calculate image bounds
-                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)img.Width;
-                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)img.Height;
+                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)image.Width;
+                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)image.Height;
                 float scale = Math.Min(xscale, yscale);
                 if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)img.Width * scale);
-                int imageHeight = (int)((float)img.Height * scale);
+                int imageWidth = (int)((float)image.Width * scale);
+                int imageHeight = (int)((float)image.Height * scale);
                 int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
                 int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
                 // Draw image
-                g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+                g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
                 // Draw image border
                 if (Math.Min(imageWidth, imageHeight) > 32)
                 {
@@ -1051,17 +1055,43 @@ namespace Manina.Windows.Forms
             /// </summary>
             void galleryWorker_DoWork(object sender, DoWorkEventArgs e)
             {
-                string requestedGalleryFile = (string)e.Argument;
-                e.Result = new KeyValuePair<string, Image>(requestedGalleryFile, Image.FromFile(requestedGalleryFile));
+                Utility.Pair<string, Size> request = (Utility.Pair<string, Size>)e.Argument;
+                string requestedGalleryFile = request.First;
+                Size size = request.Second;
+                Image img = Image.FromFile(requestedGalleryFile);
+
+                // Calculate image bounds
+                float xscale = (float)size.Width / (float)img.Width;
+                float yscale = (float)size.Height / (float)img.Height;
+                float scale = Math.Min(xscale, yscale);
+                if (scale > 1.0f) scale = 1.0f;
+                int imageWidth = (int)((float)img.Width * scale);
+                int imageHeight = (int)((float)img.Height * scale);
+
+                // Create a scaled image
+                Image scaled = new Bitmap(imageWidth, imageHeight);
+                using (Graphics g = Graphics.FromImage(scaled))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.High;
+                    g.DrawImage(img, 0, 0, imageWidth, imageHeight);
+                }
+                img.Dispose();
+
+                e.Result = new Utility.Triple<string, Image, Size>(requestedGalleryFile, scaled, size);
             }
             /// <summary>
             /// Handles the RunWorkerCompleted event of the galleryWorker.
             /// </summary>
             void galleryWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
             {
-                KeyValuePair<string, Image> result = (KeyValuePair<string, Image>)e.Result;
-                lastGalleryFile = result.Key;
-                lastGalleryImage = result.Value;
+                if (lastGalleryImage != null)
+                    lastGalleryImage.Dispose();
+
+                Utility.Triple<string, Image, Size> result = (Utility.Triple<string, Image, Size>)e.Result;
+                lastGalleryFile = result.First;
+                lastGalleryImage = result.Second;
+                lastGalleryImageSize = result.Third;
                 mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
             #endregion

@@ -87,6 +87,37 @@ namespace Manina.Windows.Forms
 
             #region Instance Methods
             /// <summary>
+            /// Gets the default header text for the given column type.
+            /// </summary>
+            public string GetDefaultText(ColumnType type)
+            {
+                switch (type)
+                {
+                    case ColumnType.DateAccessed:
+                        return "Last Access";
+                    case ColumnType.DateCreated:
+                        return "Created";
+                    case ColumnType.DateModified:
+                        return "Modified";
+                    case ColumnType.FileName:
+                        return "Filename";
+                    case ColumnType.Name:
+                        return "Name";
+                    case ColumnType.FilePath:
+                        return "Path";
+                    case ColumnType.FileSize:
+                        return "Size";
+                    case ColumnType.FileType:
+                        return "Type";
+                    case ColumnType.Dimensions:
+                        return "Dimensions";
+                    case ColumnType.Resolution:
+                        return "Resolution";
+                    default:
+                        throw new InvalidOperationException("Unknown column type.");
+                }
+            }
+            /// <summary>
             /// Returns an enumerator to use to iterate through columns.
             /// </summary>
             /// <returns>An IEnumerator&lt;ImageListViewColumn&gt; that represents the item collection.</returns>

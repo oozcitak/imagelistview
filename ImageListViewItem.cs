@@ -351,7 +351,6 @@ namespace Manina.Windows.Forms
         private void UpdateFileInfo()
         {
             if (!isDirty) return;
-            isDirty = false;
 
             Utility.ShellFileInfo info = new Utility.ShellFileInfo(mFileName);
             if (info.Error) return;
@@ -372,6 +371,8 @@ namespace Manina.Windows.Forms
                     mResolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
                 }
             }
+
+            isDirty = false;
         }
         /// <summary>
         /// Invoked by the worker thread to update item details.
@@ -380,7 +381,7 @@ namespace Manina.Windows.Forms
             long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution)
         {
             if (!isDirty) return;
-            isDirty = false;
+
             mDateAccessed = dateAccessed;
             mDateCreated = dateCreated;
             mDateModified = dateModified;
@@ -390,6 +391,8 @@ namespace Manina.Windows.Forms
             defaultText = name;
             mDimensions = dimension;
             mResolution = resolution;
+
+            isDirty = false;
         }
         #endregion
     }

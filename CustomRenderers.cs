@@ -6,6 +6,8 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using System.ComponentModel;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace Manina.Windows.Forms
 {
@@ -389,27 +391,27 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="image">The image to draw.</param>
             /// <param name="bounds">The bounding rectangle of the preview area.</param>
-            public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Rectangle bounds)
+            public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
-                Image img = item.GetImage();
                 // Calculate image bounds
-                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)img.Width;
-                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)img.Height;
+                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)image.Width;
+                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)image.Height;
                 float scale = Math.Min(xscale, yscale);
                 if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)img.Width * scale);
-                int imageHeight = (int)((float)img.Height * scale);
+                int imageWidth = (int)((float)image.Width * scale);
+                int imageHeight = (int)((float)image.Height * scale);
                 int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
                 int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
                 // Draw image
-                g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+                g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
                 // Draw image border
-                if (img.Width > 32)
+                if (image.Width > 32)
                 {
-                    using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
+                    using (Pen pBorder = new Pen(Color.Black))
                     {
-                        g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                        g.DrawRectangle(pBorder, imageX, imageY, imageWidth, imageHeight);
                     }
                 }
             }
@@ -450,15 +452,37 @@ namespace Manina.Windows.Forms
 
             void worker_DoWork(object sender, DoWorkEventArgs e)
             {
-                string requestedGalleryFile = (string)e.Argument;
-                e.Result = new KeyValuePair<string, Image>(requestedGalleryFile, Image.FromFile(requestedGalleryFile));
+                Utility.Pair<string, Size> request = (Utility.Pair<string, Size>)e.Argument;
+                string requestedGalleryFile = request.First;
+                Size size = request.Second;
+
+                // Calculate image bounds
+                Image img = Image.FromFile(requestedGalleryFile);
+                float xscale = (float)size.Width / (float)img.Width;
+                float yscale = (float)size.Height / (float)img.Height;
+                float scale = Math.Min(xscale, yscale);
+                if (scale > 1.0f) scale = 1.0f;
+                int imageWidth = (int)((float)img.Width * scale);
+                int imageHeight = (int)((float)img.Height * scale);
+                Image scaled = new Bitmap(imageWidth, imageHeight);
+                using (Graphics g = Graphics.FromImage(scaled))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.High;
+                    g.DrawImage(img, 0, 0, imageWidth, imageHeight);
+                }
+
+                e.Result = new Utility.Pair<string, Image>(requestedGalleryFile, scaled);
             }
 
             void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
             {
-                KeyValuePair<string, Image> result = (KeyValuePair<string, Image>)e.Result;
-                cachedFileName = result.Key;
-                cachedImage = result.Value;
+                if (cachedImage != null)
+                    cachedImage.Dispose();
+
+                Utility.Pair<string, Image> result = (Utility.Pair<string, Image>)e.Result;
+                cachedFileName = result.First;
+                cachedImage = result.Second;
                 mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
@@ -472,7 +496,7 @@ namespace Manina.Windows.Forms
                 base.InitializeGraphics(g);
 
                 Clip = false;
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+
                 ItemDrawOrder = ItemDrawOrder.NormalSelectedHovered;
             }
             /// <summary>
@@ -513,26 +537,21 @@ namespace Manina.Windows.Forms
                     }
 
                     // Get item image
-                    Image img = null;
-                    img = item.ThumbnailImage;
-                    if ((state & ItemState.Hovered) == ItemState.Hovered)
+                    Image img = item.ThumbnailImage;
+                    if ((state & ItemState.Hovered) != ItemState.None)
                     {
                         if (cachedImage == null || cachedFileName == null || string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
                         {
                             if (!worker.IsBusy)
-                                worker.RunWorkerAsync(item.FileName);
+                                worker.RunWorkerAsync(new Utility.Pair<string, Size>(item.FileName, new Size(bounds.Width - 8, bounds.Height - 8)));
                         }
                         else
                             img = cachedImage;
                     }
 
                     // Calculate image bounds
-                    float xscale = ((float)bounds.Width - 8.0f) / (float)img.Width;
-                    float yscale = ((float)bounds.Height - 8.0f) / (float)img.Height;
-                    float scale = Math.Min(xscale, yscale);
-                    if (scale > 1.0f) scale = 1.0f;
-                    int imageWidth = (int)((float)img.Width * scale);
-                    int imageHeight = (int)((float)img.Height * scale);
+                    int imageWidth = img.Width;
+                    int imageHeight = img.Height;
                     int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
                     int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
 
@@ -578,6 +597,7 @@ namespace Manina.Windows.Forms
 
                     // Draw the image
                     g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+
                     // Draw image border
                     if (imageWidth > 32)
                     {
@@ -663,10 +683,26 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class PanelRenderer : ImageListView.ImageListViewRenderer
         {
+            private const int PropertyTagImageDescription = 0x010E;
+            private const int PropertyTagEquipModel = 0x0110;
+            private const int PropertyTagDateTime = 0x0132;
+            private const int PropertyTagArtist = 0x013B;
+            private const int PropertyTagCopyright = 0x8298;
+            private const int PropertyTagExifExposureTime = 0x829A;
+            private const int PropertyTagExifFNumber = 0x829D;
+            private const int PropertyTagExifISOSpeed = 0x8827;
+            private const int PropertyTagExifShutterSpeed = 0x9201;
+            private const int PropertyTagExifAperture = 0x9202;
+            private const int PropertyTagExifUserComment = 0x9286;
+
             private int mPanelWidth;
             private bool mPanelVisible;
-            private string mDefaultText;
             private Font mCaptionFont;
+            private Dictionary<int, string> mTags;
+
+            BackgroundWorker worker;
+            private string cachedFileName;
+            private Image cachedImage;
 
             private Font CaptionFont
             {
@@ -679,21 +715,68 @@ namespace Manina.Windows.Forms
             }
 
             public PanelRenderer()
-                : this(180)
+                : this(240)
             {
                 ;
             }
 
             public PanelRenderer(int panelWidth)
-                : this(panelWidth, "Select an image to display its properties here.")
-            {
-                ;
-            }
-
-            public PanelRenderer(int panelWidth, string defaultText)
             {
                 mPanelWidth = panelWidth;
-                mDefaultText = defaultText;
+                mTags = new Dictionary<int, string>()
+                {
+                    {PropertyTagImageDescription, "Description"},
+                    {PropertyTagEquipModel, "Camera Model"},
+                    {PropertyTagDateTime, "Date Taken"},
+                    {PropertyTagArtist, "Artist"},
+                    {PropertyTagCopyright, "Copyright"},
+                    {PropertyTagExifExposureTime, "Exposure Time"},
+                    {PropertyTagExifFNumber, "F Number"},
+                    {PropertyTagExifISOSpeed, "ISO Speed"},
+                    {PropertyTagExifShutterSpeed, "Shutter Speed"},
+                    {PropertyTagExifAperture, "Aperture"},
+                    {PropertyTagExifUserComment, "Comments"},
+                };
+
+                cachedFileName = null;
+                cachedImage = null;
+                worker = new BackgroundWorker();
+                worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+                worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+            }
+
+            void worker_DoWork(object sender, DoWorkEventArgs e)
+            {
+                Utility.Pair<string, int> request = (Utility.Pair<string, int>)e.Argument;
+                string requestedGalleryFile = (string)request.First;
+                int width = request.Second;
+
+                // Calculate image bounds
+                Image img = Image.FromFile(requestedGalleryFile);
+                float scale = (float)width / (float)img.Width;
+                if (scale > 1.0f) scale = 1.0f;
+                int imageWidth = (int)((float)img.Width * scale);
+                int imageHeight = (int)((float)img.Height * scale);
+                Image scaled = new Bitmap(imageWidth, imageHeight);
+                using (Graphics g = Graphics.FromImage(scaled))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.High;
+                    g.DrawImage(img, 0, 0, imageWidth, imageHeight);
+                }
+
+                e.Result = new Utility.Pair<string, Image>(requestedGalleryFile, scaled);
+            }
+
+            void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+            {
+                if (cachedImage != null)
+                    cachedImage.Dispose();
+
+                Utility.Pair<string, Image> result = (Utility.Pair<string, Image>)e.Result;
+                cachedFileName = result.First;
+                cachedImage = result.Second;
+                mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
             /// <summary>
@@ -713,18 +796,6 @@ namespace Manina.Windows.Forms
                     e.ItemAreaBounds = r;
                     mPanelVisible = true;
                 }
-            }
-            /// <summary>
-            /// Initializes the System.Drawing.Graphics used to draw
-            /// control elements.
-            /// </summary>
-            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
-            public override void InitializeGraphics(Graphics g)
-            {
-                base.InitializeGraphics(g);
-
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
             }
             /// <summary>
             /// Releases managed resources.
@@ -753,7 +824,10 @@ namespace Manina.Windows.Forms
                 }
                 using (Brush bBorder = new LinearGradientBrush(rect, Color.FromArgb(220, 220, 220), Color.White, LinearGradientMode.Vertical))
                 {
-                    g.FillRectangle(bBorder, rect.Right, rect.Top, 2, rect.Height);
+                    using (Pen pBorder = new Pen(bBorder))
+                    {
+                        g.DrawLine(pBorder, rect.Right, rect.Top, rect.Right, rect.Bottom);
+                    }
                 }
 
                 rect.Inflate(-4, -4);
@@ -761,47 +835,45 @@ namespace Manina.Windows.Forms
                 sf.Alignment = StringAlignment.Center;
                 sf.LineAlignment = StringAlignment.Center;
 
-                if (mImageListView.Items.FocusedItem == null)
+                ImageListViewItem item = null;
+                if (mImageListView.Items.FocusedItem != null)
+                    item = mImageListView.Items.FocusedItem;
+                else if (mImageListView.SelectedItems.Count != 0)
+                    item = mImageListView.SelectedItems[0];
+                else if (mImageListView.Items.Count != 0)
+                    item = mImageListView.Items[0];
+
+                if (item != null)
                 {
-                    // Default text
-                    g.DrawString(mDefaultText, mImageListView.Font, Brushes.Black, rect, sf);
-                }
-                else
-                {
-                    ImageListViewItem item = mImageListView.Items.FocusedItem;
                     rect.Inflate(-4, -4);
-                    // Draw selected image
-                    using (Image img = item.GetImage())
+
+                    Image img = item.ThumbnailImage;
+                    if (cachedImage == null || cachedFileName == null || string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
                     {
-                        // Calculate image bounds
-                        float xscale = (float)rect.Width / (float)img.Width;
-                        float yscale = (float)rect.Height / (float)img.Height;
-                        float scale = Math.Min(xscale, yscale);
-                        if (scale > 1.0f) scale = 1.0f;
-                        int imageWidth = (int)((float)img.Width * scale);
-                        int imageHeight = (int)((float)img.Height * scale);
-                        int imageX = rect.Left + (rect.Width - imageWidth) / 2;
-                        int imageY = rect.Top;
-                        // Draw image
-                        g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
-                        // Draw image border
-                        if (img.Width > 32)
-                        {
-                            using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
-                            {
-                                g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
-                            }
-                            if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
-                            {
-                                using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                                {
-                                    g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
-                                }
-                            }
-                        }
-                        rect.Y = imageHeight + 16;
-                        rect.Height -= imageHeight + 16;
+                        if (!worker.IsBusy)
+                            worker.RunWorkerAsync(new Utility.Pair<string, int>(item.FileName, rect.Width));
                     }
+                    else
+                        img = cachedImage;
+
+                    // Draw image
+                    g.DrawImageUnscaled(img, rect.Location);
+
+                    // Draw image border
+                    if (img.Width > 32)
+                    {
+                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                        {
+                            g.DrawRectangle(pGray128, rect.Left, rect.Top, img.Width, img.Height);
+                        }
+                        using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                        {
+                            g.DrawRectangle(pWhite128, rect.Left + 1, rect.Top + 1, img.Width - 2, img.Height - 2);
+                        }
+                    }
+                    rect.Y = img.Height + 16;
+                    rect.Height -= img.Height + 16;
+
                     // Image information
                     sf.Alignment = StringAlignment.Near;
                     sf.LineAlignment = StringAlignment.Near;
@@ -814,29 +886,110 @@ namespace Manina.Windows.Forms
                     rect.Height -= textHeight;
 
                     StringBuilder sb = new StringBuilder();
+                    // File properties
                     sb.AppendLine(item.FileType);
 
-                    sb.Append("Dimensions: ");
+                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Dimensions));
+                    sb.Append(": ");
                     sb.Append(item.GetSubItemText(ColumnType.Dimensions));
                     sb.AppendLine();
 
-                    sb.Append("Resolution: ");
+                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Resolution));
+                    sb.Append(": ");
                     sb.Append(item.Resolution.Width);
                     sb.AppendLine(" dpi");
 
-                    sb.Append("Size: ");
+                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.FileSize));
+                    sb.Append(": ");
                     sb.Append(item.GetSubItemText(ColumnType.FileSize));
                     sb.AppendLine();
 
-                    sb.Append("Modified: ");
+                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateModified));
+                    sb.Append(": ");
                     sb.Append(item.GetSubItemText(ColumnType.DateModified));
                     sb.AppendLine();
 
-                    sb.Append("Created: ");
+                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateCreated));
+                    sb.Append(": ");
                     sb.Append(item.GetSubItemText(ColumnType.DateCreated));
                     sb.AppendLine();
-                    sb.AppendLine();
 
+                    // Exif info
+                    sb.AppendLine();
+                    using (FileStream stream = new FileStream(item.FileName, FileMode.Open, FileAccess.Read))
+                    {
+                        using (Image tempImage = Image.FromStream(stream, false, false))
+                        {
+                            foreach (PropertyItem prop in tempImage.PropertyItems)
+                            {
+                                if (mTags.ContainsKey(prop.Id))
+                                {
+                                    string tagName = mTags[prop.Id];
+                                    short tagType = prop.Type;
+                                    int tagLen = prop.Len;
+                                    byte[] tagBytes = prop.Value;
+                                    string tagValue = string.Empty;
+                                    switch (tagType)
+                                    {
+                                        case 1: // byte
+                                            foreach (byte b in tagBytes)
+                                                tagValue += b.ToString() + " ";
+                                            break;
+                                        case 2: // ascii
+                                            int len = Array.IndexOf(tagBytes, (byte)0);
+                                            if (len == -1) len = tagLen;
+                                            tagValue = Encoding.ASCII.GetString(tagBytes, 0, len);
+                                            if (prop.Id == PropertyTagDateTime)
+                                            {
+                                                tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
+                                            }
+                                            break;
+                                        case 3: // ushort
+                                            for (int i = 0; i < tagLen; i += 2)
+                                                tagValue += BitConverter.ToUInt16(tagBytes, i).ToString() + " ";
+                                            break;
+                                        case 4: // uint
+                                            for (int i = 0; i < tagLen; i += 4)
+                                                tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + " ";
+                                            break;
+                                        case 5: // uint rational
+                                            for (int i = 0; i < tagLen; i += 8)
+                                                tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + "/" +
+                                                    BitConverter.ToUInt32(tagBytes, i + 4).ToString() + " ";
+                                            break;
+                                        case 7: // undefined as ascii
+                                            int lenu = Array.IndexOf(tagBytes, (byte)0);
+                                            if (lenu == -1) len = tagLen;
+                                            tagValue = Encoding.ASCII.GetString(tagBytes, 0, lenu);
+                                            if (prop.Id == PropertyTagDateTime)
+                                            {
+                                                tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
+                                            }
+                                            break;
+                                        case 9: // int
+                                            for (int i = 0; i < tagLen; i += 4)
+                                                tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + " ";
+                                            break;
+                                        case 10: // int rational
+                                            for (int i = 0; i < tagLen; i += 8)
+                                                tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + "/" +
+                                                    BitConverter.ToInt32(tagBytes, i + 4).ToString() + " ";
+                                            break;
+                                    }
+                                    tagValue = tagValue.Trim();
+
+                                    if (tagValue != string.Empty)
+                                    {
+                                        sb.Append(tagName);
+                                        sb.Append(": ");
+                                        sb.Append(tagValue);
+                                        sb.AppendLine();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Print image details
                     g.DrawString(sb.ToString(), mImageListView.Font, Brushes.Black, rect, sf);
                 }
             }

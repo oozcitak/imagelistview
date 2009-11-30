@@ -312,5 +312,101 @@ namespace Manina.Windows.Forms
             DrawRoundedRectangle(graphics, pen, (int)rect.Left, (int)rect.Top, (int)rect.Width, (int)rect.Height, (int)radius);
         }
         #endregion
+
+        #region Tuples
+        /// <summary>
+        /// Represents a two element tuple.
+        /// </summary>
+        /// <typeparam name="T1">Type of first element.</typeparam>
+        /// <typeparam name="T2">Type of second element.</typeparam>
+        public sealed class Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+        {
+            private readonly T1 mFirst;
+            private readonly T2 mSecond;
+
+            /// <summary>
+            /// Gets the first element.
+            /// </summary>
+            public T1 First { get { return mFirst; } }
+            /// <summary>
+            /// Gets the second element.
+            /// </summary>
+            public T2 Second { get { return mSecond; } }
+
+            public Pair(T1 first, T2 second)
+            {
+                mFirst = first;
+                mSecond = second;
+            }
+
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.
+            /// </summary>
+            /// <param name="other">An object to compare with this object.</param>
+            /// <returns>
+            /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            /// </returns>
+            public bool Equals(Pair<T1, T2> other)
+            {
+                if (other == null)
+                    throw new NullReferenceException();
+                if (ReferenceEquals(this, other)) return true;
+                if (!(other is Pair<T1, T2>)) return false;
+                return Equals(other.First, First) &&
+                    Equals(other.Second, Second);
+            }
+        }
+
+        /// <summary>
+        /// Represents a three element tuple.
+        /// </summary>
+        /// <typeparam name="T1">Type of first element.</typeparam>
+        /// <typeparam name="T2">Type of second element.</typeparam>
+        /// <typeparam name="T3">Type of third element.</typeparam>
+        public sealed class Triple<T1, T2, T3> : IEquatable<Triple<T1, T2, T3>>
+        {
+            private readonly T1 mFirst;
+            private readonly T2 mSecond;
+            private readonly T3 mThird;
+
+            /// <summary>
+            /// Gets the first element.
+            /// </summary>
+            public T1 First { get { return mFirst; } }
+            /// <summary>
+            /// Gets the second element.
+            /// </summary>
+            public T2 Second { get { return mSecond; } }
+            /// <summary>
+            /// Gets the third element.
+            /// </summary>
+            public T3 Third { get { return mThird; } }
+
+            public Triple(T1 first, T2 second, T3 third)
+            {
+                mFirst = first;
+                mSecond = second;
+                mThird = third;
+            }
+
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.
+            /// </summary>
+            /// <param name="other">An object to compare with this object.</param>
+            /// <returns>
+            /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            /// </returns>
+            public bool Equals(Triple<T1, T2, T3> other)
+            {
+                if (other == null)
+                    throw new NullReferenceException();
+                if (ReferenceEquals(this, other)) return true;
+                if (!(other is Triple<T1, T2, T3>)) return false;
+                return Equals(other.First, First) &&
+                    Equals(other.Second, Second) &&
+                    Equals(other.Third, Third);
+            }
+        }
+        #endregion
     }
 }

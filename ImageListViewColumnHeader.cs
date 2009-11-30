@@ -26,36 +26,12 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the default header text for this column type.
             /// </summary>
-            [Category("Appearance"), Browsable(false), Description("Gets the default header text for this column type."), Localizable(true)]
+            [Category("Appearance"), Browsable(false), Description("Gets the default header text for this column type.")]
             public virtual string DefaultText
             {
                 get
                 {
-                    switch (mType)
-                    {
-                        case ColumnType.DateAccessed:
-                            return "Last Access";
-                        case ColumnType.DateCreated:
-                            return "Created";
-                        case ColumnType.DateModified:
-                            return "Modified";
-                        case ColumnType.FileName:
-                            return "Filename";
-                        case ColumnType.Name:
-                            return "Name";
-                        case ColumnType.FilePath:
-                            return "Path";
-                        case ColumnType.FileSize:
-                            return "Size";
-                        case ColumnType.FileType:
-                            return "Type";
-                        case ColumnType.Dimensions:
-                            return "Dimensions";
-                        case ColumnType.Resolution:
-                            return "Resolution";
-                        default:
-                            throw new InvalidOperationException("Unknown column type.");
-                    }
+                    return owner.GetDefaultText(mType);
                 }
             }
             /// <summary>
