@@ -1,11 +1,14 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
-= 1.1 (29 November 2009) =
+= 1.1 (30 November 2009) =
   * Fixed !ImageListView.!EnsureVisible to work with the Gallery mode.
   * !ImageListViewCacheManager now properly zeroes out the memory used when it clears the cache. 
   * The preview image is now loaded by a background thread in Gallery view mode. 
   * Threaded renderers now use a !BackgroundWorker.
+  * Preview image in Gallery mode is now cached. 
+  * Introduced Tuples, used mainly while talking to worker threads. 
+  * !PanelRenderer now displays some common Exif tags.
 
 = 1.0 (28 November 2009) =
   * Added the Gallery view mode. 
