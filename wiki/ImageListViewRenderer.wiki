@@ -9,7 +9,7 @@ The look of the ImageListView can be customized with renderers. If you would lik
 
 == Built-in custom renderers ==
 
-You can find those renderers in the source code and the latest binaries. To use a built-in custom renderer, use the !ImageListView.!SetRenderer method as below:
+You can find these renderers in the source code and the latest binaries. To use a built-in custom renderer, use the !ImageListView.!SetRenderer method as below:
 
 {{{
 myImageListView.SetRenderer(new ImageListViewRenderers.XPRenderer());
