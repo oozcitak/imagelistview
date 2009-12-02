@@ -12,5 +12,6 @@
   * Drag&drop support
   * Details view: filename, type, size, path, dimensions, resolution, ...
   * Fast thumbnail extractor for embedded Exif thumbnails
+  * Three view modes: Thumbnails, Galery and Details.
 
-http://imagelistview.googlecode.com/svn/wiki/ImageListView.demo.jpg
+http://imagelistview.googlecode.com/svn/wiki/ImageListView.thumbnails.jpg

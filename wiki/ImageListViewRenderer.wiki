@@ -41,6 +41,20 @@ http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.tiles.jpg
 
 _Tiles renderer displays items with more details. Item states from top-to-bottom: selected, focused, mouse over._
 
+=== !PanelRenderer ===
+
+You can set the width of the panel in the constructor.
+
+{{{
+// Create a new PanelRenderer and set the width
+// of the description area to 180 pixels
+myImageListView.SetRenderer(new ImageListViewRenderers.PanelRenderer(180));
+}}}
+
+http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.panel.jpg
+
+_Panel renderer displays items with details shown in a fixed panel._
+
 === !ZoomingRenderer ===
 
 You can set the zoom factor in the constructor.
@@ -189,6 +203,18 @@ public virtual void DrawColumnExtender(Graphics g, Rectangle bounds)
 }
 }}}
 
+==== !DrawGalleryImage ====
+
+Draws the large preview image of the focused item in Gallery view mode.
+
+{{{
+public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
+{
+    base.DrawGalleryImage(g, item, image, bounds);
+    g.DrawRectangle(Pens.Black, bounds);
+}
+}}}
+
 ==== !DrawScrollBarFiller ====
 
 Draws the area between the vertical and horizontal scrollbars. The base class draws the filler with !SystemColors.Control.
@@ -226,6 +252,20 @@ public virtual void DrawInsertionCaret(Graphics g, Rectangle bounds)
 {
     // Draw a red caret
     g.FillRectangle(Brushes.Red, bounds);
+}
+}}}
+
+==== !OnLayout ====
+
+Used to affect the size of the item display area before the layout is calculated. 
+
+{{{
+public virtual void OnLayout(LayoutEventArgs e)
+{
+    // Add a 10 pixel margin to the 
+	// left of the item display area
+	e.ItemAreaBounds.X += 10;
+	e.ItemAreaBounds.Width -= 10;
 }
 }}}
 
