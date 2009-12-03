@@ -788,7 +788,8 @@ namespace Manina.Windows.Forms
                 mPanelVisible = false;
                 // Allocate space for the panel
                 int iwidth = this.MeasureItem(View.Thumbnails).Width + mImageListView.ItemMargin.Width;
-                if (mImageListView.View == View.Thumbnails && e.ItemAreaBounds.Width > mPanelWidth + iwidth)
+                if (mImageListView.View == View.Thumbnails && e.ItemAreaBounds.Width > mPanelWidth + iwidth &&
+                    mImageListView.Items.Count > 0)
                 {
                     Rectangle r = e.ItemAreaBounds;
                     r.X += mPanelWidth;
@@ -829,7 +830,10 @@ namespace Manina.Windows.Forms
                         g.DrawLine(pBorder, rect.Right, rect.Top, rect.Right, rect.Bottom);
                     }
                 }
-
+                using (Pen pWhite = new Pen(Color.FromArgb(64, Color.White)))
+                {
+                    g.DrawRectangle(pWhite, rect.Left + 2, rect.Top + 2, rect.Width - 5, rect.Height - 4);
+                }
                 rect.Inflate(-4, -4);
                 StringFormat sf = new StringFormat();
                 sf.Alignment = StringAlignment.Center;
@@ -838,7 +842,7 @@ namespace Manina.Windows.Forms
                 ImageListViewItem item = null;
                 if (mImageListView.Items.FocusedItem != null)
                     item = mImageListView.Items.FocusedItem;
-                else if (mImageListView.SelectedItems.Count != 0)
+                else if (mImageListView.SelectedItems.Count > 0)
                     item = mImageListView.SelectedItems[0];
                 else if (mImageListView.Items.Count != 0)
                     item = mImageListView.Items[0];

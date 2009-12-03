@@ -77,6 +77,8 @@ namespace Manina.Windows.Forms
                 }
                 set
                 {
+                    if (mItems[index] == mFocused)
+                        mFocused = value;
                     bool oldSelected = mItems[index].Selected;
                     mItems[index] = value;
                     mItems[index].mIndex = index;
@@ -181,6 +183,7 @@ namespace Manina.Windows.Forms
             public void Clear()
             {
                 mItems.Clear();
+                mFocused = null;
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Clear();
@@ -244,6 +247,7 @@ namespace Manina.Windows.Forms
             {
                 for (int i = item.mIndex; i < mItems.Count; i++)
                     mItems[i].mIndex--;
+                if (item == mFocused) mFocused = null;
                 bool ret = mItems.Remove(item);
                 if (mImageListView != null)
                 {
@@ -266,6 +270,7 @@ namespace Manina.Windows.Forms
                 for (int i = index; i < mItems.Count; i++)
                     mItems[i].mIndex--;
                 Guid iguid = mItems[index].Guid;
+                if (mItems[index] == mFocused) mFocused = null;
                 mItems.RemoveAt(index);
                 if (mImageListView != null)
                 {
@@ -315,6 +320,7 @@ namespace Manina.Windows.Forms
             {
                 for (int i = item.mIndex; i < mItems.Count; i++)
                     mItems[i].mIndex--;
+                if (item == mFocused) mFocused = null;
                 if (mImageListView != null)
                     mImageListView.cacheManager.Remove(item.Guid);
                 bool ret = mItems.Remove(item);
