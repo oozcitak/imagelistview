@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
 using System.Drawing.Design;
+using System.Runtime.Serialization;
+using System.Resources;
+using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
@@ -13,7 +16,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Editor(typeof(ColumnHeaderCollectionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ColumnHeaderCollectionTypeConverter))]
-        public class ImageListViewColumnHeaderCollection : IEnumerable<ImageListViewColumnHeader>, ICloneable
+        public class ImageListViewColumnHeaderCollection : IEnumerable<ImageListViewColumnHeader>, ICloneable, ISerializable
         {
             #region Member Variables
             private ImageListView mImageListView;
@@ -32,7 +35,7 @@ namespace Manina.Windows.Forms
             [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this collection.")]
             public ImageListView ImageListView { get { return mImageListView; } }
             /// <summary>
-            /// Gets the item at the specified index within the collection.
+            /// Gets the column at the specified index within the collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or item at the specified index within the collection.")]
             public ImageListViewColumnHeader this[int index]
@@ -43,7 +46,7 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Gets or sets the item with the specified type within the collection.
+            /// Gets the column with the specified type within the collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item with the specified type within the collection.")]
             public ImageListViewColumnHeader this[ColumnType type]
@@ -87,35 +90,14 @@ namespace Manina.Windows.Forms
 
             #region Instance Methods
             /// <summary>
-            /// Gets the default header text for the given column type.
+            /// Gets the default column header text for the given column type.
             /// </summary>
+            [Localizable(true)]
             public string GetDefaultText(ColumnType type)
             {
-                switch (type)
-                {
-                    case ColumnType.DateAccessed:
-                        return "Last Access";
-                    case ColumnType.DateCreated:
-                        return "Created";
-                    case ColumnType.DateModified:
-                        return "Modified";
-                    case ColumnType.FileName:
-                        return "Filename";
-                    case ColumnType.Name:
-                        return "Name";
-                    case ColumnType.FilePath:
-                        return "Path";
-                    case ColumnType.FileSize:
-                        return "Size";
-                    case ColumnType.FileType:
-                        return "Type";
-                    case ColumnType.Dimensions:
-                        return "Dimensions";
-                    case ColumnType.Resolution:
-                        return "Resolution";
-                    default:
-                        throw new InvalidOperationException("Unknown column type.");
-                }
+                ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources",
+                    Assembly.GetExecutingAssembly());
+                return manager.GetString(type.ToString());
             }
             /// <summary>
             /// Returns an enumerator to use to iterate through columns.
@@ -178,6 +160,43 @@ namespace Manina.Windows.Forms
                 Array.Copy(this.mItems, clone.mItems, 0);
                 return clone;
             }
+            #endregion
+
+            #region ISerializable Members
+            public ImageListViewColumnHeaderCollection(SerializationInfo info, StreamingContext context)
+            {
+                for (int i = 0; i < mItems.Length; i++)
+                {
+                    ColumnType type = (ColumnType)info.GetInt32(string.Format("{0}:{1}", i, "Type"));
+                    int index = info.GetInt32(string.Format("{0}:{1}", i, "Index"));
+                    string text = info.GetString(string.Format("{0}:{1}", i, "Text"));
+                    bool visible = info.GetBoolean(string.Format("{0}:{1}", i, "Visible"));
+                    int width = info.GetInt32(string.Format("{0}:{1}", i, "Width"));
+                    ImageListViewColumnHeader col=new ImageListViewColumnHeader(type, text, width);
+                    col.DisplayIndex = index;
+                    col.Visible = visible;
+                    mItems[i] = col;
+                }
+            }
+
+            /// <summary>
+            /// Populates a SerializationInfo with the data needed to serialize the target object.
+            /// </summary>
+            /// <param name="info">The SerializationInfo to populate with data.</param>
+            /// <param name="context">The destination for this serialization.</param>
+            public void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                for (int i = 0; i < mItems.Length; i++)
+                {
+                    ImageListView.ImageListViewColumnHeader col = mItems[i];
+                    info.AddValue(string.Format("{0}:{1}", i, "Type"), col.Type);
+                    info.AddValue(string.Format("{0}:{1}", i, "Index"), col.DisplayIndex);
+                    info.AddValue(string.Format("{0}:{1}", i, "Text"), col.Text);
+                    info.AddValue(string.Format("{0}:{1}", i, "Visible"), col.Visible);
+                    info.AddValue(string.Format("{0}:{1}", i, "Width"), col.Width);
+                }
+            }
+
             #endregion
         }
     }
