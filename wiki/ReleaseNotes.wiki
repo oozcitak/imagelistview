@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 1.2 (03 December 2009) =
+
+ * Cached images are now properly disposed.
+
 = 1.1 (30 November 2009) =
   * Fixed !ImageListView.!EnsureVisible to work with the Gallery mode.
   * !ImageListViewCacheManager now properly zeroes out the memory used when it clears the cache. 
