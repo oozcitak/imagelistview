@@ -106,11 +106,12 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void EditColumns()
         {
+            // TODO: Column editing cannot be undone in the designer.
             property = TypeDescriptor.GetProperties(imageListView)["Columns"];
             UITypeEditor editor = (UITypeEditor)property.GetEditor(typeof(UITypeEditor));
-            object value = property.GetValue(imageListView);
+            object value = imageListView.Columns;// property.GetValue(imageListView);
             value = editor.EditValue(this, this, value);
-            imageListView.SetColumnsInternal((ImageListView.ImageListViewColumnHeaderCollection)value);
+            SetProperty("Columns", value);
             designerService.Refresh(Component);
         }
         #endregion

@@ -704,21 +704,6 @@ namespace Manina.Windows.Forms
                 return ItemVisibility.PartiallyVisible;
         }
         /// <summary>
-        /// Sets the column header colection.
-        /// </summary>
-        internal void SetColumnsInternal(ImageListViewColumnHeaderCollection columns)
-        {
-            /// TODO: This is called by the collection editor to set the Columns collection.
-            /// Current implementation does not support undoing in the IDE. Columns should
-            /// instead be set in the collection editor using its PropertyDescriptor.
-            /// However, the Columns property does not have a public setter, 
-            /// and this seems to pose a problem; the collection editor can not set
-            /// the Columns if I set the Columns through its PropertyDescriptor in the
-            /// collection editor.
-            mColumns = columns;
-            mRenderer.Refresh();
-        }
-        /// <summary>
         /// Gets the guids of visible items.
         /// </summary>
         internal Dictionary<Guid, bool> GetVisibleItems()

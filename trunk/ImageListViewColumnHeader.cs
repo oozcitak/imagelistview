@@ -26,7 +26,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the default header text for this column type.
             /// </summary>
-            [Category("Appearance"), Browsable(false), Description("Gets the default header text for this column type.")]
+            [Category("Appearance"), Browsable(false), Description("Gets the default header text for this column type."), Localizable(true)]
             public virtual string DefaultText
             {
                 get
