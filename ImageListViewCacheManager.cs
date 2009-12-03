@@ -10,7 +10,7 @@ namespace Manina.Windows.Forms
     /// Represents the cache manager responsible for asynchronously loading
     /// item thumbnails.
     /// </summary>
-    internal class ImageListViewCacheManager
+    internal class ImageListViewCacheManager : IDisposable
     {
         #region Constants
         private const int PropertyTagThumbnailData = 0x501B;
@@ -31,19 +31,22 @@ namespace Manina.Windows.Forms
         private long memoryUsed;
         private long memoryUsedByRemoved;
         private List<Guid> removedItems;
+
+        private bool disposed;
         #endregion
 
         #region Private Classes
         /// <summary>
         /// Represents an item in the thumbnail cache.
         /// </summary>
-        private class CacheItem
+        private class CacheItem : IDisposable
         {
             private string mFileName;
             private Size mSize;
             private Image mImage;
             private CacheState mState;
             private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
+            private bool disposed;
 
             /// <summary>
             /// Gets the name of the image file.
@@ -72,12 +75,26 @@ namespace Manina.Windows.Forms
                 mSize = size;
                 mImage = image;
                 mState = state;
+                disposed = false;
             }
 
             public CacheItem(string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
                 : this(filename, size, image, state)
             {
                 mUseEmbeddedThumbnails = useEmbeddedThumbnails;
+            }
+
+            public void Dispose()
+            {
+                if (!disposed)
+                {
+                    if (mImage != null)
+                    {
+                        mImage.Dispose();
+                        mImage = null;
+                    }
+                    disposed = true;
+                }
             }
         }
         #endregion
@@ -134,6 +151,8 @@ namespace Manina.Windows.Forms
 
             mThread = new Thread(new ParameterizedThreadStart(DoWork));
             mThread.IsBackground = true;
+
+            disposed = false;
         }
         #endregion
 
@@ -187,6 +206,8 @@ namespace Manina.Windows.Forms
         {
             lock (thumbCache)
             {
+                foreach (CacheItem item in thumbCache.Values)
+                    item.Dispose();
                 thumbCache.Clear();
             }
             memoryUsed = 0;
@@ -212,7 +233,10 @@ namespace Manina.Windows.Forms
                     foreach (Guid iguid in removedItems)
                     {
                         if (thumbCache.ContainsKey(iguid))
+                        {
+                            thumbCache[iguid].Dispose();
                             thumbCache.Remove(iguid);
+                        }
                     }
                 }
                 removedItems.Clear();
@@ -269,6 +293,29 @@ namespace Manina.Windows.Forms
             }
             return img;
         }
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (disposed) return;
+
+            lock (thumbCache)
+            {
+                foreach (CacheItem item in thumbCache.Values)
+                    item.Dispose();
+                thumbCache.Clear();
+            }
+            lock (toCache)
+            {
+                toCache.Clear();
+            }
+            memoryUsed = 0;
+            memoryUsedByRemoved = 0;
+            removedItems.Clear();
+            disposed = true;
+        }
+
         #endregion
 
         #region Static Methods
@@ -340,7 +387,11 @@ namespace Manina.Windows.Forms
                     {
                         if (!owner.thumbCache.ContainsKey(guid) || owner.thumbCache[guid].Size != thumbsize)
                         {
-                            owner.thumbCache.Remove(guid);
+                            if (owner.thumbCache.ContainsKey(guid))
+                            {
+                                owner.thumbCache[guid].Dispose();
+                                owner.thumbCache.Remove(guid);
+                            }
                             if (thumb == null)
                                 owner.thumbCache.Add(guid, new CacheItem(filename, thumbsize, null, CacheState.Error));
                             else
@@ -361,18 +412,25 @@ namespace Manina.Windows.Forms
                         Dictionary<Guid, bool> visible = (Dictionary<Guid, bool>)owner.mImageListView.Invoke(new GetVisibleItemsInternal(owner.mImageListView.GetVisibleItems));
                         lock (owner.thumbCache)
                         {
-                            long memoryUsed = 0;
-                            Dictionary<Guid, CacheItem> newCache = new Dictionary<Guid, CacheItem>();
-                            foreach (Guid vguid in visible.Keys)
+                            foreach (KeyValuePair<Guid, CacheItem> item in owner.thumbCache)
                             {
-                                if (owner.thumbCache.ContainsKey(vguid))
+                                if (!visible.ContainsKey(item.Key))
                                 {
-                                    newCache.Add(vguid, owner.thumbCache[vguid]);
-                                    memoryUsed += owner.thumbCache[vguid].Size.Width * owner.thumbCache[vguid].Size.Height * 24 / 8;
+                                    owner.removedItems.Add(item.Key);
+                                    owner.memoryUsedByRemoved += item.Value.Size.Width * item.Value.Size.Height * 24 / 8;
                                 }
                             }
-                            owner.thumbCache = newCache;
-                            owner.memoryUsed = memoryUsed;
+                            foreach (Guid iguid in owner.removedItems)
+                            {
+                                if (owner.thumbCache.ContainsKey(iguid))
+                                {
+                                    owner.thumbCache[iguid].Dispose();
+                                    owner.thumbCache.Remove(iguid);
+                                }
+                            }
+                            owner.removedItems.Clear();
+                            owner.memoryUsed -= owner.memoryUsedByRemoved;
+                            owner.memoryUsedByRemoved = 0;
                         }
                     }
 
