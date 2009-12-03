@@ -471,7 +471,7 @@ namespace Manina.Windows.Forms
                     g.InterpolationMode = InterpolationMode.High;
                     g.DrawImage(img, 0, 0, imageWidth, imageHeight);
                 }
-
+                img.Dispose();
                 e.Result = new Utility.Pair<string, Image>(requestedGalleryFile, scaled);
             }
 
@@ -764,7 +764,7 @@ namespace Manina.Windows.Forms
                     g.InterpolationMode = InterpolationMode.High;
                     g.DrawImage(img, 0, 0, imageWidth, imageHeight);
                 }
-
+                img.Dispose();
                 e.Result = new Utility.Pair<string, Image>(requestedGalleryFile, scaled);
             }
 
