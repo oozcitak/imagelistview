@@ -1456,6 +1456,7 @@ namespace Manina.Windows.Forms
             {
                 mRenderer.Dispose();
                 mHeaderFont.Dispose();
+                cacheManager.Dispose();
             }
 
             base.Dispose(disposing);
