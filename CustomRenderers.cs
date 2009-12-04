@@ -150,32 +150,50 @@ namespace Manina.Windows.Forms
                         // Draw item text
                         int lineHeight = CaptionFont.Height;
                         RectangleF rt;
-                        StringFormat sf = new StringFormat();
-                        rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + mImageListView.ThumbnailSize.Width,
-                            bounds.Top + itemPadding.Height + (Math.Max(mImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
-                            mTileWidth, lineHeight);
-                        sf.Alignment = StringAlignment.Near;
-                        sf.FormatFlags = StringFormatFlags.NoWrap;
-                        sf.LineAlignment = StringAlignment.Center;
-                        sf.Trimming = StringTrimming.EllipsisCharacter;
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        using (StringFormat sf = new StringFormat())
                         {
-                            g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
-                        }
-                        using (Brush bItemDetails = new SolidBrush(Color.Gray))
-                        {
-                            rt.Offset(0, 1.5f * lineHeight);
-                            g.DrawString(item.GetSubItemText(ColumnType.FileType),
-                                mImageListView.Font, bItemDetails, rt, sf);
-                            rt.Offset(0, 1.1f * lineHeight);
-                            g.DrawString(string.Format("{0} pixels, {1} dpi", item.GetSubItemText(ColumnType.Dimensions), item.Resolution.Width),
-                                mImageListView.Font, bItemDetails, rt, sf);
-                            rt.Offset(0, 1.1f * lineHeight);
-                            g.DrawString(item.GetSubItemText(ColumnType.FileSize),
-                                mImageListView.Font, bItemDetails, rt, sf);
-                            rt.Offset(0, 1.1f * lineHeight);
-                            g.DrawString(item.GetSubItemText(ColumnType.DateModified),
-                                mImageListView.Font, bItemDetails, rt, sf);
+                            rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + mImageListView.ThumbnailSize.Width,
+                                bounds.Top + itemPadding.Height + (Math.Max(mImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
+                                mTileWidth, lineHeight);
+                            sf.Alignment = StringAlignment.Near;
+                            sf.FormatFlags = StringFormatFlags.NoWrap;
+                            sf.LineAlignment = StringAlignment.Center;
+                            sf.Trimming = StringTrimming.EllipsisCharacter;
+                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            {
+                                g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
+                            }
+                            using (Brush bItemDetails = new SolidBrush(Color.Gray))
+                            {
+                                rt.Offset(0, 1.5f * lineHeight);
+                                if (!string.IsNullOrEmpty(item.FileType))
+                                {
+                                    g.DrawString(item.GetSubItemText(ColumnType.FileType),
+                                        mImageListView.Font, bItemDetails, rt, sf);
+                                    rt.Offset(0, 1.1f * lineHeight);
+                                }
+                                if (item.Dimensions != Size.Empty || item.Resolution != SizeF.Empty)
+                                {
+                                    string text = "";
+                                    if (item.Dimensions != Size.Empty)
+                                        text += item.GetSubItemText(ColumnType.Dimensions) + " pixels ";
+                                    if (item.Resolution != SizeF.Empty)
+                                        text += item.Resolution.Width + " dpi";
+                                    g.DrawString(text, mImageListView.Font, bItemDetails, rt, sf);
+                                    rt.Offset(0, 1.1f * lineHeight);
+                                }
+                                if (item.FileSize != 0)
+                                {
+                                    g.DrawString(item.GetSubItemText(ColumnType.FileSize),
+                                        mImageListView.Font, bItemDetails, rt, sf);
+                                    rt.Offset(0, 1.1f * lineHeight);
+                                }
+                                if (item.DateModified != DateTime.MinValue)
+                                {
+                                    g.DrawString(item.GetSubItemText(ColumnType.DateModified),
+                                        mImageListView.Font, bItemDetails, rt, sf);
+                                }
+                            }
                         }
                     }
 
@@ -312,33 +330,35 @@ namespace Manina.Windows.Forms
                     // Draw item text
                     SizeF szt = TextRenderer.MeasureText(item.Text, mImageListView.Font);
                     RectangleF rt;
-                    StringFormat sf = new StringFormat();
-                    rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 3 * itemPadding.Height + mImageListView.ThumbnailSize.Height, mImageListView.ThumbnailSize.Width, szt.Height);
-                    sf.Alignment = StringAlignment.Center;
-                    sf.FormatFlags = StringFormatFlags.NoWrap;
-                    sf.LineAlignment = StringAlignment.Center;
-                    sf.Trimming = StringTrimming.EllipsisCharacter;
-                    rt.Width += 1;
-                    rt.Inflate(1, 2);
-                    if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
-                        rt.Inflate(-1, -1);
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    using (StringFormat sf = new StringFormat())
                     {
-                        g.FillRectangle(SystemBrushes.Highlight, rt);
-                    }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
-                    {
-                        g.FillRectangle(SystemBrushes.GrayText, rt);
-                    }
-                    if (((state & ItemState.Selected) != ItemState.None))
-                    {
-                        g.DrawString(item.Text, mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
-                    }
-                    else
-                    {
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 3 * itemPadding.Height + mImageListView.ThumbnailSize.Height, mImageListView.ThumbnailSize.Width, szt.Height);
+                        sf.Alignment = StringAlignment.Center;
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        rt.Width += 1;
+                        rt.Inflate(1, 2);
+                        if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                            rt.Inflate(-1, -1);
+                        if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                         {
-                            g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                            g.FillRectangle(SystemBrushes.Highlight, rt);
+                        }
+                        else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                        {
+                            g.FillRectangle(SystemBrushes.GrayText, rt);
+                        }
+                        if (((state & ItemState.Selected) != ItemState.None))
+                        {
+                            g.DrawString(item.Text, mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                        }
+                        else
+                        {
+                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            {
+                                g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                            }
                         }
                     }
 
@@ -361,25 +381,27 @@ namespace Manina.Windows.Forms
                     }
 
                     Size offset = new Size(2, (bounds.Height - mImageListView.Font.Height) / 2);
-                    StringFormat sf = new StringFormat();
-                    sf.FormatFlags = StringFormatFlags.NoWrap;
-                    sf.Alignment = StringAlignment.Near;
-                    sf.LineAlignment = StringAlignment.Center;
-                    sf.Trimming = StringTrimming.EllipsisCharacter;
-                    // Sub text
-                    List<Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
-                    RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
-                    foreach (Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader column in uicolumns)
+                    using (StringFormat sf = new StringFormat())
                     {
-                        rt.Width = column.Width - 2 * offset.Width;
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        // Sub text
+                        List<ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
+                        RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
+                        foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                         {
-                            if ((state & ItemState.Selected) == ItemState.None)
-                                g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
-                            else
-                                g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                            rt.Width = column.Width - 2 * offset.Width;
+                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            {
+                                if ((state & ItemState.Selected) == ItemState.None)
+                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                                else
+                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                            }
+                            rt.X += column.Width;
                         }
-                        rt.X += column.Width;
                     }
 
                     if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
@@ -429,6 +451,7 @@ namespace Manina.Windows.Forms
             BackgroundWorker worker;
             private string cachedFileName;
             private Image cachedImage;
+            private bool cacheError;
 
             public ZoomingRenderer()
                 : this(0.5f)
@@ -443,6 +466,7 @@ namespace Manina.Windows.Forms
                 if (zoomRatio > 1.0f) zoomRatio = 1.0f;
                 mZoomRatio = zoomRatio;
 
+                cacheError = false;
                 cachedFileName = null;
                 cachedImage = null;
                 worker = new BackgroundWorker();
@@ -456,23 +480,10 @@ namespace Manina.Windows.Forms
                 string requestedGalleryFile = request.First;
                 Size size = request.Second;
 
-                // Calculate image bounds
-                Image img = Image.FromFile(requestedGalleryFile);
-                float xscale = (float)size.Width / (float)img.Width;
-                float yscale = (float)size.Height / (float)img.Height;
-                float scale = Math.Min(xscale, yscale);
-                if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)img.Width * scale);
-                int imageHeight = (int)((float)img.Height * scale);
-                Image scaled = new Bitmap(imageWidth, imageHeight);
-                using (Graphics g = Graphics.FromImage(scaled))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.High;
-                    g.DrawImage(img, 0, 0, imageWidth, imageHeight);
-                }
-                img.Dispose();
-                e.Result = new Utility.Pair<string, Image>(requestedGalleryFile, scaled);
+                Image scaled = Utility.ThumbnailFromFile(requestedGalleryFile, size);
+                bool error = (scaled == null);
+
+                e.Result = new Utility.Triple<string, Image, bool>(requestedGalleryFile, scaled, error);
             }
 
             void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -480,9 +491,10 @@ namespace Manina.Windows.Forms
                 if (cachedImage != null)
                     cachedImage.Dispose();
 
-                Utility.Pair<string, Image> result = (Utility.Pair<string, Image>)e.Result;
+                Utility.Triple<string, Image, bool> result = (Utility.Triple<string, Image, bool>)e.Result;
                 cachedFileName = result.First;
                 cachedImage = result.Second;
+                cacheError = result.Third;
                 mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
@@ -537,17 +549,25 @@ namespace Manina.Windows.Forms
                     }
 
                     // Get item image
-                    Image img = item.ThumbnailImage;
+                    Image img = null;
                     if ((state & ItemState.Hovered) != ItemState.None)
                     {
-                        if (cachedImage == null || cachedFileName == null || string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
+                        if (string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0)
                         {
+                            if (cacheError)
+                                img = mImageListView.ErrorImage;
+                            else
+                                img = cachedImage;
+                        }
+                        else
+                        {
+                            img = item.ThumbnailImage;
                             if (!worker.IsBusy)
                                 worker.RunWorkerAsync(new Utility.Pair<string, Size>(item.FileName, new Size(bounds.Width - 8, bounds.Height - 8)));
                         }
-                        else
-                            img = cachedImage;
                     }
+                    else
+                        img = item.ThumbnailImage;
 
                     // Calculate image bounds
                     int imageWidth = img.Width;
@@ -618,21 +638,27 @@ namespace Manina.Windows.Forms
                     if ((state & ItemState.Hovered) != ItemState.None)
                     {
                         RectangleF rt;
-                        StringFormat sf = new StringFormat();
-                        rt = new RectangleF(bounds.Left + 4, bounds.Top + 4, bounds.Width - 8, (bounds.Height - imageHeight) / 2 - 8);
-                        sf.Alignment = StringAlignment.Center;
-                        sf.FormatFlags = StringFormatFlags.NoWrap;
-                        sf.LineAlignment = StringAlignment.Center;
-                        sf.Trimming = StringTrimming.EllipsisCharacter;
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        using (StringFormat sf = new StringFormat())
                         {
-                            g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
-                        }
-                        rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
-                        using (Brush bGrayText = new SolidBrush(Color.Gray))
-                        {
-                            g.DrawString(string.Format("{0} pixels, {1}", item.GetSubItemText(ColumnType.Dimensions), item.GetSubItemText(ColumnType.FileSize)),
-                                mImageListView.Font, bGrayText, rt, sf);
+                            rt = new RectangleF(bounds.Left + 4, bounds.Top + 4, bounds.Width - 8, (bounds.Height - imageHeight) / 2 - 8);
+                            sf.Alignment = StringAlignment.Center;
+                            sf.FormatFlags = StringFormatFlags.NoWrap;
+                            sf.LineAlignment = StringAlignment.Center;
+                            sf.Trimming = StringTrimming.EllipsisCharacter;
+                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            {
+                                g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                            }
+                            rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
+                            string details = "";
+                            if (item.Dimensions != Size.Empty)
+                                details += item.GetSubItemText(ColumnType.Dimensions) + " pixels ";
+                            if (item.FileSize != 0)
+                                details += item.GetSubItemText(ColumnType.FileSize);
+                            using (Brush bGrayText = new SolidBrush(Color.Gray))
+                            {
+                                g.DrawString(details, mImageListView.Font, bGrayText, rt, sf);
+                            }
                         }
                     }
 
@@ -703,6 +729,7 @@ namespace Manina.Windows.Forms
             BackgroundWorker worker;
             private string cachedFileName;
             private Image cachedImage;
+            private bool cacheError;
 
             private Font CaptionFont
             {
@@ -738,6 +765,7 @@ namespace Manina.Windows.Forms
                     {PropertyTagExifUserComment, "Comments"},
                 };
 
+                cacheError = false;
                 cachedFileName = null;
                 cachedImage = null;
                 worker = new BackgroundWorker();
@@ -751,21 +779,10 @@ namespace Manina.Windows.Forms
                 string requestedGalleryFile = (string)request.First;
                 int width = request.Second;
 
-                // Calculate image bounds
-                Image img = Image.FromFile(requestedGalleryFile);
-                float scale = (float)width / (float)img.Width;
-                if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)img.Width * scale);
-                int imageHeight = (int)((float)img.Height * scale);
-                Image scaled = new Bitmap(imageWidth, imageHeight);
-                using (Graphics g = Graphics.FromImage(scaled))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.High;
-                    g.DrawImage(img, 0, 0, imageWidth, imageHeight);
-                }
-                img.Dispose();
-                e.Result = new Utility.Pair<string, Image>(requestedGalleryFile, scaled);
+                Image scaled = Utility.ThumbnailFromFile(requestedGalleryFile, new Size(width, int.MaxValue));
+                bool error = (scaled == null);
+
+                e.Result = new Utility.Triple<string, Image, bool>(requestedGalleryFile, scaled, error);
             }
 
             void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -773,9 +790,10 @@ namespace Manina.Windows.Forms
                 if (cachedImage != null)
                     cachedImage.Dispose();
 
-                Utility.Pair<string, Image> result = (Utility.Pair<string, Image>)e.Result;
+                Utility.Triple<string, Image, bool> result = (Utility.Triple<string, Image, bool>)e.Result;
                 cachedFileName = result.First;
                 cachedImage = result.Second;
+                cacheError = result.Third;
                 mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
@@ -807,6 +825,100 @@ namespace Manina.Windows.Forms
                     mCaptionFont.Dispose();
             }
             /// <summary>
+            /// Draws the large preview image of the focused item in Gallery mode.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="image">The image to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the preview area.</param>
+            public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
+            {
+                // Allocate some space for the panel
+                Rectangle panel = new Rectangle(bounds.Left, bounds.Bottom - 3 * mImageListView.Font.Height, bounds.Width, 3 * mImageListView.Font.Height);
+                bounds.Height -= panel.Height;
+                base.DrawGalleryImage(g, item, image, bounds);
+
+                // Draw panel background
+                using (Brush bBack = new LinearGradientBrush(panel, Color.FromArgb(32, SystemColors.Control), Color.FromArgb(196, SystemColors.Control), LinearGradientMode.Vertical))
+                {
+                    g.FillRectangle(bBack, panel);
+                }
+                using (Brush bBorder = new LinearGradientBrush(panel, SystemColors.ControlLightLight, SystemColors.ControlDark, LinearGradientMode.Vertical))
+                using (Pen pBorder = new Pen(bBorder))
+                {
+                    g.DrawLine(pBorder, panel.Left, panel.Bottom - 1, panel.Right, panel.Bottom - 1);
+                }
+                using (Pen pTopBorder = new Pen(SystemColors.ControlDark))
+                {
+                    g.DrawLine(pTopBorder, panel.Left, panel.Top, panel.Right, panel.Top);
+                }
+
+                // Image information
+                string space = " ";
+                string colon = ":";
+                List<string> texts = new List<string>();
+                texts.Add(item.Text);
+                if (item.Dimensions != Size.Empty)
+                {
+                    texts.Add(mImageListView.Columns.GetDefaultText(ColumnType.Dimensions) + colon);
+                    texts.Add(item.GetSubItemText(ColumnType.Dimensions) + space);
+                }
+                if (item.FileSize != 0)
+                {
+                    texts.Add(mImageListView.Columns.GetDefaultText(ColumnType.FileSize) + colon);
+                    texts.Add(item.GetSubItemText(ColumnType.FileSize) + space);
+                }
+                if (item.DateModified != DateTime.MinValue)
+                {
+                    texts.Add(mImageListView.Columns.GetDefaultText(ColumnType.DateModified) + colon);
+                    texts.Add(item.GetSubItemText(ColumnType.DateModified) + space);
+                }
+
+                List<int> widths = new List<int>();
+                int totalwidth = 0;
+                int height = 0;
+                for (int i = 0; i < texts.Count; i++)
+                {
+                    int width;
+                    if (i == 0)
+                    {
+                        SizeF sz = g.MeasureString(texts[i], CaptionFont);
+                        width = (int)sz.Width;
+                        height = (int)sz.Height;
+                        widths.Add(width);
+                    }
+                    else
+                    {
+                        using (StringFormat sf = new StringFormat())
+                        {
+                            sf.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+                            width = (int)g.MeasureString(texts[i], mImageListView.Font, panel.Width, sf).Width;
+                            widths.Add(width);
+                            totalwidth += width;
+                        }
+                    }
+                }
+                if (totalwidth > panel.Width - 4) totalwidth = panel.Width - 4;
+
+                // Draw item text
+                int x = panel.X + (panel.Width - widths[0]) / 2;
+                int y = panel.Y + (panel.Height / 2 - height) / 2;
+                g.DrawString(texts[0], CaptionFont, SystemBrushes.WindowText, x, y);
+
+                // Draw item details
+                x = panel.X + (panel.Width - totalwidth) / 2;
+                y = panel.Y + panel.Height / 2 + (panel.Height / 2 - height) / 2;
+
+                for (int i = 1; i < texts.Count; i++)
+                {
+                    if (i % 2 == 1)
+                        g.DrawString(texts[i], mImageListView.Font, SystemBrushes.GrayText, x, y);
+                    else
+                        g.DrawString(texts[i], mImageListView.Font, SystemBrushes.WindowText, x, y);
+                    x += widths[i];
+                }
+            }
+            /// <summary>
             /// Draws the background of the control.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
@@ -835,9 +947,6 @@ namespace Manina.Windows.Forms
                     g.DrawRectangle(pWhite, rect.Left + 2, rect.Top + 2, rect.Width - 5, rect.Height - 4);
                 }
                 rect.Inflate(-4, -4);
-                StringFormat sf = new StringFormat();
-                sf.Alignment = StringAlignment.Center;
-                sf.LineAlignment = StringAlignment.Center;
 
                 ImageListViewItem item = null;
                 if (mImageListView.Items.FocusedItem != null)
@@ -851,14 +960,20 @@ namespace Manina.Windows.Forms
                 {
                     rect.Inflate(-4, -4);
 
-                    Image img = item.ThumbnailImage;
-                    if (cachedImage == null || cachedFileName == null || string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) != 0)
+                    Image img = null;
+                    if (string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
+                        if (cacheError)
+                            img = mImageListView.ErrorImage;
+                        else
+                            img = cachedImage;
+                    }
+                    else
+                    {
+                        img = item.ThumbnailImage;
                         if (!worker.IsBusy)
                             worker.RunWorkerAsync(new Utility.Pair<string, int>(item.FileName, rect.Width));
                     }
-                    else
-                        img = cachedImage;
 
                     // Draw image
                     g.DrawImageUnscaled(img, rect.Location);
@@ -879,122 +994,142 @@ namespace Manina.Windows.Forms
                     rect.Height -= img.Height + 16;
 
                     // Image information
-                    sf.Alignment = StringAlignment.Near;
-                    sf.LineAlignment = StringAlignment.Near;
-                    sf.Trimming = StringTrimming.EllipsisCharacter;
-                    sf.FormatFlags = StringFormatFlags.NoWrap;
-                    g.DrawString(item.Text, CaptionFont, Brushes.Black, rect, sf);
-
-                    int textHeight = (int)CaptionFont.GetHeight() * 2;
-                    rect.Y += textHeight;
-                    rect.Height -= textHeight;
-
-                    StringBuilder sb = new StringBuilder();
-                    // File properties
-                    sb.AppendLine(item.FileType);
-
-                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Dimensions));
-                    sb.Append(": ");
-                    sb.Append(item.GetSubItemText(ColumnType.Dimensions));
-                    sb.AppendLine();
-
-                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Resolution));
-                    sb.Append(": ");
-                    sb.Append(item.Resolution.Width);
-                    sb.AppendLine(" dpi");
-
-                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.FileSize));
-                    sb.Append(": ");
-                    sb.Append(item.GetSubItemText(ColumnType.FileSize));
-                    sb.AppendLine();
-
-                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateModified));
-                    sb.Append(": ");
-                    sb.Append(item.GetSubItemText(ColumnType.DateModified));
-                    sb.AppendLine();
-
-                    sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateCreated));
-                    sb.Append(": ");
-                    sb.Append(item.GetSubItemText(ColumnType.DateCreated));
-                    sb.AppendLine();
-
-                    // Exif info
-                    sb.AppendLine();
-                    using (FileStream stream = new FileStream(item.FileName, FileMode.Open, FileAccess.Read))
+                    using (StringFormat sf = new StringFormat())
                     {
-                        using (Image tempImage = Image.FromStream(stream, false, false))
-                        {
-                            foreach (PropertyItem prop in tempImage.PropertyItems)
-                            {
-                                if (mTags.ContainsKey(prop.Id))
-                                {
-                                    string tagName = mTags[prop.Id];
-                                    short tagType = prop.Type;
-                                    int tagLen = prop.Len;
-                                    byte[] tagBytes = prop.Value;
-                                    string tagValue = string.Empty;
-                                    switch (tagType)
-                                    {
-                                        case 1: // byte
-                                            foreach (byte b in tagBytes)
-                                                tagValue += b.ToString() + " ";
-                                            break;
-                                        case 2: // ascii
-                                            int len = Array.IndexOf(tagBytes, (byte)0);
-                                            if (len == -1) len = tagLen;
-                                            tagValue = Encoding.ASCII.GetString(tagBytes, 0, len);
-                                            if (prop.Id == PropertyTagDateTime)
-                                            {
-                                                tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
-                                            }
-                                            break;
-                                        case 3: // ushort
-                                            for (int i = 0; i < tagLen; i += 2)
-                                                tagValue += BitConverter.ToUInt16(tagBytes, i).ToString() + " ";
-                                            break;
-                                        case 4: // uint
-                                            for (int i = 0; i < tagLen; i += 4)
-                                                tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + " ";
-                                            break;
-                                        case 5: // uint rational
-                                            for (int i = 0; i < tagLen; i += 8)
-                                                tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + "/" +
-                                                    BitConverter.ToUInt32(tagBytes, i + 4).ToString() + " ";
-                                            break;
-                                        case 7: // undefined as ascii
-                                            int lenu = Array.IndexOf(tagBytes, (byte)0);
-                                            if (lenu == -1) len = tagLen;
-                                            tagValue = Encoding.ASCII.GetString(tagBytes, 0, lenu);
-                                            if (prop.Id == PropertyTagDateTime)
-                                            {
-                                                tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
-                                            }
-                                            break;
-                                        case 9: // int
-                                            for (int i = 0; i < tagLen; i += 4)
-                                                tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + " ";
-                                            break;
-                                        case 10: // int rational
-                                            for (int i = 0; i < tagLen; i += 8)
-                                                tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + "/" +
-                                                    BitConverter.ToInt32(tagBytes, i + 4).ToString() + " ";
-                                            break;
-                                    }
-                                    tagValue = tagValue.Trim();
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Near;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        g.DrawString(item.Text, CaptionFont, Brushes.Black, rect, sf);
 
-                                    if (tagValue != string.Empty)
+                        int textHeight = (int)CaptionFont.GetHeight() * 2;
+                        rect.Y += textHeight;
+                        rect.Height -= textHeight;
+
+                        StringBuilder sb = new StringBuilder();
+                        // File properties
+                        sb.AppendLine(item.FileType);
+
+                        if (item.Dimensions != Size.Empty)
+                        {
+                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Dimensions));
+                            sb.Append(": ");
+                            sb.Append(item.GetSubItemText(ColumnType.Dimensions));
+                            sb.AppendLine();
+                        }
+                        if (item.Resolution != SizeF.Empty)
+                        {
+                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Resolution));
+                            sb.Append(": ");
+                            sb.Append(item.Resolution.Width);
+                            sb.AppendLine(" dpi");
+                        }
+                        if (item.FileSize != 0)
+                        {
+                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.FileSize));
+                            sb.Append(": ");
+                            sb.Append(item.GetSubItemText(ColumnType.FileSize));
+                            sb.AppendLine();
+                        }
+                        if (item.DateModified != DateTime.MinValue)
+                        {
+                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateModified));
+                            sb.Append(": ");
+                            sb.Append(item.GetSubItemText(ColumnType.DateModified));
+                            sb.AppendLine();
+                        }
+                        if (item.DateCreated != DateTime.MinValue)
+                        {
+                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateCreated));
+                            sb.Append(": ");
+                            sb.Append(item.GetSubItemText(ColumnType.DateCreated));
+                            sb.AppendLine();
+                        }
+                        // Exif info
+                        sb.AppendLine();
+                        try
+                        {
+                            using (FileStream stream = new FileStream(item.FileName, FileMode.Open, FileAccess.Read))
+                            {
+                                using (Image tempImage = Image.FromStream(stream, false, false))
+                                {
+                                    foreach (PropertyItem prop in tempImage.PropertyItems)
                                     {
-                                        sb.Append(tagName);
-                                        sb.Append(": ");
-                                        sb.Append(tagValue);
-                                        sb.AppendLine();
+                                        if (mTags.ContainsKey(prop.Id))
+                                        {
+                                            string tagName = mTags[prop.Id];
+                                            short tagType = prop.Type;
+                                            int tagLen = prop.Len;
+                                            byte[] tagBytes = prop.Value;
+                                            string tagValue = string.Empty;
+                                            switch (tagType)
+                                            {
+                                                case 1: // byte
+                                                    foreach (byte b in tagBytes)
+                                                        tagValue += b.ToString() + " ";
+                                                    break;
+                                                case 2: // ascii
+                                                    int len = Array.IndexOf(tagBytes, (byte)0);
+                                                    if (len == -1) len = tagLen;
+                                                    tagValue = Encoding.ASCII.GetString(tagBytes, 0, len);
+                                                    if (prop.Id == PropertyTagDateTime)
+                                                    {
+                                                        tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
+                                                    }
+                                                    break;
+                                                case 3: // ushort
+                                                    for (int i = 0; i < tagLen; i += 2)
+                                                        tagValue += BitConverter.ToUInt16(tagBytes, i).ToString() + " ";
+                                                    break;
+                                                case 4: // uint
+                                                    for (int i = 0; i < tagLen; i += 4)
+                                                        tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + " ";
+                                                    break;
+                                                case 5: // uint rational
+                                                    for (int i = 0; i < tagLen; i += 8)
+                                                        tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + "/" +
+                                                            BitConverter.ToUInt32(tagBytes, i + 4).ToString() + " ";
+                                                    break;
+                                                case 7: // undefined as ascii
+                                                    int lenu = Array.IndexOf(tagBytes, (byte)0);
+                                                    if (lenu == -1) len = tagLen;
+                                                    tagValue = Encoding.ASCII.GetString(tagBytes, 0, lenu);
+                                                    if (prop.Id == PropertyTagDateTime)
+                                                    {
+                                                        tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
+                                                    }
+                                                    break;
+                                                case 9: // int
+                                                    for (int i = 0; i < tagLen; i += 4)
+                                                        tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + " ";
+                                                    break;
+                                                case 10: // int rational
+                                                    for (int i = 0; i < tagLen; i += 8)
+                                                        tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + "/" +
+                                                            BitConverter.ToInt32(tagBytes, i + 4).ToString() + " ";
+                                                    break;
+                                            }
+                                            tagValue = tagValue.Trim();
+
+                                            if (tagValue != string.Empty)
+                                            {
+                                                sb.Append(tagName);
+                                                sb.Append(": ");
+                                                sb.Append(tagValue);
+                                                sb.AppendLine();
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
+                        catch
+                        {
+                            ;
+                        }
+                        // Print image details
+                        g.DrawString(sb.ToString(), mImageListView.Font, Brushes.Black, rect, sf);
                     }
-                    // Print image details
-                    g.DrawString(sb.ToString(), mImageListView.Font, Brushes.Black, rect, sf);
                 }
             }
         }

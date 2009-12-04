@@ -29,6 +29,7 @@ namespace Manina.Windows.Forms
         public bool MouseInColumnArea { get; set; }
         public bool MouseInItemArea { get; set; }
         public bool MouseClicked { get; set; }
+        public Point LastClickLocation { get; set; }
         #endregion
 
         #region Constructor

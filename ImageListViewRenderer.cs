@@ -30,6 +30,7 @@ namespace Manina.Windows.Forms
             private Image lastGalleryImage;
             private Size lastGalleryImageSize;
             private string lastGalleryFile;
+            private bool lastGalleryError;
             #endregion
 
             #region Properties
@@ -66,6 +67,7 @@ namespace Manina.Windows.Forms
                 mClip = true;
                 mItemDrawOrder = ItemDrawOrder.ItemIndex;
 
+                lastGalleryError = false;
                 lastGalleryImage = null;
                 lastGalleryFile = null;
                 galleryWorker = new BackgroundWorker();
@@ -494,16 +496,23 @@ namespace Manina.Windows.Forms
                     Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
 
-                    Image image = item.ThumbnailImage;
-                    if (lastGalleryImage == null || lastGalleryFile == null ||
-                        string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) != 0 ||
-                        lastGalleryImageSize != bounds.Size)
+                    Image image = null;
+                    if (string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) == 0 &&
+                        lastGalleryError)
                     {
+                        image = mImageListView.ErrorImage;
+                    }
+                    else if (string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) == 0 &&
+                        lastGalleryImage != null && lastGalleryFile != null && lastGalleryImageSize == bounds.Size)
+                    {
+                        image = lastGalleryImage;
+                    }
+                    else
+                    {
+                        image = item.ThumbnailImage;
                         if (!galleryWorker.IsBusy)
                             galleryWorker.RunWorkerAsync(new Utility.Pair<string, Size>(item.FileName, bounds.Size));
                     }
-                    else
-                        image = lastGalleryImage;
 
                     if (mClip)
                         g.SetClip(bounds);
@@ -786,15 +795,17 @@ namespace Manina.Windows.Forms
                     // Draw item text
                     SizeF szt = TextRenderer.MeasureText(item.Text, mImageListView.Font);
                     RectangleF rt;
-                    StringFormat sf = new StringFormat();
-                    rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + mImageListView.ThumbnailSize.Height, mImageListView.ThumbnailSize.Width, szt.Height);
-                    sf.Alignment = StringAlignment.Center;
-                    sf.FormatFlags = StringFormatFlags.NoWrap;
-                    sf.LineAlignment = StringAlignment.Center;
-                    sf.Trimming = StringTrimming.EllipsisCharacter;
-                    using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                    using (StringFormat sf = new StringFormat())
                     {
-                        g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + mImageListView.ThumbnailSize.Height, mImageListView.ThumbnailSize.Width, szt.Height);
+                        sf.Alignment = StringAlignment.Center;
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        {
+                            g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                        }
                     }
                 }
                 else if (mImageListView.View == View.Details)
@@ -814,21 +825,23 @@ namespace Manina.Windows.Forms
                         }
                     }
                     Size offset = new Size(2, (bounds.Height - mImageListView.Font.Height) / 2);
-                    StringFormat sf = new StringFormat();
-                    sf.FormatFlags = StringFormatFlags.NoWrap;
-                    sf.Alignment = StringAlignment.Near;
-                    sf.LineAlignment = StringAlignment.Center;
-                    sf.Trimming = StringTrimming.EllipsisCharacter;
-                    // Sub text
-                    RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
-                    foreach (ImageListViewColumnHeader column in uicolumns)
+                    using (StringFormat sf = new StringFormat())
                     {
-                        rt.Width = column.Width - 2 * offset.Width;
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        // Sub text
+                        RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
+                        foreach (ImageListViewColumnHeader column in uicolumns)
                         {
-                            g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                            rt.Width = column.Width - 2 * offset.Width;
+                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            {
+                                g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                            }
+                            rt.X += column.Width;
                         }
-                        rt.X += column.Width;
                     }
                 }
 
@@ -882,13 +895,7 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of column in client coordinates.</param>
             public virtual void DrawColumnHeader(Graphics g, ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
             {
-                StringFormat sf = new StringFormat();
-                sf.FormatFlags = StringFormatFlags.NoWrap;
-                sf.Alignment = StringAlignment.Near;
-                sf.LineAlignment = StringAlignment.Center;
-                sf.Trimming = StringTrimming.EllipsisCharacter;
-
-                // Paint background
+                 // Paint background
                 if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
@@ -928,7 +935,16 @@ namespace Manina.Windows.Forms
                 bounds.X += textOffset;
                 bounds.Width -= textOffset;
                 if (bounds.Width > 4)
-                    g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), SystemBrushes.WindowText, bounds, sf);
+                {
+                    using (StringFormat sf = new StringFormat())
+                    {
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), SystemBrushes.WindowText, bounds, sf);
+                    }
+                }
             }
             /// <summary>
             /// Draws the large preview image of the focused item in Gallery mode.
@@ -1058,27 +1074,11 @@ namespace Manina.Windows.Forms
                 Utility.Pair<string, Size> request = (Utility.Pair<string, Size>)e.Argument;
                 string requestedGalleryFile = request.First;
                 Size size = request.Second;
-                Image img = Image.FromFile(requestedGalleryFile);
 
-                // Calculate image bounds
-                float xscale = (float)size.Width / (float)img.Width;
-                float yscale = (float)size.Height / (float)img.Height;
-                float scale = Math.Min(xscale, yscale);
-                if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)img.Width * scale);
-                int imageHeight = (int)((float)img.Height * scale);
+                Image scaled = Utility.ThumbnailFromFile(requestedGalleryFile, size);
+                bool error = (scaled == null);
 
-                // Create a scaled image
-                Image scaled = new Bitmap(imageWidth, imageHeight);
-                using (Graphics g = Graphics.FromImage(scaled))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.High;
-                    g.DrawImage(img, 0, 0, imageWidth, imageHeight);
-                }
-                img.Dispose();
-
-                e.Result = new Utility.Triple<string, Image, Size>(requestedGalleryFile, scaled, size);
+                e.Result = new Utility.Quadruple<string, Image, Size, bool>(requestedGalleryFile, scaled, size, error);
             }
             /// <summary>
             /// Handles the RunWorkerCompleted event of the galleryWorker.
@@ -1088,10 +1088,11 @@ namespace Manina.Windows.Forms
                 if (lastGalleryImage != null)
                     lastGalleryImage.Dispose();
 
-                Utility.Triple<string, Image, Size> result = (Utility.Triple<string, Image, Size>)e.Result;
+                Utility.Quadruple<string, Image, Size, bool> result = (Utility.Quadruple<string, Image, Size, bool>)e.Result;
                 lastGalleryFile = result.First;
                 lastGalleryImage = result.Second;
                 lastGalleryImageSize = result.Third;
+                lastGalleryError = result.Fourth;
                 mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
             #endregion

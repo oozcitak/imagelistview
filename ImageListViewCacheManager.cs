@@ -382,7 +382,8 @@ namespace Manina.Windows.Forms
                 {
                     bool thumbnailCreated = false;
                     bool cleanupRequired = false;
-                    Image thumb = ThumbnailFromFile(filename, thumbsize, useEmbedded);
+                    Image thumb = Utility.ThumbnailFromFile(filename, thumbsize, useEmbedded);
+
                     lock (owner.thumbCache)
                     {
                         if (!owner.thumbCache.ContainsKey(guid) || owner.thumbCache[guid].Size != thumbsize)
@@ -441,85 +442,6 @@ namespace Manina.Windows.Forms
                     }
                 }
             }
-        }
-        /// <summary>
-        /// Creates a thumbnail image of given size for the specified image file.
-        /// </summary>
-        private static Image ThumbnailFromFile(string filename, Size thumbSize, UseEmbeddedThumbnails useEmbedded)
-        {
-            Bitmap thumb = null;
-            try
-            {
-                if (thumbSize.Width <= 0 || thumbSize.Height <= 0)
-                    throw new ArgumentException();
-
-                Image sourceImage = null;
-                if (useEmbedded != UseEmbeddedThumbnails.Never)
-                {
-                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                    {
-                        sourceImage = Image.FromStream(stream, false, false);
-                        bool hasTag = false;
-                        // Try to get the embedded thumbnail.
-                        foreach (int index in sourceImage.PropertyIdList)
-                        {
-                            if (index == PropertyTagThumbnailData)
-                            {
-                                hasTag = true;
-                                byte[] rawImage = sourceImage.GetPropertyItem(PropertyTagThumbnailData).Value;
-                                sourceImage.Dispose();
-                                using (MemoryStream memStream = new MemoryStream(rawImage))
-                                {
-                                    sourceImage = Image.FromStream(memStream);
-                                }
-                                if (useEmbedded == UseEmbeddedThumbnails.Auto)
-                                {
-                                    // Check that the embedded thumbnail is large enough.
-                                    float aspectRatio = (float)sourceImage.Width / (float)sourceImage.Height;
-                                    Size actualThumbSize = Size.Empty;
-                                    if (aspectRatio > 1.0f)
-                                        actualThumbSize = new Size(thumbSize.Width, (int)(((float)thumbSize.Height) / aspectRatio));
-                                    else
-                                        actualThumbSize = new Size((int)(((float)thumbSize.Width) * aspectRatio), thumbSize.Height);
-
-                                    if (System.Math.Max((float)actualThumbSize.Width / (float)sourceImage.Width, (float)actualThumbSize.Height / (float)sourceImage.Height) > EmbeddedThumbnailSizeTolerance)
-                                    {
-                                        sourceImage.Dispose();
-                                        sourceImage = null;
-                                    }
-                                }
-                            }
-                        }
-                        if (!hasTag)
-                        {
-                            sourceImage.Dispose();
-                            sourceImage = null;
-                        }
-                    }
-                }
-
-                // If the source image does not have an embedded thumbnail or if the
-                // embedded thumbnail is too small, read and scale the entire image.
-                if (sourceImage == null)
-                    sourceImage = Image.FromFile(filename);
-
-                float f = System.Math.Max((float)sourceImage.Width / (float)thumbSize.Width, (float)sourceImage.Height / (float)thumbSize.Height);
-                if (f < 1.0f) f = 1.0f; // Do not upsize small images
-                int x = (int)System.Math.Round((float)sourceImage.Width / f);
-                int y = (int)System.Math.Round((float)sourceImage.Height / f);
-                thumb = new Bitmap(x, y);
-                using (Graphics g = Graphics.FromImage(thumb))
-                {
-                    g.FillRectangle(Brushes.White, 0, 0, x, y);
-                    g.DrawImage(sourceImage, 0, 0, x, y);
-                }
-                sourceImage.Dispose();
-            }
-            catch
-            {
-                thumb = null;
-            }
-            return thumb;
         }
         #endregion
     }
