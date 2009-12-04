@@ -12,6 +12,12 @@ namespace Manina.Windows.Forms
     /// </summary>
     public static class Utility
     {
+        #region Constants
+        private const int PropertyTagThumbnailData = 0x501B;
+        private const int PropertyTagThumbnailImageWidth = 0x5020;
+        private const int PropertyTagThumbnailImageHeight = 0x5021;
+        #endregion
+
         #region Platform Invoke
         // GetFileAttributesEx
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -143,9 +149,9 @@ namespace Manina.Windows.Forms
 
         #region Shell Utilities
         /// <summary>
-        /// A utility class combining FileInfo with SHGetFileInfo.
+        /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
-        public class ShellFileInfo
+        public class ShellImageFileInfo
         {
             private static Dictionary<string, string> cachedFileTypes;
             private uint structSize = 0;
@@ -160,8 +166,10 @@ namespace Manina.Windows.Forms
             public string DisplayName { get; private set; }
             public long Size { get; private set; }
             public string TypeName { get; private set; }
+            public Size Dimension { get; private set; }
+            public SizeF Resolution { get; private set; }
 
-            public ShellFileInfo(string path)
+            public ShellImageFileInfo(string path)
             {
                 if (cachedFileTypes == null)
                     cachedFileTypes = new Dictionary<string, string>();
@@ -188,7 +196,14 @@ namespace Manina.Windows.Forms
                         cachedFileTypes.Add(Extension, typeName);
                     }
                     TypeName = typeName;
-
+                    using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    {
+                        using (Image img = Image.FromStream(stream, false, false))
+                        {
+                            Dimension = img.Size;
+                            Resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
+                        }
+                    }
                     Error = false;
                 }
                 catch
@@ -199,7 +214,131 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Graphics Extensions
+        #region Graphics Utilities
+        /// <summary>
+        /// Reads and returns an image from the given file.
+        /// </summary>
+        /// <param name="filename">The filename pointing to an image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
+        /// <param name="backColor">Background color of returned thumbnail.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
+        {
+            Image source = null;
+            Image thumb = null;
+            try
+            {
+                if (size.Width <= 0 || size.Height <= 0)
+                    throw new ArgumentException();
+
+                if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Never)
+                {
+                    // Read and scale the source image
+                    source = Image.FromFile(filename);
+                }
+                else
+                {
+                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    {
+                        using (Image img = Image.FromStream(stream, false, false))
+                        {
+                            foreach (int index in img.PropertyIdList)
+                            {
+                                if (index == PropertyTagThumbnailData)
+                                {
+                                    // Fetch the embedded thumbnail
+                                    byte[] rawImage = img.GetPropertyItem(PropertyTagThumbnailData).Value;
+                                    using (MemoryStream memStream = new MemoryStream(rawImage))
+                                    {
+                                        source = Image.FromStream(memStream);
+                                    }
+                                    if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
+                                    {
+                                        // Check that the embedded thumbnail is large enough.
+                                        if (source.Width < size.Width && source.Height < size.Height)
+                                        {
+                                            source.Dispose();
+                                            source = null;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    // Revert to source image if an embedded thumbnail of required size
+                    // was not found.
+                    if (source == null)
+                        source = Image.FromFile(filename);
+                }
+
+                float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
+                if (f < 1.0f) f = 1.0f; // Do not upsize small images
+                int width = (int)System.Math.Round((float)source.Width / f);
+                int height = (int)System.Math.Round((float)source.Height / f);
+                thumb = new Bitmap(width, height);
+                using (Graphics g = Graphics.FromImage(thumb))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.High;
+
+                    using (Brush brush = new SolidBrush(backColor))
+                    {
+                        g.FillRectangle(Brushes.White, 0, 0, width, height);
+                    }
+
+                    g.DrawImage(source, 0, 0, width, height);
+                }
+                source.Dispose();
+            }
+            catch
+            {
+                if(thumb!=null)
+                    thumb.Dispose();
+                thumb = null;
+            }
+            finally
+            {
+                if (source != null)
+                    source.Dispose();
+                source = null;
+            }
+
+            return thumb;
+        }
+        /// <summary>
+        /// Reads and returns an image from the given file.
+        /// </summary>
+        /// <param name="filename">The filename pointing to an image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            return ThumbnailFromFile(filename, size, useEmbeddedThumbnails, Color.White);
+        }
+        /// <summary>
+        /// Reads and returns an image from the given file.
+        /// </summary>
+        /// <param name="filename">The filename pointing to an image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <param name="backColor">Background color of returned thumbnail.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        public static Image ThumbnailFromFile(string filename, Size size, Color backColor)
+        {
+            return ThumbnailFromFile(filename, size, UseEmbeddedThumbnails.Auto, backColor);
+        }
+        /// <summary>
+        /// Reads and returns an image from the given file.
+        /// </summary>
+        /// <param name="filename">The filename pointing to an image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        public static Image ThumbnailFromFile(string filename, Size size)
+        {
+            return ThumbnailFromFile(filename, size, UseEmbeddedThumbnails.Auto, Color.White);
+        }
         /// <summary>
         /// Creates a new image from the given base 64 string.
         /// </summary>
@@ -405,6 +544,64 @@ namespace Manina.Windows.Forms
                 return Equals(other.First, First) &&
                     Equals(other.Second, Second) &&
                     Equals(other.Third, Third);
+            }
+        }
+        /// <summary>
+        /// Represents a four element tuple.
+        /// </summary>
+        /// <typeparam name="T1">Type of first element.</typeparam>
+        /// <typeparam name="T2">Type of second element.</typeparam>
+        /// <typeparam name="T3">Type of third element.</typeparam>
+        /// <typeparam name="T4">Type of fourth element.</typeparam>
+        public sealed class Quadruple<T1, T2, T3, T4> : IEquatable<Quadruple<T1, T2, T3, T4>>
+        {
+            private readonly T1 mFirst;
+            private readonly T2 mSecond;
+            private readonly T3 mThird;
+            private readonly T4 mFourth;
+
+            /// <summary>
+            /// Gets the first element.
+            /// </summary>
+            public T1 First { get { return mFirst; } }
+            /// <summary>
+            /// Gets the second element.
+            /// </summary>
+            public T2 Second { get { return mSecond; } }
+            /// <summary>
+            /// Gets the third element.
+            /// </summary>
+            public T3 Third { get { return mThird; } }
+            /// <summary>
+            /// Gets the fourth element.
+            /// </summary>
+            public T4 Fourth { get { return mFourth; } }
+
+            public Quadruple(T1 first, T2 second, T3 third, T4 fourth)
+            {
+                mFirst = first;
+                mSecond = second;
+                mThird = third;
+                mFourth = fourth;
+            }
+
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.
+            /// </summary>
+            /// <param name="other">An object to compare with this object.</param>
+            /// <returns>
+            /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            /// </returns>
+            public bool Equals(Quadruple<T1, T2, T3, T4> other)
+            {
+                if (other == null)
+                    throw new NullReferenceException();
+                if (ReferenceEquals(this, other)) return true;
+                if (!(other is Quadruple<T1, T2, T3, T4>)) return false;
+                return Equals(other.First, First) &&
+                    Equals(other.Second, Second) &&
+                    Equals(other.Third, Third) &&
+                    Equals(other.Fourth, Fourth);
             }
         }
         #endregion

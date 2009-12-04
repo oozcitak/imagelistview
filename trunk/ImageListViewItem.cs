@@ -319,11 +319,20 @@ namespace Manina.Windows.Forms
             switch (type)
             {
                 case ColumnType.DateAccessed:
-                    return DateAccessed.ToString("g");
+                    if (DateAccessed == DateTime.MinValue)
+                        return "";
+                    else
+                        return DateAccessed.ToString("g");
                 case ColumnType.DateCreated:
-                    return DateCreated.ToString("g");
+                    if (DateCreated == DateTime.MinValue)
+                        return "";
+                    else
+                        return DateCreated.ToString("g");
                 case ColumnType.DateModified:
-                    return DateModified.ToString("g");
+                    if (DateModified == DateTime.MinValue)
+                        return "";
+                    else
+                        return DateModified.ToString("g");
                 case ColumnType.FileName:
                     return FileName;
                 case ColumnType.Name:
@@ -331,13 +340,22 @@ namespace Manina.Windows.Forms
                 case ColumnType.FilePath:
                     return FilePath;
                 case ColumnType.FileSize:
-                    return Utility.FormatSize(FileSize);
+                    if (FileSize == 0)
+                        return "";
+                    else
+                        return Utility.FormatSize(FileSize);
                 case ColumnType.FileType:
                     return FileType;
                 case ColumnType.Dimensions:
-                    return string.Format("{0} x {1}", Dimensions.Width, Dimensions.Height);
+                    if (Dimensions == Size.Empty)
+                        return "";
+                    else
+                        return string.Format("{0} x {1}", Dimensions.Width, Dimensions.Height);
                 case ColumnType.Resolution:
-                    return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
+                    if (Resolution == SizeF.Empty)
+                        return "";
+                    else
+                        return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
@@ -351,8 +369,9 @@ namespace Manina.Windows.Forms
         private void UpdateFileInfo()
         {
             if (!isDirty) return;
+            isDirty = false;
 
-            Utility.ShellFileInfo info = new Utility.ShellFileInfo(mFileName);
+            Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
             if (info.Error) return;
 
             mDateAccessed = info.LastAccessTime;
@@ -371,8 +390,6 @@ namespace Manina.Windows.Forms
                     mResolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
                 }
             }
-
-            isDirty = false;
         }
         /// <summary>
         /// Invoked by the worker thread to update item details.

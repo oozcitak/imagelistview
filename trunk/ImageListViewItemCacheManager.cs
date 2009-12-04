@@ -125,28 +125,14 @@ namespace Manina.Windows.Forms
                 }
                 // Read file info
                 string filename = item.FileName;
-                Utility.ShellFileInfo info = new Utility.ShellFileInfo(filename);
+                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(filename);
                 string path = Path.GetDirectoryName(filename);
                 string name = Path.GetFileName(filename);
-                Size dimension;
-                SizeF resolution;
-                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                {
-                    using (Image img = Image.FromStream(stream, false, false))
-                    {
-                        dimension = img.Size;
-                        resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
-                    }
-                }
                 // Update file info
-
-                if (!info.Error)
+                lock (item.Item)
                 {
-                    lock (item.Item)
-                    {
-                        item.Item.UpdateDetailsInternal(info.LastAccessTime, info.CreationTime, info.LastWriteTime,
-                        info.Size, info.TypeName, path, name, dimension, resolution);
-                    }
+                    item.Item.UpdateDetailsInternal(info.LastAccessTime, info.CreationTime, info.LastWriteTime,
+                    info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
                 }
             }
         }
