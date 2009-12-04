@@ -78,7 +78,7 @@ namespace Manina.Windows.Forms
                     // Calculate item size
                     Size itemPadding = new Size(4, 4);
                     itemSize.Width = mImageListView.ThumbnailSize.Width + 4 * itemPadding.Width + mTileWidth;
-                    itemSize.Height = Math.Max(mTextHeight, mImageListView.ThumbnailSize.Height) + itemPadding.Height;
+                    itemSize.Height = Math.Max(mTextHeight, mImageListView.ThumbnailSize.Height) + 2 * itemPadding.Height;
                     return itemSize;
                 }
                 else
@@ -843,14 +843,10 @@ namespace Manina.Windows.Forms
                 {
                     g.FillRectangle(bBack, panel);
                 }
-                using (Brush bBorder = new LinearGradientBrush(panel, SystemColors.ControlLightLight, SystemColors.ControlDark, LinearGradientMode.Vertical))
-                using (Pen pBorder = new Pen(bBorder))
+                using (Pen pBorder = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
                 {
+                    g.DrawLine(pBorder, panel.Left, panel.Top, panel.Right, panel.Top);
                     g.DrawLine(pBorder, panel.Left, panel.Bottom - 1, panel.Right, panel.Bottom - 1);
-                }
-                using (Pen pTopBorder = new Pen(SystemColors.ControlDark))
-                {
-                    g.DrawLine(pTopBorder, panel.Left, panel.Top, panel.Right, panel.Top);
                 }
 
                 // Image information
@@ -931,20 +927,13 @@ namespace Manina.Windows.Forms
                 // Draw the panel
                 Rectangle rect = bounds;
                 rect.Width = mPanelWidth - 6;
-                using (Brush bBack = new LinearGradientBrush(rect, Color.White, Color.FromArgb(220, 220, 220), LinearGradientMode.Vertical))
+                using (Brush bBack = new LinearGradientBrush(rect, Color.FromArgb(196, SystemColors.Control), Color.FromArgb(32, SystemColors.Control), LinearGradientMode.Horizontal))
                 {
                     g.FillRectangle(bBack, rect);
                 }
-                using (Brush bBorder = new LinearGradientBrush(rect, Color.FromArgb(220, 220, 220), Color.White, LinearGradientMode.Vertical))
+                using (Pen pBorder = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
                 {
-                    using (Pen pBorder = new Pen(bBorder))
-                    {
-                        g.DrawLine(pBorder, rect.Right, rect.Top, rect.Right, rect.Bottom);
-                    }
-                }
-                using (Pen pWhite = new Pen(Color.FromArgb(64, Color.White)))
-                {
-                    g.DrawRectangle(pWhite, rect.Left + 2, rect.Top + 2, rect.Width - 5, rect.Height - 4);
+                    g.DrawLine(pBorder, rect.Right, rect.Top, rect.Right, rect.Bottom);
                 }
                 rect.Inflate(-4, -4);
 
