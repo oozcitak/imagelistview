@@ -216,7 +216,60 @@ namespace Manina.Windows.Forms
 
         #region Graphics Utilities
         /// <summary>
-        /// Reads and returns an image from the given file.
+        /// Creates a thumbnail from the given image.
+        /// </summary>
+        /// <param name="image">The source image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <param name="backColor">Background color of returned thumbnail.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        public static Image ThumbnailFromImage(Image image, Size size, Color backColor)
+        {
+            if (size.Width <= 0 || size.Height <= 0)
+                throw new ArgumentException();
+
+            Image thumb = null;
+            try
+            {
+                float f = System.Math.Max((float)image.Width / (float)size.Width, (float)image.Height / (float)size.Height);
+                if (f < 1.0f) f = 1.0f; // Do not upsize small images
+                int width = (int)System.Math.Round((float)image.Width / f);
+                int height = (int)System.Math.Round((float)image.Height / f);
+                thumb = new Bitmap(width, height);
+                using (Graphics g = Graphics.FromImage(thumb))
+                {
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.InterpolationMode = InterpolationMode.High;
+
+                    using (Brush brush = new SolidBrush(backColor))
+                    {
+                        g.FillRectangle(Brushes.White, 0, 0, width, height);
+                    }
+
+                    g.DrawImage(image, 0, 0, width, height);
+                }
+            }
+            catch
+            {
+                if (thumb != null)
+                    thumb.Dispose();
+                thumb = null;
+            }
+
+            return thumb;
+        }
+        /// <summary>
+        /// Creates a thumbnail from the given image.
+        /// </summary>
+        /// <param name="image">The source image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <param name="backColor">Background color of returned thumbnail.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        public static Image ThumbnailFromImage(Image image, Size size)
+        {
+            return ThumbnailFromImage(image, size, Color.White);
+        }
+        /// <summary>
+        /// Creates a thumbnail from the given image file.
         /// </summary>
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>
@@ -225,13 +278,13 @@ namespace Manina.Windows.Forms
         /// <returns>The image from the given file or null if an error occurs.</returns>
         public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
         {
+            if (size.Width <= 0 || size.Height <= 0)
+                throw new ArgumentException();
+
             Image source = null;
             Image thumb = null;
             try
             {
-                if (size.Width <= 0 || size.Height <= 0)
-                    throw new ArgumentException();
-
                 if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Never)
                 {
                     // Read and scale the source image
@@ -294,7 +347,7 @@ namespace Manina.Windows.Forms
             }
             catch
             {
-                if(thumb!=null)
+                if (thumb != null)
                     thumb.Dispose();
                 thumb = null;
             }
@@ -308,7 +361,7 @@ namespace Manina.Windows.Forms
             return thumb;
         }
         /// <summary>
-        /// Reads and returns an image from the given file.
+        /// Creates a thumbnail from the given image file.
         /// </summary>
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>
@@ -319,7 +372,7 @@ namespace Manina.Windows.Forms
             return ThumbnailFromFile(filename, size, useEmbeddedThumbnails, Color.White);
         }
         /// <summary>
-        /// Reads and returns an image from the given file.
+        /// Creates a thumbnail from the given image file.
         /// </summary>
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>
@@ -330,7 +383,7 @@ namespace Manina.Windows.Forms
             return ThumbnailFromFile(filename, size, UseEmbeddedThumbnails.Auto, backColor);
         }
         /// <summary>
-        /// Reads and returns an image from the given file.
+        /// Creates a thumbnail from the given image file.
         /// </summary>
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>

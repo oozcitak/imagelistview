@@ -20,6 +20,8 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Member Variables
+        private object lockObject;
+
         private ImageListView mImageListView;
         private Thread mThread;
         private int mCacheLimitAsItemCount;
@@ -27,6 +29,7 @@ namespace Manina.Windows.Forms
 
         private Dictionary<Guid, CacheItem> toCache;
         private Dictionary<Guid, CacheItem> thumbCache;
+        private Dictionary<Guid, Image> editCache;
 
         private long memoryUsed;
         private long memoryUsedByRemoved;
@@ -138,12 +141,15 @@ namespace Manina.Windows.Forms
         #region Constructor
         public ImageListViewCacheManager(ImageListView owner)
         {
+            lockObject = new object();
+
             mImageListView = owner;
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 10;
 
             toCache = new Dictionary<Guid, CacheItem>();
             thumbCache = new Dictionary<Guid, CacheItem>();
+            editCache = new Dictionary<Guid, Image>();
 
             memoryUsed = 0;
             memoryUsedByRemoved = 0;
@@ -157,6 +163,40 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Instance Methods
+        /// <summary>
+        /// Starts editing an item. While items are edited,
+        /// their original images will be seperately cached
+        /// instead of fetching them from the file.
+        /// </summary>
+        /// <param name="guid">The GUID of the item</param>
+        /// <param name="filename">The image filename.</param>
+        public void BeginItemEdit(Guid guid, string filename)
+        {
+            lock (lockObject)
+            {
+                using (Image img = Image.FromFile(filename))
+                {
+                    editCache.Add(guid, new Bitmap(img));
+                }
+            }
+        }
+        /// <summary>
+        /// Ends editing an item. After this call, item
+        /// image will be continued to be fetched from the
+        /// file.
+        /// </summary>
+        /// <param name="guid"></param>
+        public void EndItemEdit(Guid guid)
+        {
+            lock (lockObject)
+            {
+                if (editCache.ContainsKey(guid))
+                {
+                    editCache[guid].Dispose();
+                    editCache.Remove(guid);
+                }
+            }
+        }
         /// <summary>
         /// Gets the cache state of the specified item.
         /// </summary>
@@ -310,6 +350,12 @@ namespace Manina.Windows.Forms
             {
                 toCache.Clear();
             }
+            lock (lockObject)
+            {
+                foreach (Image img in editCache.Values)
+                    img.Dispose();
+                editCache.Clear();
+            }
             memoryUsed = 0;
             memoryUsedByRemoved = 0;
             removedItems.Clear();
@@ -382,7 +428,19 @@ namespace Manina.Windows.Forms
                 {
                     bool thumbnailCreated = false;
                     bool cleanupRequired = false;
-                    Image thumb = Utility.ThumbnailFromFile(filename, thumbsize, useEmbedded);
+
+                    Image thumb = null;
+
+                    // Is it in the edit cache?
+                    lock (owner.lockObject)
+                    {
+                        if (owner.editCache.ContainsKey(guid))
+                            thumb = Utility.ThumbnailFromImage(owner.editCache[guid], thumbsize);
+                    }
+
+                    // Read from file
+                    if (thumb == null)
+                        thumb = Utility.ThumbnailFromFile(filename, thumbsize, useEmbedded);
 
                     lock (owner.thumbCache)
                     {
