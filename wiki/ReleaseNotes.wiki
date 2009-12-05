@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 1.4 (05 December 2009) =
+
+  * Added the !BeginEdit and !EndEdit methods to !ImageListViewItem. They should be used while editing items to prevent collisions with cache threads.
+
 = 1.3 (04 December 2009) =
 
   * Moved the !ThumbnailFromFile method to the static Utility class. It is used by all renderers.
