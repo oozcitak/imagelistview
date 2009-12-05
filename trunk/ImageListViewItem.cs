@@ -307,7 +307,46 @@ namespace Manina.Windows.Forms
         /// <returns>The item image.</returns>
         public Image GetImage()
         {
-            return Image.FromFile(mFileName);
+            BeginEdit();
+            Image img = Image.FromFile(mFileName);
+            EndEdit();
+            return img;
+        }
+        /// <summary>
+        /// Begins editing the item.
+        /// This method must be used while editing the item
+        /// to prevent collisions with the cache manager.
+        /// </summary>
+        public void BeginEdit()
+        {
+            if (mImageListView != null)
+                mImageListView.cacheManager.BeginItemEdit(mGuid, mFileName);
+            else
+                throw new InvalidOperationException("Owner control is null.");
+        }
+        /// <summary>
+        /// Ends editing and updates the item.
+        /// </summary>
+        public void EndEdit()
+        {
+            if (mImageListView != null)
+                mImageListView.cacheManager.EndItemEdit(mGuid);
+            else
+                throw new InvalidOperationException("Owner control is null.");
+            Update();
+        }
+        /// <summary>
+        /// Updates item thumbnail and item details.
+        /// </summary>
+        public void Update()
+        {
+            isDirty = true;
+            if (mImageListView != null)
+            {
+                mImageListView.cacheManager.Remove(Guid);
+                mImageListView.itemCacheManager.Add(this);
+                mImageListView.Refresh();
+            }
         }
         /// <summary>
         /// Returns the sub item item text corresponding to the specified column type.
