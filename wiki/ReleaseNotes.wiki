@@ -1,11 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
-<wiki:comment>
-= 1.4 (05 December 2009) =
+= 1.4 (07 December 2009) =
 
   * Added the !BeginEdit and !EndEdit methods to !ImageListViewItem. They should be used while editing items to prevent collisions with cache threads.
-</wiki:comment>
+  * Custom renderers now use the central thumbnail cache instead of their own worker threads.
 
 = 1.3 (04 December 2009) =
 
