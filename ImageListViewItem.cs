@@ -33,6 +33,7 @@ namespace Manina.Windows.Forms
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
+        private bool editing;
         #endregion
 
         #region Properties
@@ -292,6 +293,7 @@ namespace Manina.Windows.Forms
 
             isDirty = true;
             defaultText = null;
+            editing = false;
         }
         public ImageListViewItem(string filename)
             : this()
@@ -304,12 +306,11 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the item image.
         /// </summary>
-        /// <returns>The item image.</returns>
         public Image GetImage()
         {
-            BeginEdit();
+            if (!editing) BeginEdit();
             Image img = Image.FromFile(mFileName);
-            EndEdit();
+            if (!editing) EndEdit();
             return img;
         }
         /// <summary>
@@ -319,21 +320,42 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void BeginEdit()
         {
-            if (mImageListView != null)
-                mImageListView.cacheManager.BeginItemEdit(mGuid, mFileName);
-            else
+            if (editing == true)
+                throw new InvalidOperationException("Already editing this item.");
+
+            if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
+
+            UpdateFileInfo();
+            mImageListView.cacheManager.BeginItemEdit(mGuid, mFileName);
+            mImageListView.itemCacheManager.BeginItemEdit(mGuid);
+
+            editing = true;
+        }
+        /// <summary>
+        /// Ends editing and updates the item.
+        /// </summary>
+        /// <param name="update">If set to true, the item will be immediately updated.</param>
+        public void EndEdit(bool update)
+        {
+            if (editing == false)
+                throw new InvalidOperationException("This item is not being edited.");
+
+            if (mImageListView == null)
+                throw new InvalidOperationException("Owner control is null.");
+
+            mImageListView.cacheManager.EndItemEdit(mGuid);
+            mImageListView.itemCacheManager.EndItemEdit(mGuid);
+
+            editing = false;
+            if (update) Update();
         }
         /// <summary>
         /// Ends editing and updates the item.
         /// </summary>
         public void EndEdit()
         {
-            if (mImageListView != null)
-                mImageListView.cacheManager.EndItemEdit(mGuid);
-            else
-                throw new InvalidOperationException("Owner control is null.");
-            Update();
+            EndEdit(true);
         }
         /// <summary>
         /// Updates item thumbnail and item details.
