@@ -1,5 +1,5 @@
 #summary Writing and using custom renderers
-#labels Phase-Implementation,Featured
+#labels Phase-Implementation
 
 = Introduction =
 
