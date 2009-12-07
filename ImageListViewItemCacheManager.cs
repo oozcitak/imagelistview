@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System;
 
 namespace Manina.Windows.Forms
 {
@@ -12,10 +13,14 @@ namespace Manina.Windows.Forms
     internal class ImageListViewItemCacheManager
     {
         #region Member Variables
+        private readonly object lockObject;
+
         private ImageListView mImageListView;
         private Thread mThread;
 
         private Queue<CacheItem> toCache;
+
+        private bool stopping;
         #endregion
 
         #region Private Classes
@@ -44,26 +49,19 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Properties
-        /// <summary>
-        /// Gets the owner image list view.
-        /// </summary>
-        public ImageListView ImageListView { get { return mImageListView; } }
-        /// <summary>
-        /// Gets the thumbnail generator thread.
-        /// </summary>
-        public Thread Thread { get { return mThread; } }
-        #endregion
-
         #region Constructor
         public ImageListViewItemCacheManager(ImageListView owner)
         {
+            lockObject = new object();
+
             mImageListView = owner;
 
             toCache = new Queue<CacheItem>();
 
-            mThread = new Thread(new ParameterizedThreadStart(DoWork));
+            mThread = new Thread(new ThreadStart(DoWork));
             mThread.IsBackground = true;
+
+            stopping = false;
         }
         #endregion
 
@@ -73,7 +71,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Start()
         {
-            mThread.Start(this);
+            mThread.Start();
             while (!mThread.IsAlive) ;
         }
         /// <summary>
@@ -81,59 +79,64 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Stop()
         {
-            if (mThread.IsAlive)
+            lock (lockObject)
             {
-                mThread.Abort();
-                mThread.Join();
+                if (!stopping)
+                {
+                    stopping = true;
+                    Monitor.Pulse(lockObject);
+                }
             }
+            mThread.Join();
         }
         /// <summary>
         /// Adds the item to the cache queue.
         /// </summary>
         public void Add(ImageListViewItem item)
         {
-            if (!item.isDirty)
-                return;
-
-            lock (toCache)
+            lock (lockObject)
             {
                 toCache.Enqueue(new CacheItem(item));
-                Monitor.Pulse(toCache);
+                Monitor.Pulse(lockObject);
             }
         }
         #endregion
 
-        #region Static Methods
+        #region Worker Method
         /// <summary>
         /// Used by the worker thread to read item data.
         /// </summary>
-        private static void DoWork(object data)
+        private void DoWork()
         {
-            ImageListViewItemCacheManager owner = (ImageListViewItemCacheManager)data;
-
             while (true)
             {
+                lock (lockObject)
+                {
+                    if (stopping) return;
+                }
+
                 CacheItem item = null;
-                lock (owner.toCache)
+                lock (lockObject)
                 {
                     // Wait until we have items waiting to be cached
-                    if (owner.toCache.Count == 0)
-                        Monitor.Wait(owner.toCache);
+                    if (toCache.Count == 0)
+                        Monitor.Wait(lockObject);
+
+                    if (stopping) return;
 
                     // Get an item from the queue
-                    item = owner.toCache.Dequeue();
+                    item = toCache.Dequeue();
                 }
+
                 // Read file info
-                string filename = item.FileName;
-                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(filename);
-                string path = Path.GetDirectoryName(filename);
-                string name = Path.GetFileName(filename);
+                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
+                string path = Path.GetDirectoryName(item.FileName);
+                string name = Path.GetFileName(item.FileName);
                 // Update file info
-                lock (item.Item)
-                {
-                    item.Item.UpdateDetailsInternal(info.LastAccessTime, info.CreationTime, info.LastWriteTime,
+                mImageListView.BeginInvoke(new UpdateItemDetailsEventHandlerInternal(
+                    mImageListView.UpdateItemDetailsInternal), item.Item,
+                    info.LastAccessTime, info.CreationTime, info.LastWriteTime,
                     info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
-                }
             }
         }
         #endregion

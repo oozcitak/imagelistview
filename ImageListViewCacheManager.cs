@@ -105,14 +105,6 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
-        /// Gets the owner image list view.
-        /// </summary>
-        public ImageListView ImageListView { get { return mImageListView; } }
-        /// <summary>
-        /// Gets the thumbnail generator thread.
-        /// </summary>
-        public Thread Thread { get { return mThread; } }
-        /// <summary>
         /// Gets or sets the cache limit as count of items.
         /// </summary>
         public int CacheLimitAsItemCount
@@ -360,7 +352,7 @@ namespace Manina.Windows.Forms
 
         #endregion
 
-        #region Static Methods
+        #region Worker Method
         /// <summary>
         /// Used by the worker thread to generate image thumbnails.
         /// Once a thumbnail image is generated, the item will be redrawn
@@ -383,6 +375,8 @@ namespace Manina.Windows.Forms
                     // Wait until we have items waiting to be cached
                     if (toCache.Count == 0)
                         Monitor.Wait(lockObject);
+
+                    if (stopping) return;
 
                     // Get an item from the queue
                     foreach (KeyValuePair<Guid, CacheItem> pair in toCache)
@@ -407,7 +401,7 @@ namespace Manina.Windows.Forms
                 // Is it outside visible area?
                 if (request != null)
                 {
-                    bool isvisible = (bool)ImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
+                    bool isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
                     if (!isvisible)
                         request = null;
                 }
@@ -485,8 +479,8 @@ namespace Manina.Windows.Forms
 
                     if (thumbnailCreated)
                     {
-                        mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(mImageListView.OnThumbnailCachedInternal), guid);
-                        mImageListView.Invoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
+                        mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(mImageListView.OnThumbnailCachedInternal), guid);
+                        mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
                     }
                 }
             }

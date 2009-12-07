@@ -1544,6 +1544,16 @@ namespace Manina.Windows.Forms
             mRenderer.Refresh();
         }
         /// <summary>
+        /// Updates item details.
+        /// This method is invoked from the item cache thread.
+        /// </summary>
+        internal void UpdateItemDetailsInternal(ImageListViewItem item, DateTime dateAccessed, DateTime dateCreated, DateTime dateModified,
+            long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution)
+        {
+            item.UpdateDetailsInternal(dateAccessed, dateCreated, dateModified,
+                fileSize, fileType, filePath, name, dimension, resolution);
+        }
+        /// <summary>
         /// Raises the ThumbnailCaching event.
         /// </summary>
         /// <param name="e">A ItemEventArgs that contains event data.</param>
