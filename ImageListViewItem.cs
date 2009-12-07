@@ -193,13 +193,13 @@ namespace Manina.Windows.Forms
                         return img;
                     else
                     {
-                        mImageListView.cacheManager.Add(Guid, FileName);
+                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                         return mImageListView.DefaultImage;
                     }
                 }
                 else
                 {
-                    mImageListView.cacheManager.Add(Guid, FileName);
+                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                     return mImageListView.DefaultImage;
                 }
             }
