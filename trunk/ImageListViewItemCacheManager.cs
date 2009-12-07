@@ -10,7 +10,7 @@ namespace Manina.Windows.Forms
     /// Represents the cache manager responsible for asynchronously loading
     /// item details.
     /// </summary>
-    internal class ImageListViewItemCacheManager
+    internal class ImageListViewItemCacheManager : IDisposable
     {
         #region Member Variables
         private readonly object lockObject;
@@ -19,6 +19,7 @@ namespace Manina.Windows.Forms
         private Thread mThread;
 
         private Queue<CacheItem> toCache;
+        private Dictionary<Guid, bool> editCache;
 
         private bool stopping;
         #endregion
@@ -57,27 +58,53 @@ namespace Manina.Windows.Forms
             mImageListView = owner;
 
             toCache = new Queue<CacheItem>();
+            editCache = new Dictionary<Guid, bool>();
 
             mThread = new Thread(new ThreadStart(DoWork));
             mThread.IsBackground = true;
 
             stopping = false;
+
+            mThread.Start();
+            while (!mThread.IsAlive) ;
         }
         #endregion
 
         #region Instance Methods
         /// <summary>
-        /// Starts the thumbnail generator thread.
+        /// Starts editing an item. While items are edited,
+        /// their original images will be seperately cached
+        /// instead of fetching them from the file.
         /// </summary>
-        public void Start()
+        /// <param name="guid">The GUID of the item</param>
+        public void BeginItemEdit(Guid guid)
         {
-            mThread.Start();
-            while (!mThread.IsAlive) ;
+            lock (lockObject)
+            {
+                if (!editCache.ContainsKey(guid))
+                    editCache.Add(guid, false);
+            }
         }
         /// <summary>
-        /// Stops the thumbnail generator thread.
+        /// Ends editing an item. After this call, item
+        /// image will be continued to be fetched from the
+        /// file.
         /// </summary>
-        public void Stop()
+        /// <param name="guid"></param>
+        public void EndItemEdit(Guid guid)
+        {
+            lock (lockObject)
+            {
+                if (editCache.ContainsKey(guid))
+                {
+                    editCache.Remove(guid);
+                }
+            }
+        }
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
         {
             lock (lockObject)
             {
@@ -87,6 +114,7 @@ namespace Manina.Windows.Forms
                     Monitor.Pulse(lockObject);
                 }
             }
+            mThread.Abort();
             mThread.Join();
         }
         /// <summary>
@@ -126,17 +154,24 @@ namespace Manina.Windows.Forms
 
                     // Get an item from the queue
                     item = toCache.Dequeue();
+
+                    // Is it being edited?
+                    if (editCache.ContainsKey(item.Item.Guid))
+                        item = null;
                 }
 
                 // Read file info
-                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
-                string path = Path.GetDirectoryName(item.FileName);
-                string name = Path.GetFileName(item.FileName);
-                // Update file info
-                mImageListView.BeginInvoke(new UpdateItemDetailsEventHandlerInternal(
-                    mImageListView.UpdateItemDetailsInternal), item.Item,
-                    info.LastAccessTime, info.CreationTime, info.LastWriteTime,
-                    info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
+                if (item != null)
+                {
+                    Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
+                    string path = Path.GetDirectoryName(item.FileName);
+                    string name = Path.GetFileName(item.FileName);
+                    // Update file info
+                    mImageListView.BeginInvoke(new UpdateItemDetailsEventHandlerInternal(
+                        mImageListView.UpdateItemDetailsInternal), item.Item,
+                        info.LastAccessTime, info.CreationTime, info.LastWriteTime,
+                        info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
+                }
             }
         }
         #endregion

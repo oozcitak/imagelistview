@@ -25,12 +25,6 @@ namespace Manina.Windows.Forms
             private int suspendCount;
             private bool needsPaint;
             private ItemDrawOrder mItemDrawOrder;
-
-            BackgroundWorker galleryWorker;
-            private Image lastGalleryImage;
-            private Size lastGalleryImageSize;
-            private string lastGalleryFile;
-            private bool lastGalleryError;
             #endregion
 
             #region Properties
@@ -66,13 +60,6 @@ namespace Manina.Windows.Forms
                 needsPaint = true;
                 mClip = true;
                 mItemDrawOrder = ItemDrawOrder.ItemIndex;
-
-                lastGalleryError = false;
-                lastGalleryImage = null;
-                lastGalleryFile = null;
-                galleryWorker = new BackgroundWorker();
-                galleryWorker.DoWork += new DoWorkEventHandler(galleryWorker_DoWork);
-                galleryWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(galleryWorker_RunWorkerCompleted);
             }
             #endregion
 
@@ -275,6 +262,21 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Instance Methods
+            /// <summary>
+            /// Loads and returns the image for the given item.
+            /// </summary>
+            public Image GetImageAsync(ImageListViewItem item, Size size)
+            {
+                Image img = mImageListView.cacheManager.GetRendererImage(item.Guid, size, mImageListView.UseEmbeddedThumbnails);
+                if (img != null)
+                    return img;
+
+                mImageListView.cacheManager.AddRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
+                return item.ThumbnailImage;
+            }
+            #endregion
+
+            #region Internal Methods
             /// <summary>
             /// Redraws the owner control.
             /// </summary>
@@ -496,23 +498,7 @@ namespace Manina.Windows.Forms
                     Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
 
-                    Image image = null;
-                    if (string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) == 0 &&
-                        lastGalleryError)
-                    {
-                        image = mImageListView.ErrorImage;
-                    }
-                    else if (string.Compare(lastGalleryFile, item.FileName, StringComparison.OrdinalIgnoreCase) == 0 &&
-                        lastGalleryImage != null && lastGalleryFile != null && lastGalleryImageSize == bounds.Size)
-                    {
-                        image = lastGalleryImage;
-                    }
-                    else
-                    {
-                        image = item.ThumbnailImage;
-                        if (!galleryWorker.IsBusy)
-                            galleryWorker.RunWorkerAsync(new Utility.Pair<string, Size>(item.FileName, bounds.Size));
-                    }
+                    Image image =GetImageAsync(item,bounds.Size);
 
                     if (mClip)
                         g.SetClip(bounds);
@@ -606,9 +592,6 @@ namespace Manina.Windows.Forms
 
                 if (bufferGraphics != null)
                     bufferGraphics.Dispose();
-
-                if (galleryWorker != null)
-                    galleryWorker.Dispose();
 
                 OnDispose();
             }
@@ -895,7 +878,7 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of column in client coordinates.</param>
             public virtual void DrawColumnHeader(Graphics g, ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
             {
-                 // Paint background
+                // Paint background
                 if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
@@ -1062,38 +1045,6 @@ namespace Manina.Windows.Forms
             public virtual void OnLayout(LayoutEventArgs e)
             {
                 ;
-            }
-            #endregion
-
-            #region Gallery Image Worker Thread
-            /// <summary>
-            /// Handles the DoWork event of the galleryWorker.
-            /// </summary>
-            void galleryWorker_DoWork(object sender, DoWorkEventArgs e)
-            {
-                Utility.Pair<string, Size> request = (Utility.Pair<string, Size>)e.Argument;
-                string requestedGalleryFile = request.First;
-                Size size = request.Second;
-
-                Image scaled = Utility.ThumbnailFromFile(requestedGalleryFile, size);
-                bool error = (scaled == null);
-
-                e.Result = new Utility.Quadruple<string, Image, Size, bool>(requestedGalleryFile, scaled, size, error);
-            }
-            /// <summary>
-            /// Handles the RunWorkerCompleted event of the galleryWorker.
-            /// </summary>
-            void galleryWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-            {
-                if (lastGalleryImage != null)
-                    lastGalleryImage.Dispose();
-
-                Utility.Quadruple<string, Image, Size, bool> result = (Utility.Quadruple<string, Image, Size, bool>)e.Result;
-                lastGalleryFile = result.First;
-                lastGalleryImage = result.Second;
-                lastGalleryImageSize = result.Third;
-                lastGalleryError = result.Fourth;
-                mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
             #endregion
         }

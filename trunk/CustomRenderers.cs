@@ -448,11 +448,6 @@ namespace Manina.Windows.Forms
         {
             private float mZoomRatio;
 
-            BackgroundWorker worker;
-            private string cachedFileName;
-            private Image cachedImage;
-            private bool cacheError;
-
             public ZoomingRenderer()
                 : this(0.5f)
             {
@@ -465,37 +460,6 @@ namespace Manina.Windows.Forms
                 if (zoomRatio < 0.0f) zoomRatio = 0.0f;
                 if (zoomRatio > 1.0f) zoomRatio = 1.0f;
                 mZoomRatio = zoomRatio;
-
-                cacheError = false;
-                cachedFileName = null;
-                cachedImage = null;
-                worker = new BackgroundWorker();
-                worker.DoWork += new DoWorkEventHandler(worker_DoWork);
-                worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
-            }
-
-            void worker_DoWork(object sender, DoWorkEventArgs e)
-            {
-                Utility.Pair<string, Size> request = (Utility.Pair<string, Size>)e.Argument;
-                string requestedGalleryFile = request.First;
-                Size size = request.Second;
-
-                Image scaled = Utility.ThumbnailFromFile(requestedGalleryFile, size);
-                bool error = (scaled == null);
-
-                e.Result = new Utility.Triple<string, Image, bool>(requestedGalleryFile, scaled, error);
-            }
-
-            void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-            {
-                if (cachedImage != null)
-                    cachedImage.Dispose();
-
-                Utility.Triple<string, Image, bool> result = (Utility.Triple<string, Image, bool>)e.Result;
-                cachedFileName = result.First;
-                cachedImage = result.Second;
-                cacheError = result.Third;
-                mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
             /// <summary>
@@ -551,21 +515,7 @@ namespace Manina.Windows.Forms
                     // Get item image
                     Image img = null;
                     if ((state & ItemState.Hovered) != ItemState.None)
-                    {
-                        if (string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            if (cacheError)
-                                img = mImageListView.ErrorImage;
-                            else
-                                img = cachedImage;
-                        }
-                        else
-                        {
-                            img = item.ThumbnailImage;
-                            if (!worker.IsBusy)
-                                worker.RunWorkerAsync(new Utility.Pair<string, Size>(item.FileName, new Size(bounds.Width - 8, bounds.Height - 8)));
-                        }
-                    }
+                        img = GetImageAsync(item, new Size(bounds.Width - 8, bounds.Height - 8));
                     else
                         img = item.ThumbnailImage;
 
@@ -726,11 +676,6 @@ namespace Manina.Windows.Forms
             private Font mCaptionFont;
             private Dictionary<int, string> mTags;
 
-            BackgroundWorker worker;
-            private string cachedFileName;
-            private Image cachedImage;
-            private bool cacheError;
-
             private Font CaptionFont
             {
                 get
@@ -764,37 +709,6 @@ namespace Manina.Windows.Forms
                     {PropertyTagExifAperture, "Aperture"},
                     {PropertyTagExifUserComment, "Comments"},
                 };
-
-                cacheError = false;
-                cachedFileName = null;
-                cachedImage = null;
-                worker = new BackgroundWorker();
-                worker.DoWork += new DoWorkEventHandler(worker_DoWork);
-                worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
-            }
-
-            void worker_DoWork(object sender, DoWorkEventArgs e)
-            {
-                Utility.Pair<string, int> request = (Utility.Pair<string, int>)e.Argument;
-                string requestedGalleryFile = (string)request.First;
-                int width = request.Second;
-
-                Image scaled = Utility.ThumbnailFromFile(requestedGalleryFile, new Size(width, int.MaxValue));
-                bool error = (scaled == null);
-
-                e.Result = new Utility.Triple<string, Image, bool>(requestedGalleryFile, scaled, error);
-            }
-
-            void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-            {
-                if (cachedImage != null)
-                    cachedImage.Dispose();
-
-                Utility.Triple<string, Image, bool> result = (Utility.Triple<string, Image, bool>)e.Result;
-                cachedFileName = result.First;
-                cachedImage = result.Second;
-                cacheError = result.Third;
-                mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
             }
 
             /// <summary>
@@ -949,20 +863,7 @@ namespace Manina.Windows.Forms
                 {
                     rect.Inflate(-4, -4);
 
-                    Image img = null;
-                    if (string.Compare(cachedFileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0)
-                    {
-                        if (cacheError)
-                            img = mImageListView.ErrorImage;
-                        else
-                            img = cachedImage;
-                    }
-                    else
-                    {
-                        img = item.ThumbnailImage;
-                        if (!worker.IsBusy)
-                            worker.RunWorkerAsync(new Utility.Pair<string, int>(item.FileName, rect.Width));
-                    }
+                    Image img = GetImageAsync(item, new Size(rect.Width, rect.Width));
 
                     // Draw image
                     g.DrawImageUnscaled(img, rect.Location);

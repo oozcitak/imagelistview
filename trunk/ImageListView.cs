@@ -351,9 +351,7 @@ namespace Manina.Windows.Forms
             nav = new NavInfo();
 
             cacheManager = new ImageListViewCacheManager(this);
-            cacheManager.Start();
             itemCacheManager = new ImageListViewItemCacheManager(this);
-            itemCacheManager.Start();
 
             disposed = false;
         }
@@ -1439,25 +1437,17 @@ namespace Manina.Windows.Forms
             disposed = true;
             if (disposing)
             {
-                mRenderer.Dispose();
-                mHeaderFont.Dispose();
+                if (mRenderer != null)
+                    mRenderer.Dispose();
+
+                if (mHeaderFont != null)
+                    mHeaderFont.Dispose();
+
                 cacheManager.Dispose();
+                itemCacheManager.Dispose();
             }
 
             base.Dispose(disposing);
-        }
-        /// <summary>
-        /// Handles the HandleDestroyed event.
-        /// </summary>
-        protected override void OnHandleDestroyed(EventArgs e)
-        {
-            itemCacheManager.Stop();
-            cacheManager.Stop();
-
-            if (mRenderer != null)
-                mRenderer.Dispose();
-
-            base.OnHandleDestroyed(e);
         }
         #endregion
 

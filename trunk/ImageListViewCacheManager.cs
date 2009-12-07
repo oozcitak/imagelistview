@@ -31,6 +31,10 @@ namespace Manina.Windows.Forms
         private Dictionary<Guid, CacheItem> thumbCache;
         private Dictionary<Guid, Image> editCache;
 
+        private Dictionary<Guid, CacheItem> rendererCache;
+        private Guid rendererGuid;
+        private CacheItem rendererItem;
+
         private long memoryUsed;
         private long memoryUsedByRemoved;
         private List<Guid> removedItems;
@@ -144,6 +148,10 @@ namespace Manina.Windows.Forms
             thumbCache = new Dictionary<Guid, CacheItem>();
             editCache = new Dictionary<Guid, Image>();
 
+            rendererCache = new Dictionary<Guid, CacheItem>();
+            rendererGuid = new Guid();
+            rendererItem = null;
+
             memoryUsed = 0;
             memoryUsedByRemoved = 0;
             removedItems = new List<Guid>();
@@ -153,6 +161,9 @@ namespace Manina.Windows.Forms
 
             stopping = false;
             disposed = false;
+
+            mThread.Start();
+            while (!mThread.IsAlive) ;
         }
         #endregion
 
@@ -206,29 +217,6 @@ namespace Manina.Windows.Forms
             }
 
             return CacheState.Unknown;
-        }
-        /// <summary>
-        /// Starts the thumbnail generator thread.
-        /// </summary>
-        public void Start()
-        {
-            mThread.Start();
-            while (!mThread.IsAlive) ;
-        }
-        /// <summary>
-        /// Stops the thumbnail generator thread.
-        /// </summary>
-        public void Stop()
-        {
-            lock (lockObject)
-            {
-                if (!stopping)
-                {
-                    stopping = true;
-                    Monitor.Pulse(lockObject);
-                }
-            }
-            mThread.Join();
         }
         /// <summary>
         /// Clears the thumbnail cache.
@@ -306,6 +294,37 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Adds the image to the renderer cache.
+        /// </summary>
+        public void AddRendererCache(Guid guid, string filename, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            lock (lockObject)
+            {
+                // Already cached?
+                if (rendererGuid == guid && rendererItem != null && rendererItem.Size == thumbSize && rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                    return;
+
+                // Renderer cache holds one item only.
+                rendererCache.Clear();
+
+                rendererCache.Add(guid, new CacheItem(filename, thumbSize, null, CacheState.InQueue, useEmbeddedThumbnails));
+                Monitor.Pulse(lockObject);
+            }
+        }
+        /// <summary>
+        /// Gets the image from the renderer cache. If the image is not cached,
+        /// null will be returned.
+        /// </summary>
+        public Image GetRendererImage(Guid guid, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            lock (lockObject)
+            {
+                if (rendererGuid == guid && rendererItem != null && rendererItem.Size == thumbSize && rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                    return rendererItem.Image;
+            }
+            return null;
+        }
+        /// <summary>
         /// Gets the image from the thumbnail cache. If the image is not cached,
         /// null will be returned.
         /// </summary>
@@ -328,6 +347,17 @@ namespace Manina.Windows.Forms
         {
             lock (lockObject)
             {
+                if (!stopping)
+                {
+                    stopping = true;
+                    Monitor.Pulse(lockObject);
+                }
+            }
+            mThread.Abort();
+            mThread.Join();
+
+            lock (lockObject)
+            {
                 if (disposed) return;
 
                 foreach (CacheItem item in thumbCache.Values)
@@ -341,6 +371,12 @@ namespace Manina.Windows.Forms
                 foreach (Image img in editCache.Values)
                     img.Dispose();
                 editCache.Clear();
+
+                foreach (CacheItem item in rendererCache.Values)
+                    item.Dispose();
+                rendererCache.Clear();
+                if (rendererItem != null)
+                    rendererItem.Dispose();
 
                 memoryUsed = 0;
                 memoryUsedByRemoved = 0;
@@ -369,40 +405,58 @@ namespace Manina.Windows.Forms
 
                 Guid guid = new Guid();
                 CacheItem request = null;
+                bool rendererRequest = false;
 
                 lock (lockObject)
                 {
                     // Wait until we have items waiting to be cached
-                    if (toCache.Count == 0)
+                    if (toCache.Count == 0 && rendererCache.Count == 0)
                         Monitor.Wait(lockObject);
 
                     if (stopping) return;
 
                     // Get an item from the queue
-                    foreach (KeyValuePair<Guid, CacheItem> pair in toCache)
+                    if (rendererCache.Count != 0)
                     {
-                        guid = pair.Key;
-                        request = pair.Value;
-                        break;
+                        foreach (KeyValuePair<Guid, CacheItem> pair in rendererCache)
+                        {
+                            guid = pair.Key;
+                            request = pair.Value;
+                            break;
+                        }
+                        rendererCache.Clear();
+                        rendererRequest = true;
                     }
-                    toCache.Remove(guid);
-
-                    // Is it already cached?
-                    CacheItem existing = null;
-                    if (thumbCache.TryGetValue(guid, out existing))
+                    else if (toCache.Count != 0)
                     {
-                        if (existing.Size == request.Size)
-                            request = null;
-                        else
-                            thumbCache.Remove(guid);
+                        foreach (KeyValuePair<Guid, CacheItem> pair in toCache)
+                        {
+                            guid = pair.Key;
+                            request = pair.Value;
+                            break;
+                        }
+                        toCache.Remove(guid);
+
+                        // Is it already cached?
+                        CacheItem existing = null;
+                        if (thumbCache.TryGetValue(guid, out existing))
+                        {
+                            if (existing.Size == request.Size)
+                                request = null;
+                            else
+                                thumbCache.Remove(guid);
+                        }
                     }
                 }
 
                 // Is it outside visible area?
+                bool isvisible = false;
                 if (request != null)
+                    isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
+
+                lock (lockObject)
                 {
-                    bool isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
-                    if (!isvisible)
+                    if (!rendererRequest && !isvisible)
                         request = null;
                 }
 
@@ -428,7 +482,17 @@ namespace Manina.Windows.Forms
 
                     lock (lockObject)
                     {
-                        if (!thumbCache.ContainsKey(guid) || thumbCache[guid].Size != request.Size)
+                        if (rendererRequest)
+                        {
+                            rendererGuid = guid;
+                            if (thumb == null)
+                                rendererItem = new CacheItem(request.FileName, request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
+                            else
+                                rendererItem = new CacheItem(request.FileName, request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
+                            rendererRequest = false;
+                            thumbnailCreated = true;
+                        }
+                        else if (!thumbCache.ContainsKey(guid) || thumbCache[guid].Size != request.Size)
                         {
                             if (thumbCache.ContainsKey(guid))
                             {
@@ -436,9 +500,9 @@ namespace Manina.Windows.Forms
                                 thumbCache.Remove(guid);
                             }
                             if (thumb == null)
-                                thumbCache.Add(guid, new CacheItem(request.FileName, request.Size, null, CacheState.Error));
+                                thumbCache.Add(guid, new CacheItem(request.FileName, request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails));
                             else
-                                thumbCache.Add(guid, new CacheItem(request.FileName, request.Size, thumb, CacheState.Cached));
+                                thumbCache.Add(guid, new CacheItem(request.FileName, request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails));
                             thumbnailCreated = true;
 
                             // Did we exceed the cache limit?
