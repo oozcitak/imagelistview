@@ -66,6 +66,13 @@ namespace Manina.Windows.Forms
 
     #region Internal Delegates
     /// <summary>
+    /// Updates item details.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void UpdateItemDetailsEventHandlerInternal(ImageListViewItem item,
+            DateTime dateAccessed, DateTime dateCreated, DateTime dateModified,
+            long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution);
+    /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
     /// <param name="guid">The guid of the item to check visibility.</param>

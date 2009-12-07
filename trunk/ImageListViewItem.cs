@@ -343,7 +343,7 @@ namespace Manina.Windows.Forms
             isDirty = true;
             if (mImageListView != null)
             {
-                mImageListView.cacheManager.Remove(Guid);
+                mImageListView.cacheManager.Remove(mGuid);
                 mImageListView.itemCacheManager.Add(this);
                 mImageListView.Refresh();
             }
