@@ -17,7 +17,6 @@ namespace Manina.Windows.Forms
     public enum CacheState
     {
         Unknown,
-        InQueue,
         Cached,
         Error,
     }

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
@@ -285,16 +286,11 @@ namespace Manina.Windows.Forms
             Image thumb = null;
             try
             {
-                if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Never)
+                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                 {
-                    // Read and scale the source image
-                    source = Image.FromFile(filename);
-                }
-                else
-                {
-                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    using (Image img = Image.FromStream(stream, false, false))
                     {
-                        using (Image img = Image.FromStream(stream, false, false))
+                        if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
                         {
                             foreach (int index in img.PropertyIdList)
                             {
@@ -309,7 +305,7 @@ namespace Manina.Windows.Forms
                                     if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
                                     {
                                         // Check that the embedded thumbnail is large enough.
-                                        if (source.Width < size.Width && source.Height < size.Height)
+                                        if (System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height) < 1.0f)
                                         {
                                             source.Dispose();
                                             source = null;
@@ -319,31 +315,26 @@ namespace Manina.Windows.Forms
                                 }
                             }
                         }
+
+                        // Revert to source image if an embedded thumbnail of required size
+                        // was not found.
+                        if (source == null)
+                            source = img;
+
+                        float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
+                        if (f < 1.0f) f = 1.0f; // Do not upsize small images
+                        int width = (int)System.Math.Round((float)source.Width / f);
+                        int height = (int)System.Math.Round((float)source.Height / f);
+                        thumb = new Bitmap(source, width, height);
+                        using (Graphics g = Graphics.FromImage(thumb))
+                        {
+                            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                            g.Clear(backColor);
+                            g.DrawImage(source, 0, 0, width, height);
+                        }
+                        source.Dispose();
                     }
-                    // Revert to source image if an embedded thumbnail of required size
-                    // was not found.
-                    if (source == null)
-                        source = Image.FromFile(filename);
                 }
-
-                float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
-                if (f < 1.0f) f = 1.0f; // Do not upsize small images
-                int width = (int)System.Math.Round((float)source.Width / f);
-                int height = (int)System.Math.Round((float)source.Height / f);
-                thumb = new Bitmap(width, height);
-                using (Graphics g = Graphics.FromImage(thumb))
-                {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.High;
-
-                    using (Brush brush = new SolidBrush(backColor))
-                    {
-                        g.FillRectangle(Brushes.White, 0, 0, width, height);
-                    }
-
-                    g.DrawImage(source, 0, 0, width, height);
-                }
-                source.Dispose();
             }
             catch
             {

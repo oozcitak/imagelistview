@@ -185,8 +185,6 @@ namespace Manina.Windows.Forms
                 CacheState state = ThumbnailCacheState;
                 if (state == CacheState.Error)
                     return mImageListView.ErrorImage;
-                else if (state == CacheState.InQueue)
-                    return mImageListView.DefaultImage;
                 else if (state == CacheState.Cached)
                 {
                     Image img = mImageListView.cacheManager.GetImage(Guid);

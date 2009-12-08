@@ -167,10 +167,17 @@ namespace Manina.Windows.Forms
                     string path = Path.GetDirectoryName(item.FileName);
                     string name = Path.GetFileName(item.FileName);
                     // Update file info
-                    mImageListView.BeginInvoke(new UpdateItemDetailsEventHandlerInternal(
-                        mImageListView.UpdateItemDetailsInternal), item.Item,
-                        info.LastAccessTime, info.CreationTime, info.LastWriteTime,
-                        info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
+                    try
+                    {
+                        mImageListView.BeginInvoke(new UpdateItemDetailsEventHandlerInternal(
+                            mImageListView.UpdateItemDetailsInternal), item.Item,
+                            info.LastAccessTime, info.CreationTime, info.LastWriteTime,
+                            info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
+                    }
+                    catch
+                    {
+                        ;
+                    }
                 }
             }
         }
