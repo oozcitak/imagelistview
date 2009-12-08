@@ -883,143 +883,163 @@ namespace Manina.Windows.Forms
                     rect.Y = img.Height + 16;
                     rect.Height -= img.Height + 16;
 
-                    // Image information
-                    using (StringFormat sf = new StringFormat())
+                    // File properties
+                    if (rect.Height>0 && !string.IsNullOrEmpty(item.FileType))
                     {
-                        sf.Alignment = StringAlignment.Near;
-                        sf.LineAlignment = StringAlignment.Near;
-                        sf.Trimming = StringTrimming.EllipsisCharacter;
-                        sf.FormatFlags = StringFormatFlags.NoWrap;
-                        g.DrawString(item.Text, CaptionFont, Brushes.Black, rect, sf);
-
-                        int textHeight = (int)CaptionFont.GetHeight() * 2;
-                        rect.Y += textHeight;
-                        rect.Height -= textHeight;
-
-                        StringBuilder sb = new StringBuilder();
-                        // File properties
-                        sb.AppendLine(item.FileType);
-
-                        if (item.Dimensions != Size.Empty)
+                        int y = DrawStringPair(g, rect, "", item.FileType);
+                        rect.Y += y;
+                        rect.Height -= y;
+                    }
+                    if (rect.Height > 0 && item.Dimensions != Size.Empty)
+                    {
+                        int y = DrawStringPair(g, rect,
+                            mImageListView.Columns.GetDefaultText(ColumnType.Dimensions) + ": ",
+                            item.GetSubItemText(ColumnType.Dimensions));
+                        rect.Y += y;
+                        rect.Height -= y;
+                    }
+                    if (rect.Height > 0 && item.Resolution != SizeF.Empty)
+                    {
+                        int y = DrawStringPair(g, rect,
+                            mImageListView.Columns.GetDefaultText(ColumnType.Resolution) + ": ",
+                            item.Resolution.Width.ToString() + " dpi");
+                        rect.Y += y;
+                        rect.Height -= y;
+                    }
+                    if (rect.Height > 0 && item.FileSize != 0)
+                    {
+                        int y = DrawStringPair(g, rect,
+                            mImageListView.Columns.GetDefaultText(ColumnType.FileSize) + ": ",
+                            item.GetSubItemText(ColumnType.FileSize));
+                        rect.Y += y;
+                        rect.Height -= y;
+                    }
+                    if (rect.Height > 0 && item.DateModified != DateTime.MinValue)
+                    {
+                        int y = DrawStringPair(g, rect,
+                            mImageListView.Columns.GetDefaultText(ColumnType.DateModified) + ": ",
+                            item.GetSubItemText(ColumnType.DateModified));
+                        rect.Y += y;
+                        rect.Height -= y;
+                    }
+                    if (rect.Height > 0 && item.DateCreated != DateTime.MinValue)
+                    {
+                        int y = DrawStringPair(g, rect,
+                            mImageListView.Columns.GetDefaultText(ColumnType.DateCreated) + ": ",
+                            item.GetSubItemText(ColumnType.DateCreated));
+                        rect.Y += y;
+                        rect.Height -= y;
+                    }
+                    // Exif info
+                    try
+                    {
+                        using (FileStream stream = new FileStream(item.FileName, FileMode.Open, FileAccess.Read))
                         {
-                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Dimensions));
-                            sb.Append(": ");
-                            sb.Append(item.GetSubItemText(ColumnType.Dimensions));
-                            sb.AppendLine();
-                        }
-                        if (item.Resolution != SizeF.Empty)
-                        {
-                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.Resolution));
-                            sb.Append(": ");
-                            sb.Append(item.Resolution.Width);
-                            sb.AppendLine(" dpi");
-                        }
-                        if (item.FileSize != 0)
-                        {
-                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.FileSize));
-                            sb.Append(": ");
-                            sb.Append(item.GetSubItemText(ColumnType.FileSize));
-                            sb.AppendLine();
-                        }
-                        if (item.DateModified != DateTime.MinValue)
-                        {
-                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateModified));
-                            sb.Append(": ");
-                            sb.Append(item.GetSubItemText(ColumnType.DateModified));
-                            sb.AppendLine();
-                        }
-                        if (item.DateCreated != DateTime.MinValue)
-                        {
-                            sb.Append(mImageListView.Columns.GetDefaultText(ColumnType.DateCreated));
-                            sb.Append(": ");
-                            sb.Append(item.GetSubItemText(ColumnType.DateCreated));
-                            sb.AppendLine();
-                        }
-                        // Exif info
-                        sb.AppendLine();
-                        try
-                        {
-                            using (FileStream stream = new FileStream(item.FileName, FileMode.Open, FileAccess.Read))
+                            using (Image tempImage = Image.FromStream(stream, false, false))
                             {
-                                using (Image tempImage = Image.FromStream(stream, false, false))
+                                foreach (PropertyItem prop in tempImage.PropertyItems)
                                 {
-                                    foreach (PropertyItem prop in tempImage.PropertyItems)
+                                    if (mTags.ContainsKey(prop.Id))
                                     {
-                                        if (mTags.ContainsKey(prop.Id))
+                                        string tagName = mTags[prop.Id];
+                                        short tagType = prop.Type;
+                                        int tagLen = prop.Len;
+                                        byte[] tagBytes = prop.Value;
+                                        string tagValue = string.Empty;
+                                        switch (tagType)
                                         {
-                                            string tagName = mTags[prop.Id];
-                                            short tagType = prop.Type;
-                                            int tagLen = prop.Len;
-                                            byte[] tagBytes = prop.Value;
-                                            string tagValue = string.Empty;
-                                            switch (tagType)
-                                            {
-                                                case 1: // byte
-                                                    foreach (byte b in tagBytes)
-                                                        tagValue += b.ToString() + " ";
-                                                    break;
-                                                case 2: // ascii
-                                                    int len = Array.IndexOf(tagBytes, (byte)0);
-                                                    if (len == -1) len = tagLen;
-                                                    tagValue = Encoding.ASCII.GetString(tagBytes, 0, len);
-                                                    if (prop.Id == PropertyTagDateTime)
-                                                    {
-                                                        tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
-                                                    }
-                                                    break;
-                                                case 3: // ushort
-                                                    for (int i = 0; i < tagLen; i += 2)
-                                                        tagValue += BitConverter.ToUInt16(tagBytes, i).ToString() + " ";
-                                                    break;
-                                                case 4: // uint
-                                                    for (int i = 0; i < tagLen; i += 4)
-                                                        tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + " ";
-                                                    break;
-                                                case 5: // uint rational
-                                                    for (int i = 0; i < tagLen; i += 8)
-                                                        tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + "/" +
-                                                            BitConverter.ToUInt32(tagBytes, i + 4).ToString() + " ";
-                                                    break;
-                                                case 7: // undefined as ascii
-                                                    int lenu = Array.IndexOf(tagBytes, (byte)0);
-                                                    if (lenu == -1) len = tagLen;
-                                                    tagValue = Encoding.ASCII.GetString(tagBytes, 0, lenu);
-                                                    if (prop.Id == PropertyTagDateTime)
-                                                    {
-                                                        tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
-                                                    }
-                                                    break;
-                                                case 9: // int
-                                                    for (int i = 0; i < tagLen; i += 4)
-                                                        tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + " ";
-                                                    break;
-                                                case 10: // int rational
-                                                    for (int i = 0; i < tagLen; i += 8)
-                                                        tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + "/" +
-                                                            BitConverter.ToInt32(tagBytes, i + 4).ToString() + " ";
-                                                    break;
-                                            }
-                                            tagValue = tagValue.Trim();
+                                            case 1: // byte
+                                                foreach (byte b in tagBytes)
+                                                    tagValue += b.ToString() + " ";
+                                                break;
+                                            case 2: // ascii
+                                                int len = Array.IndexOf(tagBytes, (byte)0);
+                                                if (len == -1) len = tagLen;
+                                                tagValue = Encoding.ASCII.GetString(tagBytes, 0, len);
+                                                if (prop.Id == PropertyTagDateTime)
+                                                {
+                                                    tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
+                                                }
+                                                break;
+                                            case 3: // ushort
+                                                for (int i = 0; i < tagLen; i += 2)
+                                                    tagValue += BitConverter.ToUInt16(tagBytes, i).ToString() + " ";
+                                                break;
+                                            case 4: // uint
+                                                for (int i = 0; i < tagLen; i += 4)
+                                                    tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + " ";
+                                                break;
+                                            case 5: // uint rational
+                                                for (int i = 0; i < tagLen; i += 8)
+                                                    tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + "/" +
+                                                        BitConverter.ToUInt32(tagBytes, i + 4).ToString() + " ";
+                                                break;
+                                            case 7: // undefined as ascii
+                                                int lenu = Array.IndexOf(tagBytes, (byte)0);
+                                                if (lenu == -1) len = tagLen;
+                                                tagValue = Encoding.ASCII.GetString(tagBytes, 0, lenu);
+                                                if (prop.Id == PropertyTagDateTime)
+                                                {
+                                                    tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
+                                                }
+                                                break;
+                                            case 9: // int
+                                                for (int i = 0; i < tagLen; i += 4)
+                                                    tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + " ";
+                                                break;
+                                            case 10: // int rational
+                                                for (int i = 0; i < tagLen; i += 8)
+                                                    tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + "/" +
+                                                        BitConverter.ToInt32(tagBytes, i + 4).ToString() + " ";
+                                                break;
+                                        }
+                                        tagValue = tagValue.Trim();
 
-                                            if (tagValue != string.Empty)
-                                            {
-                                                sb.Append(tagName);
-                                                sb.Append(": ");
-                                                sb.Append(tagValue);
-                                                sb.AppendLine();
-                                            }
+                                        if (rect.Height > 0 && tagValue != string.Empty)
+                                        {
+                                            int y = DrawStringPair(g, rect, tagName + ": ", tagValue);
+                                            rect.Y += y;
+                                            rect.Height -= y;
                                         }
                                     }
                                 }
                             }
                         }
-                        catch
-                        {
-                            ;
-                        }
-                        // Print image details
-                        g.DrawString(sb.ToString(), mImageListView.Font, Brushes.Black, rect, sf);
                     }
+                    catch
+                    {
+                        ;
+                    }
+                }
+            }
+            /// <summary>
+            /// Draws the given caption/text inside the given rectangle.
+            /// </summary>
+            private int DrawStringPair(Graphics g, Rectangle r, string caption, string text)
+            {
+                using (StringFormat sf = new StringFormat())
+                {
+                    sf.Alignment = StringAlignment.Near;
+                    sf.LineAlignment = StringAlignment.Near;
+                    sf.Trimming = StringTrimming.EllipsisCharacter;
+                    sf.FormatFlags = StringFormatFlags.NoWrap;
+
+                    SizeF szc = g.MeasureString(caption, mImageListView.Font, r.Size, sf);
+                    int y = (int)szc.Height;
+                    if (szc.Width > r.Width) szc.Width = r.Width;
+                    Rectangle txrect = new Rectangle(r.Location, Size.Ceiling(szc));
+                    g.DrawString(caption, mImageListView.Font, SystemBrushes.GrayText, txrect, sf);
+                    txrect.X += txrect.Width;
+                    txrect.Width = r.Width;
+                    if (txrect.X < r.Right)
+                    {
+                        SizeF szt = g.MeasureString(text, mImageListView.Font, r.Size, sf);
+                        y = Math.Max(y, (int)szt.Height);
+                        txrect = Rectangle.Intersect(r, txrect);
+                        g.DrawString(text, mImageListView.Font, SystemBrushes.WindowText, txrect, sf);
+                    }
+
+                    return y;
                 }
             }
         }
