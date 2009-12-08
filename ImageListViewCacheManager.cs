@@ -147,7 +147,7 @@ namespace Manina.Windows.Forms
 
             mImageListView = owner;
             mCacheLimitAsItemCount = 0;
-            mCacheLimitAsMemory = 10;
+            mCacheLimitAsMemory = 20 * 1024 * 1024;
 
             toCache = new Stack<CacheItem>();
             thumbCache = new Dictionary<Guid, CacheItem>();
@@ -482,11 +482,11 @@ namespace Manina.Windows.Forms
                                 editSource = null;
                         }
                         if (editSource != null)
-                            thumb = Utility.ThumbnailFromImage(editSource, request.Size);
+                            thumb = Utility.ThumbnailFromImage(editSource, request.Size, Color.White);
 
                         // Read from file
                         if (thumb == null)
-                            thumb = Utility.ThumbnailFromFile(request.FileName, request.Size, request.UseEmbeddedThumbnails);
+                            thumb = Utility.ThumbnailFromFile(request.FileName, request.Size, request.UseEmbeddedThumbnails, Color.White);
 
                         // Create the cache item
                         if (thumb == null)
@@ -513,11 +513,14 @@ namespace Manina.Windows.Forms
                             {
                                 thumbCache.Add(guid, result);
 
-                                // Did we exceed the cache limit?
-                                memoryUsed += request.Size.Width * request.Size.Height * 24 / 8;
-                                if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
-                                    (mCacheLimitAsItemCount != 0 && thumbCache.Count > mCacheLimitAsItemCount))
-                                    cleanupRequired = true;
+                                if (thumb != null)
+                                {
+                                    // Did we exceed the cache limit?
+                                    memoryUsed += thumb.Width * thumb.Height * 24 / 8;
+                                    if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
+                                        (mCacheLimitAsItemCount != 0 && thumbCache.Count > mCacheLimitAsItemCount))
+                                        cleanupRequired = true;
+                                }
                             }
                         }
 
@@ -530,7 +533,7 @@ namespace Manina.Windows.Forms
                             ;
                         }
                     }
-                    
+
                     // Check if the cache is exhausted
                     lock (lockObject)
                     {
@@ -541,7 +544,7 @@ namespace Manina.Windows.Forms
 
                     // Do we need a refresh?
                     sw.Stop();
-                    if (sw.ElapsedMilliseconds > 200)
+                    if (sw.ElapsedMilliseconds > 100)
                     {
                         try
                         {
@@ -553,7 +556,13 @@ namespace Manina.Windows.Forms
                         }
                         sw.Reset();
                     }
-                    sw.Start();
+                    if (queueFull)
+                        sw.Start();
+                    else
+                    {
+                        sw.Reset();
+                        sw.Stop();
+                    }
                 }
 
                 // Clean up invisible items

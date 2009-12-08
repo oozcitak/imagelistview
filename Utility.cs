@@ -259,36 +259,26 @@ namespace Manina.Windows.Forms
             return thumb;
         }
         /// <summary>
-        /// Creates a thumbnail from the given image.
-        /// </summary>
-        /// <param name="image">The source image.</param>
-        /// <param name="size">Requested image size.</param>
-        /// <param name="backColor">Background color of returned thumbnail.</param>
-        /// <returns>The image from the given file or null if an error occurs.</returns>
-        public static Image ThumbnailFromImage(Image image, Size size)
-        {
-            return ThumbnailFromImage(image, size, Color.White);
-        }
-        /// <summary>
         /// Creates a thumbnail from the given image file.
         /// </summary>
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="backColor">Background color of returned thumbnail.</param>
+        /// <param name="useGDI">If true uses GDI instead of GDI+.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
         public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
 
-            Image source = null;
+            Bitmap source = null;
             Image thumb = null;
             try
             {
                 using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                 {
-                    using (Image img = Image.FromStream(stream, false, false))
+                    using (Bitmap img = (Bitmap)Bitmap.FromStream(stream, false, false))
                     {
                         if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
                         {
@@ -300,7 +290,7 @@ namespace Manina.Windows.Forms
                                     byte[] rawImage = img.GetPropertyItem(PropertyTagThumbnailData).Value;
                                     using (MemoryStream memStream = new MemoryStream(rawImage))
                                     {
-                                        source = Image.FromStream(memStream);
+                                        source = (Bitmap)Bitmap.FromStream(memStream);
                                     }
                                     if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
                                     {
@@ -350,38 +340,6 @@ namespace Manina.Windows.Forms
             }
 
             return thumb;
-        }
-        /// <summary>
-        /// Creates a thumbnail from the given image file.
-        /// </summary>
-        /// <param name="filename">The filename pointing to an image.</param>
-        /// <param name="size">Requested image size.</param>
-        /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
-        /// <returns>The image from the given file or null if an error occurs.</returns>
-        public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails)
-        {
-            return ThumbnailFromFile(filename, size, useEmbeddedThumbnails, Color.White);
-        }
-        /// <summary>
-        /// Creates a thumbnail from the given image file.
-        /// </summary>
-        /// <param name="filename">The filename pointing to an image.</param>
-        /// <param name="size">Requested image size.</param>
-        /// <param name="backColor">Background color of returned thumbnail.</param>
-        /// <returns>The image from the given file or null if an error occurs.</returns>
-        public static Image ThumbnailFromFile(string filename, Size size, Color backColor)
-        {
-            return ThumbnailFromFile(filename, size, UseEmbeddedThumbnails.Auto, backColor);
-        }
-        /// <summary>
-        /// Creates a thumbnail from the given image file.
-        /// </summary>
-        /// <param name="filename">The filename pointing to an image.</param>
-        /// <param name="size">Requested image size.</param>
-        /// <returns>The image from the given file or null if an error occurs.</returns>
-        public static Image ThumbnailFromFile(string filename, Size size)
-        {
-            return ThumbnailFromFile(filename, size, UseEmbeddedThumbnails.Auto, Color.White);
         }
         /// <summary>
         /// Creates a new image from the given base 64 string.
