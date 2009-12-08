@@ -271,7 +271,7 @@ namespace Manina.Windows.Forms
                 if (img != null)
                     return img;
 
-                mImageListView.cacheManager.AddRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
+                mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
                 return item.ThumbnailImage;
             }
             #endregion
@@ -498,7 +498,7 @@ namespace Manina.Windows.Forms
                     Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
 
-                    Image image =GetImageAsync(item,bounds.Size);
+                    Image image = GetImageAsync(item, bounds.Size);
 
                     if (mClip)
                         g.SetClip(bounds);

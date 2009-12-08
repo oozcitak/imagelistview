@@ -27,11 +27,11 @@ namespace Manina.Windows.Forms
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
 
-        private Dictionary<Guid, CacheItem> toCache;
+        private Stack<CacheItem> toCache;
         private Dictionary<Guid, CacheItem> thumbCache;
         private Dictionary<Guid, Image> editCache;
 
-        private Dictionary<Guid, CacheItem> rendererCache;
+        private Stack<CacheItem> rendererToCache;
         private Guid rendererGuid;
         private CacheItem rendererItem;
 
@@ -49,6 +49,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         private class CacheItem : IDisposable
         {
+            private Guid mGuid;
             private string mFileName;
             private Size mSize;
             private Image mImage;
@@ -56,6 +57,10 @@ namespace Manina.Windows.Forms
             private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
             private bool disposed;
 
+            /// <summary>
+            /// Gets the guid of the item.
+            /// </summary>
+            public Guid Guid { get { return mGuid; } }
             /// <summary>
             /// Gets the name of the image file.
             /// </summary>
@@ -77,8 +82,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public UseEmbeddedThumbnails UseEmbeddedThumbnails { get { return mUseEmbeddedThumbnails; } }
 
-            public CacheItem(string filename, Size size, Image image, CacheState state)
+            public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state)
             {
+                mGuid = guid;
                 mFileName = filename;
                 mSize = size;
                 mImage = image;
@@ -86,8 +92,8 @@ namespace Manina.Windows.Forms
                 disposed = false;
             }
 
-            public CacheItem(string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
-                : this(filename, size, image, state)
+            public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
+                : this(guid, filename, size, image, state)
             {
                 mUseEmbeddedThumbnails = useEmbeddedThumbnails;
             }
@@ -130,7 +136,6 @@ namespace Manina.Windows.Forms
         public long MemoryUsed { get { lock (lockObject) { return memoryUsed; } } }
         /// <summary>
         /// Returns the count of items in the cache.
-        /// Requires a cache lock, use sparingly.
         /// </summary>
         public long CacheSize { get { lock (lockObject) { return thumbCache.Count; } } }
         #endregion
@@ -144,11 +149,11 @@ namespace Manina.Windows.Forms
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 10;
 
-            toCache = new Dictionary<Guid, CacheItem>();
+            toCache = new Stack<CacheItem>();
             thumbCache = new Dictionary<Guid, CacheItem>();
             editCache = new Dictionary<Guid, Image>();
 
-            rendererCache = new Dictionary<Guid, CacheItem>();
+            rendererToCache = new Stack<CacheItem>();
             rendererGuid = new Guid();
             rendererItem = null;
 
@@ -211,8 +216,6 @@ namespace Manina.Windows.Forms
             {
                 CacheItem item = null;
                 if (thumbCache.TryGetValue(guid, out item))
-                    return item.State;
-                else if (toCache.TryGetValue(guid, out item))
                     return item.State;
             }
 
@@ -286,17 +289,14 @@ namespace Manina.Windows.Forms
                         thumbCache.Remove(guid);
                 }
                 // Add to cache
-                if (!toCache.TryGetValue(guid, out item))
-                {
-                    toCache.Add(guid, new CacheItem(filename, thumbSize, null, CacheState.InQueue, useEmbeddedThumbnails));
-                    Monitor.Pulse(lockObject);
-                }
+                toCache.Push(new CacheItem(guid, filename, thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails));
+                Monitor.Pulse(lockObject);
             }
         }
         /// <summary>
         /// Adds the image to the renderer cache.
         /// </summary>
-        public void AddRendererCache(Guid guid, string filename, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        public void AddToRendererCache(Guid guid, string filename, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
             lock (lockObject)
             {
@@ -305,9 +305,9 @@ namespace Manina.Windows.Forms
                     return;
 
                 // Renderer cache holds one item only.
-                rendererCache.Clear();
+                rendererToCache.Clear();
 
-                rendererCache.Add(guid, new CacheItem(filename, thumbSize, null, CacheState.InQueue, useEmbeddedThumbnails));
+                rendererToCache.Push(new CacheItem(guid, filename, thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails));
                 Monitor.Pulse(lockObject);
             }
         }
@@ -364,7 +364,7 @@ namespace Manina.Windows.Forms
                     item.Dispose();
                 thumbCache.Clear();
 
-                foreach (CacheItem item in toCache.Values)
+                foreach (CacheItem item in toCache)
                     item.Dispose();
                 toCache.Clear();
 
@@ -372,9 +372,9 @@ namespace Manina.Windows.Forms
                     img.Dispose();
                 editCache.Clear();
 
-                foreach (CacheItem item in rendererCache.Values)
+                foreach (CacheItem item in rendererToCache)
                     item.Dispose();
-                rendererCache.Clear();
+                rendererToCache.Clear();
                 if (rendererItem != null)
                     rendererItem.Dispose();
 
@@ -398,125 +398,179 @@ namespace Manina.Windows.Forms
         {
             while (true)
             {
-                lock (lockObject)
-                {
-                    if (stopping) return;
-                }
-
                 Guid guid = new Guid();
                 CacheItem request = null;
                 bool rendererRequest = false;
-
                 lock (lockObject)
                 {
+                    if (stopping) return;
+
                     // Wait until we have items waiting to be cached
-                    if (toCache.Count == 0 && rendererCache.Count == 0)
+                    if (toCache.Count == 0 && rendererToCache.Count == 0)
                         Monitor.Wait(lockObject);
 
                     if (stopping) return;
-
-                    // Get an item from the queue
-                    if (rendererCache.Count != 0)
-                    {
-                        foreach (KeyValuePair<Guid, CacheItem> pair in rendererCache)
-                        {
-                            guid = pair.Key;
-                            request = pair.Value;
-                            break;
-                        }
-                        rendererCache.Clear();
-                        rendererRequest = true;
-                    }
-                    else if (toCache.Count != 0)
-                    {
-                        foreach (KeyValuePair<Guid, CacheItem> pair in toCache)
-                        {
-                            guid = pair.Key;
-                            request = pair.Value;
-                            break;
-                        }
-                        toCache.Remove(guid);
-
-                        // Is it already cached?
-                        CacheItem existing = null;
-                        if (thumbCache.TryGetValue(guid, out existing))
-                        {
-                            if (existing.Size == request.Size)
-                                request = null;
-                            else
-                                thumbCache.Remove(guid);
-                        }
-                    }
                 }
 
-                // Is it outside visible area?
-                bool isvisible = false;
-                if (request != null)
-                    isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
+                // Set to true when we exceed the cache memory limit
+                bool cleanupRequired = false;
+                // Set to true when we fetch at least one thumbnail
+                bool thumbnailCreated = false;
 
-                lock (lockObject)
+                // Loop until we exhaust the queue
+                bool queueFull = true;
+                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                while (queueFull)
                 {
-                    if (!rendererRequest && !isvisible)
-                        request = null;
-                }
-
-                // Proceed if we have a filename
-                if (request != null)
-                {
-                    bool thumbnailCreated = false;
-                    bool cleanupRequired = false;
-
-                    Image thumb = null;
-
-                    // Is it in the edit cache?
                     lock (lockObject)
                     {
-                        Image source = null;
-                        if (editCache.TryGetValue(guid, out source))
-                            thumb = Utility.ThumbnailFromImage(source, request.Size);
+                        sw.Start();
+                        // Get an item from the queue
+                        if (toCache.Count != 0)
+                        {
+                            request = toCache.Pop();
+                            guid = request.Guid;
+
+                            // Is it already cached?
+                            CacheItem existing = null;
+                            if (thumbCache.TryGetValue(guid, out existing))
+                            {
+                                if (existing.Size == request.Size)
+                                    request = null;
+                                else
+                                    thumbCache.Remove(guid);
+                            }
+                        }
+                        else if (rendererToCache.Count != 0)
+                        {
+                            request = rendererToCache.Pop();
+                            guid = request.Guid;
+                            rendererToCache.Clear();
+                            rendererRequest = true;
+                        }
                     }
 
-                    // Read from file
-                    if (thumb == null)
-                        thumb = Utility.ThumbnailFromFile(request.FileName, request.Size, request.UseEmbeddedThumbnails);
+                    // Is it outside visible area?
+                    bool isvisible = false;
+                    try
+                    {
+                        if (request != null)
+                            isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
+                    }
+                    catch
+                    {
+                        ;
+                    }
 
                     lock (lockObject)
                     {
+                        if (!rendererRequest && !isvisible)
+                            request = null;
+                    }
+
+                    // Proceed if we have a filename
+                    CacheItem result = null;
+                    if (request != null)
+                    {
+                        Image thumb = null;
+
+                        // Is it in the edit cache?
+                        Image editSource = null;
+                        lock (lockObject)
+                        {
+                            if (!editCache.TryGetValue(guid, out editSource))
+                                editSource = null;
+                        }
+                        if (editSource != null)
+                            thumb = Utility.ThumbnailFromImage(editSource, request.Size);
+
+                        // Read from file
+                        if (thumb == null)
+                            thumb = Utility.ThumbnailFromFile(request.FileName, request.Size, request.UseEmbeddedThumbnails);
+
+                        // Create the cache item
+                        if (thumb == null)
+                            result = new CacheItem(guid, request.FileName, request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
+                        else
+                            result = new CacheItem(guid, request.FileName, request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
+                        thumbnailCreated = true;
+
                         if (rendererRequest)
                         {
-                            rendererGuid = guid;
-                            if (thumb == null)
-                                rendererItem = new CacheItem(request.FileName, request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
-                            else
-                                rendererItem = new CacheItem(request.FileName, request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
-                            rendererRequest = false;
-                            thumbnailCreated = true;
-                        }
-                        else if (!thumbCache.ContainsKey(guid) || thumbCache[guid].Size != request.Size)
-                        {
-                            if (thumbCache.ContainsKey(guid))
+                            lock (lockObject)
                             {
-                                thumbCache[guid].Dispose();
-                                thumbCache.Remove(guid);
-                            }
-                            if (thumb == null)
-                                thumbCache.Add(guid, new CacheItem(request.FileName, request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails));
-                            else
-                                thumbCache.Add(guid, new CacheItem(request.FileName, request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails));
-                            thumbnailCreated = true;
+                                if (rendererItem != null)
+                                    rendererItem.Dispose();
 
-                            // Did we exceed the cache limit?
-                            memoryUsed += request.Size.Width * request.Size.Height * 24 / 8;
-                            if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
-                                (mCacheLimitAsItemCount != 0 && thumbCache.Count > mCacheLimitAsItemCount))
-                                cleanupRequired = true;
+                                rendererGuid = guid;
+                                rendererItem = result;
+                                rendererRequest = false;
+                            }
+                        }
+                        else
+                        {
+                            lock (lockObject)
+                            {
+                                thumbCache.Add(guid, result);
+
+                                // Did we exceed the cache limit?
+                                memoryUsed += request.Size.Width * request.Size.Height * 24 / 8;
+                                if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
+                                    (mCacheLimitAsItemCount != 0 && thumbCache.Count > mCacheLimitAsItemCount))
+                                    cleanupRequired = true;
+                            }
+                        }
+
+                        try
+                        {
+                            mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(mImageListView.OnThumbnailCachedInternal), guid);
+                        }
+                        catch
+                        {
+                            ;
                         }
                     }
-
-                    // Clean up invisible items
-                    if (cleanupRequired)
+                    
+                    // Check if the cache is exhausted
+                    lock (lockObject)
                     {
-                        Dictionary<Guid, bool> visible = (Dictionary<Guid, bool>)mImageListView.Invoke(new GetVisibleItemsInternal(mImageListView.GetVisibleItems));
+                        if (stopping) return;
+                        if (toCache.Count == 0 && rendererToCache.Count == 0)
+                            queueFull = false;
+                    }
+
+                    // Do we need a refresh?
+                    sw.Stop();
+                    if (sw.ElapsedMilliseconds > 200)
+                    {
+                        try
+                        {
+                            mImageListView.Invoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
+                        }
+                        catch
+                        {
+                            ;
+                        }
+                        sw.Reset();
+                    }
+                    sw.Start();
+                }
+
+                // Clean up invisible items
+                if (cleanupRequired)
+                {
+                    Dictionary<Guid, bool> visible = new Dictionary<Guid, bool>();
+                    try
+                    {
+                        visible = (Dictionary<Guid, bool>)mImageListView.Invoke(new GetVisibleItemsInternal(mImageListView.GetVisibleItems));
+                    }
+                    catch
+                    {
+                        ;
+                    }
+
+                    if (visible.Count != 0)
+                    {
                         lock (lockObject)
                         {
                             foreach (KeyValuePair<Guid, CacheItem> item in thumbCache)
@@ -540,11 +594,17 @@ namespace Manina.Windows.Forms
                             memoryUsedByRemoved = 0;
                         }
                     }
+                }
 
-                    if (thumbnailCreated)
+                if (thumbnailCreated)
+                {
+                    try
                     {
-                        mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(mImageListView.OnThumbnailCachedInternal), guid);
-                        mImageListView.BeginInvoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
+                        mImageListView.Invoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
+                    }
+                    catch
+                    {
+                        ;
                     }
                 }
             }
