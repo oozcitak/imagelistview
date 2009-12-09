@@ -61,6 +61,33 @@ namespace Manina.Windows.Forms {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Aperture.
+        /// </summary>
+        internal static string Aperture {
+            get {
+                return ResourceManager.GetString("Aperture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Artist.
+        /// </summary>
+        internal static string Artist {
+            get {
+                return ResourceManager.GetString("Artist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copyright.
+        /// </summary>
+        internal static string Copyright {
+            get {
+                return ResourceManager.GetString("Copyright", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Last Access.
         /// </summary>
         internal static string DateAccessed {
@@ -88,11 +115,38 @@ namespace Manina.Windows.Forms {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Taken.
+        /// </summary>
+        internal static string DateTaken {
+            get {
+                return ResourceManager.GetString("DateTaken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dimensions.
         /// </summary>
         internal static string Dimensions {
             get {
                 return ResourceManager.GetString("Dimensions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Camera.
+        /// </summary>
+        internal static string EquipmentModel {
+            get {
+                return ResourceManager.GetString("EquipmentModel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exposure Time.
+        /// </summary>
+        internal static string ExposureTime {
+            get {
+                return ResourceManager.GetString("ExposureTime", resourceCulture);
             }
         }
         
@@ -133,6 +187,33 @@ namespace Manina.Windows.Forms {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to F Number.
+        /// </summary>
+        internal static string FNumber {
+            get {
+                return ResourceManager.GetString("FNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        internal static string ImageDescription {
+            get {
+                return ResourceManager.GetString("ImageDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ISO Speed.
+        /// </summary>
+        internal static string ISOSpeed {
+            get {
+                return ResourceManager.GetString("ISOSpeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         internal static string Name {
@@ -147,6 +228,24 @@ namespace Manina.Windows.Forms {
         internal static string Resolution {
             get {
                 return ResourceManager.GetString("Resolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shutter Speed.
+        /// </summary>
+        internal static string ShutterSpeed {
+            get {
+                return ResourceManager.GetString("ShutterSpeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comments.
+        /// </summary>
+        internal static string UserComment {
+            get {
+                return ResourceManager.GetString("UserComment", resourceCulture);
             }
         }
     }

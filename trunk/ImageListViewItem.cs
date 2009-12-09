@@ -19,17 +19,29 @@ namespace Manina.Windows.Forms
         protected internal bool mSelected;
         private string mText;
         private int mZOrder;
-        internal string defaultText;
+        private string defaultText;
         // File info
-        internal DateTime mDateAccessed;
-        internal DateTime mDateCreated;
-        internal DateTime mDateModified;
-        internal string mFileType;
+        private DateTime mDateAccessed;
+        private DateTime mDateCreated;
+        private DateTime mDateModified;
+        private string mFileType;
         private string mFileName;
-        internal string mFilePath;
-        internal long mFileSize;
-        internal Size mDimensions;
-        internal SizeF mResolution;
+        private string mFilePath;
+        private long mFileSize;
+        private Size mDimensions;
+        private SizeF mResolution;
+        // Exif tags
+        private string mImageDescription;
+        private string mEquipmentModel;
+        private DateTime mDateTaken;
+        private string mArtist;
+        private string mCopyright;
+        private string mExposureTime;
+        private float mFNumber;
+        private ushort mISOSpeed;
+        private string mShutterSpeed;
+        private string mAperture;
+        private string mUserComment;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
@@ -273,6 +285,61 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Data"), Browsable(false), Description("Gets image resolution in pixels per inch.")]
         public SizeF Resolution { get { UpdateFileInfo(); return mResolution; } }
+        /// <summary>
+        /// Gets image deascription.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets image deascription.")]
+        public string ImageDescription { get { UpdateFileInfo(); return mImageDescription; } }
+        /// <summary>
+        /// Gets the camera model.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the camera model.")]
+        public string EquipmentModel { get { UpdateFileInfo(); return mEquipmentModel; } }
+        /// <summary>
+        /// Gets the date and time the image was taken.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the date and time the image was taken.")]
+        public DateTime DateTaken { get { UpdateFileInfo(); return mDateTaken; } }
+        /// <summary>
+        /// Gets the name of the artist.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the name of the artist.")]
+        public string Artist { get { UpdateFileInfo(); return mArtist; } }
+        /// <summary>
+        /// Gets image copyright information.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets image copyright information.")]
+        public string Copyright { get { UpdateFileInfo(); return mCopyright; } }
+        /// <summary>
+        /// Gets the exposure time in seconds.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the exposure time in seconds.")]
+        public string ExposureTime { get { UpdateFileInfo(); return mExposureTime; } }
+        /// <summary>
+        /// Gets the F number.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the F number.")]
+        public float FNumber { get { UpdateFileInfo(); return mFNumber; } }
+        /// <summary>
+        /// Gets the ISO speed.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the ISO speed.")]
+        public ushort ISOSpeed { get { UpdateFileInfo(); return mISOSpeed; } }
+        /// <summary>
+        /// Gets the shutter speed.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the shutter speed.")]
+        public string ShutterSpeed { get { UpdateFileInfo(); return mShutterSpeed; } }
+        /// <summary>
+        /// Gets the lens aperture value.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets the lens aperture value.")]
+        public string Aperture { get { UpdateFileInfo(); return mAperture; } }
+        /// <summary>
+        /// Gets user comments.
+        /// </summary>
+        [Category("Data"), Browsable(false), Description("Gets user comments.")]
+        public string UserComment { get { UpdateFileInfo(); return mUserComment; } }
         #endregion
 
         #region Constructors
@@ -415,6 +482,31 @@ namespace Manina.Windows.Forms
                         return "";
                     else
                         return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
+                case ColumnType.ImageDescription:
+                    return ImageDescription;
+                case ColumnType.EquipmentModel:
+                    return EquipmentModel;
+                case ColumnType.DateTaken:
+                    if (DateTaken == DateTime.MinValue)
+                        return "";
+                    else
+                        return DateTaken.ToString("g");
+                case ColumnType.Artist:
+                    return Artist;
+                case ColumnType.Copyright:
+                    return Copyright;
+                case ColumnType.ExposureTime:
+                    return ExposureTime;
+                case ColumnType.FNumber:
+                    return FNumber.ToString("f2");
+                case ColumnType.ISOSpeed:
+                    return ISOSpeed.ToString();
+                case ColumnType.ShutterSpeed:
+                    return ShutterSpeed;
+                case ColumnType.Aperture:
+                    return Aperture;
+                case ColumnType.UserComment:
+                    return UserComment;
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
@@ -428,45 +520,40 @@ namespace Manina.Windows.Forms
         private void UpdateFileInfo()
         {
             if (!isDirty) return;
-            isDirty = false;
 
             Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
-            if (info.Error) return;
+            UpdateDetailsInternal(info);
+
+            isDirty = false;
+        }
+        /// <summary>
+        /// Invoked by the worker thread to update item details.
+        /// </summary>
+        internal void UpdateDetailsInternal(Utility.ShellImageFileInfo info)
+        {
+            if (!isDirty) return;
 
             mDateAccessed = info.LastAccessTime;
             mDateCreated = info.CreationTime;
             mDateModified = info.LastWriteTime;
             mFileSize = info.Size;
             mFileType = info.TypeName;
-            mFilePath = Path.GetDirectoryName(FileName);
-            defaultText = Path.GetFileName(FileName);
-
-            using (FileStream stream = new FileStream(mFileName, FileMode.Open, FileAccess.Read))
-            {
-                using (Image img = Image.FromStream(stream, false, false))
-                {
-                    mDimensions = img.Size;
-                    mResolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
-                }
-            }
-        }
-        /// <summary>
-        /// Invoked by the worker thread to update item details.
-        /// </summary>
-        internal void UpdateDetailsInternal(DateTime dateAccessed, DateTime dateCreated, DateTime dateModified,
-            long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution)
-        {
-            if (!isDirty) return;
-
-            mDateAccessed = dateAccessed;
-            mDateCreated = dateCreated;
-            mDateModified = dateModified;
-            mFileSize = fileSize;
-            mFileType = fileType;
-            mFilePath = filePath;
-            defaultText = name;
-            mDimensions = dimension;
-            mResolution = resolution;
+            mFilePath = info.DirectoryName;
+            defaultText = info.DisplayName;
+            mDimensions = info.Dimensions;
+            mResolution = info.Resolution;
+            // Exif tags
+            mImageDescription = info.ImageDescription;
+            mEquipmentModel = info.EquipmentModel;
+            mDateTaken = info.DateTaken;
+            mArtist = info.Artist;
+            mCopyright = info.Copyright;
+            mExposureTime = info.ExposureTime;
+            mFNumber = info.FNumber;
+            mISOSpeed = info.ISOSpeed;
+            mShutterSpeed = info.ShutterSpeed;
+            mAperture = info.ApertureValue;
+            mUserComment = info.UserComment;
 
             isDirty = false;
         }

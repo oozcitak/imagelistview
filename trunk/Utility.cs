@@ -5,6 +5,8 @@ using System.IO;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.Drawing.Imaging;
+using System.Text;
 
 namespace Manina.Windows.Forms
 {
@@ -149,6 +151,19 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Shell Utilities
+        //Exif tags
+        private const int PropertyTagImageDescription = 0x010E;
+        private const int PropertyTagEquipmentModel = 0x0110;
+        private const int PropertyTagDateTime = 0x0132;
+        private const int PropertyTagArtist = 0x013B;
+        private const int PropertyTagCopyright = 0x8298;
+        private const int PropertyTagExposureTime = 0x829A;
+        private const int PropertyTagFNumber = 0x829D;
+        private const int PropertyTagISOSpeed = 0x8827;
+        private const int PropertyTagShutterSpeed = 0x9201;
+        private const int PropertyTagAperture = 0x9202;
+        private const int PropertyTagUserComment = 0x9286;
+
         /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
@@ -167,8 +182,20 @@ namespace Manina.Windows.Forms
             public string DisplayName { get; private set; }
             public long Size { get; private set; }
             public string TypeName { get; private set; }
-            public Size Dimension { get; private set; }
+            public Size Dimensions { get; private set; }
             public SizeF Resolution { get; private set; }
+            // Exif tags
+            public string ImageDescription { get; private set; }
+            public string EquipmentModel { get; private set; }
+            public DateTime DateTaken { get; private set; }
+            public string Artist { get; private set; }
+            public string Copyright { get; private set; }
+            public string ExposureTime { get; private set; }
+            public float FNumber { get; private set; }
+            public ushort ISOSpeed { get; private set; }
+            public string ShutterSpeed { get; private set; }
+            public string ApertureValue { get; private set; }
+            public string UserComment { get; private set; }
 
             public ShellImageFileInfo(string path)
             {
@@ -201,8 +228,48 @@ namespace Manina.Windows.Forms
                     {
                         using (Image img = Image.FromStream(stream, false, false))
                         {
-                            Dimension = img.Size;
+                            Dimensions = img.Size;
                             Resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
+                            // Read exif properties
+                            foreach (PropertyItem prop in img.PropertyItems)
+                            {
+                                switch (prop.Id)
+                                {
+                                    case PropertyTagImageDescription:
+                                        ImageDescription = ReadExifAscii(prop.Value);
+                                        break;
+                                    case PropertyTagEquipmentModel:
+                                        EquipmentModel = ReadExifAscii(prop.Value);
+                                        break;
+                                    case PropertyTagDateTime:
+                                        DateTaken = ReadExifDateTime(prop.Value);
+                                        break;
+                                    case PropertyTagArtist:
+                                        Artist = ReadExifAscii(prop.Value);
+                                        break;
+                                    case PropertyTagCopyright:
+                                        Copyright = ReadExifAscii(prop.Value);
+                                        break;
+                                    case PropertyTagExposureTime:
+                                        ExposureTime = ReadExifURational(prop.Value);
+                                        break;
+                                    case PropertyTagFNumber:
+                                        FNumber = ReadExifFloat(prop.Value);
+                                        break;
+                                    case PropertyTagISOSpeed:
+                                        ISOSpeed = ReadExifUShort(prop.Value);
+                                        break;
+                                    case PropertyTagShutterSpeed:
+                                        ShutterSpeed = ReadExifRational(prop.Value);
+                                        break;
+                                    case PropertyTagAperture:
+                                        ApertureValue = ReadExifURational(prop.Value);
+                                        break;
+                                    case PropertyTagUserComment:
+                                        UserComment = ReadExifAscii(prop.Value);
+                                        break;
+                                }
+                            }
                         }
                     }
                     Error = false;
@@ -212,6 +279,54 @@ namespace Manina.Windows.Forms
                     Error = true;
                 }
             }
+        }
+        // Convert Exif types
+        private static byte ReadExifByte(byte[] value)
+        {
+            return value[0];
+        }
+        private static string ReadExifAscii(byte[] value)
+        {
+            int len = Array.IndexOf(value, (byte)0);
+            if (len == -1) len = value.Length;
+            return Encoding.ASCII.GetString(value, 0, len);
+        }
+        private static DateTime ReadExifDateTime(byte[] value)
+        {
+            return DateTime.ParseExact(ReadExifAscii(value),
+                "yyyy:MM:dd HH:mm:ss",
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+        private static ushort ReadExifUShort(byte[] value)
+        {
+            return BitConverter.ToUInt16(value, 0);
+        }
+        private static uint ReadExifUInt(byte[] value)
+        {
+            return BitConverter.ToUInt32(value, 0);
+        }
+        private static int ReadExifInt(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0);
+        }
+        private static string ReadExifURational(byte[] value)
+        {
+            return BitConverter.ToUInt32(value, 0).ToString() + "/" +
+                    BitConverter.ToUInt32(value, 4).ToString();
+        }
+        private static string ReadExifRational(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0).ToString() + "/" +
+                    BitConverter.ToInt32(value, 4).ToString();
+        }
+        private static float ReadExifFloat(byte[] value)
+        {
+            uint num = BitConverter.ToUInt32(value, 0);
+            uint den = BitConverter.ToUInt32(value, 4);
+            if (den == 0)
+                return 0.0f;
+            else
+                return (float)num / (float)den;
         }
         #endregion
 

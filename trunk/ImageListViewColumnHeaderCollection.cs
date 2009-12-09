@@ -76,6 +76,17 @@ namespace Manina.Windows.Forms
                     new ImageListViewColumnHeader(ColumnType.FileName),
                     new ImageListViewColumnHeader(ColumnType.DateCreated),
                     new ImageListViewColumnHeader(ColumnType.DateAccessed),
+                    new ImageListViewColumnHeader(ColumnType.ImageDescription),
+                    new ImageListViewColumnHeader(ColumnType.EquipmentModel),
+                    new ImageListViewColumnHeader(ColumnType.DateTaken),
+                    new ImageListViewColumnHeader(ColumnType.Artist),
+                    new ImageListViewColumnHeader(ColumnType.Copyright),
+                    new ImageListViewColumnHeader(ColumnType.ExposureTime),
+                    new ImageListViewColumnHeader(ColumnType.FNumber),
+                    new ImageListViewColumnHeader(ColumnType.ISOSpeed),
+                    new ImageListViewColumnHeader(ColumnType.ShutterSpeed),
+                    new ImageListViewColumnHeader(ColumnType.Aperture),
+                    new ImageListViewColumnHeader(ColumnType.UserComment),
                };
                 for (int i = 0; i < mItems.Length; i++)
                 {
@@ -172,7 +183,7 @@ namespace Manina.Windows.Forms
                     string text = info.GetString(string.Format("{0}:{1}", i, "Text"));
                     bool visible = info.GetBoolean(string.Format("{0}:{1}", i, "Visible"));
                     int width = info.GetInt32(string.Format("{0}:{1}", i, "Width"));
-                    ImageListViewColumnHeader col=new ImageListViewColumnHeader(type, text, width);
+                    ImageListViewColumnHeader col = new ImageListViewColumnHeader(type, text, width);
                     col.DisplayIndex = index;
                     col.Visible = visible;
                     mItems[i] = col;

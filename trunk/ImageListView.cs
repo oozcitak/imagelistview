@@ -727,6 +727,25 @@ namespace Manina.Windows.Forms
 
         #region Event Handlers
         /// <summary>
+        /// Raises the VisibleChanged event when the Visible property 
+        /// value of the control's container changes.
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnParentVisibleChanged(EventArgs e)
+        {
+            Form parent = this.FindForm();
+            if (parent != null)
+                ((Form)parent).FormClosing += new FormClosingEventHandler(ImageListView_ParentFormClosing);
+        }
+        /// <summary>
+        /// Handles the FormClosing event of the parent form.
+        /// </summary>
+        void ImageListView_ParentFormClosing(object sender, FormClosingEventArgs e)
+        {
+            cacheManager.Stop();
+            itemCacheManager.Stop();
+        }
+        /// <summary>
         /// Handles the DragOver event.
         /// </summary>
         protected override void OnDragOver(DragEventArgs e)
@@ -1442,9 +1461,6 @@ namespace Manina.Windows.Forms
 
                 if (mHeaderFont != null)
                     mHeaderFont.Dispose();
-
-                cacheManager.Dispose();
-                itemCacheManager.Dispose();
             }
 
             base.Dispose(disposing);
@@ -1537,11 +1553,9 @@ namespace Manina.Windows.Forms
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(ImageListViewItem item, DateTime dateAccessed, DateTime dateCreated, DateTime dateModified,
-            long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution)
+        internal void UpdateItemDetailsInternal(ImageListViewItem item,Utility.ShellImageFileInfo info)
         {
-            item.UpdateDetailsInternal(dateAccessed, dateCreated, dateModified,
-                fileSize, fileType, filePath, name, dimension, resolution);
+            item.UpdateDetailsInternal(info);
         }
         /// <summary>
         /// Raises the ThumbnailCaching event.

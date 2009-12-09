@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Aperture" xml:space="preserve">
+    <value>Diyafram Açıklığı</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Sanatçı</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Telif Hakkı</value>
+  </data>
   <data name="DateAccessed" xml:space="preserve">
     <value>Erişim</value>
   </data>
@@ -126,8 +135,17 @@
   <data name="DateModified" xml:space="preserve">
     <value>Değiştirilme</value>
   </data>
+  <data name="DateTaken" xml:space="preserve">
+    <value>Alındığı Tarih</value>
+  </data>
   <data name="Dimensions" xml:space="preserve">
     <value>Boyutlar</value>
+  </data>
+  <data name="EquipmentModel" xml:space="preserve">
+    <value>Kamera</value>
+  </data>
+  <data name="ExposureTime" xml:space="preserve">
+    <value>Işık Alma Süresi</value>
   </data>
   <data name="FileName" xml:space="preserve">
     <value>Dosya adı</value>
@@ -141,10 +159,25 @@
   <data name="FileType" xml:space="preserve">
     <value>Tür</value>
   </data>
+  <data name="FNumber" xml:space="preserve">
+    <value>Diyafram Değeri</value>
+  </data>
+  <data name="ImageDescription" xml:space="preserve">
+    <value>Açıklama</value>
+  </data>
+  <data name="ISOSpeed" xml:space="preserve">
+    <value>ISO Hızı</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Adı</value>
   </data>
   <data name="Resolution" xml:space="preserve">
     <value>Çözünülürlük</value>
+  </data>
+  <data name="ShutterSpeed" xml:space="preserve">
+    <value>Örtücü Hızı</value>
+  </data>
+  <data name="UserComment" xml:space="preserve">
+    <value>Notlar</value>
   </data>
 </root>
