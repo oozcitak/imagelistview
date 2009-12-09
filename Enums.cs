@@ -44,9 +44,21 @@ namespace Manina.Windows.Forms
         FileSize,
         Dimensions,
         Resolution,
+        // Exif properties
+        ImageDescription,
+        EquipmentModel,
+        DateTaken,
+        Artist,
+        Copyright,
+        ExposureTime,
+        FNumber,
+        ISOSpeed,
+        ShutterSpeed,
+        Aperture,
+        UserComment,
     }
     /// <summary>
-    /// Represents the sort order of am image list view column.
+    /// Represents the sort order of an image list view column.
     /// </summary>
     public enum SortOrder
     {

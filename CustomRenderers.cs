@@ -659,22 +659,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class PanelRenderer : ImageListView.ImageListViewRenderer
         {
-            private const int PropertyTagImageDescription = 0x010E;
-            private const int PropertyTagEquipModel = 0x0110;
-            private const int PropertyTagDateTime = 0x0132;
-            private const int PropertyTagArtist = 0x013B;
-            private const int PropertyTagCopyright = 0x8298;
-            private const int PropertyTagExifExposureTime = 0x829A;
-            private const int PropertyTagExifFNumber = 0x829D;
-            private const int PropertyTagExifISOSpeed = 0x8827;
-            private const int PropertyTagExifShutterSpeed = 0x9201;
-            private const int PropertyTagExifAperture = 0x9202;
-            private const int PropertyTagExifUserComment = 0x9286;
 
             private int mPanelWidth;
             private bool mPanelVisible;
             private Font mCaptionFont;
-            private Dictionary<int, string> mTags;
 
             private Font CaptionFont
             {
@@ -695,20 +683,6 @@ namespace Manina.Windows.Forms
             public PanelRenderer(int panelWidth)
             {
                 mPanelWidth = panelWidth;
-                mTags = new Dictionary<int, string>()
-                {
-                    {PropertyTagImageDescription, "Description"},
-                    {PropertyTagEquipModel, "Camera Model"},
-                    {PropertyTagDateTime, "Date Taken"},
-                    {PropertyTagArtist, "Artist"},
-                    {PropertyTagCopyright, "Copyright"},
-                    {PropertyTagExifExposureTime, "Exposure Time"},
-                    {PropertyTagExifFNumber, "F Number"},
-                    {PropertyTagExifISOSpeed, "ISO Speed"},
-                    {PropertyTagExifShutterSpeed, "Shutter Speed"},
-                    {PropertyTagExifAperture, "Aperture"},
-                    {PropertyTagExifUserComment, "Comments"},
-                };
             }
 
             /// <summary>
@@ -884,131 +858,38 @@ namespace Manina.Windows.Forms
                     rect.Height -= img.Height + 16;
 
                     // File properties
-                    if (rect.Height>0 && !string.IsNullOrEmpty(item.FileType))
+                    if (rect.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
                         int y = DrawStringPair(g, rect, "", item.FileType);
                         rect.Y += y;
                         rect.Height -= y;
                     }
-                    if (rect.Height > 0 && item.Dimensions != Size.Empty)
-                    {
-                        int y = DrawStringPair(g, rect,
-                            mImageListView.Columns.GetDefaultText(ColumnType.Dimensions) + ": ",
-                            item.GetSubItemText(ColumnType.Dimensions));
-                        rect.Y += y;
-                        rect.Height -= y;
-                    }
-                    if (rect.Height > 0 && item.Resolution != SizeF.Empty)
-                    {
-                        int y = DrawStringPair(g, rect,
-                            mImageListView.Columns.GetDefaultText(ColumnType.Resolution) + ": ",
-                            item.Resolution.Width.ToString() + " dpi");
-                        rect.Y += y;
-                        rect.Height -= y;
-                    }
-                    if (rect.Height > 0 && item.FileSize != 0)
-                    {
-                        int y = DrawStringPair(g, rect,
-                            mImageListView.Columns.GetDefaultText(ColumnType.FileSize) + ": ",
-                            item.GetSubItemText(ColumnType.FileSize));
-                        rect.Y += y;
-                        rect.Height -= y;
-                    }
-                    if (rect.Height > 0 && item.DateModified != DateTime.MinValue)
-                    {
-                        int y = DrawStringPair(g, rect,
-                            mImageListView.Columns.GetDefaultText(ColumnType.DateModified) + ": ",
-                            item.GetSubItemText(ColumnType.DateModified));
-                        rect.Y += y;
-                        rect.Height -= y;
-                    }
-                    if (rect.Height > 0 && item.DateCreated != DateTime.MinValue)
-                    {
-                        int y = DrawStringPair(g, rect,
-                            mImageListView.Columns.GetDefaultText(ColumnType.DateCreated) + ": ",
-                            item.GetSubItemText(ColumnType.DateCreated));
-                        rect.Y += y;
-                        rect.Height -= y;
-                    }
-                    // Exif info
-                    try
-                    {
-                        using (FileStream stream = new FileStream(item.FileName, FileMode.Open, FileAccess.Read))
-                        {
-                            using (Image tempImage = Image.FromStream(stream, false, false))
-                            {
-                                foreach (PropertyItem prop in tempImage.PropertyItems)
-                                {
-                                    if (mTags.ContainsKey(prop.Id))
-                                    {
-                                        string tagName = mTags[prop.Id];
-                                        short tagType = prop.Type;
-                                        int tagLen = prop.Len;
-                                        byte[] tagBytes = prop.Value;
-                                        string tagValue = string.Empty;
-                                        switch (tagType)
-                                        {
-                                            case 1: // byte
-                                                foreach (byte b in tagBytes)
-                                                    tagValue += b.ToString() + " ";
-                                                break;
-                                            case 2: // ascii
-                                                int len = Array.IndexOf(tagBytes, (byte)0);
-                                                if (len == -1) len = tagLen;
-                                                tagValue = Encoding.ASCII.GetString(tagBytes, 0, len);
-                                                if (prop.Id == PropertyTagDateTime)
-                                                {
-                                                    tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
-                                                }
-                                                break;
-                                            case 3: // ushort
-                                                for (int i = 0; i < tagLen; i += 2)
-                                                    tagValue += BitConverter.ToUInt16(tagBytes, i).ToString() + " ";
-                                                break;
-                                            case 4: // uint
-                                                for (int i = 0; i < tagLen; i += 4)
-                                                    tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + " ";
-                                                break;
-                                            case 5: // uint rational
-                                                for (int i = 0; i < tagLen; i += 8)
-                                                    tagValue += BitConverter.ToUInt32(tagBytes, i).ToString() + "/" +
-                                                        BitConverter.ToUInt32(tagBytes, i + 4).ToString() + " ";
-                                                break;
-                                            case 7: // undefined as ascii
-                                                int lenu = Array.IndexOf(tagBytes, (byte)0);
-                                                if (lenu == -1) len = tagLen;
-                                                tagValue = Encoding.ASCII.GetString(tagBytes, 0, lenu);
-                                                if (prop.Id == PropertyTagDateTime)
-                                                {
-                                                    tagValue = DateTime.ParseExact(tagValue, "yyyy:MM:dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture).ToString("g");
-                                                }
-                                                break;
-                                            case 9: // int
-                                                for (int i = 0; i < tagLen; i += 4)
-                                                    tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + " ";
-                                                break;
-                                            case 10: // int rational
-                                                for (int i = 0; i < tagLen; i += 8)
-                                                    tagValue += BitConverter.ToInt32(tagBytes, i).ToString() + "/" +
-                                                        BitConverter.ToInt32(tagBytes, i + 4).ToString() + " ";
-                                                break;
-                                        }
-                                        tagValue = tagValue.Trim();
 
-                                        if (rect.Height > 0 && tagValue != string.Empty)
-                                        {
-                                            int y = DrawStringPair(g, rect, tagName + ": ", tagValue);
-                                            rect.Y += y;
-                                            rect.Height -= y;
-                                        }
-                                    }
-                                }
+                    foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                    {
+                        if (column.Type == ColumnType.ImageDescription)
+                        {
+                            rect.Y += 8;
+                            rect.Height -= 8;
+                        }
+
+                        if (rect.Height <= 0) break;
+
+                        if (column.Type != ColumnType.FileType &&
+                            column.Type != ColumnType.DateAccessed &&
+                            column.Type != ColumnType.FileName &&
+                            column.Type != ColumnType.FilePath &&
+                            column.Type != ColumnType.Name)
+                        {
+                            string caption = column.Text;
+                            string text = item.GetSubItemText(column.Type);
+                            if (!string.IsNullOrEmpty(text))
+                            {
+                                int y = DrawStringPair(g, rect, caption + ": ", text);
+                                rect.Y += y;
+                                rect.Height -= y;
                             }
                         }
-                    }
-                    catch
-                    {
-                        ;
                     }
                 }
             }

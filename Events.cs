@@ -57,11 +57,6 @@ namespace Manina.Windows.Forms
     /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid);
-    /// <summary>
-    /// Represents the method that will handle the Refresh event. 
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void RefreshEventHandlerInternal();
     #endregion
 
     #region Internal Delegates
@@ -69,20 +64,23 @@ namespace Manina.Windows.Forms
     /// Updates item details.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void UpdateItemDetailsEventHandlerInternal(ImageListViewItem item,
-            DateTime dateAccessed, DateTime dateCreated, DateTime dateModified,
-            long fileSize, string fileType, string filePath, string name, Size dimension, SizeF resolution);
+    internal delegate void UpdateItemDetailsDelegateInternal(ImageListViewItem item,Utility.ShellImageFileInfo info);
     /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
     /// <param name="guid">The guid of the item to check visibility.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate bool CheckItemVisibleInternal(Guid guid);
+    internal delegate bool CheckItemVisibleDelegateInternal(Guid guid);
     /// <summary>
     /// Gets the guids of visible items.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate Dictionary<Guid, bool> GetVisibleItemsInternal();
+    internal delegate Dictionary<Guid, bool> GetVisibleItemsDelegateInternal();
+    /// <summary>
+    /// Refreshes the owner control.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void RefreshDelegateInternal();
     #endregion
 
     #region Event Arguments

@@ -39,7 +39,8 @@ namespace Manina.Windows.Forms
         private long memoryUsedByRemoved;
         private List<Guid> removedItems;
 
-        private bool stopping;
+        private volatile bool stopping;
+        private bool stopped;
         private bool disposed;
         #endregion
 
@@ -165,6 +166,7 @@ namespace Manina.Windows.Forms
             mThread.IsBackground = true;
 
             stopping = false;
+            stopped = false;
             disposed = false;
 
             mThread.Start();
@@ -275,7 +277,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Adds the image to the cache queue.
         /// </summary>
-        public void Add(Guid guid, string filename, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        public void Add(Guid guid, string filename, Size thumbSize, 
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
             lock (lockObject)
             {
@@ -289,25 +292,30 @@ namespace Manina.Windows.Forms
                         thumbCache.Remove(guid);
                 }
                 // Add to cache
-                toCache.Push(new CacheItem(guid, filename, thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails));
+                toCache.Push(new CacheItem(guid, filename, 
+                    thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails));
                 Monitor.Pulse(lockObject);
             }
         }
         /// <summary>
         /// Adds the image to the renderer cache.
         /// </summary>
-        public void AddToRendererCache(Guid guid, string filename, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        public void AddToRendererCache(Guid guid, string filename, 
+            Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
             lock (lockObject)
             {
                 // Already cached?
-                if (rendererGuid == guid && rendererItem != null && rendererItem.Size == thumbSize && rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                if (rendererGuid == guid && rendererItem != null && 
+                    rendererItem.Size == thumbSize && 
+                    rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                     return;
 
                 // Renderer cache holds one item only.
                 rendererToCache.Clear();
 
-                rendererToCache.Push(new CacheItem(guid, filename, thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails));
+                rendererToCache.Push(new CacheItem(guid, filename, 
+                    thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails));
                 Monitor.Pulse(lockObject);
             }
         }
@@ -315,11 +323,14 @@ namespace Manina.Windows.Forms
         /// Gets the image from the renderer cache. If the image is not cached,
         /// null will be returned.
         /// </summary>
-        public Image GetRendererImage(Guid guid, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        public Image GetRendererImage(Guid guid, Size thumbSize, 
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
             lock (lockObject)
             {
-                if (rendererGuid == guid && rendererItem != null && rendererItem.Size == thumbSize && rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                if (rendererGuid == guid && rendererItem != null && 
+                    rendererItem.Size == thumbSize && 
+                    rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                     return rendererItem.Image;
             }
             return null;
@@ -341,9 +352,9 @@ namespace Manina.Windows.Forms
             return null;
         }
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Stops the cache manager.
         /// </summary>
-        public void Dispose()
+        public void Stop()
         {
             lock (lockObject)
             {
@@ -353,12 +364,25 @@ namespace Manina.Windows.Forms
                     Monitor.Pulse(lockObject);
                 }
             }
-            mThread.Abort();
-            mThread.Join();
+        }
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing,
+        /// releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            lock (lockObject)
+            {
+                if (!stopping)
+                    Stop();
+                if (!stopped)
+                    return;
+            }
+
+            if (disposed) return;
 
             lock (lockObject)
             {
-                if (disposed) return;
 
                 foreach (CacheItem item in thumbCache.Values)
                     item.Dispose();
@@ -381,9 +405,9 @@ namespace Manina.Windows.Forms
                 memoryUsed = 0;
                 memoryUsedByRemoved = 0;
                 removedItems.Clear();
-
-                disposed = true;
             }
+
+            disposed = true;
         }
 
         #endregion
@@ -396,20 +420,16 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void DoWork()
         {
-            while (true)
+            while (!stopping)
             {
                 Guid guid = new Guid();
                 CacheItem request = null;
                 bool rendererRequest = false;
                 lock (lockObject)
                 {
-                    if (stopping) return;
-
                     // Wait until we have items waiting to be cached
                     if (toCache.Count == 0 && rendererToCache.Count == 0)
                         Monitor.Wait(lockObject);
-
-                    if (stopping) return;
                 }
 
                 // Set to true when we exceed the cache memory limit
@@ -452,14 +472,13 @@ namespace Manina.Windows.Forms
 
                     // Is it outside visible area?
                     bool isvisible = false;
-                    try
+                    if (request != null)
                     {
-                        if (request != null)
-                            isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleInternal(mImageListView.IsItemVisible), guid);
-                    }
-                    catch
-                    {
-                        ;
+                        if (!stopping)
+                        {
+                            isvisible = (bool)mImageListView.Invoke(
+                                new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                        }
                     }
 
                     lock (lockObject)
@@ -482,17 +501,21 @@ namespace Manina.Windows.Forms
                                 editSource = null;
                         }
                         if (editSource != null)
-                            thumb = Utility.ThumbnailFromImage(editSource, request.Size, Color.White);
+                            thumb = Utility.ThumbnailFromImage(editSource,
+                                request.Size, Color.White);
 
                         // Read from file
                         if (thumb == null)
-                            thumb = Utility.ThumbnailFromFile(request.FileName, request.Size, request.UseEmbeddedThumbnails, Color.White);
+                            thumb = Utility.ThumbnailFromFile(request.FileName,
+                                request.Size, request.UseEmbeddedThumbnails, Color.White);
 
                         // Create the cache item
                         if (thumb == null)
-                            result = new CacheItem(guid, request.FileName, request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
+                            result = new CacheItem(guid, request.FileName,
+                                request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
                         else
-                            result = new CacheItem(guid, request.FileName, request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
+                            result = new CacheItem(guid, request.FileName,
+                                request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
                         thumbnailCreated = true;
 
                         if (rendererRequest)
@@ -524,20 +547,16 @@ namespace Manina.Windows.Forms
                             }
                         }
 
-                        try
+                        if (!stopping)
                         {
-                            mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(mImageListView.OnThumbnailCachedInternal), guid);
-                        }
-                        catch
-                        {
-                            ;
+                            mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                                mImageListView.OnThumbnailCachedInternal), guid);
                         }
                     }
 
                     // Check if the cache is exhausted
                     lock (lockObject)
                     {
-                        if (stopping) return;
                         if (toCache.Count == 0 && rendererToCache.Count == 0)
                             queueFull = false;
                     }
@@ -546,13 +565,10 @@ namespace Manina.Windows.Forms
                     sw.Stop();
                     if (sw.ElapsedMilliseconds > 100)
                     {
-                        try
+                        if (!stopping)
                         {
-                            mImageListView.Invoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
-                        }
-                        catch
-                        {
-                            ;
+                            mImageListView.Invoke(
+                                new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
                         }
                         sw.Reset();
                     }
@@ -569,13 +585,11 @@ namespace Manina.Windows.Forms
                 if (cleanupRequired)
                 {
                     Dictionary<Guid, bool> visible = new Dictionary<Guid, bool>();
-                    try
+                    if (!stopping)
                     {
-                        visible = (Dictionary<Guid, bool>)mImageListView.Invoke(new GetVisibleItemsInternal(mImageListView.GetVisibleItems));
-                    }
-                    catch
-                    {
-                        ;
+
+                        visible = (Dictionary<Guid, bool>)mImageListView.Invoke(
+                            new GetVisibleItemsDelegateInternal(mImageListView.GetVisibleItems));
                     }
 
                     if (visible.Count != 0)
@@ -607,16 +621,19 @@ namespace Manina.Windows.Forms
 
                 if (thumbnailCreated)
                 {
-                    try
+                    if (!stopping)
                     {
-                        mImageListView.Invoke(new RefreshEventHandlerInternal(mImageListView.OnRefreshInternal));
-                    }
-                    catch
-                    {
-                        ;
+                        mImageListView.Invoke(
+                            new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
                     }
                 }
             }
+
+            lock (lockObject)
+            {
+                stopped = true;
+            }
+            Dispose();
         }
         #endregion
     }

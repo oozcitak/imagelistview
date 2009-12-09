@@ -21,7 +21,8 @@ namespace Manina.Windows.Forms
         private Queue<CacheItem> toCache;
         private Dictionary<Guid, bool> editCache;
 
-        private bool stopping;
+        private volatile bool stopping;
+        private bool stopped;
         #endregion
 
         #region Private Classes
@@ -64,6 +65,7 @@ namespace Manina.Windows.Forms
             mThread.IsBackground = true;
 
             stopping = false;
+            stopped = false;
 
             mThread.Start();
             while (!mThread.IsAlive) ;
@@ -102,22 +104,6 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            lock (lockObject)
-            {
-                if (!stopping)
-                {
-                    stopping = true;
-                    Monitor.Pulse(lockObject);
-                }
-            }
-            mThread.Abort();
-            mThread.Join();
-        }
-        /// <summary>
         /// Adds the item to the cache queue.
         /// </summary>
         public void Add(ImageListViewItem item)
@@ -128,6 +114,33 @@ namespace Manina.Windows.Forms
                 Monitor.Pulse(lockObject);
             }
         }
+        /// <summary>
+        /// Stops the cache manager.
+        /// </summary>
+        public void Stop()
+        {
+            lock (lockObject)
+            {
+                if (!stopping)
+                {
+                    stopping = true;
+                    Monitor.Pulse(lockObject);
+                }
+            }
+        }
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            lock (lockObject)
+            {
+                if (!stopping)
+                    Stop();
+                if (!stopped)
+                    return;
+            }
+        }
         #endregion
 
         #region Worker Method
@@ -136,12 +149,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void DoWork()
         {
-            while (true)
+            while (!stopping)
             {
-                lock (lockObject)
-                {
-                    if (stopping) return;
-                }
 
                 CacheItem item = null;
                 lock (lockObject)
@@ -149,8 +158,6 @@ namespace Manina.Windows.Forms
                     // Wait until we have items waiting to be cached
                     if (toCache.Count == 0)
                         Monitor.Wait(lockObject);
-
-                    if (stopping) return;
 
                     // Get an item from the queue
                     item = toCache.Dequeue();
@@ -164,22 +171,20 @@ namespace Manina.Windows.Forms
                 if (item != null)
                 {
                     Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
-                    string path = Path.GetDirectoryName(item.FileName);
-                    string name = Path.GetFileName(item.FileName);
                     // Update file info
-                    try
+                    if (!stopping)
                     {
-                        mImageListView.BeginInvoke(new UpdateItemDetailsEventHandlerInternal(
-                            mImageListView.UpdateItemDetailsInternal), item.Item,
-                            info.LastAccessTime, info.CreationTime, info.LastWriteTime,
-                            info.Size, info.TypeName, path, name, info.Dimension, info.Resolution);
-                    }
-                    catch
-                    {
-                        ;
+                        mImageListView.BeginInvoke(new UpdateItemDetailsDelegateInternal(
+                            mImageListView.UpdateItemDetailsInternal), item.Item, info);
                     }
                 }
             }
+
+            lock (lockObject)
+            {
+                stopped = true;
+            }
+            Dispose();
         }
         #endregion
     }
