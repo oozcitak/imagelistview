@@ -7,6 +7,8 @@
   * Added new column types for common Exif tags.
   * Added English and Turkish resources for new columns.
   * Panel renderer displays Exif tags from item properties.
+  * !TilesRenderer's default width is now 150 pixels.
+  * Added the new column types to !ImageListViewItemComparer.
 
 = 1.4 (07 December 2009) =
 
