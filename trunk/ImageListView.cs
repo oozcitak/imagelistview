@@ -432,6 +432,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void SetRenderer(ImageListViewRenderer renderer)
         {
+            if (renderer == null)
+                throw new ArgumentNullException("renderer");
+
             if (mRenderer != null)
                 mRenderer.Dispose();
             mRenderer = renderer;

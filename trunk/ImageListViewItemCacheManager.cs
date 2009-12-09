@@ -160,11 +160,14 @@ namespace Manina.Windows.Forms
                         Monitor.Wait(lockObject);
 
                     // Get an item from the queue
-                    item = toCache.Dequeue();
+                    if (toCache.Count != 0)
+                    {
+                        item = toCache.Dequeue();
 
-                    // Is it being edited?
-                    if (editCache.ContainsKey(item.Item.Guid))
-                        item = null;
+                        // Is it being edited?
+                        if (editCache.ContainsKey(item.Item.Guid))
+                            item = null;
+                    }
                 }
 
                 // Read file info

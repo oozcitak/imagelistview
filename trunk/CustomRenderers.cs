@@ -47,7 +47,7 @@ namespace Manina.Windows.Forms
             }
 
             public TilesRenderer()
-                : this(180)
+                : this(150)
             {
                 ;
             }

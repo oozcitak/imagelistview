@@ -498,9 +498,15 @@ namespace Manina.Windows.Forms
                 case ColumnType.ExposureTime:
                     return ExposureTime;
                 case ColumnType.FNumber:
-                    return FNumber.ToString("f2");
+                    if (FNumber == 0.0f)
+                        return "";
+                    else
+                        return FNumber.ToString("f2");
                 case ColumnType.ISOSpeed:
-                    return ISOSpeed.ToString();
+                    if (ISOSpeed == 0)
+                        return "";
+                    else
+                        return ISOSpeed.ToString();
                 case ColumnType.ShutterSpeed:
                     return ShutterSpeed;
                 case ColumnType.Aperture:

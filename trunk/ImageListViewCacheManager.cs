@@ -420,6 +420,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void DoWork()
         {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
             while (!stopping)
             {
                 Guid guid = new Guid();
@@ -439,7 +441,6 @@ namespace Manina.Windows.Forms
 
                 // Loop until we exhaust the queue
                 bool queueFull = true;
-                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                 while (queueFull)
                 {
                     lock (lockObject)
