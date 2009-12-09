@@ -1,6 +1,13 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.0 (09 December 2009) =
+
+  * Cache threads now exit gracefully.
+  * Added new column types for common Exif tags.
+  * Added English and Turkish resources for new columns.
+  * Panel renderer displays Exif tags from item properties.
+
 = 1.4 (07 December 2009) =
 
   * Added the !BeginEdit and !EndEdit methods to !ImageListViewItem. They should be used while editing items to prevent collisions with cache threads.
