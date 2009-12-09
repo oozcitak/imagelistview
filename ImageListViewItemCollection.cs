@@ -410,6 +410,39 @@ namespace Manina.Windows.Forms
                             float ry = y.Resolution.Width * y.Resolution.Height;
                             result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
                             break;
+                        case ColumnType.ImageDescription:
+                            result = string.Compare(x.ImageDescription, y.ImageDescription, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.EquipmentModel:
+                            result = string.Compare(x.EquipmentModel, y.EquipmentModel, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.DateTaken:
+                            result = DateTime.Compare(x.DateTaken, y.DateTaken);
+                            break;
+                        case ColumnType.Artist:
+                            result = string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.Copyright:
+                            result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.ExposureTime:
+                            result = string.Compare(x.ExposureTime, y.ExposureTime, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.FNumber:
+                            result = (x.FNumber < y.FNumber ? -1 : (x.FNumber > y.FNumber ? 1 : 0));
+                            break;
+                        case ColumnType.ISOSpeed:
+                            result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
+                            break;
+                        case ColumnType.ShutterSpeed:
+                            result = string.Compare(x.ShutterSpeed, y.ShutterSpeed, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.Aperture:
+                            result = string.Compare(x.Aperture, y.Aperture, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.UserComment:
+                            result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
+                            break;
                         default:
                             result = 0;
                             break;
