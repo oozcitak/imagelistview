@@ -747,25 +747,6 @@ namespace Manina.Windows.Forms
 
         #region Event Handlers
         /// <summary>
-        /// Raises the VisibleChanged event when the Visible property 
-        /// value of the control's container changes.
-        /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
-        protected override void OnParentVisibleChanged(EventArgs e)
-        {
-            Form parent = this.FindForm();
-            if (parent != null)
-                ((Form)parent).FormClosing += new FormClosingEventHandler(ImageListView_ParentFormClosing);
-        }
-        /// <summary>
-        /// Handles the FormClosing event of the parent form.
-        /// </summary>
-        void ImageListView_ParentFormClosing(object sender, FormClosingEventArgs e)
-        {
-            cacheManager.Stop();
-            itemCacheManager.Stop();
-        }
-        /// <summary>
         /// Handles the DragOver event.
         /// </summary>
         protected override void OnDragOver(DragEventArgs e)
@@ -1466,21 +1447,47 @@ namespace Manina.Windows.Forms
             mRenderer.Refresh();
         }
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Control"/> and its child controls and optionally releases the managed resources.
+        /// Raises the <see cref="E:System.Windows.Forms.Control.HandleDestroyed"/> event.
         /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            // TODO: I really am not happy with the way threads are being waited to finish.
+            // There <strong>sould</strong> a better way.
+
+            // Wait until cache threads exit
+            cacheManager.Stop();
+            while (!cacheManager.Stopped)
+                Application.DoEvents();
+            itemCacheManager.Stop();
+            while (!itemCacheManager.Stopped)
+                Application.DoEvents();
+
+            base.OnHandleDestroyed(e);
+        }
+        /// <summary>
+        /// Releases the unmanaged resources used by the control and its child controls 
+        /// and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; 
+        /// false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
-
-            disposed = true;
-            if (disposing)
+            if (!disposed)
             {
-                if (mRenderer != null)
-                    mRenderer.Dispose();
+                if (disposing)
+                {
+                    if (mRenderer != null)
+                        mRenderer.Dispose();
 
-                if (mHeaderFont != null)
-                    mHeaderFont.Dispose();
+                    if (mHeaderFont != null)
+                        mHeaderFont.Dispose();
+
+                    cacheManager.Dispose();
+                    itemCacheManager.Dispose();
+                }
+
+                disposed = true;
             }
 
             base.Dispose(disposing);
@@ -1573,7 +1580,7 @@ namespace Manina.Windows.Forms
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(ImageListViewItem item,Utility.ShellImageFileInfo info)
+        internal void UpdateItemDetailsInternal(ImageListViewItem item, Utility.ShellImageFileInfo info)
         {
             item.UpdateDetailsInternal(info);
         }
