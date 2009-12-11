@@ -40,6 +40,7 @@ namespace Manina.Windows.Forms
 
         private volatile bool stopping;
         private bool stopped;
+        private bool disposed;
         #endregion
 
         #region Private Classes
@@ -68,6 +69,17 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region Properties
+        /// <summary>
+        /// Determines whether the cache thread is being stopped.
+        /// </summary>
+        private bool Stopping { get { lock (lockObject) { return stopping; } } }
+        /// <summary>
+        /// Determines whether the cache thread is stopped.
+        /// </summary>
+        public bool Stopped { get { lock (lockObject) { return stopped; } } }
+        #endregion
+
         #region Constructor
         public ImageListViewItemCacheManager(ImageListView owner)
         {
@@ -83,6 +95,7 @@ namespace Manina.Windows.Forms
 
             stopping = false;
             stopped = false;
+            disposed = false;
 
             mThread.Start();
             while (!mThread.IsAlive) ;
@@ -150,12 +163,13 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Dispose()
         {
-            lock (lockObject)
+            if (!Stopped)
+                throw new InvalidOperationException("The cache manager must be stopped before being disposed.");
+
+            if (!disposed)
             {
-                if (!stopping)
-                    Stop();
-                if (!stopped)
-                    return;
+                // Nothing to dispose
+                disposed = true;
             }
         }
         #endregion
@@ -166,7 +180,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void DoWork()
         {
-            while (!stopping)
+            while (!Stopping)
             {
 
                 CacheItem item = null;
@@ -211,7 +225,6 @@ namespace Manina.Windows.Forms
             {
                 stopped = true;
             }
-            Dispose();
         }
         #endregion
     }
