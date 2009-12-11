@@ -494,8 +494,15 @@ namespace Manina.Windows.Forms
                     {
                         if (!stopping)
                         {
-                            isvisible = (bool)mImageListView.Invoke(
-                                new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                            try
+                            {
+                                isvisible = (bool)mImageListView.Invoke(
+                                    new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                            }
+                            catch
+                            {
+                                ;
+                            }
                         }
                     }
 
@@ -567,8 +574,15 @@ namespace Manina.Windows.Forms
 
                         if (!stopping)
                         {
+                            try
+                            {
                             mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
                                 mImageListView.OnThumbnailCachedInternal), guid);
+                            }
+                            catch
+                            {
+                                ;
+                            }
                         }
                     }
 
@@ -585,8 +599,15 @@ namespace Manina.Windows.Forms
                     {
                         if (!stopping)
                         {
+                            try
+                            {
                             mImageListView.Invoke(
                                 new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                            }
+                            catch
+                            {
+                                ;
+                            }
                         }
                         sw.Reset();
                     }
@@ -605,9 +626,15 @@ namespace Manina.Windows.Forms
                     Dictionary<Guid, bool> visible = new Dictionary<Guid, bool>();
                     if (!stopping)
                     {
-
+                        try
+                        {
                         visible = (Dictionary<Guid, bool>)mImageListView.Invoke(
                             new GetVisibleItemsDelegateInternal(mImageListView.GetVisibleItems));
+                        }
+                        catch
+                        {
+                            ;
+                        }
                     }
 
                     if (visible.Count != 0)
@@ -641,8 +668,15 @@ namespace Manina.Windows.Forms
                 {
                     if (!stopping)
                     {
+                        try
+                        {
                         mImageListView.Invoke(
                             new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                        }
+                        catch
+                        {
+                            ;
+                        }
                     }
                 }
             }

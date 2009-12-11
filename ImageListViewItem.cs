@@ -90,7 +90,7 @@ namespace Manina.Windows.Forms
         /// Gets the cache state of the item thumbnail.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the cache state of the item thumbnail.")]
-        public CacheState ThumbnailCacheState { get { return mImageListView.cacheManager.GetCacheState(Guid); } }
+        public CacheState ThumbnailCacheState { get { return mImageListView.cacheManager.GetCacheState(mGuid); } }
         /// <summary>
         /// Gets a value determining if the item is focused.
         /// </summary>
@@ -183,10 +183,7 @@ namespace Manina.Windows.Forms
             get
             {
                 if (string.IsNullOrEmpty(mText))
-                {
-                    UpdateFileInfo();
                     return defaultText;
-                }
                 else
                     return mText;
             }
@@ -381,6 +378,7 @@ namespace Manina.Windows.Forms
             : this()
         {
             mFileName = filename;
+            defaultText = Path.GetFileName(filename);
         }
         #endregion
 
