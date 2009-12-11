@@ -194,8 +194,15 @@ namespace Manina.Windows.Forms
                     // Update file info
                     if (!stopping)
                     {
-                        mImageListView.BeginInvoke(new UpdateItemDetailsDelegateInternal(
-                            mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                        try
+                        {
+                            mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
+                                mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                        }
+                        catch
+                        {
+                            ;
+                        }
                     }
                 }
             }
