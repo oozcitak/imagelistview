@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.2 (13 December 2009) =
+
+  * Cleaned up the utility class.
+  * Moved default and error images to the neutral resource.
+  * Fixed places where !ImageListViewRenderer.Refresh was called instead of Control.Refresh. This should increase rendering performance.
+
 = 2.1 (11 December 2009) =
 
   * Fixed a bug where cache managers tried to invoke the control after its handle was destroyed.
