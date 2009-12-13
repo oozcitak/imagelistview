@@ -74,7 +74,7 @@ namespace Manina.Windows.Forms
                     mFocused = value;
                     // Refresh items
                     if (oldFocusedItem != mFocused && mImageListView != null)
-                        mImageListView.mRenderer.Refresh();
+                        mImageListView.Refresh();
                 }
             }
             /// <summary>
@@ -144,7 +144,7 @@ namespace Manina.Windows.Forms
                     mImageListView.itemCacheManager.Add(item);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                 }
             }
             /// <summary>
@@ -169,7 +169,7 @@ namespace Manina.Windows.Forms
 
                 if (mImageListView != null)
                 {
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                     mImageListView.mRenderer.ResumePaint();
                 }
             }
@@ -189,7 +189,7 @@ namespace Manina.Windows.Forms
 
                 if (mImageListView != null)
                 {
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                     mImageListView.mRenderer.ResumePaint();
                 }
 
@@ -205,7 +205,7 @@ namespace Manina.Windows.Forms
                 {
                     mImageListView.cacheManager.Clear();
                     mImageListView.SelectedItems.Clear();
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                 }
             }
             /// <summary>
@@ -250,7 +250,7 @@ namespace Manina.Windows.Forms
                     mImageListView.itemCacheManager.Add(item);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                 }
             }
             /// <summary>
@@ -271,7 +271,7 @@ namespace Manina.Windows.Forms
                     mImageListView.cacheManager.Remove(item.Guid);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                 }
                 return ret;
             }
@@ -294,7 +294,7 @@ namespace Manina.Windows.Forms
                     mImageListView.cacheManager.Remove(iguid);
                     if (mItems[index].Selected)
                         mImageListView.OnSelectionChangedInternal();
-                    mImageListView.mRenderer.Refresh();
+                    mImageListView.Refresh();
                 }
             }
             #endregion

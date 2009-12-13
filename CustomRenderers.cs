@@ -533,8 +533,7 @@ namespace Manina.Windows.Forms
                     Image img = null;
                     if ((state & ItemState.Hovered) != ItemState.None)
                         img = GetImageAsync(item, new Size(bounds.Width - 8, bounds.Height - 8));
-                    else
-                        img = item.ThumbnailImage;
+                    if (img == null) img = item.ThumbnailImage;
 
                     // Calculate image bounds
                     int imageWidth = img.Width;
@@ -855,6 +854,7 @@ namespace Manina.Windows.Forms
                     rect.Inflate(-4, -4);
 
                     Image img = GetImageAsync(item, new Size(rect.Width, rect.Width));
+                    if (img == null) img = item.ThumbnailImage;
 
                     // Draw image
                     g.DrawImageUnscaled(img, rect.Location);

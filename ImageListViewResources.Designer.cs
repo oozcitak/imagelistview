@@ -123,6 +123,13 @@ namespace Manina.Windows.Forms {
             }
         }
         
+        internal static System.Drawing.Bitmap DefaultImage {
+            get {
+                object obj = ResourceManager.GetObject("DefaultImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Dimensions.
         /// </summary>
@@ -138,6 +145,13 @@ namespace Manina.Windows.Forms {
         internal static string EquipmentModel {
             get {
                 return ResourceManager.GetString("EquipmentModel", resourceCulture);
+            }
+        }
+        
+        internal static System.Drawing.Bitmap ErrorImage {
+            get {
+                object obj = ResourceManager.GetObject("ErrorImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
