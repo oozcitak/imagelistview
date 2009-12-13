@@ -396,9 +396,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Dispose()
         {
-            if (!Stopped)
-                throw new InvalidOperationException("The cache manager must be stopped before being disposed.");
-
             if (!disposed)
             {
                 lock (lockObject)
@@ -495,8 +492,15 @@ namespace Manina.Windows.Forms
                     bool isvisible = false;
                     if (request != null)
                     {
-                        isvisible = (bool)mImageListView.Invoke(
-                            new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                        try
+                        {
+                            isvisible = (bool)mImageListView.Invoke(
+                                new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            ;
+                        }
                     }
 
                     lock (lockObject)
@@ -565,8 +569,15 @@ namespace Manina.Windows.Forms
                             }
                         }
 
-                        mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
-                            mImageListView.OnThumbnailCachedInternal), guid);
+                        try
+                        {
+                            mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                                mImageListView.OnThumbnailCachedInternal), guid);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            ;
+                        }
                     }
 
                     // Check if the cache is exhausted
@@ -580,9 +591,16 @@ namespace Manina.Windows.Forms
                     sw.Stop();
                     if (sw.ElapsedMilliseconds > 100)
                     {
-                        mImageListView.Invoke(
-                            new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
-                        sw.Reset();
+                        try
+                        {
+                            mImageListView.Invoke(
+                                new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                            sw.Reset();
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            ;
+                        }
                     }
                     if (queueFull)
                         sw.Start();
@@ -597,8 +615,15 @@ namespace Manina.Windows.Forms
                 if (cleanupRequired)
                 {
                     Dictionary<Guid, bool> visible = new Dictionary<Guid, bool>();
-                    visible = (Dictionary<Guid, bool>)mImageListView.Invoke(
-                        new GetVisibleItemsDelegateInternal(mImageListView.GetVisibleItems));
+                    try
+                    {
+                        visible = (Dictionary<Guid, bool>)mImageListView.Invoke(
+                            new GetVisibleItemsDelegateInternal(mImageListView.GetVisibleItems));
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        ;
+                    }
 
                     if (visible.Count != 0)
                     {
@@ -629,8 +654,15 @@ namespace Manina.Windows.Forms
 
                 if (thumbnailCreated)
                 {
-                    mImageListView.Invoke(
-                        new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                    try
+                    {
+                        mImageListView.Invoke(
+                            new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        ;
+                    }
                 }
             }
 

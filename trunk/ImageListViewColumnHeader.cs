@@ -86,7 +86,7 @@ namespace Manina.Windows.Forms
                             this.mDisplayIndex = newIndex;
                             targetColumn.mDisplayIndex = oldIndex;
                             if (mImageListView != null)
-                                mImageListView.mRenderer.Refresh();
+                                mImageListView.Refresh();
                         }
                     }
                 }
@@ -125,7 +125,7 @@ namespace Manina.Windows.Forms
                 {
                     mText = value;
                     if (mImageListView != null)
-                        mImageListView.mRenderer.Refresh();
+                        mImageListView.Refresh();
                 }
             }
             /// <summary>
@@ -153,7 +153,7 @@ namespace Manina.Windows.Forms
                 {
                     mVisible = value;
                     if (mImageListView != null)
-                        mImageListView.mRenderer.Refresh();
+                        mImageListView.Refresh();
                 }
             }
             /// <summary>
@@ -170,7 +170,7 @@ namespace Manina.Windows.Forms
                 {
                     mWidth = System.Math.Max(12, value);
                     if (mImageListView != null)
-                        mImageListView.mRenderer.Refresh();
+                        mImageListView.Refresh();
                 }
             }
             #endregion
@@ -225,7 +225,7 @@ namespace Manina.Windows.Forms
                     width = System.Math.Max(width, itemwidth);
                 }
                 this.Width = width + 8;
-                mImageListView.mRenderer.Refresh();
+                mImageListView.Refresh();
             }
             #endregion
         }

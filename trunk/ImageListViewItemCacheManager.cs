@@ -163,9 +163,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Dispose()
         {
-            if (!Stopped)
-                throw new InvalidOperationException("The cache manager must be stopped before being disposed.");
-
             if (!disposed)
             {
                 // Nothing to dispose
@@ -213,7 +210,7 @@ namespace Manina.Windows.Forms
                             mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
                                 mImageListView.UpdateItemDetailsInternal), item.Item, info);
                         }
-                        catch
+                        catch (ObjectDisposedException)
                         {
                             ;
                         }

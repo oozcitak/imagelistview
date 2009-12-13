@@ -22,6 +22,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.ComponentModel.Design.Serialization;
+using System.Resources;
+using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
@@ -159,7 +161,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
         [Category("Appearance"), Description("Gets the collection of columns of the image list view."), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ImageListViewColumnHeaderCollection Columns { get { return mColumns; } internal set { mColumns = value; mRenderer.Refresh(); } }
+        public ImageListViewColumnHeaderCollection Columns { get { return mColumns; } internal set { mColumns = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the placeholder image.
         /// </summary>
@@ -196,7 +198,7 @@ namespace Manina.Windows.Forms
                 if (mHeaderFont != null)
                     mHeaderFont.Dispose();
                 mHeaderFont = (Font)value.Clone();
-                mRenderer.Refresh();
+                Refresh();
             }
         }
         /// <summary>
@@ -208,7 +210,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the spacing between items.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the spacing between items."), DefaultValue(typeof(Size), "4,4")]
-        public Size ItemMargin { get { return mItemMargin; } set { mItemMargin = value; mRenderer.Refresh(); } }
+        public Size ItemMargin { get { return mItemMargin; } set { mItemMargin = value; Refresh(); } }
         /// <summary>
         /// Gets the collection of selected items contained in the image list view.
         /// </summary>
@@ -246,7 +248,7 @@ namespace Manina.Windows.Forms
                 {
                     mThumbnailSize = value;
                     cacheManager.Clear();
-                    mRenderer.Refresh();
+                    Refresh();
                 }
             }
         }
@@ -266,7 +268,7 @@ namespace Manina.Windows.Forms
                 {
                     mUseEmbeddedThumbnails = value;
                     cacheManager.Clear();
-                    mRenderer.Refresh();
+                    Refresh();
                 }
             }
         }
@@ -287,7 +289,7 @@ namespace Manina.Windows.Forms
                 mView = value;
                 layoutManager.Update();
                 EnsureVisible(current);
-                mRenderer.Refresh();
+                Refresh();
                 mRenderer.ResumePaint();
             }
         }
@@ -335,15 +337,17 @@ namespace Manina.Windows.Forms
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 20 * 1024 * 1024;
             mColumns = new ImageListViewColumnHeaderCollection(this);
-            DefaultImage = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAdRJREFUOE+lk81LG1EUxeufVXFVUcSNlFIJ6ErUjaQUtYrfxrgQQewq2NKWVpN0nKdGRV1ELZRWdO9ClMyorUnTmMxnzAxicnrfWKIxUUEHfsN83Dn3zH3nlQF48qiDCzT0iROubhavdgtaeWsJmunZNSrbBO15pzDpNOcnVw/7G5HlnGGaMNMWDEInVAcbimkjZdg4dbAQV3TUvhbVvADvrBsmGj0+dH0KYuCLH72fGXqnw+ifCWPQH8ZwcB1eYQMtw5NI6Baq3EzLC1SQbd7Z41/DfMTAonyGkGQgJGcQOrSwdGRj+fgcK78vMMa+Ia6WEOCW+cvVaA6rJ9lb4TV/1Aw5EAsd8P/1BtawKJ2RA+ospcmNDnZgYo5g+wYWDlSMBlYQU9LFAopp4ZXvAz5uxzC19Qu+n4cY29zBSPgE3v+8+76LvvcBxFIlHKRouvVDQXSI8iWzEjoECe1fIwW8HPAXC/C1T9JkXSNzeDMfvRNeE73pgAucao8QeNoc1JIk8KzJ47i4C14TTWZQ2XZtFcodgQz24lkidw9ZErAKBWrcwnEiqUCjQWoUW9WBYkz3ShE2Ek6U2VWUX3SK43Xt7AcPB7d2H7QPNPrmbT7K/OKh/ANGwthSNAtyCAAAAABJRU5ErkJggg==");
-            ErrorImage = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAnpJREFUOE+lk/9LE3EYx+tf0TDtCyERhD9ofkHMvhg780t6zE3nZi2njExqN/dNckWihphEqJlDISiwgkpNJCQijLKIuozUbmtufpl3zpsF7+4+cDeViKAHnoODz/v1fp7n83x2AtjxXyEDNuev5rOJG54aJuYysusOA79mr+R5m46NXNIyyxfpxO3nt4glIRVzmfxL7loIvg6ID3tJ8r52BBkTQtZSf7C+iNoMUQExt4kSndVCpMuDn6NDEPuvIuo9R1K848XGyCDCHU34btYIczUFKoQARKcxIdpk4Fa63ES85qokqQRv14G3VSD2xIeF65fxtSqfY/V5CWR+8kfq0x52muNipx6CQ68CpP6x0qjFcgMN8dEAZupofKSz7SpAOsDKfYp9LUSoOCoEWbhkLUe4rgyRGy6Eb3rxriSdVQGLDWVR8XEfBI+RlKo4KgBZGKo9gwVzKYIWLSKDtzBFpUVVQLC+OLo+3ItVh0EtVXbc+DRNGLLwR00JAsZiBMw0IgPdeFVwKA7gzmvYlZ5WCN0etVTZMXK7Dfx9HxH6DUXg9KcR8jIItDdjMj813sKs6aT9m7UC68N31VJlRyVk4byuEHNaCqtDPXirO4WJ3P3xIX6pPJrwuSKX87c0Yu1Bv+q42OGV7r6FCGdpDRHPMBaM5+zlxrJS4tcoD+NDeRY1XZohzHsuQLjXh/A1aWmM5ZivLsPCFUYanCS2WfA8O0UYzdy9dZGU1XxTmEa91hz2v6/SINAmzaO3E4s9neBa3Ziij2M0M9n/LCPpz6usQF6eOJg4eSyVeZF3gJ3I3ceP5+zhx7KS2ZEjSczT9F1/f0zbX9q//P8GR0WnSFUgshMAAAAASUVORK5CYII=");
+            ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources",
+                Assembly.GetExecutingAssembly());
+            mDefaultImage = manager.GetObject("DefaultImage") as Image;
+            mErrorImage = manager.GetObject("ErrorImage") as Image;
             HeaderFont = this.Font;
             mItems = new ImageListViewItemCollection(this);
             mItemMargin = new Size(4, 4);
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.Opaque | ControlStyles.Selectable | ControlStyles.UserMouse, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque | ControlStyles.Selectable | ControlStyles.UserMouse, true);
             Size = new Size(120, 100);
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
@@ -381,7 +385,7 @@ namespace Manina.Windows.Forms
         public void ClearThumbnailCache()
         {
             cacheManager.Clear();
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Temporarily suspends the layout logic for the control.
@@ -405,7 +409,7 @@ namespace Manina.Windows.Forms
         public new void ResumeLayout(bool performLayout)
         {
             base.ResumeLayout(performLayout);
-            if (performLayout) mRenderer.Refresh();
+            if (performLayout) Refresh();
             mRenderer.ResumePaint(true);
         }
         /// <summary>
@@ -424,7 +428,7 @@ namespace Manina.Windows.Forms
             col.Width = width;
             col.DisplayIndex = displayIndex;
             col.Visible = visible;
-            mRenderer.Refresh();
+            Refresh();
             mRenderer.ResumePaint();
         }
         /// <summary>
@@ -441,7 +445,7 @@ namespace Manina.Windows.Forms
             col.Width = width;
             col.DisplayIndex = displayIndex;
             col.Visible = visible;
-            mRenderer.Refresh();
+            Refresh();
             mRenderer.ResumePaint();
         }
         /// <summary>
@@ -458,7 +462,7 @@ namespace Manina.Windows.Forms
             mRenderer.mImageListView = this;
             if (layoutManager != null)
                 layoutManager.Update(true);
-            mRenderer.Refresh(true);
+            Refresh();
         }
         /// <summary>
         /// Sorts the items.
@@ -466,7 +470,7 @@ namespace Manina.Windows.Forms
         public void Sort()
         {
             mItems.Sort();
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Marks all items as selected.
@@ -480,7 +484,7 @@ namespace Manina.Windows.Forms
 
             OnSelectionChangedInternal();
 
-            mRenderer.Refresh();
+            Refresh();
             mRenderer.ResumePaint();
         }
         /// <summary>
@@ -490,7 +494,7 @@ namespace Manina.Windows.Forms
         {
             mRenderer.SuspendPaint();
             mSelectedItems.Clear();
-            mRenderer.Refresh();
+            Refresh();
             mRenderer.ResumePaint();
         }
         /// <summary>
@@ -648,7 +652,7 @@ namespace Manina.Windows.Forms
                     hScrollBar.Value = 0;
                     vScrollBar.Value = newYOffset;
                 }
-                mRenderer.Refresh();
+                Refresh();
                 return true;
             }
             else
@@ -782,7 +786,7 @@ namespace Manina.Windows.Forms
                 {
                     nav.DragIndex = index;
                     nav.DragCaretOnRight = dragCaretOnRight;
-                    mRenderer.Refresh(true);
+                    Refresh();
                 }
             }
             else
@@ -810,7 +814,7 @@ namespace Manina.Windows.Forms
             if (AllowItemDrag && nav.SelfDragging)
             {
                 nav.DragIndex = -1;
-                mRenderer.Refresh(true);
+                Refresh();
             }
 
             base.OnDragLeave(e);
@@ -880,7 +884,7 @@ namespace Manina.Windows.Forms
         private void vScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             mViewOffset.Y = e.NewValue;
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Handles the Scroll event of the hScrollBar control.
@@ -888,7 +892,7 @@ namespace Manina.Windows.Forms
         private void hScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             mViewOffset.X = e.NewValue;
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Handles the Tick event of the scrollTimer control.
@@ -917,7 +921,7 @@ namespace Manina.Windows.Forms
                 return;
 
             layoutManager.Update();
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Handles the Paint event.
@@ -925,7 +929,7 @@ namespace Manina.Windows.Forms
         protected override void OnPaint(PaintEventArgs e)
         {
             if (!disposed && mRenderer != null)
-                mRenderer.Render(e.Graphics);
+                mRenderer.Refresh(e.Graphics);
         }
         /// <summary>
         /// Handles the MouseDown event.
@@ -963,7 +967,7 @@ namespace Manina.Windows.Forms
                 nav.DraggingSeperator = true;
                 nav.SelSeperator = nav.HoveredSeparator;
                 nav.SelStart = e.Location;
-                mRenderer.Refresh();
+                Refresh();
             }
             else if ((e.Button & MouseButtons.Left) == MouseButtons.Left && AllowColumnClick && nav.HoveredColumn != (ColumnType)(-1))
             {
@@ -979,13 +983,13 @@ namespace Manina.Windows.Forms
                     SortColumn = nav.HoveredColumn;
                     SortOrder = SortOrder.Ascending;
                 }
-                mRenderer.Refresh();
+                Refresh();
             }
             else if (((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) && nav.MouseInItemArea)
             {
                 nav.SelStart = e.Location;
                 nav.SelEnd = e.Location;
-                mRenderer.Refresh();
+                Refresh();
             }
 
             mRenderer.ResumePaint();
@@ -1057,7 +1061,7 @@ namespace Manina.Windows.Forms
                 nav.Dragging = false;
                 nav.DraggingSeperator = false;
 
-                mRenderer.Refresh();
+                Refresh();
 
                 if (AllowColumnClick && nav.HoveredColumn != (ColumnType)(-1))
                 {
@@ -1150,7 +1154,7 @@ namespace Manina.Windows.Forms
                 int colwidth = Columns[nav.SelSeperator].Width + delta;
                 colwidth = System.Math.Max(16, colwidth);
                 Columns[nav.SelSeperator].Width = colwidth;
-                mRenderer.Refresh();
+                Refresh();
             }
             else if (((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) &&
                 AllowDrag && !nav.SelfDragging &&
@@ -1164,7 +1168,7 @@ namespace Manina.Windows.Forms
                 {
                     nav.HoveredItem.Selected = true;
                     // Force a refresh
-                    mRenderer.Refresh(true);
+                    Refresh();
                 }
 
                 // Start drag-and-drop
@@ -1232,7 +1236,7 @@ namespace Manina.Windows.Forms
                         }
                     }
                 }
-                mRenderer.Refresh();
+                Refresh();
             }
             else if (nav.MouseClicked && ((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) && nav.MouseInItemArea)
             {
@@ -1250,7 +1254,7 @@ namespace Manina.Windows.Forms
                 oldHoveredColumn != nav.HoveredColumn ||
                 oldHoveredSeparator != nav.HoveredSeparator ||
                 oldSelSeperator != nav.SelSeperator)
-                mRenderer.Refresh();
+                Refresh();
 
             mRenderer.ResumePaint();
 
@@ -1294,7 +1298,7 @@ namespace Manina.Windows.Forms
                     nav.SelStart = new Point(nav.SelStart.X - delta, nav.SelStart.Y);
             }
 
-            mRenderer.Refresh();
+            Refresh();
 
             base.OnMouseWheel(e);
         }
@@ -1310,12 +1314,12 @@ namespace Manina.Windows.Forms
             if (nav.HoveredItem != null)
             {
                 nav.HoveredItem = null;
-                mRenderer.Refresh();
+                Refresh();
             }
             if (nav.HoveredColumn != (ColumnType)(-1))
             {
                 nav.HoveredColumn = (ColumnType)(-1);
-                mRenderer.Refresh();
+                Refresh();
             }
             if (nav.HoveredSeparator != (ColumnType)(-1))
                 Cursor = Cursors.Default;
@@ -1337,7 +1341,7 @@ namespace Manina.Windows.Forms
             if (AllowColumnClick && nav.HoveredSeparator != (ColumnType)(-1))
             {
                 Columns[nav.HoveredSeparator].AutoFit();
-                mRenderer.Refresh();
+                Refresh();
             }
             mRenderer.ResumePaint();
 
@@ -1436,7 +1440,7 @@ namespace Manina.Windows.Forms
         protected override void OnGotFocus(EventArgs e)
         {
             base.OnGotFocus(e);
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Handles the LostFocus event.
@@ -1444,7 +1448,7 @@ namespace Manina.Windows.Forms
         protected override void OnLostFocus(EventArgs e)
         {
             base.OnLostFocus(e);
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Control.HandleDestroyed"/> event.
@@ -1452,18 +1456,8 @@ namespace Manina.Windows.Forms
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
-            // TODO: I really am not happy with the way threads are being waited to finish.
-            // There <strong>sould</strong> a better way.
-
-            // Wait until cache threads exit
             cacheManager.Stop();
-            while (!cacheManager.Stopped)
-                Application.DoEvents();
             itemCacheManager.Stop();
-            while (!itemCacheManager.Stopped)
-                Application.DoEvents();
-
-            base.OnHandleDestroyed(e);
         }
         /// <summary>
         /// Releases the unmanaged resources used by the control and its child controls 
@@ -1574,7 +1568,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         internal void OnRefreshInternal()
         {
-            mRenderer.Refresh();
+            Refresh();
         }
         /// <summary>
         /// Updates item details.

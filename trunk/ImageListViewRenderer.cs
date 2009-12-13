@@ -289,7 +289,7 @@ namespace Manina.Windows.Forms
                     return img;
 
                 mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
-                return item.ThumbnailImage;
+                return null;
             }
             #endregion
 
@@ -299,19 +299,19 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="forceUpdate">If true, forces an immediate update, even if
             /// the renderer is suspended by a SuspendPaint call.</param>
-            internal void Refresh(bool forceUpdate)
+            internal void Refresh(Graphics graphics, bool forceUpdate)
             {
                 if (forceUpdate || CanPaint())
-                    mImageListView.Refresh();
+                    Render(graphics);
                 else
                     needsPaint = true;
             }
             /// <summary>
             /// Redraws the owner control.
             /// </summary>
-            internal void Refresh()
+            internal void Refresh(Graphics graphics)
             {
-                Refresh(false);
+                Refresh(graphics, false);
             }
             /// <summary>
             /// Suspends painting until a matching ResumePaint call is made.
@@ -333,7 +333,7 @@ namespace Manina.Windows.Forms
                 if (ispublic)
                 {
                     suspended = false;
-                    if (needsPaint) Refresh();
+                    if (needsPaint) mImageListView.Refresh();
                 }
                 else
                     ResumePaint();
@@ -359,7 +359,7 @@ namespace Manina.Windows.Forms
 
                 suspendCount--;
                 if (needsPaint)
-                    Refresh();
+                    mImageListView.Refresh();
             }
             /// <summary>
             /// Determines if the control can be painted.
@@ -371,7 +371,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Renders the control.
             /// </summary>
-            internal void Render(Graphics graphics)
+            private void Render(Graphics graphics)
             {
                 if (disposed)
                     return;
@@ -516,6 +516,7 @@ namespace Manina.Windows.Forms
                     bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
 
                     Image image = GetImageAsync(item, bounds.Size);
+                    if (image == null) image = item.ThumbnailImage;
 
                     if (mClip)
                         g.SetClip(bounds);
