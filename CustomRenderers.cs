@@ -876,6 +876,11 @@ namespace Manina.Windows.Forms
                     rect.Y = img.Height + 16;
                     rect.Height -= img.Height + 16;
 
+                    // File name
+                    g.DrawString(item.Text, CaptionFont, SystemBrushes.WindowText, rect);
+                    rect.Y += 16;
+                    rect.Height -= 16;
+
                     // File properties
                     if (rect.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {

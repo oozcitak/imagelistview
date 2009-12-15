@@ -763,7 +763,7 @@ namespace Manina.Windows.Forms
                         Utility.FillRoundedRectangle(g, bGray64, bounds, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                if (((state & ItemState.Hovered) != ItemState.None))
+                if ((state & ItemState.Hovered) != ItemState.None)
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(8, SystemColors.Highlight), Color.FromArgb(32, SystemColors.Highlight), LinearGradientMode.Vertical))
                     {
@@ -815,9 +815,27 @@ namespace Manina.Windows.Forms
                 }
                 else if (mImageListView.View == View.Details)
                 {
-                    // Separators 
-                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
                     List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
+                    // Shade sort column
+                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    foreach (ImageListViewColumnHeader column in uicolumns)
+                    {
+                        if (mImageListView.SortColumn == column.Type && mImageListView.SortOrder != SortOrder.None &&
+                            (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None)
+                        {
+                            Rectangle subItemBounds = bounds;
+                            subItemBounds.X = x;
+                            subItemBounds.Width = column.Width;
+                            using (Brush bGray16 = new SolidBrush(Color.FromArgb(16, SystemColors.GrayText)))
+                            {
+                                g.FillRectangle(bGray16, subItemBounds);
+                            }
+                            break;
+                        }
+                        x += column.Width;
+                    }
+                    // Separators 
+                    x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
                         x += column.Width;

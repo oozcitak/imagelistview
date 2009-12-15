@@ -285,18 +285,7 @@ namespace Manina.Windows.Forms
             /// </exception>
             public void RemoveAt(int index)
             {
-                for (int i = index; i < mItems.Count; i++)
-                    mItems[i].mIndex--;
-                Guid iguid = mItems[index].Guid;
-                if (mItems[index] == mFocused) mFocused = null;
-                mItems.RemoveAt(index);
-                if (mImageListView != null)
-                {
-                    mImageListView.cacheManager.Remove(iguid);
-                    if (mItems[index].Selected)
-                        mImageListView.OnSelectionChangedInternal();
-                    mImageListView.Refresh();
-                }
+                Remove(mItems[index]);
             }
             #endregion
 

@@ -404,13 +404,13 @@ namespace Manina.Windows.Forms
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
 
-            Bitmap source = null;
+            Image source = null;
             Image thumb = null;
             try
             {
                 using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                 {
-                    using (Bitmap img = (Bitmap)Bitmap.FromStream(stream, false, false))
+                    using (Image img = Image.FromStream(stream, false, false))
                     {
                         if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
                         {
@@ -422,12 +422,13 @@ namespace Manina.Windows.Forms
                                     byte[] rawImage = img.GetPropertyItem(PropertyTagThumbnailData).Value;
                                     using (MemoryStream memStream = new MemoryStream(rawImage))
                                     {
-                                        source = (Bitmap)Bitmap.FromStream(memStream);
+                                        source = Image.FromStream(memStream);
                                     }
                                     if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
                                     {
                                         // Check that the embedded thumbnail is large enough.
-                                        if (System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height) < 1.0f)
+                                        if (Math.Max((float)source.Width / (float)size.Width,
+                                            (float)source.Height / (float)size.Height) < 1.0f)
                                         {
                                             source.Dispose();
                                             source = null;
@@ -437,26 +438,25 @@ namespace Manina.Windows.Forms
                                 }
                             }
                         }
-
-                        // Revert to source image if an embedded thumbnail of required size
-                        // was not found.
-                        if (source == null)
-                            source = img;
-
-                        float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
-                        if (f < 1.0f) f = 1.0f; // Do not upsize small images
-                        int width = (int)System.Math.Round((float)source.Width / f);
-                        int height = (int)System.Math.Round((float)source.Height / f);
-                        thumb = new Bitmap(source, width, height);
-                        using (Graphics g = Graphics.FromImage(thumb))
-                        {
-                            g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                            g.Clear(backColor);
-                            g.DrawImage(source, 0, 0, width, height);
-                        }
-                        source.Dispose();
                     }
                 }
+                // Revert to source image if an embedded thumbnail of required size
+                // was not found.
+                if (source == null)
+                    source = Image.FromFile(filename);
+
+                float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
+                if (f < 1.0f) f = 1.0f; // Do not upsize small images
+                int width = (int)System.Math.Round((float)source.Width / f);
+                int height = (int)System.Math.Round((float)source.Height / f);
+                thumb = new Bitmap(source, width, height);
+                using (Graphics g = Graphics.FromImage(thumb))
+                {
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.Clear(backColor);
+                    g.DrawImage(source, 0, 0, width, height);
+                }
+                source.Dispose();
             }
             catch
             {

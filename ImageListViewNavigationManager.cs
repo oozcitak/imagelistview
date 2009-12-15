@@ -28,7 +28,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents details of keyboard and mouse navigation events.
         /// </summary>
-        internal class ImageListViewNavigationManager
+        internal class ImageListViewNavigationManager : IDisposable
         {
             #region Constants
             /// <summary>
@@ -49,6 +49,8 @@ namespace Manina.Windows.Forms
             private Dictionary<ImageListViewItem, bool> highlightedItems;
 
             private bool selfDragging;
+
+            private System.Windows.Forms.Timer scrollTimer;
             #endregion
 
             #region Properties
@@ -134,6 +136,11 @@ namespace Manina.Windows.Forms
                 selfDragging = false;
 
                 highlightedItems = new Dictionary<ImageListViewItem, bool>();
+
+                scrollTimer = new System.Windows.Forms.Timer();
+                scrollTimer.Interval = 100;
+                scrollTimer.Enabled = false;
+                scrollTimer.Tick += new EventHandler(scrollTimer_Tick);
             }
             #endregion
 
@@ -152,6 +159,14 @@ namespace Manina.Windows.Forms
                         return ItemHighlightState.Highlighted;
                 }
                 return ItemHighlightState.NotHighlighted;
+            }
+            /// <summary>
+            /// Performs application-defined tasks associated with freeing, 
+            /// releasing, or resetting unmanaged resources.
+            /// </summary>
+            public void Dispose()
+            {
+                scrollTimer.Dispose();
             }
             #endregion
 
@@ -180,6 +195,38 @@ namespace Manina.Windows.Forms
                 DoHitTest(e.Location);
 
                 mImageListView.mRenderer.SuspendPaint();
+
+                // Do we need to scroll the view?
+                if (MouseSelecting && mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll && !scrollTimer.Enabled)
+                {
+                    if (e.Y > mImageListView.ClientRectangle.Bottom)
+                    {
+                        scrollTimer.Tag = -120;
+                        scrollTimer.Enabled = true;
+                    }
+                    else if (e.Y < mImageListView.ClientRectangle.Top)
+                    {
+                        scrollTimer.Tag = 120;
+                        scrollTimer.Enabled = true;
+                    }
+                }
+                else if (MouseSelecting && mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll && !scrollTimer.Enabled)
+                {
+                    if (e.X > mImageListView.ClientRectangle.Right)
+                    {
+                        scrollTimer.Tag = -120;
+                        scrollTimer.Enabled = true;
+                    }
+                    else if (e.X < mImageListView.ClientRectangle.Left)
+                    {
+                        scrollTimer.Tag = 120;
+                        scrollTimer.Enabled = true;
+                    }
+                }
+                else if (scrollTimer.Enabled && mImageListView.ClientRectangle.Contains(e.Location))
+                {
+                    scrollTimer.Enabled = false;
+                }
 
                 if (DraggingSeperator)
                 {
@@ -275,7 +322,7 @@ namespace Manina.Windows.Forms
                 }
                 else if (!MouseSelecting && !DraggingSeperator && inItemArea && (LeftButton || RightButton) &&
                     ((Math.Abs(e.Location.X - lastMouseDownLocation.X) > SelectionTolerance ||
-                    Math.Abs(e.Location.X - lastMouseDownLocation.X) > SelectionTolerance)))
+                    Math.Abs(e.Location.Y - lastMouseDownLocation.Y) > SelectionTolerance)))
                 {
                     if (HoveredItem == null)
                     {
@@ -303,7 +350,7 @@ namespace Manina.Windows.Forms
                         DataObject data = new DataObject(DataFormats.FileDrop, filenames);
                         DropTarget = null;
                         selfDragging = true;
-                        mImageListView.DoDragDrop(data, DragDropEffects.Copy | DragDropEffects.Move);
+                        mImageListView.DoDragDrop(data, DragDropEffects.Copy);
                         selfDragging = false;
 
                         // Since the MouseUp event will be eaten by DoDragDrop we will not receive
@@ -350,6 +397,10 @@ namespace Manina.Windows.Forms
                 DoHitTest(e.Location);
 
                 mImageListView.mRenderer.SuspendPaint();
+
+                // Stop if we are scrolling
+                if (scrollTimer.Enabled)
+                    scrollTimer.Enabled = false;
 
                 if (DraggingSeperator)
                 {
@@ -602,7 +653,6 @@ namespace Manina.Windows.Forms
                     if (DropToRight) i++;
                     foreach (ImageListViewItem item in draggedItems)
                     {
-                        item.mSelected = false;
                         mImageListView.Items.InsertInternal(i, item);
                         i++;
                     }
@@ -710,7 +760,7 @@ namespace Manina.Windows.Forms
                         dragDropTarget = null;
                     }
                     else if (selfDragging)
-                        e.Effect = DragDropEffects.Move;
+                        e.Effect = DragDropEffects.Copy;
                     else
                         e.Effect = DragDropEffects.Copy;
 
@@ -721,7 +771,6 @@ namespace Manina.Windows.Forms
                         mImageListView.Refresh(true);
                     }
                 }
-
                 else
                     e.Effect = DragDropEffects.None;
             }
@@ -811,6 +860,22 @@ namespace Manina.Windows.Forms
                     index = mImageListView.Items.Count - 1;
 
                 return index;
+            }
+            #endregion
+
+            #region Scroll Timer
+            /// <summary>
+            /// Handles the Tick event of the scrollTimer control.
+            /// </summary>
+            private void scrollTimer_Tick(object sender, EventArgs e)
+            {
+                int delta = (int)scrollTimer.Tag;
+                if (MouseSelecting)
+                {
+                    Point location = mImageListView.PointToClient(Control.MousePosition);
+                    mImageListView.OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
+                }
+                mImageListView.OnMouseWheel(new MouseEventArgs(MouseButtons.None, 0, 0, 0, delta));
             }
             #endregion
         }
