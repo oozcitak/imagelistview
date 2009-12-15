@@ -72,7 +72,6 @@ namespace Manina.Windows.Forms
         private Point mViewOffset;
 
         // Layout variables
-        private System.Windows.Forms.Timer scrollTimer;
         internal System.Windows.Forms.HScrollBar hScrollBar;
         internal System.Windows.Forms.VScrollBar vScrollBar;
         internal ImageListViewLayoutManager layoutManager;
@@ -109,11 +108,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Description("Gets or sets whether duplicate items (image files pointing to the same path on the file system) are allowed."), DefaultValue(false)]
         public bool AllowDuplicateFileNames { get; set; }
-        /// <summary>
-        /// Gets or sets whether the user can reorder items by dragging.
-        /// </summary>
-        [Category("Behavior"), Description("Gets or sets whether the user can reorder items by dragging."), DefaultValue(false)]
-        public bool AllowItemDrag { get; set; }
         /// <summary>
         /// Gets or sets the background color of the control.
         /// </summary>
@@ -358,7 +352,6 @@ namespace Manina.Windows.Forms
             AllowColumnResize = true;
             AllowDrag = false;
             AllowDuplicateFileNames = false;
-            AllowItemDrag = false;
             BackColor = SystemColors.Window;
             mBorderStyle = BorderStyle.Fixed3D;
             mCacheLimitAsItemCount = 0;
@@ -379,11 +372,6 @@ namespace Manina.Windows.Forms
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
             mView = View.Thumbnails;
-
-            scrollTimer = new System.Windows.Forms.Timer();
-            scrollTimer.Interval = 100;
-            scrollTimer.Enabled = false;
-            scrollTimer.Tick += new EventHandler(scrollTimer_Tick);
 
             mViewOffset = new Point(0, 0);
             hScrollBar = new System.Windows.Forms.HScrollBar();
@@ -799,19 +787,6 @@ namespace Manina.Windows.Forms
             Refresh();
         }
         /// <summary>
-        /// Handles the Tick event of the scrollTimer control.
-        /// </summary>
-        private void scrollTimer_Tick(object sender, EventArgs e)
-        {
-            int delta = (int)scrollTimer.Tag;
-            if (navigationManager.MouseSelecting)
-            {
-                Point location = base.PointToClient(Control.MousePosition);
-                OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
-            }
-            OnMouseWheel(new MouseEventArgs(MouseButtons.None, 0, 0, 0, delta));
-        }
-        /// <summary>
         /// Handles the Resize event.
         /// </summary>
         protected override void OnResize(EventArgs e)
@@ -994,6 +969,7 @@ namespace Manina.Windows.Forms
 
                     cacheManager.Dispose();
                     itemCacheManager.Dispose();
+                    navigationManager.Dispose();
                 }
 
                 disposed = true;
