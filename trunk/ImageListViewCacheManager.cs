@@ -258,10 +258,10 @@ namespace Manina.Windows.Forms
                 foreach (CacheItem item in thumbCache.Values)
                     item.Dispose();
                 thumbCache.Clear();
+                removedItems.Clear();
 
                 memoryUsed = 0;
                 memoryUsedByRemoved = 0;
-                removedItems.Clear();
             }
         }
         /// <summary>
@@ -659,10 +659,10 @@ namespace Manina.Windows.Forms
                         {
                             foreach (KeyValuePair<Guid, CacheItem> item in thumbCache)
                             {
-                                if (!visible.ContainsKey(item.Key))
+                                if (!visible.ContainsKey(item.Key) && item.Value.State == CacheState.Cached && item.Value.Image != null)
                                 {
                                     removedItems.Add(item.Key);
-                                    memoryUsedByRemoved += item.Value.Size.Width * item.Value.Size.Height * 24 / 8;
+                                    memoryUsedByRemoved += item.Value.Image.Width * item.Value.Image.Width * 24 / 8;
                                 }
                             }
                             foreach (Guid iguid in removedItems)
