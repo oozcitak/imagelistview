@@ -494,12 +494,19 @@ namespace Manina.Windows.Forms
                     {
                         try
                         {
-                            isvisible = (bool)mImageListView.Invoke(
-                                new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                            {
+                                isvisible = (bool)mImageListView.Invoke(
+                                    new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                            }
                         }
                         catch (ObjectDisposedException)
                         {
-                            ;
+                            if (!Stopping) throw;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            if (!Stopping) throw;
                         }
                     }
 
@@ -509,7 +516,7 @@ namespace Manina.Windows.Forms
                             request = null;
                     }
 
-                    // Proceed if we have a filename
+                    // Proceed if we have a valid request
                     CacheItem result = null;
                     if (request != null)
                     {
@@ -571,12 +578,19 @@ namespace Manina.Windows.Forms
 
                         try
                         {
-                            mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
-                                mImageListView.OnThumbnailCachedInternal), guid);
+                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                            {
+                                mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                                    mImageListView.OnThumbnailCachedInternal), guid);
+                            }
                         }
                         catch (ObjectDisposedException)
                         {
-                            ;
+                            if (!Stopping) throw;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            if (!Stopping) throw;
                         }
                     }
 
@@ -593,13 +607,20 @@ namespace Manina.Windows.Forms
                     {
                         try
                         {
-                            mImageListView.Invoke(
-                                new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                            {
+                                mImageListView.Invoke(
+                                    new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                            }
                             sw.Reset();
                         }
                         catch (ObjectDisposedException)
                         {
-                            ;
+                            if (!Stopping) throw;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            if (!Stopping) throw;
                         }
                     }
                     if (queueFull)
@@ -617,12 +638,19 @@ namespace Manina.Windows.Forms
                     Dictionary<Guid, bool> visible = new Dictionary<Guid, bool>();
                     try
                     {
-                        visible = (Dictionary<Guid, bool>)mImageListView.Invoke(
-                            new GetVisibleItemsDelegateInternal(mImageListView.GetVisibleItems));
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        {
+                            visible = (Dictionary<Guid, bool>)mImageListView.Invoke(
+                                new GetVisibleItemsDelegateInternal(mImageListView.GetVisibleItems));
+                        }
                     }
                     catch (ObjectDisposedException)
                     {
-                        ;
+                        if (!Stopping) throw;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        if (!Stopping) throw;
                     }
 
                     if (visible.Count != 0)
@@ -656,12 +684,19 @@ namespace Manina.Windows.Forms
                 {
                     try
                     {
-                        mImageListView.Invoke(
-                            new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        {
+                            mImageListView.Invoke(
+                                new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                        }
                     }
                     catch (ObjectDisposedException)
                     {
-                        ;
+                        if (!Stopping) throw;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        if (!Stopping) throw;
                     }
                 }
             }

@@ -400,11 +400,11 @@ namespace Manina.Windows.Forms
                     foreach (ImageListViewColumnHeader column in mImageListView.Columns.GetUIColumns())
                     {
                         ColumnState state = ColumnState.None;
-                        if (column.Hovered)
+                        if (ReferenceEquals(mImageListView.navigationManager.HoveredColumn, column))
                             state |= ColumnState.Hovered;
-                        if (mImageListView.nav.HoveredSeparator == column.Type)
+                        if (ReferenceEquals(mImageListView.navigationManager.HoveredSeparator, column))
                             state |= ColumnState.SeparatorHovered;
-                        if (mImageListView.nav.SelSeperator == column.Type)
+                        if (ReferenceEquals(mImageListView.navigationManager.SelectedSeperator, column))
                             state |= ColumnState.SeparatorSelected;
 
                         Rectangle bounds = new Rectangle(x, y, column.Width, h);
@@ -462,16 +462,13 @@ namespace Manina.Windows.Forms
 
                         // Determine item state
                         ItemState state = ItemState.None;
-                        bool isSelected;
-                        if (mImageListView.nav.Highlight.TryGetValue(item, out isSelected))
-                        {
-                            if (isSelected)
-                                state |= ItemState.Selected;
-                        }
-                        else if (item.Selected)
+                        ItemHighlightState highlightState = mImageListView.navigationManager.HighlightState(item);
+                        if (highlightState == ItemHighlightState.HighlightedAndSelected ||
+                            (highlightState == ItemHighlightState.NotHighlighted && item.Selected))
                             state |= ItemState.Selected;
 
-                        if (item.Hovered && mImageListView.nav.Dragging == false)
+                        if (ReferenceEquals(mImageListView.navigationManager.HoveredItem, item) &&
+                            mImageListView.navigationManager.MouseSelecting == false)
                             state |= ItemState.Hovered;
 
                         if (item.Focused)
@@ -522,6 +519,7 @@ namespace Manina.Windows.Forms
                         g.SetClip(bounds);
                     else
                         g.SetClip(mImageListView.layoutManager.ClientArea);
+
                     DrawGalleryImage(g, item, image, bounds);
                 }
 
@@ -535,13 +533,9 @@ namespace Manina.Windows.Forms
                 }
 
                 // Draw the selection rectangle
-                if (mImageListView.nav.Dragging)
+                if (mImageListView.navigationManager.MouseSelecting)
                 {
-                    Rectangle sel = new Rectangle(
-                        System.Math.Min(mImageListView.nav.SelStart.X, mImageListView.nav.SelEnd.X),
-                        System.Math.Min(mImageListView.nav.SelStart.Y, mImageListView.nav.SelEnd.Y),
-                        System.Math.Abs(mImageListView.nav.SelStart.X - mImageListView.nav.SelEnd.X),
-                        System.Math.Abs(mImageListView.nav.SelStart.Y - mImageListView.nav.SelEnd.Y));
+                    Rectangle sel = mImageListView.navigationManager.SelectionRectangle;
                     if (sel.Height > 0 && sel.Width > 0)
                     {
                         if (mClip)
@@ -557,14 +551,23 @@ namespace Manina.Windows.Forms
                 }
 
                 // Draw the insertion caret
-                if (mImageListView.nav.DragIndex != -1)
+                if (mImageListView.navigationManager.DropTarget != null)
                 {
-                    int i = mImageListView.nav.DragIndex;
-                    Rectangle bounds = bounds = mImageListView.layoutManager.GetItemBounds(i);
-                    if (mImageListView.nav.DragCaretOnRight)
-                        bounds.Offset(mImageListView.layoutManager.ItemSizeWithMargin.Width, 0);
-                    bounds.Offset(-mImageListView.ItemMargin.Width, 0);
-                    bounds.Width = mImageListView.ItemMargin.Width;
+                    Rectangle bounds = mImageListView.layoutManager.GetItemBounds(mImageListView.navigationManager.DropTarget.Index);
+                    if (mImageListView.View == View.Details)
+                    {
+                        if (mImageListView.navigationManager.DropToRight)
+                            bounds.Offset(0, mImageListView.layoutManager.ItemSizeWithMargin.Height);
+                        bounds.Offset(0, -1);
+                        bounds.Height = 2;
+                    }
+                    else
+                    {
+                        if (mImageListView.navigationManager.DropToRight)
+                            bounds.Offset(mImageListView.layoutManager.ItemSizeWithMargin.Width, 0);
+                        bounds.Offset(-(mImageListView.ItemMargin.Width - 2) / 2 - 2, 0);
+                        bounds.Width = 2;
+                    }
                     if (mClip)
                         g.SetClip(bounds);
                     else
@@ -745,7 +748,8 @@ namespace Manina.Windows.Forms
                 {
                     g.FillRectangle(bItemBack, bounds);
                 }
-                if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                    (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                 {
                     using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                     {
@@ -1035,8 +1039,6 @@ namespace Manina.Windows.Forms
             {
                 using (Brush b = new SolidBrush(SystemColors.Highlight))
                 {
-                    bounds.X = bounds.X + bounds.Width / 2 - 1;
-                    bounds.Width = 2;
                     g.FillRectangle(b, bounds);
                 }
             }

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -365,7 +366,18 @@ namespace Manina.Windows.Forms
             {
                 if (mImageListView == null || mImageListView.SortOrder == SortOrder.None)
                     return;
+
+                // Display wait cursor while sorting
+                Cursor cursor = mImageListView.Cursor;
+                mImageListView.Cursor = Cursors.WaitCursor;
+
+                // Sort items
                 mItems.Sort(new ImageListViewItemComparer(mImageListView.SortColumn, mImageListView.SortOrder));
+                // Update item indices
+                for (int i = 0; i < mItems.Count; i++)
+                    mItems[i].mIndex = i;
+
+                mImageListView.Cursor = cursor;
             }
             #endregion
 
