@@ -1,6 +1,15 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.3 (15 December 2009) =
+
+  * Hovering items while the control does not have focus now draws highlighted item background.
+  * Changing !BackColor and placeholder images redraws the control.
+  * Sorting properties now check if a Sort is needed.
+  * Removed the Hovered property from !ImageListViewItem and !ImageListViewColumnHeader.
+  * The wait cursor is displayed while sorting items.
+  * Fixed issues with keyboard navigation and drag&drop logic.
+
 = 2.2 (13 December 2009) =
 
   * Cleaned up the utility class.
