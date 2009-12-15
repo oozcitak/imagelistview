@@ -119,7 +119,8 @@ namespace Manina.Windows.Forms
                     {
                         g.FillRectangle(bItemBack, bounds);
                     }
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                        (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                     {
                         using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                         {
@@ -559,7 +560,8 @@ namespace Manina.Windows.Forms
                     {
                         Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
                     }
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                        (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                     {
                         using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                         {

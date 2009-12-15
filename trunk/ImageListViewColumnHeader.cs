@@ -92,18 +92,6 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Determines whether the mouse is currently hovered over the column header.
-            /// </summary>
-            [Category("Appearance"), Browsable(false), Description("Determines whether the mouse is currently hovered over the column.")]
-            public bool Hovered
-            {
-                get
-                {
-                    if (mImageListView == null) return false;
-                    return (mImageListView.nav.HoveredColumn == this.Type);
-                }
-            }
-            /// <summary>
             /// Gets the ImageListView owning this item.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this item.")]

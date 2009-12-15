@@ -203,16 +203,23 @@ namespace Manina.Windows.Forms
                 {
                     Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
                     // Update file info
-                    if (!stopping)
+                    if (!Stopping)
                     {
                         try
                         {
-                            mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
-                                mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                            {
+                                mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
+                                    mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                            }
                         }
                         catch (ObjectDisposedException)
                         {
-                            ;
+                            if (!Stopping) throw;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            if (!Stopping) throw;
                         }
                     }
                 }

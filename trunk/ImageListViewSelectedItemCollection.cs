@@ -120,16 +120,20 @@ namespace Manina.Windows.Forms
 
             #region Helper Methods
             /// <summary>
-            /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Removes all items from the collection.
             /// </summary>
-            /// <exception cref="T:System.NotSupportedException">
-            /// The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
-            /// </exception>
             internal void Clear()
+            {
+                Clear(true);
+            }
+            /// <summary>
+            /// Removes all items from the collection.
+            /// </summary>
+            internal void Clear(bool raiseEvent)
             {
                 foreach (ImageListViewItem item in this)
                     item.mSelected = false;
-                if (mImageListView != null)
+                if (raiseEvent && mImageListView != null)
                     mImageListView.OnSelectionChangedInternal();
             }
             #endregion

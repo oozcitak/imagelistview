@@ -134,11 +134,6 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Browsable(false), Description("Gets the unique identifier for this item.")]
         internal Guid Guid { get { return mGuid; } private set { mGuid = value; } }
         /// <summary>
-        /// Determines whether the mouse is currently hovered over the item.
-        /// </summary>
-        [Category("Appearance"), Browsable(false), Description("Determines whether the mouse is currently hovered over the item.")]
-        public bool Hovered { get { return (mImageListView.nav.HoveredItem == this); } }
-        /// <summary>
         /// Gets the ImageListView owning this item.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this item.")]

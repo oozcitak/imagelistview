@@ -44,6 +44,10 @@ namespace Manina.Windows.Forms
         /// Default width of column headers in pixels.
         /// </summary>
         internal const int DefaultColumnWidth = 100;
+        /// <summary>
+        /// Selection tolerance for column separators.
+        /// </summary>
+        internal const int SeparatorSize = 12;
         private const int WS_BORDER = 0x00800000;
         private const int WS_EX_CLIENTEDGE = 0x00000200;
         #endregion
@@ -73,9 +77,10 @@ namespace Manina.Windows.Forms
         internal System.Windows.Forms.VScrollBar vScrollBar;
         internal ImageListViewLayoutManager layoutManager;
         private bool disposed;
+        private bool forceRefresh;
 
         // Interaction variables
-        internal NavInfo nav;
+        internal ImageListViewNavigationManager navigationManager;
 
         // Cache thread
         internal ImageListViewCacheManager cacheManager;
@@ -113,7 +118,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color of the control.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color of the control."), DefaultValue(typeof(Color), "Window")]
-        public override Color BackColor { get { return base.BackColor; } set { base.BackColor = value; } }
+        public override Color BackColor { get { return base.BackColor; } set { base.BackColor = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the border style of the control.
         /// </summary>
@@ -166,23 +171,17 @@ namespace Manina.Windows.Forms
         /// Gets or sets the placeholder image.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the placeholder image.")]
-        public Image DefaultImage { get { return mDefaultImage; } set { mDefaultImage = value; } }
+        public Image DefaultImage { get { return mDefaultImage; } set { mDefaultImage = value; Refresh(); } }
         /// <summary>
         /// Gets the rectangle that represents the display area of the control.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the rectangle that represents the display area of the control.")]
-        public override Rectangle DisplayRectangle
-        {
-            get
-            {
-                return layoutManager.ClientArea;
-            }
-        }
+        public override Rectangle DisplayRectangle { get { return layoutManager.ClientArea; } }
         /// <summary>
         /// Gets or sets the error image.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the error image.")]
-        public Image ErrorImage { get { return mErrorImage; } set { mErrorImage = value; } }
+        public Image ErrorImage { get { return mErrorImage; } set { mErrorImage = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the font of the column headers.
         /// </summary>
@@ -221,12 +220,40 @@ namespace Manina.Windows.Forms
         /// Gets or sets the sort column.
         /// </summary>
         [Category("Appearance"), DefaultValue(typeof(ColumnType), "Name"), Description("Gets or sets the sort column.")]
-        public ColumnType SortColumn { get { return mSortColumn; } set { mSortColumn = value; Sort(); } }
+        public ColumnType SortColumn
+        {
+            get
+            {
+                return mSortColumn;
+            }
+            set
+            {
+                if (value != mSortColumn)
+                {
+                    mSortColumn = value;
+                    Sort();
+                }
+            }
+        }
         /// <summary>
         /// Gets or sets the sort order.
         /// </summary>
         [Category("Appearance"), DefaultValue(typeof(SortOrder), "None"), Description("Gets or sets the sort order.")]
-        public SortOrder SortOrder { get { return mSortOrder; } set { mSortOrder = value; Sort(); } }
+        public SortOrder SortOrder
+        {
+            get
+            {
+                return mSortOrder;
+            }
+            set
+            {
+                if (value != mSortOrder)
+                {
+                    mSortOrder = value;
+                    Sort();
+                }
+            }
+        }
         /// <summary>
         /// This property is not relevant for this class.
         /// </summary>
@@ -368,8 +395,9 @@ namespace Manina.Windows.Forms
             Controls.Add(hScrollBar);
             Controls.Add(vScrollBar);
             layoutManager = new ImageListViewLayoutManager(this);
+            forceRefresh = false;
 
-            nav = new NavInfo();
+            navigationManager = new ImageListViewNavigationManager(this);
 
             cacheManager = new ImageListViewCacheManager(this);
             itemCacheManager = new ImageListViewItemCacheManager(this);
@@ -502,47 +530,34 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="pt">The client coordinates of the point to be tested.</param>
         /// <param name="hitInfo">Details of the hit test.</param>
-        /// <returns>true if the point is over an item or column; false otherwise.</returns>
-        public bool HitTest(Point pt, out HitInfo hitInfo)
+        public void HitTest(Point pt, out HitInfo hitInfo)
         {
-            int sepSize = 12;
-
-            hitInfo = new HitInfo();
-            hitInfo.ColumnHit = false;
-            hitInfo.ItemHit = false;
-            hitInfo.ColumnSeparatorHit = false;
-            hitInfo.ColumnIndex = (ColumnType)(-1);
-            hitInfo.ItemIndex = -1;
-            hitInfo.ColumnSeparator = (ColumnType)(-1);
-            int headerHeight = mRenderer.MeasureColumnHeaderHeight();
-
-            if (View == View.Details && pt.Y <= headerHeight)
+            if (View == View.Details && pt.Y <= mRenderer.MeasureColumnHeaderHeight())
             {
-                hitInfo.InHeaderArea = true;
                 int i = 0;
                 int x = layoutManager.ColumnHeaderBounds.Left;
+                ColumnType colIndex = (ColumnType)(-1);
+                ColumnType sepIndex = (ColumnType)(-1);
                 foreach (ImageListViewColumnHeader col in Columns.GetUIColumns())
                 {
                     // Over a column?
-                    if (pt.X >= x && pt.X < x + col.Width + sepSize / 2)
-                    {
-                        hitInfo.ColumnHit = true;
-                        hitInfo.ColumnIndex = col.Type;
-                    }
+                    if (pt.X >= x && pt.X < x + col.Width + SeparatorSize / 2)
+                        colIndex = col.Type;
+
                     // Over a colummn separator?
-                    if (pt.X > x + col.Width - sepSize / 2 && pt.X < x + col.Width + sepSize / 2)
-                    {
-                        hitInfo.ColumnSeparatorHit = true;
-                        hitInfo.ColumnSeparator = col.Type;
-                    }
-                    if (hitInfo.ColumnHit) break;
+                    if (pt.X > x + col.Width - SeparatorSize / 2 && pt.X < x + col.Width + SeparatorSize / 2)
+                        sepIndex = col.Type;
+
+                    if (colIndex != (ColumnType)(-1)) break;
                     x += col.Width;
                     i++;
                 }
+                hitInfo = new HitInfo(colIndex, sepIndex);
             }
-            else if (ScrollOrientation == ScrollOrientation.VerticalScroll)
+            else
             {
-                hitInfo.InItemArea = true;
+                int itemIndex = -1;
+
                 // Normalize to item area coordinates
                 pt.X -= layoutManager.ItemAreaBounds.Left;
                 pt.Y -= layoutManager.ItemAreaBounds.Top;
@@ -552,47 +567,21 @@ namespace Manina.Windows.Forms
                     int col = (pt.X + mViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
                     int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
 
-                    if (col <= layoutManager.Cols)
+                    if (ScrollOrientation == ScrollOrientation.HorizontalScroll ||
+                        (ScrollOrientation == ScrollOrientation.VerticalScroll && col <= layoutManager.Cols))
                     {
                         int index = row * layoutManager.Cols + col;
                         if (index >= 0 && index <= Items.Count - 1)
                         {
                             Rectangle bounds = layoutManager.GetItemBounds(index);
                             if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
-                            {
-                                hitInfo.ItemHit = true;
-                                hitInfo.ItemIndex = index;
-                            }
+                                itemIndex = index;
                         }
                     }
                 }
+
+                hitInfo = new HitInfo(itemIndex);
             }
-            else if (ScrollOrientation == ScrollOrientation.HorizontalScroll)
-            {
-                hitInfo.InItemArea = true;
-                // Normalize to item area coordinates
-                pt.X -= layoutManager.ItemAreaBounds.Left;
-                pt.Y -= layoutManager.ItemAreaBounds.Top;
-
-                if (pt.X > 0 && pt.Y > 0)
-                {
-                    int col = (pt.X + mViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                    int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
-
-                    int index = row * layoutManager.Cols + col;
-                    if (index >= 0 && index < Items.Count)
-                    {
-                        Rectangle bounds = layoutManager.GetItemBounds(index);
-                        if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
-                        {
-                            hitInfo.ItemHit = true;
-                            hitInfo.ItemIndex = index;
-                        }
-                    }
-                }
-            }
-
-            return (hitInfo.ColumnHit || hitInfo.ColumnSeparatorHit || hitInfo.ItemHit);
         }
         /// <summary>
         /// Scrolls the image list view to ensure that the item with the specified 
@@ -665,11 +654,20 @@ namespace Manina.Windows.Forms
         /// <returns>An ItemVisibility value.</returns>
         public ItemVisibility IsItemVisible(ImageListViewItem item)
         {
-            return IsItemVisible(mItems.IndexOf(item));
+            return IsItemVisible(item.Index);
         }
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Refreshed the control.
+        /// </summary>
+        internal void Refresh(bool force)
+        {
+            forceRefresh = force;
+            Refresh();
+            forceRefresh = false;
+        }
         /// <summary>
         /// Returns the item index after applying the given navigation key.
         /// </summary>
@@ -747,6 +745,7 @@ namespace Manina.Windows.Forms
             }
             return visible;
         }
+
         #endregion
 
         #region Event Handlers
@@ -755,43 +754,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnDragOver(DragEventArgs e)
         {
-            if (AllowItemDrag && nav.SelfDragging)
-            {
-                e.Effect = DragDropEffects.Move;
-
-                // Calculate the location of the insertion cursor
-                Point pt = new Point(e.X, e.Y);
-                pt = PointToClient(pt);
-                // Normalize to item area coordinates
-                pt.X -= layoutManager.ItemAreaBounds.Left;
-                pt.Y -= layoutManager.ItemAreaBounds.Top;
-                // Row and column mouse is over
-                bool dragCaretOnRight = false;
-                int col = pt.X / layoutManager.ItemSizeWithMargin.Width;
-                int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
-                if (col > layoutManager.Cols - 1)
-                {
-                    col = layoutManager.Cols - 1;
-                    dragCaretOnRight = true;
-                }
-                // Index of the item mouse is over
-                int index = row * layoutManager.Cols + col;
-                if (index < 0) index = 0;
-                if (index > Items.Count - 1)
-                {
-                    index = Items.Count - 1;
-                    dragCaretOnRight = true;
-                }
-                if (index != nav.DragIndex || dragCaretOnRight != nav.DragCaretOnRight)
-                {
-                    nav.DragIndex = index;
-                    nav.DragCaretOnRight = dragCaretOnRight;
-                    Refresh();
-                }
-            }
-            else
-                e.Effect = DragDropEffects.None;
-
+            navigationManager.DragOver(e);
             base.OnDragOver(e);
         }
         /// <summary>
@@ -799,11 +762,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnDragEnter(DragEventArgs e)
         {
-            if (!nav.SelfDragging && e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-            else
-                e.Effect = DragDropEffects.None;
-
+            navigationManager.DragEnter(e);
             base.OnDragEnter(e);
         }
         /// <summary>
@@ -811,12 +770,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnDragLeave(EventArgs e)
         {
-            if (AllowItemDrag && nav.SelfDragging)
-            {
-                nav.DragIndex = -1;
-                Refresh();
-            }
-
+            navigationManager.DragLeave();
             base.OnDragLeave(e);
         }
 
@@ -825,57 +779,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnDragDrop(DragEventArgs e)
         {
-            mRenderer.SuspendPaint();
-
-            if (nav.SelfDragging)
-            {
-                // Reorder items
-                List<ImageListViewItem> draggedItems = new List<ImageListViewItem>();
-                int i = nav.DragIndex;
-                foreach (ImageListViewItem item in mSelectedItems)
-                {
-                    if (item.Index <= i) i--;
-                    draggedItems.Add(item);
-                    mItems.RemoveInternal(item);
-                }
-                if (i < 0) i = 0;
-                if (i > mItems.Count - 1) i = mItems.Count - 1;
-                if (nav.DragCaretOnRight) i++;
-                foreach (ImageListViewItem item in draggedItems)
-                {
-                    item.mSelected = false;
-                    mItems.InsertInternal(i, item);
-                    i++;
-                }
-                OnSelectionChanged(new EventArgs());
-            }
-            else
-            {
-                // Add items
-                foreach (string filename in (string[])e.Data.GetData(DataFormats.FileDrop))
-                {
-                    try
-                    {
-                        using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                        {
-                            using (Image img = Image.FromStream(stream, false, false))
-                            {
-                                mItems.Add(filename);
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        ;
-                    }
-                }
-            }
-
-            nav.DragIndex = -1;
-            nav.SelfDragging = false;
-
-            mRenderer.ResumePaint();
-
+            navigationManager.DragDrop(e);
             base.OnDragDrop(e);
         }
         /// <summary>
@@ -900,7 +804,7 @@ namespace Manina.Windows.Forms
         private void scrollTimer_Tick(object sender, EventArgs e)
         {
             int delta = (int)scrollTimer.Tag;
-            if (nav.Dragging)
+            if (navigationManager.MouseSelecting)
             {
                 Point location = base.PointToClient(Control.MousePosition);
                 OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
@@ -929,71 +833,18 @@ namespace Manina.Windows.Forms
         protected override void OnPaint(PaintEventArgs e)
         {
             if (!disposed && mRenderer != null)
-                mRenderer.Refresh(e.Graphics);
+                mRenderer.Refresh(e.Graphics, forceRefresh);
         }
         /// <summary>
         /// Handles the MouseDown event.
         /// </summary>
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            nav.ClickedItem = null;
-            nav.HoveredItem = null;
-            nav.HoveredColumn = (ColumnType)(-1);
-            nav.HoveredSeparator = (ColumnType)(-1);
-            nav.SelSeperator = (ColumnType)(-1);
+            // Capture focus if right clicked
+            if (!Focused && (e.Button & MouseButtons.Right) == MouseButtons.Right)
+                Focus();
 
-            HitInfo h;
-            HitTest(e.Location, out h);
-
-            if (h.ItemHit && (((e.Button & MouseButtons.Left) == MouseButtons.Left) || ((e.Button & MouseButtons.Right) == MouseButtons.Right)))
-                nav.ClickedItem = mItems[h.ItemIndex];
-            if (h.ItemHit)
-                nav.HoveredItem = mItems[h.ItemIndex];
-            if (h.ColumnHit)
-                nav.HoveredColumn = h.ColumnIndex;
-            if (h.ColumnSeparatorHit)
-                nav.HoveredSeparator = h.ColumnSeparator;
-
-            nav.MouseInColumnArea = h.InHeaderArea;
-            nav.MouseInItemArea = h.InItemArea;
-
-            if ((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right)
-                nav.MouseClicked = true;
-
-            mRenderer.SuspendPaint();
-
-            if ((e.Button & MouseButtons.Left) == MouseButtons.Left && AllowColumnResize && nav.HoveredSeparator != (ColumnType)(-1))
-            {
-                nav.DraggingSeperator = true;
-                nav.SelSeperator = nav.HoveredSeparator;
-                nav.SelStart = e.Location;
-                Refresh();
-            }
-            else if ((e.Button & MouseButtons.Left) == MouseButtons.Left && AllowColumnClick && nav.HoveredColumn != (ColumnType)(-1))
-            {
-                if (SortColumn == nav.HoveredColumn)
-                {
-                    if (SortOrder == SortOrder.Descending)
-                        SortOrder = SortOrder.Ascending;
-                    else
-                        SortOrder = SortOrder.Descending;
-                }
-                else
-                {
-                    SortColumn = nav.HoveredColumn;
-                    SortOrder = SortOrder.Ascending;
-                }
-                Refresh();
-            }
-            else if (((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) && nav.MouseInItemArea)
-            {
-                nav.SelStart = e.Location;
-                nav.SelEnd = e.Location;
-                Refresh();
-            }
-
-            mRenderer.ResumePaint();
-
+            navigationManager.MouseDown(e);
             base.OnMouseDown(e);
         }
         /// <summary>
@@ -1001,82 +852,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            bool suppressClick = nav.Dragging;
-            nav.SelfDragging = false;
-
-            scrollTimer.Enabled = false;
-            mRenderer.SuspendPaint();
-
-            if ((e.Button & MouseButtons.Left) == MouseButtons.Left && nav.DraggingSeperator)
-            {
-                OnColumnWidthChanged(new ColumnEventArgs(Columns[nav.SelSeperator]));
-                nav.DraggingSeperator = false;
-            }
-            else if (((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) && nav.MouseClicked)
-            {
-                bool clear = true;
-                if (nav.ControlDown) clear = false;
-                if (nav.ShiftDown && nav.Dragging) clear = false;
-                if (!nav.Dragging && ((e.Button & MouseButtons.Right) == MouseButtons.Right))
-                {
-                    if (nav.HoveredItem != null && nav.HoveredItem.Selected)
-                        clear = false;
-                }
-                if (clear)
-                    ClearSelection();
-
-                if (nav.Dragging)
-                {
-                    if (nav.Highlight.Count != 0)
-                    {
-                        foreach (KeyValuePair<ImageListViewItem, bool> pair in nav.Highlight)
-                            pair.Key.mSelected = pair.Value;
-                        OnSelectionChanged(new EventArgs());
-                        nav.Highlight.Clear();
-                    }
-                    nav.Dragging = false;
-                }
-                else if (nav.ControlDown && nav.HoveredItem != null)
-                {
-                    nav.HoveredItem.Selected = !nav.HoveredItem.Selected;
-                }
-                else if (nav.ShiftDown && nav.HoveredItem != null && Items.FocusedItem != null)
-                {
-                    int focusedIndex = mItems.IndexOf(mItems.FocusedItem);
-                    int hoveredIndex = mItems.IndexOf(nav.HoveredItem);
-                    int start = System.Math.Min(focusedIndex, hoveredIndex);
-                    int end = System.Math.Max(focusedIndex, hoveredIndex);
-                    for (int i = start; i <= end; i++)
-                        Items[i].Selected = true;
-                }
-                else if (nav.HoveredItem != null)
-                {
-                    nav.HoveredItem.Selected = true;
-                }
-
-                // Move focus to the item under the cursor
-                if (!(!nav.Dragging && nav.ShiftDown) && nav.HoveredItem != null)
-                    Items.FocusedItem = nav.HoveredItem;
-
-                nav.Dragging = false;
-                nav.DraggingSeperator = false;
-
-                Refresh();
-
-                if (AllowColumnClick && nav.HoveredColumn != (ColumnType)(-1))
-                {
-                    OnColumnClick(new ColumnClickEventArgs(Columns[nav.HoveredColumn], e.Location, e.Button));
-                }
-            }
-
-            if (!suppressClick && nav.HoveredItem != null)
-                OnItemClick(new ItemClickEventArgs(nav.HoveredItem, e.Location, e.Button));
-
-            if ((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right)
-                nav.MouseClicked = false;
-
-            mRenderer.ResumePaint();
-
+            navigationManager.MouseUp(e);
             base.OnMouseUp(e);
         }
         /// <summary>
@@ -1084,180 +860,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            mRenderer.SuspendPaint();
-
-            ImageListViewItem oldHoveredItem = nav.HoveredItem;
-            ColumnType oldHoveredColumn = nav.HoveredColumn;
-            ColumnType oldHoveredSeparator = nav.HoveredSeparator;
-            ColumnType oldSelSeperator = nav.SelSeperator;
-            ColumnType oldSelSep = nav.SelSeperator;
-            nav.HoveredItem = null;
-            nav.HoveredColumn = (ColumnType)(-1);
-            nav.HoveredSeparator = (ColumnType)(-1);
-            nav.SelSeperator = (ColumnType)(-1);
-
-            HitInfo h;
-            HitTest(e.Location, out h);
-
-            if (h.ItemHit)
-                nav.HoveredItem = mItems[h.ItemIndex];
-            if (h.ColumnHit)
-                nav.HoveredColumn = h.ColumnIndex;
-            if (h.ColumnSeparatorHit)
-                nav.HoveredSeparator = h.ColumnSeparator;
-
-            nav.MouseInColumnArea = h.InHeaderArea;
-            nav.MouseInItemArea = h.InItemArea;
-
-            if (nav.DraggingSeperator)
-            {
-                nav.HoveredColumn = oldSelSep;
-                nav.HoveredSeparator = oldSelSep;
-                nav.SelSeperator = oldSelSep;
-            }
-            else if (nav.Dragging)
-            {
-                nav.HoveredColumn = (ColumnType)(-1);
-                nav.HoveredSeparator = (ColumnType)(-1);
-                nav.SelSeperator = (ColumnType)(-1);
-            }
-
-            if (nav.Dragging && ScrollOrientation == ScrollOrientation.VerticalScroll && e.Y > ClientRectangle.Bottom && !scrollTimer.Enabled)
-            {
-                scrollTimer.Tag = -120;
-                scrollTimer.Enabled = true;
-            }
-            else if (nav.Dragging && ScrollOrientation == ScrollOrientation.VerticalScroll && e.Y < ClientRectangle.Top && !scrollTimer.Enabled)
-            {
-                scrollTimer.Tag = 120;
-                scrollTimer.Enabled = true;
-            }
-            else if (nav.Dragging && ScrollOrientation == ScrollOrientation.HorizontalScroll && e.X > ClientRectangle.Right && !scrollTimer.Enabled)
-            {
-                scrollTimer.Tag = -120;
-                scrollTimer.Enabled = true;
-            }
-            else if (nav.Dragging && ScrollOrientation == ScrollOrientation.HorizontalScroll && e.X < ClientRectangle.Left && !scrollTimer.Enabled)
-            {
-                scrollTimer.Tag = 120;
-                scrollTimer.Enabled = true;
-            }
-            else if (scrollTimer.Enabled && ClientRectangle.Contains(e.Location))
-            {
-                scrollTimer.Enabled = false;
-            }
-
-            if ((e.Button & MouseButtons.Left) == MouseButtons.Left && nav.DraggingSeperator)
-            {
-                int delta = e.Location.X - nav.SelStart.X;
-                nav.SelStart = e.Location;
-                int colwidth = Columns[nav.SelSeperator].Width + delta;
-                colwidth = System.Math.Max(16, colwidth);
-                Columns[nav.SelSeperator].Width = colwidth;
-                Refresh();
-            }
-            else if (((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) &&
-                AllowDrag && !nav.SelfDragging &&
-                nav.HoveredItem != null && nav.ClickedItem != null &&
-                ReferenceEquals(nav.HoveredItem, nav.ClickedItem))
-            {
-                nav.Dragging = false;
-                if (!nav.HoveredItem.Selected)
-                    ClearSelection();
-                if (mSelectedItems.Count == 0)
-                {
-                    nav.HoveredItem.Selected = true;
-                    // Force a refresh
-                    Refresh();
-                }
-
-                // Start drag-and-drop
-                string[] filenames = new string[mSelectedItems.Count];
-                for (int i = 0; i < mSelectedItems.Count; i++)
-                    filenames[i] = mSelectedItems[i].FileName;
-                DataObject data = new DataObject(DataFormats.FileDrop, filenames);
-                nav.SelfDragging = true;
-                nav.DragIndex = -1;
-                DoDragDrop(data, DragDropEffects.Copy | DragDropEffects.Move);
-                nav.SelfDragging = false;
-            }
-            else if (((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) && nav.Dragging)
-            {
-                if (!nav.ShiftDown && !nav.ControlDown && SelectedItems.Count != 0)
-                    ClearSelection();
-
-                nav.SelEnd = e.Location;
-                Rectangle sel = new Rectangle(System.Math.Min(nav.SelStart.X, nav.SelEnd.X), System.Math.Min(nav.SelStart.Y, nav.SelEnd.Y), System.Math.Abs(nav.SelStart.X - nav.SelEnd.X), System.Math.Abs(nav.SelStart.Y - nav.SelEnd.Y));
-                nav.Highlight.Clear();
-                Point pt1 = nav.SelStart;
-                Point pt2 = nav.SelEnd;
-                // Normalize to item area coordinates
-                pt1.X -= layoutManager.ItemAreaBounds.Left;
-                pt1.Y -= layoutManager.ItemAreaBounds.Top;
-                pt2.X -= layoutManager.ItemAreaBounds.Left;
-                pt2.Y -= layoutManager.ItemAreaBounds.Top;
-                if ((ScrollOrientation == ScrollOrientation.HorizontalScroll && (pt1.Y > 0 || pt2.Y > 0)) ||
-                    (ScrollOrientation == ScrollOrientation.VerticalScroll && (pt1.X > 0 || pt2.X > 0)))
-                {
-                    if (pt1.X < 0) pt1.X = 0;
-                    if (pt1.Y < 0) pt1.Y = 0;
-                    if (pt2.X < 0) pt2.X = 0;
-                    if (pt2.Y < 0) pt2.Y = 0;
-                    int startRow = (Math.Min(pt1.Y, pt2.Y) + ViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
-                    int endRow = (Math.Max(pt1.Y, pt2.Y) + ViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
-                    int startCol = (Math.Min(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                    int endCol = (Math.Max(pt1.X, pt2.X) + ViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                    if (ScrollOrientation == ScrollOrientation.HorizontalScroll &&
-                        (startRow <= layoutManager.Rows - 1 || endRow <= layoutManager.Rows - 1))
-                    {
-                        for (int row = startRow; row <= endRow; row++)
-                        {
-                            for (int col = startCol; col <= endCol; col++)
-                            {
-                                int i = row * layoutManager.Cols + col;
-                                if (i >= 0 && i <= mItems.Count - 1 && !nav.Highlight.ContainsKey(mItems[i]))
-                                    nav.Highlight.Add(mItems[i], (nav.ControlDown ? !Items[i].Selected : true));
-                            }
-                        }
-                    }
-                    else if (ScrollOrientation == ScrollOrientation.VerticalScroll &&
-                        (startCol <= layoutManager.Cols - 1 || endCol <= layoutManager.Cols - 1))
-                    {
-                        startCol = Math.Min(layoutManager.Cols - 1, startCol);
-                        endCol = Math.Min(layoutManager.Cols - 1, endCol);
-                        for (int row = startRow; row <= endRow; row++)
-                        {
-                            for (int col = startCol; col <= endCol; col++)
-                            {
-                                int i = row * layoutManager.Cols + col;
-                                if (i >= 0 && i <= mItems.Count - 1 && !nav.Highlight.ContainsKey(mItems[i]))
-                                    nav.Highlight.Add(mItems[i], (nav.ControlDown ? !Items[i].Selected : true));
-                            }
-                        }
-                    }
-                }
-                Refresh();
-            }
-            else if (nav.MouseClicked && ((e.Button & MouseButtons.Left) == MouseButtons.Left || (e.Button & MouseButtons.Right) == MouseButtons.Right) && nav.MouseInItemArea)
-            {
-                nav.SelEnd = e.Location;
-                if (System.Math.Max(System.Math.Abs(nav.SelEnd.X - nav.SelStart.X), System.Math.Abs(nav.SelEnd.Y - nav.SelStart.Y)) > 2)
-                    nav.Dragging = true;
-            }
-
-            if (Focused && AllowColumnResize && nav.HoveredSeparator != (ColumnType)(-1) && Cursor == Cursors.Default)
-                Cursor = Cursors.VSplit;
-            else if (Focused && nav.HoveredSeparator == (ColumnType)(-1) && Cursor != Cursors.Default)
-                Cursor = Cursors.Default;
-
-            if (oldHoveredItem != nav.HoveredItem ||
-                oldHoveredColumn != nav.HoveredColumn ||
-                oldHoveredSeparator != nav.HoveredSeparator ||
-                oldSelSeperator != nav.SelSeperator)
-                Refresh();
-
-            mRenderer.ResumePaint();
-
+            navigationManager.MouseMove(e);
             base.OnMouseMove(e);
         }
         /// <summary>
@@ -1265,6 +868,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
+            mRenderer.SuspendPaint();
+
             if (ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
                 int newYOffset = mViewOffset.Y - (e.Delta / 120) * vScrollBar.SmallChange;
@@ -1278,8 +883,6 @@ namespace Manina.Windows.Forms
                 mViewOffset.Y = newYOffset;
                 hScrollBar.Value = 0;
                 vScrollBar.Value = newYOffset;
-                if (nav.Dragging)
-                    nav.SelStart = new Point(nav.SelStart.X, nav.SelStart.Y - delta);
             }
             else
             {
@@ -1294,11 +897,10 @@ namespace Manina.Windows.Forms
                 mViewOffset.X = newXOffset;
                 vScrollBar.Value = 0;
                 hScrollBar.Value = newXOffset;
-                if (nav.Dragging)
-                    nav.SelStart = new Point(nav.SelStart.X - delta, nav.SelStart.Y);
             }
 
             Refresh();
+            mRenderer.ResumePaint();
 
             base.OnMouseWheel(e);
         }
@@ -1307,25 +909,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseLeave(EventArgs e)
         {
-            nav.MouseInItemArea = false;
-            nav.MouseInColumnArea = false;
-
-            mRenderer.SuspendPaint();
-            if (nav.HoveredItem != null)
-            {
-                nav.HoveredItem = null;
-                Refresh();
-            }
-            if (nav.HoveredColumn != (ColumnType)(-1))
-            {
-                nav.HoveredColumn = (ColumnType)(-1);
-                Refresh();
-            }
-            if (nav.HoveredSeparator != (ColumnType)(-1))
-                Cursor = Cursors.Default;
-
-            mRenderer.ResumePaint();
-
+            navigationManager.MouseLeave();
             base.OnMouseLeave(e);
         }
         /// <summary>
@@ -1333,18 +917,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
-            mRenderer.SuspendPaint();
-            if (nav.HoveredItem != null)
-            {
-                OnItemDoubleClick(new ItemClickEventArgs(nav.HoveredItem, e.Location, e.Button));
-            }
-            if (AllowColumnClick && nav.HoveredSeparator != (ColumnType)(-1))
-            {
-                Columns[nav.HoveredSeparator].AutoFit();
-                Refresh();
-            }
-            mRenderer.ResumePaint();
-
+            navigationManager.MouseDoubleClick(e);
             base.OnMouseDoubleClick(e);
         }
         /// <summary>
@@ -1352,18 +925,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override bool IsInputKey(Keys keyData)
         {
-            if ((keyData & Keys.ShiftKey) == Keys.ShiftKey || (keyData & Keys.ControlKey) == Keys.ControlKey)
-            {
-                ImageListViewItem item = this.Items.FocusedItem;
-                int index = 0;
-                if (item != null)
-                    index = mItems.IndexOf(item);
-                nav.SelStartKey = index;
-            }
-
-            if ((keyData & Keys.ShiftKey) == Keys.ShiftKey ||
-                (keyData & Keys.ControlKey) == Keys.ControlKey ||
-                (keyData & Keys.Left) == Keys.Left ||
+            if ((keyData & Keys.Left) == Keys.Left ||
                 (keyData & Keys.Right) == Keys.Right ||
                 (keyData & Keys.Up) == Keys.Up ||
                 (keyData & Keys.Down) == Keys.Down)
@@ -1376,63 +938,16 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnKeyDown(KeyEventArgs e)
         {
+            navigationManager.KeyDown(e);
             base.OnKeyDown(e);
-
-            nav.ShiftDown = e.Shift;
-            nav.ControlDown = e.Control;
-
-            if (Items.Count == 0)
-                return;
-
-            ImageListViewItem item = this.Items.FocusedItem;
-            int index = 0;
-            if (item != null)
-                index = mItems.IndexOf(item);
-
-            int newindex = ApplyNavKey(index, e.KeyCode);
-            if (index == newindex)
-                return;
-
-            mRenderer.SuspendPaint();
-            index = newindex;
-            if (nav.ControlDown)
-            {
-                nav.SelStartKey = index;
-                Items.FocusedItem = Items[index];
-                EnsureVisible(index);
-            }
-            else if (nav.ShiftDown)
-            {
-                ClearSelection();
-                nav.SelEndKey = index;
-                Items.FocusedItem = Items[index];
-                int imin = System.Math.Min(nav.SelStartKey, nav.SelEndKey);
-                int imax = System.Math.Max(nav.SelStartKey, nav.SelEndKey);
-                for (int i = imin; i <= imax; i++)
-                {
-                    Items[i].Selected = true;
-                }
-                EnsureVisible(nav.SelEndKey);
-            }
-            else
-            {
-                ClearSelection();
-                nav.SelStartKey = index;
-                Items[index].Selected = true;
-                Items.FocusedItem = Items[index];
-                EnsureVisible(index);
-            }
-            mRenderer.ResumePaint();
         }
         /// <summary>
         /// Handles the KeyUp event.
         /// </summary>
         protected override void OnKeyUp(KeyEventArgs e)
         {
+            navigationManager.KeyUp(e);
             base.OnKeyUp(e);
-
-            nav.ShiftDown = e.Shift;
-            nav.ControlDown = e.Control;
         }
         /// <summary>
         /// Handles the GotFocus event.

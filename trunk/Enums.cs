@@ -129,4 +129,13 @@ namespace Manina.Windows.Forms
         HoveredNormalSelected,
         HoveredSelectedNormal,
     }
+    /// <summary>
+    /// Represents the item highlight state during mouse selection.
+    /// </summary>
+    internal enum ItemHighlightState
+    {
+        NotHighlighted,
+        Highlighted,
+        HighlightedAndSelected,
+    }
 }

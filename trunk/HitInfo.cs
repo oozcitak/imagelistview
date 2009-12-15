@@ -14,25 +14,73 @@
 // limitations under the License.
 //
 // Ozgur Ozcitak (ozcitak@yahoo.com)
- 
+
 namespace Manina.Windows.Forms
 {
-    public partial class ImageListView 
+    public partial class ImageListView
     {
         /// <summary>
         /// Represents the details of a mouse hit test.
         /// </summary>
-        public struct HitInfo
+        public class HitInfo
         {
-            #region Member Variables
-            public bool InHeaderArea;
-            public bool InItemArea;
-            public bool ColumnHit;
-            public bool ItemHit;
-            public bool ColumnSeparatorHit;
-            public ColumnType ColumnIndex;
-            public int ItemIndex;
-            public ColumnType ColumnSeparator;
+            #region Properties
+            /// <summary>
+            /// Gets whether an item is under the hit point.
+            /// </summary>
+            public bool ItemHit { get { return ItemIndex != -1; } }
+            /// <summary>
+            /// Gets whether a column is under the hit point.
+            /// </summary>
+            public bool ColumnHit { get { return ColumnIndex != (ColumnType)(-1); } }
+            /// <summary>
+            /// Gets whether a column separator is under the hit point.
+            /// </summary>
+            public bool ColumnSeparatorHit { get { return ColumnSeparator != (ColumnType)(-1); } }
+
+            /// <summary>
+            /// Gets the index of the item under the hit point.
+            /// </summary>
+            public int ItemIndex { get; private set; }
+            /// <summary>
+            /// Gets the index of the column under the hit point.
+            /// </summary>
+            public ColumnType ColumnIndex { get; private set; }
+            /// <summary>
+            /// Gets the index of the column separator under the hit point.
+            /// </summary>
+            public ColumnType ColumnSeparator { get; private set; }
+
+            /// <summary>
+            /// Gets whether the hit point is inside the item area.
+            /// </summary>
+            public bool InItemArea { get; private set; }
+            /// <summary>
+            /// Gets whether the hit point is inside the column header area.
+            /// </summary>
+            public bool InHeaderArea { get; private set; }
+            #endregion
+
+            #region Constructor
+            private HitInfo(int itemIndex, ColumnType columnIndex, ColumnType columnSeparator, bool inItemArea, bool inHeaderArea)
+            {
+                ItemIndex = itemIndex;
+                ColumnIndex = columnIndex;
+                ColumnSeparator = columnSeparator;
+
+                InItemArea = inItemArea;
+                InHeaderArea = inHeaderArea;
+            }
+            public HitInfo(int itemIndex)
+                : this(itemIndex, (ColumnType)(-1), (ColumnType)(-1), true, false)
+            {
+                ;
+            }
+            public HitInfo(ColumnType columnIndex, ColumnType columnSeparator)
+                : this(-1, columnIndex, columnSeparator, false, true)
+            {
+                ;
+            }
             #endregion
         }
     }
