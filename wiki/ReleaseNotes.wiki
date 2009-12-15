@@ -4,7 +4,7 @@
 = 2.4 (16 December 2009) =
 
   * Panel renderer now displays the name of the image file in its panel in Thumbnail mode.
-  * Removed the confusing AllowItemDrag property from !ImageListView.
+  * Removed the confusing !AllowItemDrag property from !ImageListView.
   * Moved the scroll timer in to the navigation manager.
   * Fixed a bug in !ImageListViewItemCollection.!RemoveAt method where the control's !OnSelectionChanged event was fired after the item was removed from the collection.
   * Default renderer now shades the background of !SortColumn in Details mode.
