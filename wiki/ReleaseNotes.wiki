@@ -5,7 +5,7 @@
 
   * Hovering items while the control does not have focus now draws highlighted item background.
   * Changing !BackColor and placeholder images redraws the control.
-  * Sorting properties now check if a Sort is needed.
+  * Sorting properties now check if a sort is actually needed.
   * Removed the Hovered property from !ImageListViewItem and !ImageListViewColumnHeader.
   * The wait cursor is displayed while sorting items.
   * Fixed issues with keyboard navigation and drag&drop logic.
