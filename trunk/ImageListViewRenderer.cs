@@ -523,15 +523,6 @@ namespace Manina.Windows.Forms
                     DrawGalleryImage(g, item, image, bounds);
                 }
 
-                // Scrollbar filler
-                if (mImageListView.hScrollBar.Visible && mImageListView.vScrollBar.Visible)
-                {
-                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
-                    Rectangle filler = new Rectangle(bounds.Right, bounds.Bottom, mImageListView.vScrollBar.Width, mImageListView.hScrollBar.Height);
-                    g.SetClip(filler);
-                    DrawScrollBarFiller(g, filler);
-                }
-
                 // Draw the selection rectangle
                 if (mImageListView.navigationManager.MouseSelecting)
                 {
@@ -578,6 +569,15 @@ namespace Manina.Windows.Forms
                 // Draw the overlay image
                 g.SetClip(mImageListView.layoutManager.ClientArea);
                 DrawOverlay(g, mImageListView.layoutManager.ClientArea);
+
+                // Scrollbar filler
+                if (mImageListView.hScrollBar.Visible && mImageListView.vScrollBar.Visible)
+                {
+                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
+                    Rectangle filler = new Rectangle(bounds.Right, bounds.Bottom, mImageListView.vScrollBar.Width, mImageListView.hScrollBar.Height);
+                    g.SetClip(filler);
+                    DrawScrollBarFiller(g, filler);
+                }
 
                 // Draw on to the control
                 bufferGraphics.Render(graphics);

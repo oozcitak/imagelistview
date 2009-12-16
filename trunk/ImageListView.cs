@@ -856,7 +856,6 @@ namespace Manina.Windows.Forms
                 if (newYOffset < vScrollBar.Minimum) newYOffset = vScrollBar.Minimum;
                 if (newYOffset > vScrollBar.Maximum) newYOffset = vScrollBar.Maximum;
                 mViewOffset.Y = newYOffset;
-                hScrollBar.Value = 0;
                 vScrollBar.Value = newYOffset;
             }
             else
@@ -870,7 +869,6 @@ namespace Manina.Windows.Forms
                 if (newXOffset < hScrollBar.Minimum) newXOffset = hScrollBar.Minimum;
                 if (newXOffset > hScrollBar.Maximum) newXOffset = hScrollBar.Maximum;
                 mViewOffset.X = newXOffset;
-                vScrollBar.Value = 0;
                 hScrollBar.Value = newXOffset;
             }
 
