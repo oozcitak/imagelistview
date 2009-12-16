@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.5 (16 December 2009) =
+
+  * The view is now scrolled while dragging the mouse outside the control's client area.
+  * The selection rectangle can no longer paint over the scroll bars.
+
 = 2.4 (16 December 2009) =
 
   * Panel renderer now displays the name of the image file in its panel in Thumbnail mode.
