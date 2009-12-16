@@ -43,6 +43,7 @@ namespace Manina.Windows.Forms
             private bool inItemArea;
             private bool inHeaderArea;
 
+            private Point lastViewOffset;
             private Point lastSeparatorDragLocation;
             private Point lastMouseDownLocation;
             private Point lastMouseMoveLocation;
@@ -181,6 +182,7 @@ namespace Manina.Windows.Forms
                 if ((e.Button & MouseButtons.Right) != MouseButtons.None)
                     RightButton = true;
 
+                lastViewOffset = mImageListView.ViewOffset;
                 lastMouseDownLocation = e.Location;
             }
             /// <summary>
@@ -251,65 +253,60 @@ namespace Manina.Windows.Forms
                     if (!ShiftKey && !ControlKey)
                         mImageListView.SelectedItems.Clear(false);
 
-                    SelectionRectangle = new Rectangle(Math.Min(lastMouseDownLocation.X, e.Location.X),
-                        Math.Min(lastMouseDownLocation.Y, e.Location.Y),
-                        Math.Abs(lastMouseDownLocation.X - e.Location.X),
-                        Math.Abs(lastMouseDownLocation.Y - e.Location.Y));
+                    // Create the selection rectangle
+                    Point viewOffset = mImageListView.ViewOffset;
+                    Point pt1 = new Point(lastMouseDownLocation.X - (viewOffset.X - lastViewOffset.X),
+                        lastMouseDownLocation.Y - (viewOffset.Y - lastViewOffset.Y));
+                    Point pt2 = new Point(e.Location.X, e.Location.Y);
+                    SelectionRectangle = new Rectangle(Math.Min(pt1.X, pt2.X), Math.Min(pt1.Y, pt2.Y), Math.Abs(pt1.X - pt2.X), Math.Abs(pt1.Y - pt2.Y));
+
+                    // Normalize to item area coordinates
+                    pt1 = new Point(SelectionRectangle.Left, SelectionRectangle.Top);
+                    pt2 = new Point(SelectionRectangle.Right, SelectionRectangle.Bottom);
+                    Point itemAreaOffset = new Point(-mImageListView.layoutManager.ItemAreaBounds.Left,
+                        -mImageListView.layoutManager.ItemAreaBounds.Top);
+                    pt1.Offset(itemAreaOffset);
+                    pt2.Offset(itemAreaOffset);
 
                     // Determine which items are highlighted
                     highlightedItems.Clear();
-                    Point pt1 = new Point(SelectionRectangle.Left, SelectionRectangle.Top);
-                    Point pt2 = new Point(SelectionRectangle.Right, SelectionRectangle.Bottom);
-                    // Normalize to item area coordinates
-                    pt1.Offset(-mImageListView.layoutManager.ItemAreaBounds.Left,
-                        -mImageListView.layoutManager.ItemAreaBounds.Top);
-                    pt2.Offset(-mImageListView.layoutManager.ItemAreaBounds.Left,
-                        -mImageListView.layoutManager.ItemAreaBounds.Top);
-                    if ((mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll && (pt1.Y > 0 || pt2.Y > 0)) ||
-                        (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll && (pt1.X > 0 || pt2.X > 0)))
+                    int startRow = (int)Math.Floor((float)(Math.Min(pt1.Y, pt2.Y) + viewOffset.Y) /
+                        (float)mImageListView.layoutManager.ItemSizeWithMargin.Height);
+                    int endRow = (int)Math.Floor((float)(Math.Max(pt1.Y, pt2.Y) + viewOffset.Y) /
+                        (float)mImageListView.layoutManager.ItemSizeWithMargin.Height);
+                    int startCol = (int)Math.Floor((float)(Math.Min(pt1.X, pt2.X) + viewOffset.X) /
+                        (float)mImageListView.layoutManager.ItemSizeWithMargin.Width);
+                    int endCol = (int)Math.Floor((float)(Math.Max(pt1.X, pt2.X) + viewOffset.X) /
+                        (float)mImageListView.layoutManager.ItemSizeWithMargin.Width);
+                    if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
+                        (startRow >= 0 || endRow >= 0))
                     {
-                        if (pt1.X < 0) pt1.X = 0;
-                        if (pt1.Y < 0) pt1.Y = 0;
-                        if (pt2.X < 0) pt2.X = 0;
-                        if (pt2.Y < 0) pt2.Y = 0;
-                        int startRow = (Math.Min(pt1.Y, pt2.Y) + mImageListView.ViewOffset.Y) /
-                            mImageListView.layoutManager.ItemSizeWithMargin.Height;
-                        int endRow = (Math.Max(pt1.Y, pt2.Y) + mImageListView.ViewOffset.Y) /
-                            mImageListView.layoutManager.ItemSizeWithMargin.Height;
-                        int startCol = (Math.Min(pt1.X, pt2.X) + mImageListView.ViewOffset.X) /
-                            mImageListView.layoutManager.ItemSizeWithMargin.Width;
-                        int endCol = (Math.Max(pt1.X, pt2.X) + mImageListView.ViewOffset.X) /
-                            mImageListView.layoutManager.ItemSizeWithMargin.Width;
-                        if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
-                            (startRow <= mImageListView.layoutManager.Rows - 1 || endRow <= mImageListView.layoutManager.Rows - 1))
+                        for (int i = startCol; i <= endCol; i++)
                         {
-                            for (int row = startRow; row <= endRow; row++)
+                            for (int col = startCol; col <= endCol; col++)
                             {
-                                for (int col = startCol; col <= endCol; col++)
-                                {
-                                    int i = row * mImageListView.layoutManager.Cols + col;
-                                    if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
-                                        !highlightedItems.ContainsKey(mImageListView.Items[i]))
-                                        highlightedItems.Add(mImageListView.Items[i],
-                                            (ControlKey ? !mImageListView.Items[i].Selected : true));
-                                }
+                                if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
+                                    !highlightedItems.ContainsKey(mImageListView.Items[i]))
+                                    highlightedItems.Add(mImageListView.Items[i],
+                                        (ControlKey ? !mImageListView.Items[i].Selected : true));
                             }
                         }
-                        else if (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll &&
-                            (startCol <= mImageListView.layoutManager.Cols - 1 || endCol <= mImageListView.layoutManager.Cols - 1))
+                    }
+                    else if (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll &&
+                        (startCol >= 0 || endCol >= 0) && (startRow >= 0 || endRow >= 0) &&
+                        (startCol <= mImageListView.layoutManager.Cols - 1 || endCol <= mImageListView.layoutManager.Cols - 1))
+                    {
+                        startCol = Math.Min(mImageListView.layoutManager.Cols - 1, Math.Max(0, startCol));
+                        endCol = Math.Min(mImageListView.layoutManager.Cols - 1, Math.Max(0, endCol));
+                        for (int row = startRow; row <= endRow; row++)
                         {
-                            startCol = Math.Min(mImageListView.layoutManager.Cols - 1, startCol);
-                            endCol = Math.Min(mImageListView.layoutManager.Cols - 1, endCol);
-                            for (int row = startRow; row <= endRow; row++)
+                            for (int col = startCol; col <= endCol; col++)
                             {
-                                for (int col = startCol; col <= endCol; col++)
-                                {
-                                    int i = row * mImageListView.layoutManager.Cols + col;
-                                    if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
-                                        !highlightedItems.ContainsKey(mImageListView.Items[i]))
-                                        highlightedItems.Add(mImageListView.Items[i],
-                                            (ControlKey ? !mImageListView.Items[i].Selected : true));
-                                }
+                                int i = row * mImageListView.layoutManager.Cols + col;
+                                if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
+                                    !highlightedItems.ContainsKey(mImageListView.Items[i]))
+                                    highlightedItems.Add(mImageListView.Items[i],
+                                        (ControlKey ? !mImageListView.Items[i].Selected : true));
                             }
                         }
                     }
