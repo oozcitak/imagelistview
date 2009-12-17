@@ -1,6 +1,8 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+<wiki:toc />
+
 = 2.5 (16 December 2009) =
 
   * The view is now scrolled while dragging the mouse outside the control's client area.
