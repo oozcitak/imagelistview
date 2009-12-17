@@ -3,7 +3,7 @@
 
 <wiki:toc />
 
-= Introduction =
+= View Modes =
 
 ImageListView can display image thumbnails in the following view modes:
 
