@@ -344,6 +344,9 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ImageListView class.
+        /// </summary>
         public ImageListView()
         {
             SetRenderer(new ImageListViewRenderer());
@@ -374,8 +377,8 @@ namespace Manina.Windows.Forms
             mView = View.Thumbnails;
 
             mViewOffset = new Point(0, 0);
-            hScrollBar = new System.Windows.Forms.HScrollBar();
-            vScrollBar = new System.Windows.Forms.VScrollBar();
+            hScrollBar = new HScrollBar();
+            vScrollBar = new VScrollBar();
             hScrollBar.Visible = false;
             vScrollBar.Visible = false;
             hScrollBar.Scroll += new ScrollEventHandler(hScrollBar_Scroll);
@@ -688,7 +691,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Determines whether the specified item is visible on the screen.
         /// </summary>
-        /// <param name="item">The Guid of the item to test.</param>
+        /// <param name="guid">The Guid of the item to test.</param>
         /// <returns>true if the item is visible or partially visible; otherwise false.</returns>
         internal bool IsItemVisible(Guid guid)
         {
@@ -697,7 +700,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Determines whether the specified item is visible on the screen.
         /// </summary>
-        /// <param name="item">The item to test.</param>
+        /// <param name="itemIndex">The index of the item to test.</param>
         /// <returns>An ItemVisibility value.</returns>
         internal ItemVisibility IsItemVisible(int itemIndex)
         {
@@ -1026,7 +1029,6 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the SelectionChanged event.
         /// </summary>
-        /// <param name="e">A EventArgs that contains event data.</param>
         internal void OnSelectionChangedInternal()
         {
             OnSelectionChanged(new EventArgs());
@@ -1044,7 +1046,7 @@ namespace Manina.Windows.Forms
         /// Raises the ThumbnailCached event.
         /// This method is invoked from the thumbnail thread.
         /// </summary>
-        /// <param name="e">The guid of the item whose thumbnail is cached.</param>
+        /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
         internal void OnThumbnailCachedInternal(Guid guid)
         {
             int itemIndex = Items.IndexOf(guid);

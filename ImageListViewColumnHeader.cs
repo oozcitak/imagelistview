@@ -164,6 +164,12 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Constructors
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
             public ImageListViewColumnHeader(ColumnType type, string text, int width)
             {
                 mImageListView = null;
@@ -174,24 +180,42 @@ namespace Manina.Windows.Forms
                 mVisible = true;
                 mDisplayIndex = -1;
             }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
             public ImageListViewColumnHeader(ColumnType type, string text)
                 : this(type, text, ImageListView.DefaultColumnWidth)
             {
                 ;
             }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
             public ImageListViewColumnHeader(ColumnType type, int width)
                 : this(type, "", width)
             {
                 ;
             }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
             public ImageListViewColumnHeader(ColumnType type)
                 : this(type, "", ImageListView.DefaultColumnWidth)
             {
                 ;
             }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
             public ImageListViewColumnHeader()
                 : this(ColumnType.Name)
             {
+                ;
             }
             #endregion
 
@@ -204,9 +228,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Cannot calculate column width. Owner image list view is null.");
 
-                int width = TextRenderer.MeasureText(Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont)).Width;
-                if (mImageListView.SortColumn == mType && mImageListView.SortOrder != SortOrder.None)
-                    width += mImageListView.mRenderer.GetSortArrowImage(mImageListView.SortOrder).Width + 4;
+                int width = 0;
                 foreach (ImageListViewItem item in mImageListView.Items)
                 {
                     int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(Type), mImageListView.Font).Width;

@@ -48,6 +48,7 @@ namespace Manina.Windows.Forms
             private Point lastMouseDownLocation;
             private Point lastMouseMoveLocation;
             private Dictionary<ImageListViewItem, bool> highlightedItems;
+            private bool suppressClick;
 
             private bool selfDragging;
 
@@ -142,6 +143,8 @@ namespace Manina.Windows.Forms
                 scrollTimer.Interval = 100;
                 scrollTimer.Enabled = false;
                 scrollTimer.Tick += new EventHandler(scrollTimer_Tick);
+
+                suppressClick = false;
             }
             #endregion
 
@@ -495,21 +498,26 @@ namespace Manina.Windows.Forms
                 }
                 else if (mImageListView.AllowColumnClick && HoveredColumn != null && HoveredSeparator == null)
                 {
-                    // Change the sort column
-                    if (mImageListView.SortColumn == HoveredColumn.Type)
+                    if (!suppressClick)
                     {
-                        if (mImageListView.SortOrder == SortOrder.Descending)
-                            mImageListView.SortOrder = SortOrder.Ascending;
+                        // Change the sort column
+                        if (mImageListView.SortColumn == HoveredColumn.Type)
+                        {
+                            if (mImageListView.SortOrder == SortOrder.Descending)
+                                mImageListView.SortOrder = SortOrder.Ascending;
+                            else
+                                mImageListView.SortOrder = SortOrder.Descending;
+                        }
                         else
-                            mImageListView.SortOrder = SortOrder.Descending;
+                        {
+                            mImageListView.mSortColumn = HoveredColumn.Type;
+                            mImageListView.mSortOrder = SortOrder.Ascending;
+                            mImageListView.Sort();
+                        }
+                        mImageListView.OnColumnClick(new ColumnClickEventArgs(HoveredColumn, e.Location, e.Button));
                     }
                     else
-                    {
-                        mImageListView.mSortColumn = HoveredColumn.Type;
-                        mImageListView.mSortOrder = SortOrder.Ascending;
-                        mImageListView.Sort();
-                    }
-                    mImageListView.OnColumnClick(new ColumnClickEventArgs(HoveredColumn, e.Location, e.Button));
+                        suppressClick = false;
                 }
 
                 if ((e.Button & MouseButtons.Left) != MouseButtons.None)
@@ -532,6 +540,7 @@ namespace Manina.Windows.Forms
                 {
                     HoveredSeparator.AutoFit();
                     mImageListView.Refresh();
+                    suppressClick = true;
                 }
             }
             /// <summary>

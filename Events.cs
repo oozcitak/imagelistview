@@ -114,6 +114,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ImageListView.ImageListViewColumnHeader Column { get { return mColumn; } }
 
+        /// <summary>
+        /// Initializes a new instance of the ColumnEventArgs class.
+        /// </summary>
+        /// <param name="column">The column that is the target of this event.</param>
         public ColumnEventArgs(ImageListView.ImageListViewColumnHeader column)
         {
             mColumn = column;
@@ -150,6 +154,13 @@ namespace Manina.Windows.Forms
         /// </summary>
         public MouseButtons Buttons { get { return mButtons; } }
 
+        /// <summary>
+        /// Initializes a new instance of the ColumnClickEventArgs class.
+        /// </summary>
+        /// <param name="column">The column that is the target of this event.</param>
+        /// <param name="location">The location of the mouse.</param>
+        /// <param name="buttons">One of the System.Windows.Forms.MouseButtons values 
+        /// indicating which mouse button was pressed.</param>
         public ColumnClickEventArgs(ImageListView.ImageListViewColumnHeader column, Point location, MouseButtons buttons)
         {
             mColumn = column;
@@ -170,6 +181,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ImageListViewItem Item { get { return mItem; } }
 
+        /// <summary>
+        /// Initializes a new instance of the ItemEventArgs class.
+        /// </summary>
+        /// <param name="item">The item that is the target of this event.</param>
         public ItemEventArgs(ImageListViewItem item)
         {
             mItem = item;
@@ -206,6 +221,13 @@ namespace Manina.Windows.Forms
         /// </summary>
         public MouseButtons Buttons { get { return mButtons; } }
 
+        /// <summary>
+        /// Initializes a new instance of the ItemClickEventArgs class.
+        /// </summary>
+        /// <param name="item">The item that is the target of this event.</param>
+        /// <param name="location">The location of the mouse.</param>
+        /// <param name="buttons">One of the System.Windows.Forms.MouseButtons values 
+        /// indicating which mouse button was pressed.</param>
         public ItemClickEventArgs(ImageListViewItem item, Point location, MouseButtons buttons)
         {
             mItem = item;
@@ -224,6 +246,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         public Rectangle ItemAreaBounds { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the LayoutEventArgs class.
+        /// </summary>
+        /// <param name="itemAreaBounds">The rectangle bounding the item area.</param>
         public LayoutEventArgs(Rectangle itemAreaBounds)
         {
             ItemAreaBounds = itemAreaBounds;

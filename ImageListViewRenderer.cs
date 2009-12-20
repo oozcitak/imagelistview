@@ -69,6 +69,9 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Constructors
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewRenderer class.
+            /// </summary>
             public ImageListViewRenderer()
             {
                 disposed = false;
@@ -297,6 +300,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Redraws the owner control.
             /// </summary>
+            /// <param name="graphics">The System.Drawing.Graphics to draw on.</param>
             /// <param name="forceUpdate">If true, forces an immediate update, even if
             /// the renderer is suspended by a SuspendPaint call.</param>
             internal void Refresh(Graphics graphics, bool forceUpdate)
@@ -415,7 +419,9 @@ namespace Manina.Windows.Forms
                         }
                         else
                             g.SetClip(mImageListView.layoutManager.ClientArea);
+
                         DrawColumnHeader(g, column, state, bounds);
+
                         x += column.Width;
                         lastX = bounds.Right;
                     }
@@ -942,12 +948,16 @@ namespace Manina.Windows.Forms
                 g.DrawLine(SystemPens.ControlLightLight, bounds.Left + 1, bounds.Top + 1, bounds.Left + 1, bounds.Bottom - 2);
                 g.DrawLine(SystemPens.ControlLightLight, bounds.Right - 1, bounds.Top + 1, bounds.Right - 1, bounds.Bottom - 2);
 
-                // Sort image
+                // Draw the sort arrow
                 int textOffset = 4;
-                if (column.Type == mImageListView.SortColumn && mImageListView.SortOrder != SortOrder.None)
+                if (mImageListView.SortOrder != SortOrder.None && mImageListView.SortColumn == column.Type)
                 {
-                    Image img = GetSortArrowImage(mImageListView.SortOrder);
-                    if (img != null)
+                    Image img = null;
+                    if (mImageListView.SortOrder == SortOrder.Ascending)
+                        img = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAYAAAD68A/GAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHNJREFUGFdjYCAXFB9LP1lwKPUIXv1FR9Mudpyq+996ovp/xo7Y8xiKS45nsBUdSbvdfqrm//Jr8/4vvTLnf+2B4v9xa0JvRi4LYINrKDycujtvf9L35mOV/xdfmfV/4eUZ/9sO1/6PWOL/PXie1w6SvAEA+BE3G3fNEd8AAAAASUVORK5CYII=");
+                    else if (mImageListView.SortOrder == SortOrder.Descending)
+                        img = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAYAAAD68A/GAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHNJREFUGFdjYCAFeE1y2uHaY/s9Z23q/6ZDtf8bDlb9D5jk/V8nV/27RobKbrhZzl02bHbNFjfDZwb+rztQ+b9mf9l/7163/+ppyreVkxTYMCw1LtU979vv8d+rx/W/WqrSRbyu0sxUPaKaoniSFKejqAUAXY8qTCsVRMkAAAAASUVORK5CYII=");
+                    using (img)
                     {
                         g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
                         textOffset += img.Width;
@@ -1033,23 +1043,7 @@ namespace Manina.Windows.Forms
                 g.FillRectangle(SystemBrushes.Control, bounds);
             }
             /// <summary>
-            /// Gets the image representing the sort arrow on column headers.
-            /// </summary>
-            /// <param name="sortOrder">The SortOrder for which the sort arrow image should be returned.</param>
-            /// <returns>The sort arrow image representing sortOrder.</returns>
-            public virtual Image GetSortArrowImage(SortOrder sortOrder)
-            {
-                if (mImageListView.SortOrder == SortOrder.Ascending)
-                {
-                    return Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAYAAAD68A/GAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHNJREFUGFdjYCAXFB9LP1lwKPUIXv1FR9Mudpyq+996ovp/xo7Y8xiKS45nsBUdSbvdfqrm//Jr8/4vvTLnf+2B4v9xa0JvRi4LYINrKDycujtvf9L35mOV/xdfmfV/4eUZ/9sO1/6PWOL/PXie1w6SvAEA+BE3G3fNEd8AAAAASUVORK5CYII=");
-                }
-                else if (mImageListView.SortOrder == SortOrder.Descending)
-                    return Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAYAAAD68A/GAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHNJREFUGFdjYCAFeE1y2uHaY/s9Z23q/6ZDtf8bDlb9D5jk/V8nV/27RobKbrhZzl02bHbNFjfDZwb+rztQ+b9mf9l/7163/+ppyreVkxTYMCw1LtU979vv8d+rx/W/WqrSRbyu0sxUPaKaoniSFKejqAUAXY8qTCsVRMkAAAAASUVORK5CYII=");
-                return
-                    null;
-            }
-            /// <summary>
-            /// Draws the insertion caret for drag & drop operations.
+            /// Draws the insertion caret for drag and drop operations.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             /// <param name="bounds">The bounding rectangle of the insertion caret.</param>
