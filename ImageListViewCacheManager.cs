@@ -270,32 +270,50 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The guid of the item to remove.</param>
         public void Remove(Guid guid)
         {
+            Remove(guid, false);
+        }
+        /// <summary>
+        /// Removes the given item from the cache.
+        /// </summary>
+        /// <param name="guid">The guid of the item to remove.</param>
+        /// <param name="removeNow">true to remove the item now; false to remove the
+        /// item later when the cache is purged.</param>
+        public void Remove(Guid guid, bool removeNow)
+        {
             lock (lockObject)
             {
                 CacheItem item = null;
                 if (!thumbCache.TryGetValue(guid, out item))
                     return;
 
-                // Calculate the memory usage (approx. Width * Height * BitsPerPixel / 8)
-                memoryUsedByRemoved += item.Size.Width * item.Size.Height * 24 / 8;
-                removedItems.Add(guid);
-
-                // Remove items now if we can free more than 25% of the cache limit
-                if ((mCacheLimitAsMemory != 0 && memoryUsedByRemoved > mCacheLimitAsMemory / 4) ||
-                    (mCacheLimitAsItemCount != 0 && removedItems.Count > mCacheLimitAsItemCount / 4))
+                if (removeNow)
                 {
-                    CacheItem itemToRemove = null;
-                    foreach (Guid iguid in removedItems)
+                    memoryUsed -= item.Size.Width * item.Size.Height * 24 / 8;
+                    thumbCache.Remove(guid);
+                }
+                else
+                {
+                    // Calculate the memory usage (approx. Width * Height * BitsPerPixel / 8)
+                    memoryUsedByRemoved += item.Size.Width * item.Size.Height * 24 / 8;
+                    removedItems.Add(guid);
+
+                    // Remove items now if we can free more than 25% of the cache limit
+                    if ((mCacheLimitAsMemory != 0 && memoryUsedByRemoved > mCacheLimitAsMemory / 4) ||
+                        (mCacheLimitAsItemCount != 0 && removedItems.Count > mCacheLimitAsItemCount / 4))
                     {
-                        if (thumbCache.TryGetValue(iguid, out itemToRemove))
+                        CacheItem itemToRemove = null;
+                        foreach (Guid iguid in removedItems)
                         {
-                            itemToRemove.Dispose();
-                            thumbCache.Remove(iguid);
+                            if (thumbCache.TryGetValue(iguid, out itemToRemove))
+                            {
+                                itemToRemove.Dispose();
+                                thumbCache.Remove(iguid);
+                            }
                         }
+                        removedItems.Clear();
+                        memoryUsed -= memoryUsedByRemoved;
+                        memoryUsedByRemoved = 0;
                     }
-                    removedItems.Clear();
-                    memoryUsed -= memoryUsedByRemoved;
-                    memoryUsedByRemoved = 0;
                 }
             }
         }
