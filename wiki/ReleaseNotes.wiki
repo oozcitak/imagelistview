@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.7 (20 December 2009) =
+
+  * Fixed a bug where updating an item did not update the item thumbnail.
+
 = 2.6 (20 December 2009) =
 
   * Added XML comments for all public fields.
