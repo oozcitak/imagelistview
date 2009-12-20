@@ -34,7 +34,11 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Constructors
-            public ImageListViewSelectedItemCollection(ImageListView owner)
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewSelectedItemCollection class.
+            /// </summary>
+            /// <param name="owner">The ImageListView owning this collection.</param>
+            internal ImageListViewSelectedItemCollection(ImageListView owner)
             {
                 mImageListView = owner;
             }
@@ -65,7 +69,7 @@ namespace Manina.Windows.Forms
             [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this collection.")]
             public ImageListView ImageListView { get { return mImageListView; } }
             /// <summary>
-            /// Gets or sets the <see cref="NetHelpers.ImageListViewItem"/> at the specified index.
+            /// Gets or sets the item at the specified index.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item at the specified index")]
             public ImageListViewItem this[int index]
@@ -237,7 +241,7 @@ namespace Manina.Windows.Forms
                 throw new NotSupportedException();
             }
             /// <summary>
-            /// Gets or sets the <see cref="NetHelpers.ImageListViewItem"/> at the specified index.
+            /// Gets or sets the item at the specified index.
             /// </summary>
             ImageListViewItem IList<ImageListViewItem>.this[int index]
             {

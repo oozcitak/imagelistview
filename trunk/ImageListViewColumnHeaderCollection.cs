@@ -33,7 +33,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Editor(typeof(ColumnHeaderCollectionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ColumnHeaderCollectionTypeConverter))]
-        public class ImageListViewColumnHeaderCollection : IEnumerable<ImageListViewColumnHeader>, ICloneable, ISerializable
+        public class ImageListViewColumnHeaderCollection : IEnumerable<ImageListViewColumnHeader>
         {
             #region Member Variables
             private ImageListView mImageListView;
@@ -78,7 +78,11 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Constructors
-            public ImageListViewColumnHeaderCollection(ImageListView owner)
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeaderCollection class.
+            /// </summary>
+            /// <param name="owner">The owner.</param>
+            internal ImageListViewColumnHeaderCollection(ImageListView owner)
             {
                 mImageListView = owner;
                 // Create the default column set
@@ -176,55 +180,6 @@ namespace Manina.Windows.Forms
             {
                 return GetEnumerator();
             }
-            #endregion
-
-            #region ICloneable Members
-            /// <summary>
-            /// Creates a new object that is a copy of the current instance.
-            /// </summary>
-            public object Clone()
-            {
-                ImageListViewColumnHeaderCollection clone = new ImageListViewColumnHeaderCollection(this.mImageListView);
-                Array.Copy(this.mItems, clone.mItems, 0);
-                return clone;
-            }
-            #endregion
-
-            #region ISerializable Members
-            public ImageListViewColumnHeaderCollection(SerializationInfo info, StreamingContext context)
-            {
-                for (int i = 0; i < mItems.Length; i++)
-                {
-                    ColumnType type = (ColumnType)info.GetInt32(string.Format("{0}:{1}", i, "Type"));
-                    int index = info.GetInt32(string.Format("{0}:{1}", i, "Index"));
-                    string text = info.GetString(string.Format("{0}:{1}", i, "Text"));
-                    bool visible = info.GetBoolean(string.Format("{0}:{1}", i, "Visible"));
-                    int width = info.GetInt32(string.Format("{0}:{1}", i, "Width"));
-                    ImageListViewColumnHeader col = new ImageListViewColumnHeader(type, text, width);
-                    col.DisplayIndex = index;
-                    col.Visible = visible;
-                    mItems[i] = col;
-                }
-            }
-
-            /// <summary>
-            /// Populates a SerializationInfo with the data needed to serialize the target object.
-            /// </summary>
-            /// <param name="info">The SerializationInfo to populate with data.</param>
-            /// <param name="context">The destination for this serialization.</param>
-            public void GetObjectData(SerializationInfo info, StreamingContext context)
-            {
-                for (int i = 0; i < mItems.Length; i++)
-                {
-                    ImageListView.ImageListViewColumnHeader col = mItems[i];
-                    info.AddValue(string.Format("{0}:{1}", i, "Type"), col.Type);
-                    info.AddValue(string.Format("{0}:{1}", i, "Index"), col.DisplayIndex);
-                    info.AddValue(string.Format("{0}:{1}", i, "Text"), col.Text);
-                    info.AddValue(string.Format("{0}:{1}", i, "Visible"), col.Visible);
-                    info.AddValue(string.Format("{0}:{1}", i, "Width"), col.Width);
-                }
-            }
-
             #endregion
         }
     }

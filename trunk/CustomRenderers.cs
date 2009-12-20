@@ -28,6 +28,9 @@ using System.IO;
 
 namespace Manina.Windows.Forms
 {
+    /// <summary>
+    /// Represents the built-in renderers.
+    /// </summary>
     public static class ImageListViewRenderers
     {
         #region DefaultRenderer
@@ -36,6 +39,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class DefaultRenderer : ImageListView.ImageListViewRenderer
         {
+            /// <summary>
+            /// Initializes a new instance of the DefaultRenderer class.
+            /// </summary>
             public DefaultRenderer()
             {
                 ;
@@ -63,18 +69,27 @@ namespace Manina.Windows.Forms
                 }
             }
 
+            /// <summary>
+            /// Initializes a new instance of the TilesRenderer class.
+            /// </summary>
             public TilesRenderer()
                 : this(150)
             {
                 ;
             }
 
+            /// <summary>
+            /// Initializes a new instance of the TilesRenderer class.
+            /// </summary>
+            /// <param name="tileWidth">Width of tiles in pixels.</param>
             public TilesRenderer(int tileWidth)
-                : base()
             {
                 mTileWidth = tileWidth;
             }
 
+            /// <summary>
+            /// Releases managed resources.
+            /// </summary>
             public override void OnDispose()
             {
                 if (mCaptionFont != null)
@@ -466,17 +481,22 @@ namespace Manina.Windows.Forms
         {
             private float mZoomRatio;
 
+            /// <summary>
+            /// Initializes a new instance of the ZoomingRenderer class.
+            /// </summary>
             public ZoomingRenderer()
                 : this(0.5f)
             {
                 ;
             }
 
+            /// <summary>
+            /// Initializes a new instance of the ZoomingRenderer class.
+            /// </summary>
+            /// <param name="zoomRatio">Relative zoom ratio.</param>
             public ZoomingRenderer(float zoomRatio)
-                : base()
             {
                 if (zoomRatio < 0.0f) zoomRatio = 0.0f;
-                if (zoomRatio > 1.0f) zoomRatio = 1.0f;
                 mZoomRatio = zoomRatio;
             }
 
@@ -692,12 +712,19 @@ namespace Manina.Windows.Forms
                 }
             }
 
+            /// <summary>
+            /// Initializes a new instance of the PanelRenderer class.
+            /// </summary>
             public PanelRenderer()
                 : this(240)
             {
                 ;
             }
 
+            /// <summary>
+            /// Initializes a new instance of the PanelRenderer class.
+            /// </summary>
+            /// <param name="panelWidth">Width of the panel in pixels.</param>
             public PanelRenderer(int panelWidth)
             {
                 mPanelWidth = panelWidth;

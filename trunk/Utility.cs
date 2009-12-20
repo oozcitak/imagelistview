@@ -30,7 +30,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Contains utility functions.
     /// </summary>
-    public static class Utility
+    internal static class Utility
     {
         #region Constants
         private const int PropertyTagThumbnailData = 0x501B;
@@ -127,8 +127,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Creates a quadword value from the given low and high-order double words.
         /// </summary>
-        /// <param name="low">the low-order dword of the new value.</param>
-        /// <param name="high">the high-order dword of the new value.</param>
+        /// <param name="lowPart">the low-order dword of the new value.</param>
+        /// <param name="highPart">the high-order dword of the new value.</param>
         /// <returns></returns>
         public static long MakeQWord(int lowPart, int highPart)
         {
@@ -137,8 +137,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Creates a quadword value from the given low and high-order double words.
         /// </summary>
-        /// <param name="low">the low-order dword of the new value.</param>
-        /// <param name="high">the high-order dword of the new value.</param>
+        /// <param name="lowPart">the low-order dword of the new value.</param>
+        /// <param name="highPart">the high-order dword of the new value.</param>
         /// <returns></returns>
         public static ulong MakeQWord(uint lowPart, uint highPart)
         {
@@ -148,8 +148,9 @@ namespace Manina.Windows.Forms
 
         #region Text Utilities
         /// <summary>
-        /// Formats the given file size in bytes as a human readable string.
+        /// Formats the given file size as a human readable string.
         /// </summary>
+        /// <param name="size">File size in bytes.</param>
         public static string FormatSize(long size)
         {
             double mod = 1024;
@@ -397,7 +398,6 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="backColor">Background color of returned thumbnail.</param>
-        /// <param name="useGDI">If true uses GDI instead of GDI+.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
         public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
         {
@@ -406,13 +406,15 @@ namespace Manina.Windows.Forms
 
             Image source = null;
             Image thumb = null;
-            try
+
+            // Try to read the exif thumbnail
+            if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
             {
-                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                try
                 {
-                    using (Image img = Image.FromStream(stream, false, false))
+                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                     {
-                        if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
+                        using (Image img = Image.FromStream(stream, false, false))
                         {
                             foreach (int index in img.PropertyIdList)
                             {
@@ -440,11 +442,75 @@ namespace Manina.Windows.Forms
                         }
                     }
                 }
-                // Revert to source image if an embedded thumbnail of required size
-                // was not found.
-                if (source == null)
-                    source = Image.FromFile(filename);
+                catch
+                {
+                    if (source != null)
+                        source.Dispose();
+                    source = null;
+                }
+            }
 
+            // Fix for the missing semicolon in GIF files
+            MemoryStream streamCopy = null;
+            try
+            {
+                if (source == null)
+                {
+                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] gifSignature = new byte[6];
+                        stream.Read(gifSignature, 0, 6);
+                        if (Encoding.ASCII.GetString(gifSignature) == "GIF89a")
+                        {
+                            stream.Seek(0, SeekOrigin.Begin);
+                            streamCopy = new MemoryStream();
+                            byte[] buffer = new byte[32768];
+                            int read = 0;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                streamCopy.Write(buffer, 0, read);
+                            }
+                            // Append the mising semicolon
+                            streamCopy.Seek(-1, SeekOrigin.End);
+                            if (streamCopy.ReadByte() != 0x3b)
+                                streamCopy.WriteByte(0x3b);
+                            source = Image.FromStream(streamCopy);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                if (source != null)
+                    source.Dispose();
+                source = null;
+                if (streamCopy != null)
+                    streamCopy.Dispose();
+                streamCopy = null;
+            }
+
+            // Revert to source image if an embedded thumbnail of required size
+            // was not found.
+            if (source == null)
+            {
+                try
+                {
+                    source = Image.FromFile(filename);
+                }
+                catch
+                {
+                    if (source != null)
+                        source.Dispose();
+                    source = null;
+                }
+            }
+
+            // If all failed, return null.
+            if (source == null) return null;
+
+            // Create the thumbnail
+            try
+            {
                 float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
                 if (f < 1.0f) f = 1.0f; // Do not upsize small images
                 int width = (int)System.Math.Round((float)source.Width / f);
@@ -456,7 +522,6 @@ namespace Manina.Windows.Forms
                     g.Clear(backColor);
                     g.DrawImage(source, 0, 0, width, height);
                 }
-                source.Dispose();
             }
             catch
             {
@@ -469,6 +534,9 @@ namespace Manina.Windows.Forms
                 if (source != null)
                     source.Dispose();
                 source = null;
+                if (streamCopy != null)
+                    streamCopy.Dispose();
+                streamCopy = null;
             }
 
             return thumb;

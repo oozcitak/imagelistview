@@ -33,7 +33,7 @@ namespace Manina.Windows.Forms
         private Color mForeColor;
         private Guid mGuid;
         internal ImageListView mImageListView;
-        protected internal bool mSelected;
+        internal bool mSelected;
         private string mText;
         private int mZOrder;
         private string defaultText;
@@ -352,6 +352,9 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewItem class.
+        /// </summary>
         public ImageListViewItem()
         {
             mIndex = -1;
@@ -369,6 +372,10 @@ namespace Manina.Windows.Forms
             defaultText = null;
             editing = false;
         }
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewItem class.
+        /// </summary>
+        /// <param name="filename">The image filename representing the item.</param>
         public ImageListViewItem(string filename)
             : this()
         {

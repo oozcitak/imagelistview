@@ -62,6 +62,14 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Constructor
+            /// <summary>
+            /// Initializes a new instance of the HitInfo class.
+            /// </summary>
+            /// <param name="itemIndex">Index of the item.</param>
+            /// <param name="columnIndex">Type of the column.</param>
+            /// <param name="columnSeparator">The column separator.</param>
+            /// <param name="inItemArea">if set to true the mouse is in the item area.</param>
+            /// <param name="inHeaderArea">if set to true the mouse cursor is in the column header area.</param>
             private HitInfo(int itemIndex, ColumnType columnIndex, ColumnType columnSeparator, bool inItemArea, bool inHeaderArea)
             {
                 ItemIndex = itemIndex;
@@ -71,12 +79,21 @@ namespace Manina.Windows.Forms
                 InItemArea = inItemArea;
                 InHeaderArea = inHeaderArea;
             }
-            public HitInfo(int itemIndex)
+            /// <summary>
+            /// Initializes a new instance of the <see cref="HitInfo"/> class.
+            /// </summary>
+            /// <param name="itemIndex">Index of the item.</param>
+            internal HitInfo(int itemIndex)
                 : this(itemIndex, (ColumnType)(-1), (ColumnType)(-1), true, false)
             {
                 ;
             }
-            public HitInfo(ColumnType columnIndex, ColumnType columnSeparator)
+            /// <summary>
+            /// Initializes a new instance of the HitInfo class.
+            /// </summary>
+            /// <param name="columnIndex">Type of the column.</param>
+            /// <param name="columnSeparator">The column separator.</param>
+            internal HitInfo(ColumnType columnIndex, ColumnType columnSeparator)
                 : this(-1, columnIndex, columnSeparator, false, true)
             {
                 ;
