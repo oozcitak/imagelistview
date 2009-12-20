@@ -1,6 +1,14 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.6 (20 December 2009) =
+
+  * Added XML comments for all public fields.
+  * Removed the ImageListViewRenderer.GetSortArrow function. Sort arrow is now drawn in the DrawColumnHeader method.
+  * Fixed the issue about the missing semicolon in GIF files. (Issue 6)
+  * Removed the SortOrder enum, it was a duplicate of Windows.Forms.SortOrder.
+  * Double clicking on a separator no longer rises a column click event.
+
 = 2.5 (16 December 2009) =
 
   * The view is now scrolled while dragging the mouse outside the control's client area.
