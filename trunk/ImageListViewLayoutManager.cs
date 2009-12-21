@@ -47,6 +47,7 @@ namespace Manina.Windows.Forms
         private int cachedItemCount;
         private Size cachedItemSize;
         private int cachedHeaderHeight;
+        private Size cachedItemMargin;
         private Dictionary<Guid, bool> cachedVisibleItems;
 
         private bool vScrollVisible;
@@ -121,21 +122,10 @@ namespace Manina.Windows.Forms
                     return true;
                 else if (mImageListView.mRenderer.MeasureColumnHeaderHeight() != cachedHeaderHeight)
                     return true;
+                else if (mImageListView.mRenderer.MeasureItemMargin(mImageListView.View) != cachedItemMargin)
+                    return true;
                 else
                     return false;
-            }
-        }
-        /// <summary>
-        /// Returns the item margin adjusted to the current view mode.
-        /// </summary>
-        public Size AdjustedItemMargin
-        {
-            get
-            {
-                if (mImageListView.View == View.Details)
-                    return new Size(2, 0);
-                else
-                    return mImageListView.ItemMargin;
             }
         }
         #endregion
@@ -160,8 +150,8 @@ namespace Manina.Windows.Forms
         public Rectangle GetItemBounds(int itemIndex)
         {
             Point location = mItemAreaBounds.Location;
-            location.X += AdjustedItemMargin.Width / 2 - mImageListView.ViewOffset.X;
-            location.Y += AdjustedItemMargin.Height / 2 - mImageListView.ViewOffset.Y;
+            location.X += cachedItemMargin.Width / 2 - mImageListView.ViewOffset.X;
+            location.Y += cachedItemMargin.Height / 2 - mImageListView.ViewOffset.Y;
             if (mImageListView.View == View.Gallery)
             {
                 location.X += itemIndex * mItemSizeWithMargin.Width;
@@ -180,10 +170,7 @@ namespace Manina.Windows.Forms
         public Rectangle GetItemBoundsWithMargin(int itemIndex)
         {
             Rectangle rec = GetItemBounds(itemIndex);
-            if (mImageListView.View == View.Details)
-                rec.Inflate(2, 0);
-            else
-                rec.Inflate(mImageListView.ItemMargin.Width / 2, mImageListView.ItemMargin.Height / 2);
+            rec.Inflate(cachedItemMargin.Width / 2, cachedItemMargin.Height / 2);
             return rec;
         }
         /// <summary>
@@ -207,6 +194,7 @@ namespace Manina.Windows.Forms
             cachedItemCount = mImageListView.Items.Count;
             cachedItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
             cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
+            cachedItemMargin = mImageListView.mRenderer.MeasureItemMargin(mImageListView.View);
             cachedVisibleItems.Clear();
 
             // Calculate drawing area
@@ -215,7 +203,7 @@ namespace Manina.Windows.Forms
 
             // Item size
             mItemSize = cachedItemSize;
-            mItemSizeWithMargin = mItemSize + AdjustedItemMargin;
+            mItemSizeWithMargin = mItemSize + cachedItemMargin;
 
             // Allocate space for scrollbars
             if (mImageListView.hScrollBar.Visible)

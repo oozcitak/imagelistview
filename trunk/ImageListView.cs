@@ -61,7 +61,6 @@ namespace Manina.Windows.Forms
         private Image mErrorImage;
         private Font mHeaderFont;
         private ImageListViewItemCollection mItems;
-        private Size mItemMargin;
         internal ImageListViewRenderer mRenderer;
         internal ImageListViewSelectedItemCollection mSelectedItems;
         private ColumnType mSortColumn;
@@ -199,11 +198,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Browsable(false), Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
         public ImageListView.ImageListViewItemCollection Items { get { return mItems; } }
-        /// <summary>
-        /// Gets or sets the spacing between items.
-        /// </summary>
-        [Category("Appearance"), Description("Gets or sets the spacing between items."), DefaultValue(typeof(Size), "4,4")]
-        public Size ItemMargin { get { return mItemMargin; } set { mItemMargin = value; Refresh(); } }
         /// <summary>
         /// Gets the collection of selected items contained in the image list view.
         /// </summary>
@@ -366,7 +360,6 @@ namespace Manina.Windows.Forms
             mErrorImage = manager.GetObject("ErrorImage") as Image;
             HeaderFont = this.Font;
             mItems = new ImageListViewItemCollection(this);
-            mItemMargin = new Size(4, 4);
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;

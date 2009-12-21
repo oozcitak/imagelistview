@@ -30,7 +30,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Contains utility functions.
     /// </summary>
-    internal static class Utility
+    public static class Utility
     {
         #region Constants
         private const int PropertyTagThumbnailData = 0x501B;
@@ -62,7 +62,7 @@ namespace Manina.Windows.Forms
             public uint nFileSizeLow;
         }
         [StructLayout(LayoutKind.Sequential)]
-        struct FILETIME
+        private struct FILETIME
         {
             public uint dwLowDateTime;
             public uint dwHighDateTime;
@@ -114,36 +114,6 @@ namespace Manina.Windows.Forms
             AddOverlays = 0x000000020,
             OverlayIndex = 0x000000040,
         }
-        /// <summary>
-        /// Creates a value for use as an lParam parameter in a message.
-        /// </summary>
-        /// <param name="low">the low-order word of the new value.</param>
-        /// <param name="high">the high-order word of the new value.</param>
-        /// <returns>Concatenation of low and high as an IntPtr.</returns>
-        public static IntPtr MakeLParam(short low, short high)
-        {
-            return (IntPtr)((((int)low) & 0xffff) | ((((int)high) & 0xffff) << 16));
-        }
-        /// <summary>
-        /// Creates a quadword value from the given low and high-order double words.
-        /// </summary>
-        /// <param name="lowPart">the low-order dword of the new value.</param>
-        /// <param name="highPart">the high-order dword of the new value.</param>
-        /// <returns></returns>
-        public static long MakeQWord(int lowPart, int highPart)
-        {
-            return (long)(((long)lowPart) | (long)(highPart << 32));
-        }
-        /// <summary>
-        /// Creates a quadword value from the given low and high-order double words.
-        /// </summary>
-        /// <param name="lowPart">the low-order dword of the new value.</param>
-        /// <param name="highPart">the high-order dword of the new value.</param>
-        /// <returns></returns>
-        public static ulong MakeQWord(uint lowPart, uint highPart)
-        {
-            return (ulong)(((ulong)lowPart) | (ulong)(highPart << 32));
-        }
         #endregion
 
         #region Text Utilities
@@ -185,7 +155,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
-        public class ShellImageFileInfo
+        internal class ShellImageFileInfo
         {
             private static Dictionary<string, string> cachedFileTypes;
             private uint structSize = 0;
@@ -356,7 +326,7 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested image size.</param>
         /// <param name="backColor">Background color of returned thumbnail.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        public static Image ThumbnailFromImage(Image image, Size size, Color backColor)
+        internal static Image ThumbnailFromImage(Image image, Size size, Color backColor)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -399,7 +369,7 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="backColor">Background color of returned thumbnail.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        public static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
+        internal static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -540,28 +510,6 @@ namespace Manina.Windows.Forms
             }
 
             return thumb;
-        }
-        /// <summary>
-        /// Creates a new image from the given base 64 string.
-        /// </summary>
-        public static Image ImageFromBase64String(string base64String)
-        {
-            byte[] imageData = Convert.FromBase64String(base64String);
-            MemoryStream memory = new MemoryStream(imageData);
-            Image image = Image.FromStream(memory);
-            memory.Close();
-            return image;
-        }
-        /// <summary>
-        /// Returns the base 64 string representation of the given image.
-        /// </summary>
-        public static string ImageToBase64String(Image image)
-        {
-            MemoryStream memory = new MemoryStream();
-            image.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
-            string base64String = Convert.ToBase64String(memory.ToArray());
-            memory.Close();
-            return base64String;
         }
         /// <summary>
         /// Gets a path representing a rounded rectangle.
