@@ -1,6 +1,14 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 2.8 (21 December 2009) =
+
+  * Adjustable properties of built-in renderers are now public.
+  * Removed !ImageListView.!ItemMargin property in favor of the new overridable !ImageListViewRenderer.!MeasureItemMargin method.
+  * Gallery image is now updated after editing an item.
+  * Moved column sort icons to the neutral resource.
+  * Cleaned up the Utility class.
+
 = 2.7 (20 December 2009) =
 
   * Fixed a bug where updating an item did not update the item thumbnail.
