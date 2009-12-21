@@ -59,6 +59,11 @@ namespace Manina.Windows.Forms
             private int mTileWidth;
             private int mTextHeight;
 
+            /// <summary>
+            /// Gets or sets the width of the tile.
+            /// </summary>
+            public int TileWidth { get { return mTileWidth; } set { mTileWidth = value; } }
+
             private Font CaptionFont
             {
                 get
@@ -451,8 +456,9 @@ namespace Manina.Windows.Forms
             public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
                 // Calculate image bounds
-                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)image.Width;
-                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)image.Height;
+                Size itemMargin = MeasureItemMargin(mImageListView.View);
+                float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
+                float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
                 float scale = Math.Min(xscale, yscale);
                 if (scale > 1.0f) scale = 1.0f;
                 int imageWidth = (int)((float)image.Width * scale);
@@ -480,6 +486,22 @@ namespace Manina.Windows.Forms
         public class ZoomingRenderer : ImageListView.ImageListViewRenderer
         {
             private float mZoomRatio;
+
+            /// <summary>
+            /// Gets or sets the relative zoom ratio.
+            /// </summary>
+            public float ZoomRatio
+            {
+                get
+                {
+                    return mZoomRatio;
+                }
+                set
+                {
+                    mZoomRatio = value;
+                    if (mZoomRatio < 0.0f) mZoomRatio = 0.0f;
+                }
+            }
 
             /// <summary>
             /// Initializes a new instance of the ZoomingRenderer class.
@@ -702,6 +724,11 @@ namespace Manina.Windows.Forms
             private bool mPanelVisible;
             private Font mCaptionFont;
 
+            /// <summary>
+            /// Gets or sets the width of the panel.
+            /// </summary>
+            public int PanelWidth { get { return mPanelWidth; } set { mPanelWidth = value; } }
+
             private Font CaptionFont
             {
                 get
@@ -738,7 +765,8 @@ namespace Manina.Windows.Forms
             {
                 mPanelVisible = false;
                 // Allocate space for the panel
-                int iwidth = this.MeasureItem(View.Thumbnails).Width + mImageListView.ItemMargin.Width;
+                Size itemMargin = MeasureItemMargin(mImageListView.View);
+                int iwidth = this.MeasureItem(View.Thumbnails).Width + itemMargin.Width;
                 if (mImageListView.View == View.Thumbnails && e.ItemAreaBounds.Width > mPanelWidth + iwidth &&
                     mImageListView.Items.Count > 0)
                 {

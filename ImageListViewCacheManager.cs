@@ -232,6 +232,12 @@ namespace Manina.Windows.Forms
                     editCache[guid].Dispose();
                     editCache.Remove(guid);
                 }
+                if (rendererGuid == guid)
+                {
+                    rendererGuid = Guid.Empty;
+                    if (rendererItem != null)
+                        rendererItem.Dispose();
+                }
             }
         }
         /// <summary>
@@ -289,6 +295,7 @@ namespace Manina.Windows.Forms
                 if (removeNow)
                 {
                     memoryUsed -= item.Size.Width * item.Size.Height * 24 / 8;
+                    item.Dispose();
                     thumbCache.Remove(guid);
                 }
                 else
@@ -332,7 +339,10 @@ namespace Manina.Windows.Forms
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
                     else
+                    {
+                        item.Dispose();
                         thumbCache.Remove(guid);
+                    }
                 }
                 // Add to cache
                 toCache.Push(new CacheItem(guid, filename,

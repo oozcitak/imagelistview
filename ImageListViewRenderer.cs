@@ -562,7 +562,8 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView.navigationManager.DropToRight)
                             bounds.Offset(mImageListView.layoutManager.ItemSizeWithMargin.Width, 0);
-                        bounds.Offset(-(mImageListView.ItemMargin.Width - 2) / 2 - 2, 0);
+                        Size itemMargin = MeasureItemMargin(mImageListView.View);
+                        bounds.Offset(-(itemMargin.Width - 2) / 2 - 2, 0);
                         bounds.Width = 2;
                     }
                     if (mClip)
@@ -646,9 +647,20 @@ namespace Manina.Windows.Forms
                     return System.Math.Max(mImageListView.HeaderFont.Height + 4, 24);
             }
             /// <summary>
+            /// Returns the spacing between items for the given view mode.
+            /// </summary>
+            /// <param name="view">The view mode for which the measurement should be made.</param>
+            public virtual Size MeasureItemMargin(View view)
+            {
+                if (view == View.Details)
+                    return new Size(2, 0);
+                else
+                    return new Size(4, 4);
+            }
+            /// <summary>
             /// Returns item size for the given view mode.
             /// </summary>
-            /// <param name="view">The view mode for which the item measurement should be made.</param>
+            /// <param name="view">The view mode for which the measurement should be made.</param>
             public virtual Size MeasureItem(View view)
             {
                 Size itemSize = new Size();
@@ -954,14 +966,11 @@ namespace Manina.Windows.Forms
                 {
                     Image img = null;
                     if (mImageListView.SortOrder == SortOrder.Ascending)
-                        img = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAYAAAD68A/GAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHNJREFUGFdjYCAXFB9LP1lwKPUIXv1FR9Mudpyq+996ovp/xo7Y8xiKS45nsBUdSbvdfqrm//Jr8/4vvTLnf+2B4v9xa0JvRi4LYINrKDycujtvf9L35mOV/xdfmfV/4eUZ/9sO1/6PWOL/PXie1w6SvAEA+BE3G3fNEd8AAAAASUVORK5CYII=");
+                        img = ImageListViewResources.SortAscending;
                     else if (mImageListView.SortOrder == SortOrder.Descending)
-                        img = Utility.ImageFromBase64String(@"iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAYAAAD68A/GAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHNJREFUGFdjYCAFeE1y2uHaY/s9Z23q/6ZDtf8bDlb9D5jk/V8nV/27RobKbrhZzl02bHbNFjfDZwb+rztQ+b9mf9l/7163/+ppyreVkxTYMCw1LtU979vv8d+rx/W/WqrSRbyu0sxUPaKaoniSFKejqAUAXY8qTCsVRMkAAAAASUVORK5CYII=");
-                    using (img)
-                    {
-                        g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
-                        textOffset += img.Width;
-                    }
+                        img = ImageListViewResources.SortDescending;
+                    g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
+                    textOffset += img.Width;
                 }
 
                 // Text
@@ -989,8 +998,9 @@ namespace Manina.Windows.Forms
             public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
                 // Calculate image bounds
-                float xscale = (float)(bounds.Width - 2 * mImageListView.ItemMargin.Width) / (float)image.Width;
-                float yscale = (float)(bounds.Height - 2 * mImageListView.ItemMargin.Height) / (float)image.Height;
+                Size itemMargin = MeasureItemMargin(mImageListView.View);
+                float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
+                float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
                 float scale = Math.Min(xscale, yscale);
                 if (scale > 1.0f) scale = 1.0f;
                 int imageWidth = (int)((float)image.Width * scale);
