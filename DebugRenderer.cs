@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Manina.Windows.Forms
 {
@@ -52,10 +53,20 @@ namespace Manina.Windows.Forms
         {
             if (item.Index == mImageListView.layoutManager.FirstPartiallyVisible ||
                 item.Index == mImageListView.layoutManager.LastPartiallyVisible)
-                g.FillRectangle(Brushes.Yellow, bounds);
+            {
+                using (Brush b = new HatchBrush(HatchStyle.BackwardDiagonal, Color.Green, Color.Transparent))
+                {
+                    g.FillRectangle(b, bounds);
+                }
+            }
             if (item.Index == mImageListView.layoutManager.FirstVisible ||
                 item.Index == mImageListView.layoutManager.LastVisible)
-                g.FillRectangle(Brushes.Green, bounds);
+            {
+                using (Brush b = new HatchBrush(HatchStyle.ForwardDiagonal, Color.Red, Color.Transparent))
+                {
+                    g.FillRectangle(b, bounds);
+                }
+            }
 
             base.DrawItem(g, item, state, bounds);
         }
