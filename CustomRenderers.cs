@@ -31,7 +31,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the built-in renderers.
     /// </summary>
-    public static class ImageListViewRenderers
+    public static partial class ImageListViewRenderers
     {
         #region DefaultRenderer
         /// <summary>

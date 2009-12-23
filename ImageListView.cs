@@ -644,7 +644,7 @@ namespace Manina.Windows.Forms
 
         #region Helper Methods
         /// <summary>
-        /// Refreshed the control.
+        /// Refreshes the control.
         /// </summary>
         internal void Refresh(bool force)
         {
