@@ -223,7 +223,7 @@ namespace Manina.Windows.Forms
                     if ((DateTime.Now - lastRedraw).Milliseconds > refreshPeriod)
                         redraw = true;
                 }
-                System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+
                 if (redraw)
                 {
                     try
@@ -238,8 +238,7 @@ namespace Manina.Windows.Forms
                         ;
                     }
                 }
-                sw.Stop();
-                System.Diagnostics.Debug.Print(sw.ElapsedMilliseconds.ToString());
+
                 inTimer = false;
             }
 
