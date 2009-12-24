@@ -43,44 +43,74 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Represents a snow flake
             /// </summary>
-            private class SnowFlake : IDisposable
+            private class SnowFlake
             {
                 public Point Location { get; set; }
                 public double Rotation { get; set; }
-                public int Speed { get; set; }
-
-                private GraphicsPath outline;
-                public GraphicsPath Outline { get { return outline; } }
-
-                private int size;
-                public int Size { get { return size; } }
+                public int Size { get; set; }
 
                 public SnowFlake(int newSize)
                 {
-                    outline = CreateOutline(newSize);
+                    Size = newSize;
                     Location = new Point(0, 0);
                     Rotation = 0.0;
                 }
+            }
 
-                private struct Segment
+            private readonly object lockObject = new object();
+
+            private int maxFlakeCount = 50;
+            private int minFlakeSize = 4;
+            private int maxFlakeSize = 12;
+            private int flakeGeneration = 3;
+            private int currentGeneration = 0;
+            private long refreshPeriod = 50;
+            private int fallSpeed = 3;
+            private DateTime lastRedraw = DateTime.Now;
+            private volatile bool inTimer = false;
+
+            private List<SnowFlake> flakes = null;
+            private System.Threading.Timer timer;
+            private Random random = new Random();
+
+            private Rectangle displayBounds = Rectangle.Empty;
+
+            private GraphicsPath flake;
+            private GraphicsPath terrain;
+
+            /// <summary>
+            /// Initializes a new instance of the NewYear2010Renderer class.
+            /// </summary>
+            public NewYear2010Renderer()
+            {
+                flake = CreateFlake(10, 3);
+                terrain = CreateTerrain();
+                timer = new System.Threading.Timer(UpdateTimerCallback, null, 0, refreshPeriod);
+            }
+
+            /// <summary>
+            /// Generates a snowflake from a Koch curve.
+            /// </summary>
+            private GraphicsPath CreateFlake(int size, int iterations)
+            {
+                Queue<PointF> segments = new Queue<PointF>();
+                float h = (float)Math.Sin(Math.PI / 3.0) * (float)size;
+                PointF v1 = new PointF(-1.0f * (float)size / 2.0f, -h / 3.0f);
+                PointF v2 = new PointF((float)size / 2f, -h / 3.0f);
+                PointF v3 = new PointF(0.0f, h * 2.0f / 3.0f);
+                segments.Enqueue(v1); segments.Enqueue(v2);
+                segments.Enqueue(v2); segments.Enqueue(v3);
+                segments.Enqueue(v3); segments.Enqueue(v1);
+
+                for (int k = 0; k < iterations - 1; k++)
                 {
-                    public PointF p1;
-                    public PointF p2;
-
-                    public Segment(float x1, float y1, float x2, float y2)
+                    int todivide = segments.Count / 2;
+                    for (int i = 0; i < todivide; i++)
                     {
-                        p1 = new PointF(x1, y1);
-                        p2 = new PointF(x2, y2);
-                    }
+                        PointF p1 = segments.Dequeue();
+                        PointF p2 = segments.Dequeue();
 
-                    public Segment(PointF v1, PointF v2)
-                    {
-                        p1 = v1;
-                        p2 = v2;
-                    }
-
-                    public Segment[] TriSect()
-                    {
+                        // Trisect the segment
                         PointF pi1 = new PointF((p2.X - p1.X) / 3.0f + p1.X,
                             (p2.Y - p1.Y) / 3.0f + p1.Y);
                         PointF pi2 = new PointF((p2.X - p1.X) * 2.0f / 3.0f + p1.X,
@@ -89,68 +119,24 @@ namespace Manina.Windows.Forms
                         double angle = Math.Atan2(p2.Y - p1.Y, p2.X - p1.X) - Math.PI / 3.0;
                         PointF pn = new PointF(pi1.X + (float)(Math.Cos(angle) * dist),
                             pi1.Y + (float)(Math.Sin(angle) * dist));
-                        return new Segment[] { new Segment(p1, pi1), new Segment(pi1, pn), new Segment(pn, pi2), new Segment(pi2, p2) };
+
+                        segments.Enqueue(p1); segments.Enqueue(pi1);
+                        segments.Enqueue(pi1); segments.Enqueue(pn);
+                        segments.Enqueue(pn); segments.Enqueue(pi2);
+                        segments.Enqueue(pi2); segments.Enqueue(p2);
                     }
                 }
 
-                private GraphicsPath CreateOutline(int newSize)
+                GraphicsPath path = new GraphicsPath();
+                while (segments.Count != 0)
                 {
-                    size = newSize;
-                    Queue<Segment> segments = new Queue<Segment>();
-                    float h = (float)Math.Sin(Math.PI / 3.0) * (float)newSize;
-                    PointF p1 = new PointF(-1.0f * (float)newSize / 2.0f, -h / 3.0f);
-                    PointF p2 = new PointF((float)newSize / 2f, -h / 3.0f);
-                    PointF p3 = new PointF(0.0f, h * 2.0f / 3.0f);
-                    segments.Enqueue(new Segment(p1, p2));
-                    segments.Enqueue(new Segment(p2, p3));
-                    segments.Enqueue(new Segment(p3, p1));
-
-                    for (int k = 0; k < 3; k++)
-                    {
-                        int todivide = segments.Count;
-                        for (int i = 0; i < todivide; i++)
-                        {
-                            foreach (Segment newsegment in segments.Dequeue().TriSect())
-                                segments.Enqueue(newsegment);
-                        }
-                    }
-
-                    GraphicsPath path = new GraphicsPath();
-                    foreach (Segment s in segments)
-                        path.AddLine(s.p1, s.p2);
-
-                    path.CloseFigure();
-                    return path;
+                    PointF p1 = segments.Dequeue();
+                    PointF p2 = segments.Dequeue();
+                    path.AddLine(p1, p2);
                 }
 
-                public void Dispose()
-                {
-                    outline.Dispose();
-                }
-            }
-
-            private int flakeCount = 200;
-            private int minFlakeSize = 6;
-            private int maxFlakeSize = 18;
-            private int refreshPeriod = 100;
-            private int flakeCreation = 3;
-            private int cycleCount = 0;
-
-            private DateTime lastPaintTime;
-            private List<SnowFlake> flakes = null;
-            private System.Threading.Timer timer;
-            private Random random = new Random();
-
-            private GraphicsPath terrain;
-
-            /// <summary>
-            /// Initializes a new instance of the NewYear2010Renderer class.
-            /// </summary>
-            public NewYear2010Renderer()
-            {
-                lastPaintTime = DateTime.Now;
-                terrain = CreateTerrain();
-                timer = new System.Threading.Timer(UpdateTimerCallback, null, 0, refreshPeriod);
+                path.CloseFigure();
+                return path;
             }
 
             /// <summary>
@@ -180,64 +166,93 @@ namespace Manina.Windows.Forms
                 path.AddLine(lastx, lasty, width + step, 0);
                 path.AddLine(width + step, 0, width + step, 200);
                 path.AddLine(width + step, 200, -step, 200);
-
                 path.CloseFigure();
+
                 return path;
             }
 
             /// <summary>
-            /// Updates the timer callback.
+            /// Updates snow flakes at each timer tick.
             /// </summary>
             private void UpdateTimerCallback(object state)
             {
-                if (ImageListView != null)
+                if (inTimer) return;
+                inTimer = true;
+
+                bool redraw = false;
+
+                lock (lockObject)
                 {
-                    Rectangle rec = ImageListView.DisplayRectangle;
+                    if (displayBounds.IsEmpty)
+                    {
+                        inTimer = false;
+                        return;
+                    }
 
                     if (flakes == null)
                         flakes = new List<SnowFlake>();
 
-                    cycleCount++;
-                    if (cycleCount == flakeCreation)
+                    // Add new snow flakes
+                    currentGeneration++;
+                    if (currentGeneration == flakeGeneration)
                     {
-                        cycleCount = 0;
-                        if (flakes.Count < flakeCount)
+                        currentGeneration = 0;
+                        if (flakes.Count < maxFlakeCount)
                         {
-                            SnowFlake flake = new SnowFlake(random.Next(minFlakeSize, maxFlakeSize));
-                            flake.Rotation = 2.0 * Math.PI * random.NextDouble();
-                            flake.Location = new Point(random.Next(rec.Left, rec.Right), -20);
-                            flake.Speed = flake.Size / 2;
-                            flakes.Add(flake);
+                            SnowFlake snowFlake = new SnowFlake(random.Next(minFlakeSize, maxFlakeSize));
+                            snowFlake.Rotation = 2.0 * Math.PI * random.NextDouble();
+                            snowFlake.Location = new Point(random.Next(displayBounds.Left, displayBounds.Right), -20);
+                            flakes.Add(snowFlake);
                         }
                     }
 
+                    // Move snow flakes
                     for (int i = flakes.Count - 1; i >= 0; i--)
                     {
-                        SnowFlake flake = flakes[i];
-                        if (flake.Location.Y > rec.Height)
-                            flakes.Remove(flake);
+                        SnowFlake snowFlake = flakes[i];
+                        if (snowFlake.Location.Y > displayBounds.Height)
+                            flakes.Remove(snowFlake);
                         else
                         {
-                            flake.Location = new Point(flake.Location.X, flake.Location.Y + flake.Speed);
-                            flake.Rotation += 360.0 / 40.0;
-                            if (flake.Rotation > 360.0) flake.Rotation -= 360.0;
+                            snowFlake.Location = new Point(snowFlake.Location.X, snowFlake.Location.Y + snowFlake.Size * fallSpeed / 10);
+                            snowFlake.Rotation += 360.0 / 40.0;
+                            if (snowFlake.Rotation > 360.0) snowFlake.Rotation -= 360.0;
                         }
                     }
 
-                    if ((DateTime.Now - lastPaintTime).Milliseconds > refreshPeriod)
+                    if ((DateTime.Now - lastRedraw).Milliseconds > refreshPeriod)
+                        redraw = true;
+                }
+                System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+                if (redraw)
+                {
+                    try
                     {
-                        try
-                        {
-                            if (ImageListView.InvokeRequired)
-                                ImageListView.Invoke((MethodInvoker)delegate { ImageListView.Refresh(); });
-                            else
-                                ImageListView.Refresh();
-                        }
-                        catch
-                        {
-                            ;
-                        }
+                        if (ImageListView.InvokeRequired)
+                            ImageListView.Invoke((MethodInvoker)delegate { ImageListView.Refresh(); });
+                        else
+                            ImageListView.Refresh();
                     }
+                    catch
+                    {
+                        ;
+                    }
+                }
+                sw.Stop();
+                System.Diagnostics.Debug.Print(sw.ElapsedMilliseconds.ToString());
+                inTimer = false;
+            }
+
+            /// <summary>
+            /// Sets the layout of the control.
+            /// </summary>
+            /// <param name="e">A LayoutEventArgs that contains event data.</param>
+            public override void OnLayout(LayoutEventArgs e)
+            {
+                base.OnLayout(e);
+                lock (lockObject)
+                {
+                    displayBounds = ImageListView.DisplayRectangle;
                 }
             }
 
@@ -248,23 +263,54 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the client area.</param>
             public override void DrawOverlay(Graphics g, Rectangle bounds)
             {
-                lastPaintTime = DateTime.Now;
-
-                DrawTerrain(g, terrain);
-
-                if (flakes != null)
+                lock (lockObject)
                 {
-                    for (int i = 0; i < flakes.Count; i++)
-                        DrawSnowFlake(g, flakes[i]);
+                    lastRedraw = DateTime.Now;
                 }
 
-                DrawTerrainOverlay(g, terrain);
+                // Draw the terrain
+                DrawTerrain(g);
+
+                lock (lockObject)
+                {
+                    // Draw the snow flakes
+                    if (flakes != null)
+                    {
+                        foreach (SnowFlake snowFlake in flakes)
+                            DrawSnowFlake(g, snowFlake);
+                    }
+                }
+
+                // Redraw some of the terrain over slow flakes
+                DrawTerrainOutline(g);
+            }
+
+            /// <summary>
+            /// Draws a snow flake.
+            /// </summary>
+            private void DrawSnowFlake(Graphics g, SnowFlake snowFlake)
+            {
+                g.ResetTransform();
+                g.TranslateTransform(-snowFlake.Size / 2, -snowFlake.Size / 2, MatrixOrder.Append);
+                g.ScaleTransform((float)snowFlake.Size / 6.0f, (float)snowFlake.Size / 6.0f);
+                g.RotateTransform((float)snowFlake.Rotation, MatrixOrder.Append);
+                g.TranslateTransform(snowFlake.Location.X, snowFlake.Location.Y, MatrixOrder.Append);
+                using (SolidBrush brush = new SolidBrush(Color.White))
+                using (Pen pen = new Pen(Color.Gray))
+                using (Pen glowPen = new Pen(Color.FromArgb(96, Color.White), 2.0f))
+                {
+                    g.DrawPath(glowPen, flake);
+                    g.FillPath(brush, flake);
+                    g.DrawPath(pen, flake);
+                }
+
+                g.ResetTransform();
             }
 
             /// <summary>
             /// Draws the terrain.
             /// </summary>
-            private void DrawTerrain(Graphics g, GraphicsPath path)
+            private void DrawTerrain(Graphics g)
             {
                 g.ResetTransform();
                 using (SolidBrush brush = new SolidBrush(Color.White))
@@ -280,9 +326,9 @@ namespace Manina.Windows.Forms
             }
 
             /// <summary>
-            /// Draws the overlay on the terrain.
+            /// Draws the terrain.
             /// </summary>
-            private void DrawTerrainOverlay(Graphics g, GraphicsPath path)
+            private void DrawTerrainOutline(Graphics g)
             {
                 g.ResetTransform();
                 using (SolidBrush brush = new SolidBrush(Color.White))
@@ -296,37 +342,13 @@ namespace Manina.Windows.Forms
             }
 
             /// <summary>
-            /// Draws a snow flake.
-            /// </summary>
-            private void DrawSnowFlake(Graphics g, SnowFlake flake)
-            {
-                using (SolidBrush brush = new SolidBrush(Color.White))
-                using (Pen glow = new Pen(Color.FromArgb(96, Color.White), 2.0f))
-                using (Pen pen = new Pen(Color.Gray))
-                {
-                    g.ResetTransform();
-                    g.TranslateTransform(-flake.Size / 2, -flake.Size / 2, MatrixOrder.Append);
-                    g.RotateTransform((float)flake.Rotation, MatrixOrder.Append);
-                    g.TranslateTransform(flake.Location.X, flake.Location.Y, MatrixOrder.Append);
-                    using (GraphicsPath glowPath = (GraphicsPath)flake.Outline.Clone())
-                    {
-                        glowPath.Widen(glow);
-                        g.DrawPath(glow, glowPath);
-                    }
-                    g.FillPath(brush, flake.Outline);
-                    g.DrawPath(pen, flake.Outline);
-                    g.ResetTransform();
-                }
-            }
-
-            /// <summary>
             /// Releases managed resources.
             /// </summary>
             public override void OnDispose()
             {
                 base.OnDispose();
-                foreach (SnowFlake flake in flakes)
-                    flake.Dispose();
+
+                flake.Dispose();
                 terrain.Dispose();
                 timer.Dispose();
             }
