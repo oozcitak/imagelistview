@@ -62,22 +62,63 @@ namespace Manina.Windows.Forms
                     Rotation = 0.0;
                 }
 
+                private struct Segment
+                {
+                    public PointF p1;
+                    public PointF p2;
+
+                    public Segment(float x1, float y1, float x2, float y2)
+                    {
+                        p1 = new PointF(x1, y1);
+                        p2 = new PointF(x2, y2);
+                    }
+
+                    public Segment(PointF v1, PointF v2)
+                    {
+                        p1 = v1;
+                        p2 = v2;
+                    }
+
+                    public Segment[] TriSect()
+                    {
+                        PointF pi1 = new PointF((p2.X - p1.X) / 3.0f + p1.X,
+                            (p2.Y - p1.Y) / 3.0f + p1.Y);
+                        PointF pi2 = new PointF((p2.X - p1.X) * 2.0f / 3.0f + p1.X,
+                            (p2.Y - p1.Y) * 2.0f / 3.0f + p1.Y);
+                        double dist = Math.Sqrt((pi1.X - pi2.X) * (pi1.X - pi2.X) + (pi1.Y - pi2.Y) * (pi1.Y - pi2.Y));
+                        double angle = Math.Atan2(p2.Y - p1.Y, p2.X - p1.X) - Math.PI / 3.0;
+                        PointF pn = new PointF(pi1.X + (float)(Math.Cos(angle) * dist),
+                            pi1.Y + (float)(Math.Sin(angle) * dist));
+                        return new Segment[] { new Segment(p1, pi1), new Segment(pi1, pn), new Segment(pn, pi2), new Segment(pi2, p2) };
+                    }
+                }
+
                 private GraphicsPath CreateOutline(int newSize)
                 {
                     size = newSize;
-                    GraphicsPath path = new GraphicsPath();
-                    int corners = 6;
-                    float minsize = size;
-                    float maxsize = 1.6f * size;
-                    float step = 2.0f * (float)Math.PI / (float)corners;
-                    for (int i = 0; i < corners; i++)
+                    Queue<Segment> segments = new Queue<Segment>();
+                    float h = (float)Math.Sin(Math.PI / 3.0) * (float)newSize;
+                    PointF p1 = new PointF(-1.0f * (float)newSize / 2.0f, -h / 3.0f);
+                    PointF p2 = new PointF((float)newSize / 2f, -h / 3.0f);
+                    PointF p3 = new PointF(0.0f, h * 2.0f / 3.0f);
+                    segments.Enqueue(new Segment(p1, p2));
+                    segments.Enqueue(new Segment(p2, p3));
+                    segments.Enqueue(new Segment(p3, p1));
+
+                    for (int k = 0; k < 3; k++)
                     {
-                        float angle = ((float)i) * step;
-                        path.AddLine((float)Math.Cos(angle) * maxsize, (float)Math.Sin(angle) * maxsize,
-                            (float)Math.Cos(angle + step / 2) * minsize, (float)Math.Sin(angle + step / 2) * minsize);
-                        path.AddLine((float)Math.Cos(angle + step / 2) * minsize, (float)Math.Sin(angle + step / 2) * minsize,
-                            (float)Math.Cos(angle + step) * maxsize, (float)Math.Sin(angle + step) * maxsize);
+                        int todivide = segments.Count;
+                        for (int i = 0; i < todivide; i++)
+                        {
+                            foreach (Segment newsegment in segments.Dequeue().TriSect())
+                                segments.Enqueue(newsegment);
+                        }
                     }
+
+                    GraphicsPath path = new GraphicsPath();
+                    foreach (Segment s in segments)
+                        path.AddLine(s.p1, s.p2);
+
                     path.CloseFigure();
                     return path;
                 }
@@ -88,10 +129,10 @@ namespace Manina.Windows.Forms
                 }
             }
 
-            private int flakeCount = 500;
-            private int minFlakeSize = 2;
-            private int maxFlakeSize = 6;
-            private int refreshPeriod = 50;
+            private int flakeCount = 200;
+            private int minFlakeSize = 6;
+            private int maxFlakeSize = 18;
+            private int refreshPeriod = 100;
             private int flakeCreation = 3;
             private int cycleCount = 0;
 
@@ -165,7 +206,7 @@ namespace Manina.Windows.Forms
                             SnowFlake flake = new SnowFlake(random.Next(minFlakeSize, maxFlakeSize));
                             flake.Rotation = 2.0 * Math.PI * random.NextDouble();
                             flake.Location = new Point(random.Next(rec.Left, rec.Right), -20);
-                            flake.Speed = flake.Size;
+                            flake.Speed = flake.Size / 2;
                             flakes.Add(flake);
                         }
                     }
