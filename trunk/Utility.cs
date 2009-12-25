@@ -341,8 +341,8 @@ namespace Manina.Windows.Forms
                 thumb = new Bitmap(width, height);
                 using (Graphics g = Graphics.FromImage(thumb))
                 {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.High;
+                    g.PixelOffsetMode = PixelOffsetMode.None;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
                     using (Brush brush = new SolidBrush(backColor))
                     {
@@ -488,7 +488,8 @@ namespace Manina.Windows.Forms
                 thumb = new Bitmap(source, width, height);
                 using (Graphics g = Graphics.FromImage(thumb))
                 {
-                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.PixelOffsetMode = PixelOffsetMode.None;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     g.Clear(backColor);
                     g.DrawImage(source, 0, 0, width, height);
                 }

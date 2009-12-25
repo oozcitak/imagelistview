@@ -633,8 +633,8 @@ namespace Manina.Windows.Forms
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             public virtual void InitializeGraphics(Graphics g)
             {
-                g.SmoothingMode = SmoothingMode.HighQuality;
-                g.InterpolationMode = InterpolationMode.High;
+                g.PixelOffsetMode = PixelOffsetMode.None;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             }
             /// <summary>
             /// Returns the height of column headers.
