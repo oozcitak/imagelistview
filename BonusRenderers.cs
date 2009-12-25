@@ -243,6 +243,17 @@ namespace Manina.Windows.Forms
             }
 
             /// <summary>
+            /// Initializes the System.Drawing.Graphics used to draw
+            /// control elements.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            public override void InitializeGraphics(Graphics g)
+            {
+                base.InitializeGraphics(g);
+                g.SmoothingMode = SmoothingMode.HighQuality;
+            }
+
+            /// <summary>
             /// Sets the layout of the control.
             /// </summary>
             /// <param name="e">A LayoutEventArgs that contains event data.</param>
