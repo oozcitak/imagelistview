@@ -19,6 +19,10 @@ In this mode, a single row of thumbnails are displayed at the bottom. The view c
 
 http://imagelistview.googlecode.com/svn/wiki/ImageListView.gallery.jpg
 
+== Pane ==
+
+In this mode, a large preview image and image metadata is displayed in the left pane.
+
 == Details ==
 
 In this mode, columns with image details are shown. Thumbnail images are not displayed. The view can be scrolled vertically.
