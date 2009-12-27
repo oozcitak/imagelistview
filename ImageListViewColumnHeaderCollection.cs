@@ -81,7 +81,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Initializes a new instance of the ImageListViewColumnHeaderCollection class.
             /// </summary>
-            /// <param name="owner">The owner.</param>
+            /// <param name="owner">The owner control.</param>
             internal ImageListViewColumnHeaderCollection(ImageListView owner)
             {
                 mImageListView = owner;

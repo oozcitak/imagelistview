@@ -78,9 +78,12 @@ namespace Manina.Windows.Forms
         /// <param name="bounds">The bounding rectangle of the client area.</param>
         public override void DrawOverlay(Graphics g, Rectangle bounds)
         {
+            // Refresh process info
             Process p = Process.GetCurrentProcess();
             p.Refresh();
             long mem = Math.Max(0, p.PrivateMemorySize64 - baseMem);
+
+            // Display memory stats
             string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(mImageListView.cacheManager.MemoryUsed));
             SizeF sz = g.MeasureString(s, ImageListView.Font);
             Rectangle r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5, 115, (int)sz.Height);
@@ -94,6 +97,7 @@ namespace Manina.Windows.Forms
             }
             g.DrawString(s, ImageListView.Font, Brushes.Black, r.Location);
 
+            // Display navigation parameters
             r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5 + (int)sz.Height + 10, 115, 125);
             using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))
             {
@@ -103,6 +107,8 @@ namespace Manina.Windows.Forms
             {
                 g.DrawRectangle(pen, r);
             }
+
+            // Is left button down?
             r = new Rectangle(r.Left + 5, r.Top + 5, 15, 15);
             if (mImageListView.navigationManager.LeftButton)
             {
@@ -111,6 +117,8 @@ namespace Manina.Windows.Forms
             g.DrawRectangle(Pens.Black, r);
             r.Offset(15, 0);
             r.Offset(15, 0);
+
+            // Is right button down?
             if (mImageListView.navigationManager.RightButton)
             {
                 g.FillRectangle(Brushes.DarkGray, r);
@@ -118,6 +126,7 @@ namespace Manina.Windows.Forms
             g.DrawRectangle(Pens.Black, r);
             r.Offset(-30, 22);
 
+            // Is shift key down?
             Color tColor = Color.Gray;
             if (mImageListView.navigationManager.ShiftKey)
                 tColor = Color.Black;
@@ -127,6 +136,7 @@ namespace Manina.Windows.Forms
             }
             r.Offset(0, 12);
 
+            // Is control key down?
             tColor = Color.Gray;
             if (mImageListView.navigationManager.ControlKey)
                 tColor = Color.Black;
@@ -136,6 +146,7 @@ namespace Manina.Windows.Forms
             }
             r.Offset(0, 20);
 
+            // Display hit test details for item area
             ImageListView.HitInfo h = null;
             mImageListView.HitTest(mImageListView.PointToClient(Control.MousePosition), out h);
 
@@ -148,6 +159,7 @@ namespace Manina.Windows.Forms
             }
             r.Offset(0, 12);
 
+            // Display hit test details for column header area
             tColor = Color.Gray;
             if (h.InHeaderArea)
                 tColor = Color.Black;
@@ -157,6 +169,7 @@ namespace Manina.Windows.Forms
             }
             r.Offset(0, 12);
 
+            // Display hit test details for pane area
             tColor = Color.Gray;
             if (h.InPaneArea)
                 tColor = Color.Black;
@@ -165,8 +178,6 @@ namespace Manina.Windows.Forms
                 g.DrawString("InPaneArea " + (h.PaneBorder ? " (Border)" : ""), mImageListView.Font, b, r.Location);
             }
             r.Offset(0, 12);
-
-
         }
     }
 }

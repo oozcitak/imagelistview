@@ -134,6 +134,10 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewLayoutManager class.
+        /// </summary>
+        /// <param name="owner">The owner control.</param>
         public ImageListViewLayoutManager(ImageListView owner)
         {
             mImageListView = owner;

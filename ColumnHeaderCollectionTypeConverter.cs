@@ -22,6 +22,8 @@ namespace Manina.Windows.Forms
 {
     /// <summary>
     /// Provides a type converter for the column header collection.
+    /// This is only used to replace the generic collection text in the
+    /// property browser with "(Collection)".
     /// </summary>
     internal class ColumnHeaderCollectionTypeConverter : TypeConverter
     {

@@ -94,6 +94,7 @@ namespace Manina.Windows.Forms
             }
             /// <summary>
             /// Initializes a new instance of the HitInfo class.
+            /// Used when the control registered an item hit.
             /// </summary>
             /// <param name="itemIndex">Index of the item.</param>
             internal HitInfo(int itemIndex)
@@ -103,6 +104,7 @@ namespace Manina.Windows.Forms
             }
             /// <summary>
             /// Initializes a new instance of the HitInfo class.
+            /// Used when the control registered a column hit.
             /// </summary>
             /// <param name="columnIndex">Type of the column.</param>
             /// <param name="columnSeparator">The column separator.</param>
@@ -113,6 +115,7 @@ namespace Manina.Windows.Forms
             }
             /// <summary>
             /// Initializes a new instance of the HitInfo class.
+            /// Used when the control registered a hit in pane area.
             /// </summary>
             /// <param name="paneBorder">True if the hit point is over the left-pane 
             /// border, false otherwise.</param>

@@ -53,7 +53,7 @@ namespace Manina.Windows.Forms
             private string mFileName;
 
             /// <summary>
-            /// Gets the item.
+            /// Gets the ImageListViewItem associated with this request.
             /// </summary>
             public ImageListViewItem Item { get { return mItem; } }
             /// <summary>
@@ -61,6 +61,11 @@ namespace Manina.Windows.Forms
             /// </summary>
             public string FileName { get { return mFileName; } }
 
+            /// <summary>
+            /// Initializes a new instance of the CacheItem class.
+            /// </summary>
+            /// <param name="item">The ImageListViewItem associated 
+            /// with this request.</param>
             public CacheItem(ImageListViewItem item)
             {
                 mItem = item;
@@ -81,6 +86,10 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewItemCacheManager class.
+        /// </summary>
+        /// <param name="owner">The owner control.</param>
         public ImageListViewItemCacheManager(ImageListView owner)
         {
             lockObject = new object();

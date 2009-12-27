@@ -52,12 +52,18 @@ namespace Manina.Windows.Forms
         /// Selection tolerance for left-pane border.
         /// </summary>
         internal const int PaneBorderSize = 4;
-
+        /// <summary>
+        /// Creates a control with a border.
+        /// </summary>
         private const int WS_BORDER = 0x00800000;
+        /// <summary>
+        /// Specifies that the control has a border with a sunken edge.
+        /// </summary>
         private const int WS_EX_CLIENTEDGE = 0x00000200;
         #endregion
 
         #region Member Variables
+        // Properties
         private BorderStyle mBorderStyle;
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
@@ -86,7 +92,7 @@ namespace Manina.Windows.Forms
         // Interaction variables
         internal ImageListViewNavigationManager navigationManager;
 
-        // Cache thread
+        // Cache threads
         internal ImageListViewCacheManager cacheManager;
         internal ImageListViewItemCacheManager itemCacheManager;
         #endregion
@@ -396,7 +402,8 @@ namespace Manina.Windows.Forms
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque | ControlStyles.Selectable | ControlStyles.UserMouse, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque | 
+                ControlStyles.Selectable | ControlStyles.UserMouse, true);
             Size = new Size(120, 100);
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
@@ -689,35 +696,6 @@ namespace Manina.Windows.Forms
             forceRefresh = force;
             Refresh();
             forceRefresh = false;
-        }
-        /// <summary>
-        /// Returns the item index after applying the given navigation key.
-        /// </summary>
-        private int ApplyNavKey(int index, System.Windows.Forms.Keys key)
-        {
-            if (key == Keys.Up && index >= layoutManager.Cols)
-                index -= layoutManager.Cols;
-            else if (key == Keys.Down && index < Items.Count - layoutManager.Cols)
-                index += layoutManager.Cols;
-            else if (key == Keys.Left && index > 0)
-                index--;
-            else if (key == Keys.Right && index < Items.Count - 1)
-                index++;
-            else if (key == Keys.PageUp && index >= layoutManager.Cols * (layoutManager.Rows - 1))
-                index -= layoutManager.Cols * (layoutManager.Rows - 1);
-            else if (key == Keys.PageDown && index < Items.Count - layoutManager.Cols * (layoutManager.Rows - 1))
-                index += layoutManager.Cols * (layoutManager.Rows - 1);
-            else if (key == Keys.Home)
-                index = 0;
-            else if (key == Keys.End)
-                index = Items.Count - 1;
-
-            if (index < 0)
-                index = 0;
-            else if (index > Items.Count - 1)
-                index = Items.Count - 1;
-
-            return index;
         }
         /// <summary>
         /// Determines whether the specified item is visible on the screen.

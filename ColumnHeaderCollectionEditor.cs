@@ -26,6 +26,9 @@ namespace Manina.Windows.Forms
     internal class ColumnHeaderCollectionEditor : CollectionEditor
     {
         #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ColumnHeaderCollectionEditor class.
+        /// </summary>
         public ColumnHeaderCollectionEditor()
             : base(typeof(ImageListView.ImageListViewColumnHeaderCollection))
         {
