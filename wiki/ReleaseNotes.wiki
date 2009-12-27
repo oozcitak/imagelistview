@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 3.0 (27 December 2009) =
+
+  * Added the new Pane view mode, removed !PanelRenderer.
+  * Fixed an issue where buffered graphics could not be created while repeatedly resizing the control.
+
 = 2.8 (21 December 2009) =
 
   * Adjustable properties of built-in renderers are now public.
