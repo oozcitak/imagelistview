@@ -285,8 +285,17 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal enum ItemHighlightState
     {
+        /// <summary>
+        /// Item is not highlighted.
+        /// </summary>
         NotHighlighted,
-        Highlighted,
+        /// <summary>
+        /// Item is highlighted and will be removed from the selection set.
+        /// </summary>
+        HighlightedAndUnSelected,
+        /// <summary>
+        /// Item is highlighted and will be added to the selection set.
+        /// </summary>
         HighlightedAndSelected,
     }
     #endregion

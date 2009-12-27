@@ -45,10 +45,23 @@ namespace Manina.Windows.Forms
             /// </summary>
             private class SnowFlake
             {
+                /// <summary>
+                /// Gets or sets the client coordinates of the snow flake.
+                /// </summary>
                 public Point Location { get; set; }
+                /// <summary>
+                /// Gets or sets the rotation angle of the snow flake in degrees.
+                /// </summary>
                 public double Rotation { get; set; }
+                /// <summary>
+                /// Gets or sets the size of the snow flake.
+                /// </summary>
                 public int Size { get; set; }
 
+                /// <summary>
+                /// Initializes a new instance of the SnowFlake class.
+                /// </summary>
+                /// <param name="newSize">The size of the snow flake.</param>
                 public SnowFlake(int newSize)
                 {
                     Size = newSize;
@@ -90,7 +103,11 @@ namespace Manina.Windows.Forms
 
             /// <summary>
             /// Generates a snowflake from a Koch curve.
+            /// http://en.wikipedia.org/wiki/Koch_snowflake
             /// </summary>
+            /// <param name="size">The size of the snow flake.</param>
+            /// <param name="iterations">Number of iterations. Higher values 
+            /// produce more complex curves.</param>
             private GraphicsPath CreateFlake(int size, int iterations)
             {
                 Queue<PointF> segments = new Queue<PointF>();
@@ -174,6 +191,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Updates snow flakes at each timer tick.
             /// </summary>
+            /// <param name="state">Not used, null.</param>
             private void UpdateTimerCallback(object state)
             {
                 if (inTimer) return;
@@ -200,7 +218,7 @@ namespace Manina.Windows.Forms
                         if (flakes.Count < maxFlakeCount)
                         {
                             SnowFlake snowFlake = new SnowFlake(random.Next(minFlakeSize, maxFlakeSize));
-                            snowFlake.Rotation = 2.0 * Math.PI * random.NextDouble();
+                            snowFlake.Rotation = 360.0 * random.NextDouble();
                             snowFlake.Location = new Point(random.Next(displayBounds.Left, displayBounds.Right), -20);
                             flakes.Add(snowFlake);
                         }
@@ -220,6 +238,7 @@ namespace Manina.Windows.Forms
                         }
                     }
 
+                    // Do we need a refresh?
                     if ((DateTime.Now - lastRedraw).Milliseconds > refreshPeriod)
                         redraw = true;
                 }
@@ -298,9 +317,13 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Draws a snow flake.
             /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="snowFlake">The snowflake to draw.</param>
             private void DrawSnowFlake(Graphics g, SnowFlake snowFlake)
             {
                 g.ResetTransform();
+                // Tranform to upper left corner before rotating.
+                // This produces a nice wobbling effect.
                 g.TranslateTransform(-snowFlake.Size / 2, -snowFlake.Size / 2, MatrixOrder.Append);
                 g.ScaleTransform((float)snowFlake.Size / 6.0f, (float)snowFlake.Size / 6.0f);
                 g.RotateTransform((float)snowFlake.Rotation, MatrixOrder.Append);
@@ -320,6 +343,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Draws the terrain.
             /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             private void DrawTerrain(Graphics g)
             {
                 g.ResetTransform();
@@ -336,8 +360,9 @@ namespace Manina.Windows.Forms
             }
 
             /// <summary>
-            /// Draws the terrain.
+            /// Draws the terrain outline.
             /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             private void DrawTerrainOutline(Graphics g)
             {
                 g.ResetTransform();

@@ -134,9 +134,13 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Constructor
-            public ImageListViewNavigationManager(ImageListView imageListView)
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewNavigationManager class.
+            /// </summary>
+            /// <param name="owner">The owner control.</param>
+            public ImageListViewNavigationManager(ImageListView owner)
             {
-                mImageListView = imageListView;
+                mImageListView = owner;
 
                 DraggingSeperator = false;
                 ResizingPane = false;
@@ -181,7 +185,7 @@ namespace Manina.Windows.Forms
                     if (highlighted)
                         return ItemHighlightState.HighlightedAndSelected;
                     else
-                        return ItemHighlightState.Highlighted;
+                        return ItemHighlightState.HighlightedAndUnSelected;
                 }
                 return ItemHighlightState.NotHighlighted;
             }

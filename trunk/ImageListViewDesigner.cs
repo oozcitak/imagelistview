@@ -65,6 +65,10 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewActionLists class.
+        /// </summary>
+        /// <param name="component">A component related to the DesignerActionList.</param>
         public ImageListViewActionLists(IComponent component)
             : base(component)
         {
@@ -153,7 +157,8 @@ namespace Manina.Windows.Forms
 
         #region IServiceProvider Members
         /// <summary>
-        /// Returns an object that represents a service provided by the component associated with the <see cref="T:System.ComponentModel.Design.DesignerActionList"/>.
+        /// Returns an object that represents a service provided by the component 
+        /// associated with the <see cref="T:System.ComponentModel.Design.DesignerActionList"/>.
         /// </summary>
         object IServiceProvider.GetService(Type serviceType)
         {
@@ -174,7 +179,8 @@ namespace Manina.Windows.Forms
             throw new NotSupportedException("Only modal dialogs are supported.");
         }
         /// <summary>
-        /// Displays the specified control in a drop down area below a value field of the property grid that provides this service.
+        /// Displays the specified control in a drop down area below a value 
+        /// field of the property grid that provides this service.
         /// </summary>
         void IWindowsFormsEditorService.DropDownControl(Control control)
         {
@@ -191,7 +197,8 @@ namespace Manina.Windows.Forms
 
         #region ITypeDescriptorContext Members
         /// <summary>
-        /// Gets the container representing this <see cref="T:System.ComponentModel.TypeDescriptor"/> request.
+        /// Gets the container representing this 
+        /// <see cref="T:System.ComponentModel.TypeDescriptor"/> request.
         /// </summary>
         IContainer ITypeDescriptorContext.Container
         {
@@ -219,7 +226,8 @@ namespace Manina.Windows.Forms
             return true;
         }
         /// <summary>
-        /// Gets the <see cref="T:System.ComponentModel.PropertyDescriptor"/> that is associated with the given context item.
+        /// Gets the <see cref="T:System.ComponentModel.PropertyDescriptor"/> 
+        /// that is associated with the given context item.
         /// </summary>
         PropertyDescriptor ITypeDescriptorContext.PropertyDescriptor
         {

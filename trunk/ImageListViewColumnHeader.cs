@@ -120,13 +120,7 @@ namespace Manina.Windows.Forms
             /// Gets the type of information displayed by the column.
             /// </summary>
             [Category("Appearance"), Browsable(false), Description("Gets or sets the type of information displayed by the column.")]
-            public ColumnType Type
-            {
-                get
-                {
-                    return mType;
-                }
-            }
+            public ColumnType Type { get { return mType; } }
             /// <summary>
             /// Gets or sets a value indicating whether the control is displayed.
             /// </summary>

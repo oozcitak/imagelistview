@@ -32,12 +32,6 @@ namespace Manina.Windows.Forms
     /// </summary>
     public static class Utility
     {
-        #region Constants
-        private const int PropertyTagThumbnailData = 0x501B;
-        private const int PropertyTagThumbnailImageWidth = 0x5020;
-        private const int PropertyTagThumbnailImageHeight = 0x5021;
-        #endregion
-
         #region Platform Invoke
         // GetFileAttributesEx
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -138,20 +132,67 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Shell Utilities
-        //Exif tags
+        #region Exif Tag IDs
+        /// <summary>
+        /// Represents the Exif tag for thumbnail data.
+        /// </summary>
+        private const int PropertyTagThumbnailData = 0x501B;
+        /// <summary>
+        /// Represents the Exif tag for thumbnail image width.
+        /// </summary>
+        private const int PropertyTagThumbnailImageWidth = 0x5020;
+        /// <summary>
+        /// Represents the Exif tag for thumbnail image height.
+        /// </summary>
+        private const int PropertyTagThumbnailImageHeight = 0x5021;
+        /// <summary>
+        /// Represents the Exif tag for  inage description.
+        /// </summary>
         private const int PropertyTagImageDescription = 0x010E;
+        /// <summary>
+        /// Represents the Exif tag for the equipment model.
+        /// </summary>
         private const int PropertyTagEquipmentModel = 0x0110;
+        /// <summary>
+        /// Represents the Exif tag for date and time the picture 
+        /// was taken.
+        /// </summary>        
         private const int PropertyTagDateTime = 0x0132;
+        /// <summary>
+        /// Represents the Exif tag for the artist.
+        /// </summary>
         private const int PropertyTagArtist = 0x013B;
+        /// <summary>
+        /// Represents the Exif tag for copyright information.
+        /// </summary>
         private const int PropertyTagCopyright = 0x8298;
+        /// <summary>
+        /// Represents the Exif tag for exposure time.
+        /// </summary>
         private const int PropertyTagExposureTime = 0x829A;
+        /// <summary>
+        /// Represents the Exif tag for F-Number.
+        /// </summary>
         private const int PropertyTagFNumber = 0x829D;
+        /// <summary>
+        /// Represents the Exif tag for ISO speed.
+        /// </summary>
         private const int PropertyTagISOSpeed = 0x8827;
+        /// <summary>
+        /// Represents the Exif tag for shutter speed.
+        /// </summary>
         private const int PropertyTagShutterSpeed = 0x9201;
+        /// <summary>
+        /// Represents the Exif tag for aperture value.
+        /// </summary>
         private const int PropertyTagAperture = 0x9202;
+        /// <summary>
+        /// Represents the Exif tag for user comments.
+        /// </summary>
         private const int PropertyTagUserComment = 0x9286;
+        #endregion
 
+        #region Shell Utilities
         /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>

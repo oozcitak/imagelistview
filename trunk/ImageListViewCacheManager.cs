@@ -29,13 +29,6 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal class ImageListViewCacheManager : IDisposable
     {
-        #region Constants
-        private const int PropertyTagThumbnailData = 0x501B;
-        private const int PropertyTagThumbnailImageWidth = 0x5020;
-        private const int PropertyTagThumbnailImageHeight = 0x5021;
-        private const float EmbeddedThumbnailSizeTolerance = 1.2f;
-        #endregion
-
         #region Member Variables
         private readonly object lockObject;
 
@@ -167,6 +160,10 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewCacheManager class.
+        /// </summary>
+        /// <param name="owner">The owner control.</param>
         public ImageListViewCacheManager(ImageListView owner)
         {
             lockObject = new object();

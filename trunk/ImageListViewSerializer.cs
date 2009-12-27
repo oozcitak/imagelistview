@@ -30,6 +30,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Deserializes the specified serialized CodeDOM object into an object.
         /// </summary>
+        /// <param name="manager">A serialization manager interface that is used during the deserialization process.</param>
+        /// <param name="codeObject">A serialized CodeDOM object to deserialize.</param>
+        /// <returns>The deserialized CodeDOM object.</returns>
         public override object Deserialize(IDesignerSerializationManager manager, object codeObject)
         {
             CodeDomSerializer baseSerializer = (CodeDomSerializer)manager.GetSerializer(typeof(ImageListView).BaseType, typeof(CodeDomSerializer));
@@ -38,6 +41,11 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Serializes the specified object into a CodeDOM object.
         /// </summary>
+        /// <param name="manager">The serialization manager to use during serialization.</param>
+        /// <param name="value">The object to serialize.</param>
+        /// <returns>
+        /// A CodeDOM object representing the object that has been serialized.
+        /// </returns>
         public override object Serialize(IDesignerSerializationManager manager, object value)
         {
             CodeDomSerializer baseSerializer = (CodeDomSerializer)manager.GetSerializer(typeof(ImageListView).BaseType, typeof(CodeDomSerializer));
