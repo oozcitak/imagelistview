@@ -22,6 +22,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -82,7 +83,7 @@ namespace Manina.Windows.Forms
             long mem = Math.Max(0, p.PrivateMemorySize64 - baseMem);
             string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(mImageListView.cacheManager.MemoryUsed));
             SizeF sz = g.MeasureString(s, ImageListView.Font);
-            Rectangle r = new Rectangle(ItemAreaBounds.Right - (int)sz.Width - 5, ItemAreaBounds.Top + 5, (int)sz.Width, (int)sz.Height);
+            Rectangle r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5, 115, (int)sz.Height);
             using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))
             {
                 g.FillRectangle(b, r);
@@ -93,7 +94,7 @@ namespace Manina.Windows.Forms
             }
             g.DrawString(s, ImageListView.Font, Brushes.Black, r.Location);
 
-            r = new Rectangle(ItemAreaBounds.Right - 60, ItemAreaBounds.Top + 5 + (int)sz.Height + 10, 55, 55);
+            r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5 + (int)sz.Height + 10, 115, 125);
             using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))
             {
                 g.FillRectangle(b, r);
@@ -133,6 +134,39 @@ namespace Manina.Windows.Forms
             {
                 g.DrawString("Control", mImageListView.Font, b, r.Location);
             }
+            r.Offset(0, 20);
+
+            ImageListView.HitInfo h = null;
+            mImageListView.HitTest(mImageListView.PointToClient(Control.MousePosition), out h);
+
+            tColor = Color.Gray;
+            if (h.InItemArea)
+                tColor = Color.Black;
+            using (Brush b = new SolidBrush(tColor))
+            {
+                g.DrawString("InItemArea (" + h.ItemIndex.ToString() + ")", mImageListView.Font, b, r.Location);
+            }
+            r.Offset(0, 12);
+
+            tColor = Color.Gray;
+            if (h.InHeaderArea)
+                tColor = Color.Black;
+            using (Brush b = new SolidBrush(tColor))
+            {
+                g.DrawString("InHeaderArea (" + h.ColumnIndex.ToString() + ")", mImageListView.Font, b, r.Location);
+            }
+            r.Offset(0, 12);
+
+            tColor = Color.Gray;
+            if (h.InPaneArea)
+                tColor = Color.Black;
+            using (Brush b = new SolidBrush(tColor))
+            {
+                g.DrawString("InPaneArea " + (h.PaneBorder ? " (Border)" : ""), mImageListView.Font, b, r.Location);
+            }
+            r.Offset(0, 12);
+
+
         }
     }
 }

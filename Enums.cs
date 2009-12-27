@@ -22,25 +22,6 @@ namespace Manina.Windows.Forms
 {
     #region Public Enums
     /// <summary>
-    /// Represents the embedded thumbnail extraction behavior.
-    /// </summary>
-    public enum UseEmbeddedThumbnails
-    {
-        /// <summary>
-        /// Creates the thumbnail from the embedded thumbnail when possible,
-        /// reverts to the source image otherwise.
-        /// </summary>
-        Auto,
-        /// <summary>
-        /// Always creates the thumbnail from the embedded thumbnail.
-        /// </summary>
-        Always,
-        /// <summary>
-        /// Always creates the thumbnail from the source image.
-        /// </summary>
-        Never,
-    }
-    /// <summary>
     /// Represents the cache state of a thumbnail image.
     /// </summary>
     public enum CacheState
@@ -59,25 +40,27 @@ namespace Manina.Windows.Forms
         Error,
     }
     /// <summary>
-    /// Represents the view mode of the image list view.
+    /// Represents the visual state of an image list column.
     /// </summary>
-    public enum View
+    [Flags]
+    public enum ColumnState
     {
         /// <summary>
-        /// In this mode, columns with image details are shown. Thumbnail images
-        /// are not displayed. The view can be scrolled vertically.
+        /// The column is not hovered.
         /// </summary>
-        Details,
+        None = 0,
         /// <summary>
-        /// In this mode, thumbnails are laid out in a grid. The view can be 
-        /// scrolled vertically.
+        /// Mouse cursor is over the column.
         /// </summary>
-        Thumbnails,
+        Hovered = 1,
         /// <summary>
-        /// In this mode, a single row of thumbnails are displayed at the
-        /// bottom. The view can be scrolled horizontally.
+        /// Mouse cursor is over the column separator.
         /// </summary>
-        Gallery,
+        SeparatorHovered = 2,
+        /// <summary>
+        /// Column separator is being dragged.
+        /// </summary>
+        SeparatorSelected = 4,
     }
     /// <summary>
     /// Represents the type of information displayed in an image list view column.
@@ -171,22 +154,42 @@ namespace Manina.Windows.Forms
         UserComment,
     }
     /// <summary>
-    /// Determines the visibility of an item.
+    /// Represents the order by which items are drawn.
     /// </summary>
-    public enum ItemVisibility
+    public enum ItemDrawOrder
     {
         /// <summary>
-        /// The item is not visible.
+        /// Draw order is determined by item insertion index.
         /// </summary>
-        NotVisible = 0,
+        ItemIndex,
         /// <summary>
-        /// The item is fully visible.
+        /// Draw order is determined by the ZOrder properties of items.
         /// </summary>
-        Visible = 1,
+        ZOrder,
         /// <summary>
-        /// The item is partially visible.
+        /// Hovered items are drawn first, followed by normal items and selected items.
         /// </summary>
-        PartiallyVisible = 2,
+        HoveredNormalSelected,
+        /// <summary>
+        /// Hovered items are drawn first, followed by selected items and normal items.
+        /// </summary>
+        HoveredSelectedNormal,
+        /// <summary>
+        /// Normal items are drawn first, followed by hovered items and selected items.
+        /// </summary>
+        NormalHoveredSelected,
+        /// <summary>
+        /// Normal items are drawn first, followed by selected items and hovered items.
+        /// </summary>
+        NormalSelectedHovered,
+        /// <summary>
+        /// Selected items are drawn first, followed by hovered items and normal items.
+        /// </summary>
+        SelectedHoveredNormal,
+        /// <summary>
+        /// Selected items are drawn first, followed by normal items and hovered items.
+        /// </summary>
+        SelectedNormalHovered,
     }
     /// <summary>
     /// Represents the visual state of an image list view item.
@@ -212,65 +215,67 @@ namespace Manina.Windows.Forms
         Hovered = 4,
     }
     /// <summary>
-    /// Represents the visual state of an image list column.
+    /// Determines the visibility of an item.
     /// </summary>
-    [Flags]
-    public enum ColumnState
+    public enum ItemVisibility
     {
         /// <summary>
-        /// The column is not hovered.
+        /// The item is not visible.
         /// </summary>
-        None = 0,
+        NotVisible,
         /// <summary>
-        /// Mouse cursor is over the column.
+        /// The item is partially visible.
         /// </summary>
-        Hovered = 1,
+        PartiallyVisible,
         /// <summary>
-        /// Mouse cursor is over the column separator.
+        /// The item is fully visible.
         /// </summary>
-        SeparatorHovered = 2,
-        /// <summary>
-        /// Column separator is being dragged.
-        /// </summary>
-        SeparatorSelected = 4,
+        Visible,
     }
     /// <summary>
-    /// Represents the order by which items are drawn.
+    /// Represents the embedded thumbnail extraction behavior.
     /// </summary>
-    public enum ItemDrawOrder
+    public enum UseEmbeddedThumbnails
     {
         /// <summary>
-        /// Draw order is determined by item insertion index.
+        /// Always creates the thumbnail from the embedded thumbnail.
         /// </summary>
-        ItemIndex,
+        Always,
         /// <summary>
-        /// Draw order is determined by the ZOrder properties of items.
+        /// Creates the thumbnail from the embedded thumbnail when possible,
+        /// reverts to the source image otherwise.
         /// </summary>
-        ZOrder,
+        Auto,
         /// <summary>
-        /// Normal items are drawn first, followed by selected items and hovered items.
+        /// Always creates the thumbnail from the source image.
         /// </summary>
-        NormalSelectedHovered,
+        Never,
+    }
+    /// <summary>
+    /// Represents the view mode of the image list view.
+    /// </summary>
+    public enum View
+    {
         /// <summary>
-        /// Normal items are drawn first, followed by hovered items and selected items.
+        /// Displays columns with image details. Thumbnail images
+        /// are not displayed. The view can be scrolled vertically.
         /// </summary>
-        NormalHoveredSelected,
+        Details,
         /// <summary>
-        /// Selected items are drawn first, followed by normal items and hovered items.
+        /// Displays a single row of thumbnails at the bottom.
+        /// The view can be scrolled horizontally.
         /// </summary>
-        SelectedNormalHovered,
+        Gallery,
         /// <summary>
-        /// Selected items are drawn first, followed by hovered items and normal items.
+        /// Displays a pane with item details.The view can be 
+        /// scrolled vertically.
         /// </summary>
-        SelectedHoveredNormal,
+        Pane,
         /// <summary>
-        /// Hovered items are drawn first, followed by normal items and selected items.
+        /// Displays thumbnails laid out in a grid. The view can be 
+        /// scrolled vertically.
         /// </summary>
-        HoveredNormalSelected,
-        /// <summary>
-        /// Hovered items are drawn first, followed by selected items and normal items.
-        /// </summary>
-        HoveredSelectedNormal,
+        Thumbnails,
     }
     #endregion
 

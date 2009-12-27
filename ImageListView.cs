@@ -48,6 +48,11 @@ namespace Manina.Windows.Forms
         /// Selection tolerance for column separators.
         /// </summary>
         internal const int SeparatorSize = 12;
+        /// <summary>
+        /// Selection tolerance for left-pane border.
+        /// </summary>
+        internal const int PaneBorderSize = 4;
+
         private const int WS_BORDER = 0x00800000;
         private const int WS_EX_CLIENTEDGE = 0x00000200;
         #endregion
@@ -61,6 +66,7 @@ namespace Manina.Windows.Forms
         private Image mErrorImage;
         private Font mHeaderFont;
         private ImageListViewItemCollection mItems;
+        private int mPaneWidth;
         internal ImageListViewRenderer mRenderer;
         internal ImageListViewSelectedItemCollection mSelectedItems;
         private ColumnType mSortColumn;
@@ -107,6 +113,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Description("Gets or sets whether duplicate items (image files pointing to the same path on the file system) are allowed."), DefaultValue(false)]
         public bool AllowDuplicateFileNames { get; set; }
+        /// <summary>
+        /// Gets or sets whether the left-pane can be resized with the mouse.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether the left-pane can be resized with the mouse."), DefaultValue(true)]
+        public bool AllowPaneResize { get; set; }
         /// <summary>
         /// Gets or sets the background color of the control.
         /// </summary>
@@ -198,6 +209,26 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Browsable(false), Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
         public ImageListView.ImageListViewItemCollection Items { get { return mItems; } }
+        /// <summary>
+        /// Gets or sets the width of the left pane.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the width of the left pane."), DefaultValue(240)]
+        public int PaneWidth
+        {
+            get
+            {
+                return mPaneWidth;
+            }
+            set
+            {
+                if (mPaneWidth != value)
+                {
+                    if (mPaneWidth < 2) mPaneWidth = 2;
+                    mPaneWidth = value;
+                    Refresh();
+                }
+            }
+        }
         /// <summary>
         /// Gets the collection of selected items contained in the image list view.
         /// </summary>
@@ -349,6 +380,7 @@ namespace Manina.Windows.Forms
             AllowColumnResize = true;
             AllowDrag = false;
             AllowDuplicateFileNames = false;
+            AllowPaneResize = true;
             BackColor = SystemColors.Window;
             mBorderStyle = BorderStyle.Fixed3D;
             mCacheLimitAsItemCount = 0;
@@ -360,6 +392,7 @@ namespace Manina.Windows.Forms
             mErrorImage = manager.GetObject("ErrorImage") as Image;
             HeaderFont = this.Font;
             mItems = new ImageListViewItemCollection(this);
+            mPaneWidth = 240;
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;
@@ -537,6 +570,11 @@ namespace Manina.Windows.Forms
                     i++;
                 }
                 hitInfo = new HitInfo(colIndex, sepIndex);
+            }
+            else if (View == View.Pane && pt.X <= mPaneWidth)
+            {
+                bool overBorder = (pt.X >= mPaneWidth - PaneBorderSize);
+                hitInfo = new HitInfo(overBorder);
             }
             else
             {

@@ -48,6 +48,7 @@ namespace Manina.Windows.Forms
         private Size cachedItemSize;
         private int cachedHeaderHeight;
         private Size cachedItemMargin;
+        private int cachedPaneWidth;
         private Dictionary<Guid, bool> cachedVisibleItems;
 
         private bool vScrollVisible;
@@ -124,6 +125,8 @@ namespace Manina.Windows.Forms
                     return true;
                 else if (mImageListView.mRenderer.MeasureItemMargin(mImageListView.View) != cachedItemMargin)
                     return true;
+                else if (mImageListView.PaneWidth != cachedPaneWidth)
+                    return true;
                 else
                     return false;
             }
@@ -195,6 +198,7 @@ namespace Manina.Windows.Forms
             cachedItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
             cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
             cachedItemMargin = mImageListView.mRenderer.MeasureItemMargin(mImageListView.View);
+            cachedPaneWidth = mImageListView.PaneWidth;
             cachedVisibleItems.Clear();
 
             // Calculate drawing area
@@ -241,8 +245,14 @@ namespace Manina.Windows.Forms
                 mItemAreaBounds.Height = mItemSizeWithMargin.Height;
                 mItemAreaBounds.Y = mClientArea.Bottom - mItemSizeWithMargin.Height;
             }
+            // Modify item area for the pane view mode
+            if (mImageListView.View == View.Pane)
+            {
+                mItemAreaBounds.Width -= cachedPaneWidth;
+                mItemAreaBounds.X += cachedPaneWidth;
+            }
 
-            if (mItemAreaBounds.Height < 1 || mItemAreaBounds.Height < 1) return;
+            if (mItemAreaBounds.Width < 1 || mItemAreaBounds.Height < 1) return;
 
             // Let the calculated bounds modified by the renderer
             LayoutEventArgs eLayout = new LayoutEventArgs(mItemAreaBounds);
