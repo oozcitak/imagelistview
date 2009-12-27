@@ -288,11 +288,11 @@ namespace Manina.Windows.Forms
             public Image GetImageAsync(ImageListViewItem item, Size size)
             {
                 Image img = mImageListView.cacheManager.GetRendererImage(item.Guid, size, mImageListView.UseEmbeddedThumbnails);
-                if (img != null)
-                    return img;
 
-                mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
-                return null;
+                if (img == null)
+                    mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
+
+                return img;
             }
             #endregion
 
@@ -456,7 +456,7 @@ namespace Manina.Windows.Forms
 
                 // Draw items
                 if (mImageListView.Items.Count > 0 &&
-                    (mImageListView.View == View.Thumbnails || mImageListView.View == View.Gallery ||
+                    (mImageListView.View != View.Details ||
                     (mImageListView.View == View.Details && mImageListView.Columns.GetUIColumns().Count != 0)) &&
                     mImageListView.layoutManager.FirstPartiallyVisible != -1 &&
                     mImageListView.layoutManager.LastPartiallyVisible != -1)
@@ -505,21 +505,25 @@ namespace Manina.Windows.Forms
                 }
 
                 // Draw the large preview image in Gallery mode
-                if (mImageListView.View == View.Gallery && mImageListView.Items.Count != 0)
+                if (mImageListView.View == View.Gallery)
                 {
+                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
+                    bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
+
                     ImageListViewItem item = null;
                     if (mImageListView.Items.FocusedItem != null)
                         item = mImageListView.Items.FocusedItem;
                     else if (mImageListView.SelectedItems.Count != 0)
                         item = mImageListView.SelectedItems[0];
-                    else
+                    else if (mImageListView.Items.Count != 0)
                         item = mImageListView.Items[0];
 
-                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
-                    bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
-
-                    Image image = GetImageAsync(item, bounds.Size);
-                    if (image == null) image = item.ThumbnailImage;
+                    Image image = null;
+                    if (item != null && bounds.Width > 4 && bounds.Height > 4)
+                    {
+                        image = GetImageAsync(item, bounds.Size);
+                        if (image == null) image = item.ThumbnailImage;
+                    }
 
                     if (mClip)
                         g.SetClip(bounds);
@@ -527,6 +531,35 @@ namespace Manina.Windows.Forms
                         g.SetClip(mImageListView.layoutManager.ClientArea);
 
                     DrawGalleryImage(g, item, image, bounds);
+                }
+
+                // Draw the left-pane
+                if (mImageListView.View == View.Pane)
+                {
+                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
+                    bounds.Width = mImageListView.mPaneWidth;
+
+                    ImageListViewItem item = null;
+                    if (mImageListView.Items.FocusedItem != null)
+                        item = mImageListView.Items.FocusedItem;
+                    else if (mImageListView.SelectedItems.Count != 0)
+                        item = mImageListView.SelectedItems[0];
+                    else if (mImageListView.Items.Count != 0)
+                        item = mImageListView.Items[0];
+
+                    Image image = null;
+                    if (item != null && bounds.Width > 4 && bounds.Height > 4)
+                    {
+                        image = GetImageAsync(item, bounds.Size);
+                        if (image == null) image = item.ThumbnailImage;
+                    }
+
+                    if (mClip)
+                        g.SetClip(bounds);
+                    else
+                        g.SetClip(mImageListView.layoutManager.ClientArea);
+
+                    DrawPane(g, item, image, bounds);
                 }
 
                 // Draw the selection rectangle
@@ -668,22 +701,20 @@ namespace Manina.Windows.Forms
                 // Reference text height
                 int textHeight = mImageListView.Font.Height;
 
-                if (view == View.Thumbnails || view == View.Gallery)
-                {
-                    // Calculate item size
-                    Size itemPadding = new Size(4, 4);
-                    itemSize = mImageListView.ThumbnailSize + itemPadding + itemPadding;
-                    itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3); // textHeight / 3 = vertical space between thumbnail and text
-                }
-                else if (view == View.Details)
+                if (view == View.Details)
                 {
                     // Calculate total column width
                     int colWidth = 0;
                     foreach (ImageListViewColumnHeader column in mImageListView.Columns)
                         if (column.Visible) colWidth += column.Width;
 
-                    // Calculate item size
                     itemSize = new Size(colWidth, textHeight + 2 * textHeight / 6); // textHeight / 6 = vertical space between item border and text
+                }
+                else
+                {
+                    Size itemPadding = new Size(4, 4);
+                    itemSize = mImageListView.ThumbnailSize + itemPadding + itemPadding;
+                    itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3); // textHeight / 3 = vertical space between thumbnail and text
                 }
 
                 return itemSize;
@@ -789,7 +820,7 @@ namespace Manina.Windows.Forms
                     }
                 }
 
-                if (mImageListView.View == View.Thumbnails || mImageListView.View == View.Gallery)
+                if (mImageListView.View != View.Details)
                 {
                     // Draw the image
                     Image img = item.ThumbnailImage;
@@ -831,7 +862,7 @@ namespace Manina.Windows.Forms
                         }
                     }
                 }
-                else if (mImageListView.View == View.Details)
+                else // if (mImageListView.View == View.Details)
                 {
                     List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
                     // Shade sort column
@@ -989,6 +1020,107 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
+            /// Draws the left pane in Pane mode.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="image">The image to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the pane.</param>
+            public virtual void DrawPane(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
+            {
+                // Draw pane background
+                using (Brush bBack = new LinearGradientBrush(bounds, Color.FromArgb(196, SystemColors.Control),
+                    Color.FromArgb(32, SystemColors.Control), LinearGradientMode.Horizontal))
+                {
+                    g.FillRectangle(bBack, bounds);
+                }
+                using (Pen pBorder = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
+                {
+                    g.DrawLine(pBorder, bounds.Right - 1, bounds.Top, bounds.Right - 1, bounds.Bottom);
+                }
+                bounds.Width -= 1;
+
+                if (item != null && image != null)
+                {
+                    // Calculate image bounds
+                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
+                    float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
+                    float scale = Math.Min(xscale, yscale);
+                    if (scale > 1.0f) scale = 1.0f;
+                    int imageWidth = (int)((float)image.Width * scale);
+                    int imageHeight = (int)((float)image.Height * scale);
+                    int imageX = bounds.Left + itemMargin.Width;
+                    int imageY = bounds.Top + itemMargin.Height;
+                    // Draw image
+                    g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
+                    // Draw image border
+                    if (image.Width > 32)
+                    {
+                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                        {
+                            g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                        }
+                        using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                        {
+                            g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                        }
+                    }
+                    bounds.X += itemMargin.Width;
+                    bounds.Width -= 2 * itemMargin.Width;
+                    bounds.Y = imageHeight + 16;
+                    bounds.Height -= imageHeight + 16;
+
+                    // Item text
+                    if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    {
+                        int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font,
+                            SystemBrushes.GrayText, SystemBrushes.WindowText);
+                        bounds.Y += 2 * y;
+                        bounds.Height -= 2 * y;
+                    }
+
+                    // File type
+                    if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
+                    {
+                        int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
+                            item.FileType, mImageListView.Font, SystemBrushes.GrayText, SystemBrushes.WindowText);
+                        bounds.Y += y;
+                        bounds.Height -= y;
+                    }
+
+                    // Metatada
+                    foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                    {
+                        if (column.Type == ColumnType.ImageDescription)
+                        {
+                            bounds.Y += 8;
+                            bounds.Height -= 8;
+                        }
+
+                        if (bounds.Height <= 0) break;
+
+                        if (column.Visible &&
+                            column.Type != ColumnType.FileType &&
+                            column.Type != ColumnType.DateAccessed &&
+                            column.Type != ColumnType.FileName &&
+                            column.Type != ColumnType.FilePath &&
+                            column.Type != ColumnType.Name)
+                        {
+                            string caption = column.Text;
+                            string text = item.GetSubItemText(column.Type);
+                            if (!string.IsNullOrEmpty(text))
+                            {
+                                int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
+                                    mImageListView.Font, SystemBrushes.GrayText, SystemBrushes.WindowText);
+                                bounds.Y += y;
+                                bounds.Height -= y;
+                            }
+                        }
+                    }
+                }
+            }
+            /// <summary>
             /// Draws the large preview image of the focused item in Gallery mode.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
@@ -997,28 +1129,31 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the preview area.</param>
             public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
-                // Calculate image bounds
-                Size itemMargin = MeasureItemMargin(mImageListView.View);
-                float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
-                float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
-                float scale = Math.Min(xscale, yscale);
-                if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)image.Width * scale);
-                int imageHeight = (int)((float)image.Height * scale);
-                int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
-                int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
-                // Draw image
-                g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
-                // Draw image border
-                if (Math.Min(imageWidth, imageHeight) > 32)
+                if (item != null && image != null)
                 {
-                    using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                    // Calculate image bounds
+                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
+                    float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
+                    float scale = Math.Min(xscale, yscale);
+                    if (scale > 1.0f) scale = 1.0f;
+                    int imageWidth = (int)((float)image.Width * scale);
+                    int imageHeight = (int)((float)image.Height * scale);
+                    int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
+                    int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
+                    // Draw image
+                    g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
+                    // Draw image border
+                    if (Math.Min(imageWidth, imageHeight) > 32)
                     {
-                        g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
-                    }
-                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                    {
-                        g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                        {
+                            g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                        }
+                        using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                        {
+                            g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                        }
                     }
                 }
             }

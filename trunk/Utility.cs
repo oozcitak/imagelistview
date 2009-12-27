@@ -320,6 +320,36 @@ namespace Manina.Windows.Forms
 
         #region Graphics Utilities
         /// <summary>
+        /// Draws the given caption and text inside the given rectangle.
+        /// </summary>
+        internal static int DrawStringPair(Graphics g, Rectangle r, string caption, string text, Font font, Brush captionBrush, Brush textBrush)
+        {
+            using (StringFormat sf = new StringFormat())
+            {
+                sf.Alignment = StringAlignment.Near;
+                sf.LineAlignment = StringAlignment.Near;
+                sf.Trimming = StringTrimming.EllipsisCharacter;
+                sf.FormatFlags = StringFormatFlags.NoWrap;
+
+                SizeF szc = g.MeasureString(caption, font, r.Size, sf);
+                int y = (int)szc.Height;
+                if (szc.Width > r.Width) szc.Width = r.Width;
+                Rectangle txrect = new Rectangle(r.Location, Size.Ceiling(szc));
+                g.DrawString(caption, font, captionBrush, txrect, sf);
+                txrect.X += txrect.Width;
+                txrect.Width = r.Width;
+                if (txrect.X < r.Right)
+                {
+                    SizeF szt = g.MeasureString(text, font, r.Size, sf);
+                    y = Math.Max(y, (int)szt.Height);
+                    txrect = Rectangle.Intersect(r, txrect);
+                    g.DrawString(text, font, textBrush, txrect, sf);
+                }
+
+                return y;
+            }
+        }
+        /// <summary>
         /// Creates a thumbnail from the given image.
         /// </summary>
         /// <param name="image">The source image.</param>

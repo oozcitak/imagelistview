@@ -59,7 +59,7 @@ namespace Manina.Windows.Forms
 
             private readonly object lockObject = new object();
 
-            private int maxFlakeCount = 50;
+            private int maxFlakeCount = 100;
             private int minFlakeSize = 4;
             private int maxFlakeSize = 12;
             private int flakeGeneration = 3;

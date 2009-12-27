@@ -50,6 +50,10 @@ namespace Manina.Windows.Forms
             /// Gets the index of the column separator under the hit point.
             /// </summary>
             public ColumnType ColumnSeparator { get; private set; }
+            /// <summary>
+            /// Gets whether the hit point is over the pane border.
+            /// </summary>
+            public bool PaneBorder { get; private set; }
 
             /// <summary>
             /// Gets whether the hit point is inside the item area.
@@ -59,6 +63,10 @@ namespace Manina.Windows.Forms
             /// Gets whether the hit point is inside the column header area.
             /// </summary>
             public bool InHeaderArea { get; private set; }
+            /// <summary>
+            /// Gets whether the hit point is inside the left-pane area.
+            /// </summary>
+            public bool InPaneArea { get; private set; }
             #endregion
 
             #region Constructor
@@ -68,9 +76,11 @@ namespace Manina.Windows.Forms
             /// <param name="itemIndex">Index of the item.</param>
             /// <param name="columnIndex">Type of the column.</param>
             /// <param name="columnSeparator">The column separator.</param>
+            /// <param name="paneBorder">if set to true the mouse cursor is over the left-pane border.</param>
             /// <param name="inItemArea">if set to true the mouse is in the item area.</param>
             /// <param name="inHeaderArea">if set to true the mouse cursor is in the column header area.</param>
-            private HitInfo(int itemIndex, ColumnType columnIndex, ColumnType columnSeparator, bool inItemArea, bool inHeaderArea)
+            /// <param name="inPaneArea">if set to true the mouse cursor is in the left-pane area.</param>
+            private HitInfo(int itemIndex, ColumnType columnIndex, ColumnType columnSeparator, bool paneBorder, bool inItemArea, bool inHeaderArea, bool inPaneArea)
             {
                 ItemIndex = itemIndex;
                 ColumnIndex = columnIndex;
@@ -78,13 +88,16 @@ namespace Manina.Windows.Forms
 
                 InItemArea = inItemArea;
                 InHeaderArea = inHeaderArea;
+
+                InPaneArea = inPaneArea;
+                PaneBorder = paneBorder;
             }
             /// <summary>
-            /// Initializes a new instance of the <see cref="HitInfo"/> class.
+            /// Initializes a new instance of the HitInfo class.
             /// </summary>
             /// <param name="itemIndex">Index of the item.</param>
             internal HitInfo(int itemIndex)
-                : this(itemIndex, (ColumnType)(-1), (ColumnType)(-1), true, false)
+                : this(itemIndex, (ColumnType)(-1), (ColumnType)(-1), false, true, false, false)
             {
                 ;
             }
@@ -94,7 +107,17 @@ namespace Manina.Windows.Forms
             /// <param name="columnIndex">Type of the column.</param>
             /// <param name="columnSeparator">The column separator.</param>
             internal HitInfo(ColumnType columnIndex, ColumnType columnSeparator)
-                : this(-1, columnIndex, columnSeparator, false, true)
+                : this(-1, columnIndex, columnSeparator, false, false, true, false)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the HitInfo class.
+            /// </summary>
+            /// <param name="paneBorder">True if the hit point is over the left-pane 
+            /// border, false otherwise.</param>
+            internal HitInfo(bool paneBorder)
+                : this(-1, (ColumnType)(-1), (ColumnType)(-1), paneBorder, false, false, true)
             {
                 ;
             }
