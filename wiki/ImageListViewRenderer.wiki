@@ -45,17 +45,7 @@ _Tiles renderer displays items with more details. Item states from top-to-bottom
 
 === !PanelRenderer ===
 
-You can set the width of the panel in the constructor.
-
-{{{
-// Create a new PanelRenderer and set the width
-// of the description area to 180 pixels
-myImageListView.SetRenderer(new ImageListViewRenderers.PanelRenderer(180));
-}}}
-
-http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.panel.jpg
-
-_Panel renderer displays items with details shown in a fixed panel._
+This renderer is removed. The new Pane view mode provides the functionality of !PanelRenderer.
 
 === !ZoomingRenderer ===
 
