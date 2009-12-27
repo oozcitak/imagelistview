@@ -42,6 +42,7 @@ namespace Manina.Windows.Forms
             private int suspendCount;
             private bool needsPaint;
             private ItemDrawOrder mItemDrawOrder;
+            private bool creatingGraphics;
             #endregion
 
             #region Properties
@@ -74,6 +75,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public ImageListViewRenderer()
             {
+                creatingGraphics = false;
                 disposed = false;
                 suspended = false;
                 suspendCount = 0;
@@ -377,11 +379,12 @@ namespace Manina.Windows.Forms
             /// </summary>
             private void Render(Graphics graphics)
             {
-                if (disposed)
-                    return;
+                if (disposed) return;
 
                 if (bufferGraphics == null)
-                    RecreateBuffer();
+                {
+                    if (!RecreateBuffer()) return;
+                }
 
                 // Update the layout
                 mImageListView.layoutManager.Update();
@@ -550,7 +553,7 @@ namespace Manina.Windows.Forms
                     Image image = null;
                     if (item != null && bounds.Width > 4 && bounds.Height > 4)
                     {
-                        image = GetImageAsync(item, bounds.Size);
+                        image = GetImageAsync(item, new Size(bounds.Width, 65535));
                         if (image == null) image = item.ThumbnailImage;
                     }
 
@@ -626,8 +629,12 @@ namespace Manina.Windows.Forms
             /// Destroys the current buffer and creates a new buffered graphics 
             /// sized to the client area of the owner control.
             /// </summary>
-            internal void RecreateBuffer()
+            internal bool RecreateBuffer()
             {
+                if (creatingGraphics) return false;
+
+                creatingGraphics = true;
+
                 bufferContext = BufferedGraphicsManager.Current;
 
                 if (disposed)
@@ -641,7 +648,11 @@ namespace Manina.Windows.Forms
                 if (bufferGraphics != null) bufferGraphics.Dispose();
                 bufferGraphics = bufferContext.Allocate(mImageListView.CreateGraphics(), new Rectangle(0, 0, width, height));
 
+                creatingGraphics = false;
+
                 InitializeGraphics(bufferGraphics.Graphics);
+
+                return true;
             }
             /// <summary>
             /// Releases buffered graphics objects.
@@ -1034,11 +1045,11 @@ namespace Manina.Windows.Forms
                 {
                     g.FillRectangle(bBack, bounds);
                 }
-                using (Pen pBorder = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
+                using (Brush bBorder = new SolidBrush(Color.FromArgb(64, SystemColors.GrayText)))
                 {
-                    g.DrawLine(pBorder, bounds.Right - 1, bounds.Top, bounds.Right - 1, bounds.Bottom);
+                    g.FillRectangle(bBorder, bounds.Right - 2, bounds.Top, 2, bounds.Height);
                 }
-                bounds.Width -= 1;
+                bounds.Width -= 2;
 
                 if (item != null && image != null)
                 {
