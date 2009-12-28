@@ -498,7 +498,7 @@ namespace Manina.Windows.Forms
 
                     mImageListView.Refresh();
                 }
-                else if (lastMouseDownInPaneArea && lastMouseDownOverItem && HoveredItem != null && LeftButton)
+                else if (lastMouseDownInItemArea && lastMouseDownOverItem && HoveredItem != null && LeftButton)
                 {
                     // Select the item under the cursor
                     if (ControlKey)
