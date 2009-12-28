@@ -134,19 +134,10 @@ namespace Manina.Windows.Forms
             /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
             public void Add(ImageListViewItem item)
             {
-                // Check if the file already exists
-                if (mImageListView != null && !mImageListView.AllowDuplicateFileNames)
-                {
-                    if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
-                        return;
-                }
-                item.owner = this;
-                item.mIndex = mItems.Count;
-                mItems.Add(item);
+                AddInternal(item);
+
                 if (mImageListView != null)
                 {
-                    item.mImageListView = mImageListView;
-                    mImageListView.itemCacheManager.Add(item);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.Refresh();
@@ -244,15 +235,10 @@ namespace Manina.Windows.Forms
             /// </exception>
             public void Insert(int index, ImageListViewItem item)
             {
-                item.owner = this;
-                item.mIndex = index;
-                for (int i = index; i < mItems.Count; i++)
-                    mItems[i].mIndex++;
-                mItems.Insert(index, item);
+                InsertInternal(index, item);
+
                 if (mImageListView != null)
                 {
-                    item.mImageListView = this.mImageListView;
-                    mImageListView.itemCacheManager.Add(item);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.Refresh();
@@ -299,6 +285,12 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void AddInternal(ImageListViewItem item)
             {
+                // Check if the file already exists
+                if (mImageListView != null && !mImageListView.AllowDuplicateFileNames)
+                {
+                    if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
+                        return;
+                }
                 item.owner = this;
                 item.mIndex = mItems.Count;
                 mItems.Add(item);
@@ -313,6 +305,12 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void InsertInternal(int index, ImageListViewItem item)
             {
+                // Check if the file already exists
+                if (mImageListView != null && !mImageListView.AllowDuplicateFileNames)
+                {
+                    if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
+                        return;
+                }
                 item.owner = this;
                 item.mIndex = index;
                 for (int i = index; i < mItems.Count; i++)

@@ -325,7 +325,7 @@ namespace Manina.Windows.Forms
                     g.FillRectangle(bItemBack, bounds);
                 }
 
-                if (mImageListView.View == View.Thumbnails || mImageListView.View == View.Gallery)
+                if (mImageListView.View != View.Details)
                 {
                     Size itemPadding = new Size(4, 4);
 
