@@ -3,7 +3,7 @@
 
 = 3.1 (28 December 2009) =
 
-  * !XPRenderer now works in Pane view mode. (Issue 8)
+  * XPRenderer now works in Pane view mode. (Issue 8)
   * Drag-and-drop honors !AllowDuplicateFileNames setting. (Issue 9)
 
 = 3.0 (27 December 2009) =
