@@ -752,24 +752,11 @@ namespace Manina.Windows.Forms
                     // Add items
                     foreach (string filename in (string[])e.Data.GetData(DataFormats.FileDrop))
                     {
-                        try
-                        {
-                            using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                            {
-                                using (Image img = Image.FromStream(stream, false, false))
-                                {
-                                    ImageListViewItem item = new ImageListViewItem(filename);
-                                    item.mSelected = true;
-                                    mImageListView.Items.InsertInternal(index, item);
-                                    if (firstItemIndex == 0) firstItemIndex = item.Index;
-                                    index++;
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            ;
-                        }
+                        ImageListViewItem item = new ImageListViewItem(filename);
+                        item.mSelected = true;
+                        mImageListView.Items.InsertInternal(index, item);
+                        if (firstItemIndex == 0) firstItemIndex = item.Index;
+                        index++;
                     }
 
                     mImageListView.EnsureVisible(firstItemIndex);
@@ -799,59 +786,70 @@ namespace Manina.Windows.Forms
             {
                 if (mImageListView.AllowDrop || (mImageListView.AllowDrag && selfDragging))
                 {
-                    // Calculate the location of the insertion cursor
-                    Point pt = new Point(e.X, e.Y);
-                    pt = mImageListView.PointToClient(pt);
-                    // Normalize to item area coordinates
-                    pt.X -= mImageListView.layoutManager.ItemAreaBounds.Left;
-                    pt.Y -= mImageListView.layoutManager.ItemAreaBounds.Top;
-
-                    // Row and column mouse is over
-                    bool dragCaretOnRight = false;
-                    int index = 0;
-
-                    if (mImageListView.View == View.Gallery)
+                    if (mImageListView.Items.Count == 0)
                     {
-                        index = (pt.X + mImageListView.ViewOffset.X) / mImageListView.layoutManager.ItemSizeWithMargin.Width;
+                        if (selfDragging)
+                            e.Effect = DragDropEffects.None;
+                        else
+                            e.Effect = DragDropEffects.Copy;
                     }
                     else
                     {
-                        int col = pt.X / mImageListView.layoutManager.ItemSizeWithMargin.Width;
-                        int row = (pt.Y + mImageListView.ViewOffset.Y) / mImageListView.layoutManager.ItemSizeWithMargin.Height;
-                        if (col > mImageListView.layoutManager.Cols - 1)
+                        // Calculate the location of the insertion cursor
+                        Point pt = new Point(e.X, e.Y);
+                        pt = mImageListView.PointToClient(pt);
+                        // Normalize to item area coordinates
+                        pt.X -= mImageListView.layoutManager.ItemAreaBounds.Left;
+                        pt.Y -= mImageListView.layoutManager.ItemAreaBounds.Top;
+
+                        // Row and column mouse is over
+                        bool dragCaretOnRight = false;
+                        int index = 0;
+
+                        if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll)
                         {
-                            col = mImageListView.layoutManager.Cols - 1;
+                            index = (pt.X + mImageListView.ViewOffset.X) / mImageListView.layoutManager.ItemSizeWithMargin.Width;
+                        }
+                        else
+                        {
+                            int col = pt.X / mImageListView.layoutManager.ItemSizeWithMargin.Width;
+                            int row = (pt.Y + mImageListView.ViewOffset.Y) / mImageListView.layoutManager.ItemSizeWithMargin.Height;
+                            if (col > mImageListView.layoutManager.Cols - 1)
+                            {
+                                col = mImageListView.layoutManager.Cols - 1;
+                                dragCaretOnRight = true;
+                            }
+                            index = row * mImageListView.layoutManager.Cols + col;
+                        }
+
+                        if (index < 0) index = 0;
+                        if (index > mImageListView.Items.Count - 1)
+                        {
+                            index = mImageListView.Items.Count - 1;
                             dragCaretOnRight = true;
                         }
-                        index = row * mImageListView.layoutManager.Cols + col;
-                    }
 
-                    if (index < 0) index = 0;
-                    if (index > mImageListView.Items.Count - 1)
-                    {
-                        index = mImageListView.Items.Count - 1;
-                        dragCaretOnRight = true;
-                    }
-                    ImageListViewItem dragDropTarget = mImageListView.Items[index];
+                        ImageListViewItem dragDropTarget = mImageListView.Items[index];
+                        
+                        if (selfDragging && (dragDropTarget.Selected ||
+                            (!dragCaretOnRight && index > 0 && mImageListView.Items[index - 1].Selected) ||
+                            (dragCaretOnRight && index < mImageListView.Items.Count - 1 && mImageListView.Items[index + 1].Selected)))
+                        {
+                            e.Effect = DragDropEffects.None;
 
-                    if (selfDragging && (dragDropTarget.Selected ||
-                        (!dragCaretOnRight && index > 0 && mImageListView.Items[index - 1].Selected) ||
-                        (dragCaretOnRight && index < mImageListView.Items.Count - 1 && mImageListView.Items[index + 1].Selected)))
-                    {
-                        e.Effect = DragDropEffects.None;
+                            dragDropTarget = null;
+                        }
+                        else if (selfDragging)
+                            e.Effect = DragDropEffects.Copy;
+                        else
+                            e.Effect = DragDropEffects.Copy;
 
-                        dragDropTarget = null;
-                    }
-                    else if (selfDragging)
-                        e.Effect = DragDropEffects.Copy;
-                    else
-                        e.Effect = DragDropEffects.Copy;
-
-                    if (!ReferenceEquals(dragDropTarget, DropTarget) || dragCaretOnRight != DropToRight)
-                    {
-                        DropTarget = dragDropTarget;
-                        DropToRight = dragCaretOnRight;
-                        mImageListView.Refresh(true);
+                        if (!ReferenceEquals(dragDropTarget, DropTarget) || dragCaretOnRight != DropToRight)
+                        {
+                            DropTarget = dragDropTarget;
+                            DropToRight = dragCaretOnRight;
+                            mImageListView.Refresh(true);
+                        }
                     }
                 }
                 else
