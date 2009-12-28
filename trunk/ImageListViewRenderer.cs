@@ -565,6 +565,10 @@ namespace Manina.Windows.Forms
                     DrawPane(g, item, image, bounds);
                 }
 
+                // Draw the overlay image
+                g.SetClip(mImageListView.layoutManager.ClientArea);
+                DrawOverlay(g, mImageListView.layoutManager.ClientArea);
+
                 // Draw the selection rectangle
                 if (mImageListView.navigationManager.MouseSelecting)
                 {
@@ -608,10 +612,6 @@ namespace Manina.Windows.Forms
                         g.SetClip(mImageListView.layoutManager.ClientArea);
                     DrawInsertionCaret(g, bounds);
                 }
-
-                // Draw the overlay image
-                g.SetClip(mImageListView.layoutManager.ClientArea);
-                DrawOverlay(g, mImageListView.layoutManager.ClientArea);
 
                 // Scrollbar filler
                 if (mImageListView.hScrollBar.Visible && mImageListView.vScrollBar.Visible)
