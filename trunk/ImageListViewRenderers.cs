@@ -371,13 +371,16 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the preview area.</param>
             public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
-                float scale = (float)(image.Height - 2 * padding - mReflectionSize) / (float)image.Height;
-                if (scale < 0.0f) scale = 0.0f;
-                int width = (int)((float)image.Width * scale);
-                int height = (int)((float)image.Height * scale);
-                int x = bounds.Left + (bounds.Width - width) / 2;
-                int y = bounds.Bottom - height - mReflectionSize - padding;
-                DrawImageWithReflection(g, image, x, y, width, height, mReflectionSize);
+                if (item != null && image != null)
+                {
+                    float scale = (float)(image.Height - 2 * padding - mReflectionSize) / (float)image.Height;
+                    if (scale < 0.0f) scale = 0.0f;
+                    int width = (int)((float)image.Width * scale);
+                    int height = (int)((float)image.Height * scale);
+                    int x = bounds.Left + (bounds.Width - width) / 2;
+                    int y = bounds.Bottom - height - mReflectionSize - padding;
+                    DrawImageWithReflection(g, image, x, y, width, height, mReflectionSize);
+                }
             }
             /// <summary>
             /// Draws the left pane in Pane view mode.
@@ -491,6 +494,18 @@ namespace Manina.Windows.Forms
                 using (Pen pen = new Pen(brush))
                 {
                     g.DrawRectangle(pen, selection);
+                }
+            }
+            /// <summary>
+            /// Draws the insertion caret for drag and drop operations.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="bounds">The bounding rectangle of the insertion caret.</param>
+            public override void DrawInsertionCaret(Graphics g, Rectangle bounds)
+            {
+                using (Brush b = new SolidBrush(Color.FromArgb(96, 144, 240)))
+                {
+                    g.FillRectangle(b, bounds);
                 }
             }
 
@@ -609,10 +624,12 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Releases managed resources.
             /// </summary>
-            public override void OnDispose()
+            public override void Dispose()
             {
                 if (mCaptionFont != null)
                     mCaptionFont.Dispose();
+
+                base.Dispose();
             }
             /// <summary>
             /// Returns item size for the given view mode.
