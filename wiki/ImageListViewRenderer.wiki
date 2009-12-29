@@ -214,37 +214,20 @@ public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Image i
 }
 }}}
 
-==== !DrawScrollBarFiller ====
+==== !DrawPane====
 
-Draws the area between the vertical and horizontal scrollbars. The base class draws the filler with !SystemColors.Control.
-
-{{{
-public virtual void DrawScrollBarFiller(Graphics g, Rectangle bounds)
-{
-    // Draw a size grip
-    ControlPaint.DrawSizeGrip(g, SystemColors.Control, bounds);
-}
-}}}
-
-==== !GetSortArrowImage ====
-
-Gets the image representing the sort direction on column headers.
+Draws the left pane in Pane view mode. The base class draws the preview image and image metadata.
 
 {{{
-public virtual Image GetSortArrowImage(SortOrder sortOrder)
+public virtual void DrawPane(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
 {
-    if (mImageListView.SortOrder == SortOrder.Ascending)
-        return myAscendingImage;
-    else if (mImageListView.SortOrder == SortOrder.Descending)
-        return myDescendingImage;
-    return
-        null;
+    ;
 }
 }}}
 
 ==== !DrawInsertionCaret ====
 
-Draws the insertion caret for drag&drop operations.
+Draws the insertion caret for drag-and-drop operations.
 
 {{{
 public virtual void DrawInsertionCaret(Graphics g, Rectangle bounds)
@@ -268,14 +251,14 @@ public virtual void OnLayout(LayoutEventArgs e)
 }
 }}}
 
-==== !OnDispose ====
+==== !Dispose ====
 
 Releases managed resources. You can override this method to dispose the local managed resources you created. 
 
 {{{
-public virtual void OnDispose()
+public virtual void Dispose()
 {
-    base.OnDispose();
+    base.Dispose();
 
     // Dispose local resources
     myFont.Dispose();
