@@ -1031,7 +1031,7 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Draws the left pane in Pane mode.
+            /// Draws the left pane in Pane view mode.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
             /// <param name="item">The ImageListViewItem to draw.</param>
