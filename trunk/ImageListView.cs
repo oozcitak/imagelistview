@@ -562,7 +562,7 @@ namespace Manina.Windows.Forms
                 int x = layoutManager.ColumnHeaderBounds.Left;
                 ColumnType colIndex = (ColumnType)(-1);
                 ColumnType sepIndex = (ColumnType)(-1);
-                foreach (ImageListViewColumnHeader col in Columns.GetUIColumns())
+                foreach (ImageListViewColumnHeader col in Columns.GetDisplayedColumns())
                 {
                     // Over a column?
                     if (pt.X >= x && pt.X < x + col.Width + SeparatorSize / 2)

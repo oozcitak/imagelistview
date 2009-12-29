@@ -404,7 +404,7 @@ namespace Manina.Windows.Forms
                     int y = mImageListView.layoutManager.ColumnHeaderBounds.Top;
                     int h = MeasureColumnHeaderHeight();
                     int lastX = 0;
-                    foreach (ImageListViewColumnHeader column in mImageListView.Columns.GetUIColumns())
+                    foreach (ImageListViewColumnHeader column in mImageListView.Columns.GetDisplayedColumns())
                     {
                         ColumnState state = ColumnState.None;
                         if (ReferenceEquals(mImageListView.navigationManager.HoveredColumn, column))
@@ -460,7 +460,7 @@ namespace Manina.Windows.Forms
                 // Draw items
                 if (mImageListView.Items.Count > 0 &&
                     (mImageListView.View != View.Details ||
-                    (mImageListView.View == View.Details && mImageListView.Columns.GetUIColumns().Count != 0)) &&
+                    (mImageListView.View == View.Details && mImageListView.Columns.GetDisplayedColumns().Count != 0)) &&
                     mImageListView.layoutManager.FirstPartiallyVisible != -1 &&
                     mImageListView.layoutManager.LastPartiallyVisible != -1)
                 {
@@ -875,7 +875,7 @@ namespace Manina.Windows.Forms
                 }
                 else // if (mImageListView.View == View.Details)
                 {
-                    List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
+                    List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
                     // Shade sort column
                     int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
                     foreach (ImageListViewColumnHeader column in uicolumns)
@@ -1040,12 +1040,11 @@ namespace Manina.Windows.Forms
             public virtual void DrawPane(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
                 // Draw pane background
-                using (Brush bBack = new LinearGradientBrush(bounds, Color.FromArgb(196, SystemColors.Control),
-                    Color.FromArgb(32, SystemColors.Control), LinearGradientMode.Horizontal))
+                using (Brush bGray16 = new SolidBrush(Color.FromArgb(16, SystemColors.GrayText)))
                 {
-                    g.FillRectangle(bBack, bounds);
+                    g.FillRectangle(bGray16, bounds);
                 }
-                using (Brush bBorder = new SolidBrush(Color.FromArgb(64, SystemColors.GrayText)))
+                using (Brush bBorder = new SolidBrush(Color.FromArgb(128, SystemColors.GrayText)))
                 {
                     g.FillRectangle(bBorder, bounds.Right - 2, bounds.Top, 2, bounds.Height);
                 }

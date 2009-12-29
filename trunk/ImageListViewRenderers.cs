@@ -49,6 +49,159 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region NoirRenderer
+        /// <summary>
+        /// A renderer with a dark theme.
+        /// </summary>
+        public class NoirRenderer : ImageListView.ImageListViewRenderer
+        {
+            private int padding;
+            private int mReflectionSize;
+
+            /// <summary>
+            /// Gets or sets the size of image reflections.
+            /// </summary>
+            public int ReflectionSize { get { return mReflectionSize; } set { mReflectionSize = value; } }
+
+            /// <summary>
+            /// Initializes a new instance of the NoirRenderer class.
+            /// </summary>
+            public NoirRenderer()
+                : this(20)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the NoirRenderer class.
+            /// </summary>
+            /// <param name="reflectionSize">Size of image reflections.</param>
+            public NoirRenderer(int reflectionSize)
+            {
+                mReflectionSize = reflectionSize;
+                padding = 4;
+            }
+
+            /// <summary>
+            /// Draws the background of the control.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="bounds">The client coordinates of the item area.</param>
+            public override void DrawBackground(Graphics g, Rectangle bounds)
+            {
+                g.Clear(Color.FromArgb(16, 16, 16));
+            }
+            /// <summary>
+            /// Returns item size for the given view mode.
+            /// </summary>
+            /// <param name="view">The view mode for which the measurement should be made.</param>
+            /// <returns></returns>
+            public override Size MeasureItem(View view)
+            {
+                if (view == View.Details)
+                    return base.MeasureItem(view);
+                else
+                    return new Size(ImageListView.ThumbnailSize.Width + 2 * padding,
+                        ImageListView.ThumbnailSize.Height + 2 * padding + mReflectionSize);
+            }
+            /// <summary>
+            /// Draws the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="state">The current view state of item.</param>
+            /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
+            public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
+            {
+                // Fill with item background color
+                if (item.BackColor != Color.Transparent)
+                {
+                    using (Brush brush = new SolidBrush(item.BackColor))
+                    {
+                        g.FillRectangle(brush, bounds);
+                    }
+                }
+
+                if (ImageListView.View == View.Details)
+                {
+                    base.DrawItem(g, item, state, bounds);
+                }
+                else
+                {
+                    // Align images to bottom of bounds, nudge hovered items a little
+                    Image img = item.ThumbnailImage;
+                    int x = bounds.Left + (bounds.Width - img.Width) / 2;
+                    int y = bounds.Bottom - img.Height - mReflectionSize - padding;
+
+                    // Item background
+                    if ((state & ItemState.Selected) == ItemState.Selected)
+                    {
+                        using (Brush brush = new LinearGradientBrush(
+                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            Color.FromArgb(64, 96, 160), Color.FromArgb(16, 16, 16)))
+                        {
+                            g.FillRectangle(brush, x - padding, y - padding, img.Width + 2 * padding, img.Height + 2 * padding);
+                        }
+                    }
+                    else if ((state & ItemState.Hovered) == ItemState.Hovered)
+                    {
+                        using (Brush brush = new LinearGradientBrush(
+                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            Color.FromArgb(64, Color.White), Color.FromArgb(16, 16, 16)))
+                        {
+                            g.FillRectangle(brush, x - padding, y - padding, img.Width + 2 * padding, img.Height + 2 * padding);
+                        }
+                    }
+
+                    // Border
+                    if ((state & ItemState.Hovered) == ItemState.Hovered)
+                    {
+                        using (Brush brush = new LinearGradientBrush(
+                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            Color.FromArgb(128, Color.White), Color.FromArgb(16, 16, 16)))
+                        using (Pen pen = new Pen(brush))
+                        {
+                            g.DrawRectangle(pen, x - padding, y - padding + 1, img.Width + 2 * padding - 1, img.Height + 2 * padding - 1);
+                        }
+                    }
+                    else if ((state & ItemState.Selected) == ItemState.Selected)
+                    {
+                        using (Brush brush = new LinearGradientBrush(
+                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            Color.FromArgb(96, 144, 240), Color.FromArgb(16, 16, 16)))
+                        using (Pen pen = new Pen(brush))
+                        {
+                            g.DrawRectangle(pen, x - padding, y - padding + 1, img.Width + 2 * padding - 1, img.Height + 2 * padding - 1);
+                        }
+                    }
+
+                    // Draw item image
+                    g.DrawImageUnscaled(img, x, y + 1);
+
+                    // Draw the reflection
+                    if (img.Width > 32 && img.Height > 32)
+                    {
+                        int reflectionHeight = img.Height / 2;
+                        if (reflectionHeight > mReflectionSize) reflectionHeight = mReflectionSize;
+
+                        Region prevClip = g.Clip;
+                        g.SetClip(new Rectangle(x, y + img.Height + 1, img.Width, reflectionHeight));
+                        g.DrawImage(img, x, y + img.Height + img.Height / 2 + 1, img.Width, -img.Height / 2);
+                        g.Clip = prevClip;
+
+                        using (Brush brush = new LinearGradientBrush(
+                            new Point(x, y + img.Height + 1), new Point(x, y + img.Height + reflectionHeight + 1),
+                            Color.FromArgb(128, 16, 16, 16), Color.FromArgb(16, 16, 16)))
+                        {
+                            if (bounds.Bottom - y - img.Height > 0)
+                                g.FillRectangle(brush, x, y + img.Height + 1, img.Width, reflectionHeight);
+                        }
+                    }
+
+                }
+            }
+        }
+        #endregion
+
         #region TilesRenderer
         /// <summary>
         /// Displays items with large tiles.
@@ -69,7 +222,7 @@ namespace Manina.Windows.Forms
                 get
                 {
                     if (mCaptionFont == null)
-                        mCaptionFont = new Font(mImageListView.Font, FontStyle.Bold);
+                        mCaptionFont = new Font(ImageListView.Font, FontStyle.Bold);
                     return mCaptionFont;
                 }
             }
@@ -100,22 +253,21 @@ namespace Manina.Windows.Forms
                 if (mCaptionFont != null)
                     mCaptionFont.Dispose();
             }
-
             /// <summary>
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the item measurement should be made.</param>
-            public override Size MeasureItem(View view)
+            public override Size MeasureItem(Manina.Windows.Forms.View view)
             {
-                if (view == View.Thumbnails)
+                if (view == Manina.Windows.Forms.View.Thumbnails)
                 {
                     Size itemSize = new Size();
                     mTextHeight = (int)(5.8f * (float)CaptionFont.Height);
 
                     // Calculate item size
                     Size itemPadding = new Size(4, 4);
-                    itemSize.Width = mImageListView.ThumbnailSize.Width + 4 * itemPadding.Width + mTileWidth;
-                    itemSize.Height = Math.Max(mTextHeight, mImageListView.ThumbnailSize.Height) + 2 * itemPadding.Height;
+                    itemSize.Width = ImageListView.ThumbnailSize.Width + 4 * itemPadding.Width + mTileWidth;
+                    itemSize.Height = Math.Max(mTextHeight, ImageListView.ThumbnailSize.Height) + 2 * itemPadding.Height;
                     return itemSize;
                 }
                 else
@@ -130,7 +282,7 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
             public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
-                if (ImageListView.View == View.Thumbnails)
+                if (ImageListView.View == Manina.Windows.Forms.View.Thumbnails)
                 {
                     Size itemPadding = new Size(4, 4);
 
@@ -139,15 +291,15 @@ namespace Manina.Windows.Forms
                     {
                         g.FillRectangle(bItemBack, bounds);
                     }
-                    if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
-                        (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
+                    if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                        (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                     {
                         using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                         {
                             Utility.FillRoundedRectangle(g, bSelected, bounds, 4);
                         }
                     }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
                         {
@@ -166,8 +318,8 @@ namespace Manina.Windows.Forms
                     Image img = item.ThumbnailImage;
                     if (img != null)
                     {
-                        int x = bounds.Left + itemPadding.Width + (mImageListView.ThumbnailSize.Width - img.Width) / 2;
-                        int y = bounds.Top + itemPadding.Height + (mImageListView.ThumbnailSize.Height - img.Height) / 2;
+                        int x = bounds.Left + itemPadding.Width + (ImageListView.ThumbnailSize.Width - img.Width) / 2;
+                        int y = bounds.Top + itemPadding.Height + (ImageListView.ThumbnailSize.Height - img.Height) / 2;
                         g.DrawImageUnscaled(img, x, y);
                         // Draw image border
                         if (img.Width > 32)
@@ -176,7 +328,7 @@ namespace Manina.Windows.Forms
                             {
                                 g.DrawRectangle(pGray128, x, y, img.Width, img.Height);
                             }
-                            if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
+                            if (System.Math.Min(ImageListView.ThumbnailSize.Width, ImageListView.ThumbnailSize.Height) > 32)
                             {
                                 using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
                                 {
@@ -190,8 +342,8 @@ namespace Manina.Windows.Forms
                         RectangleF rt;
                         using (StringFormat sf = new StringFormat())
                         {
-                            rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + mImageListView.ThumbnailSize.Width,
-                                bounds.Top + itemPadding.Height + (Math.Max(mImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
+                            rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + ImageListView.ThumbnailSize.Width,
+                                bounds.Top + itemPadding.Height + (Math.Max(ImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
                                 mTileWidth, lineHeight);
                             sf.Alignment = StringAlignment.Near;
                             sf.FormatFlags = StringFormatFlags.NoWrap;
@@ -207,7 +359,7 @@ namespace Manina.Windows.Forms
                                 if (!string.IsNullOrEmpty(item.FileType))
                                 {
                                     g.DrawString(item.GetSubItemText(ColumnType.FileType),
-                                        mImageListView.Font, bItemDetails, rt, sf);
+                                        ImageListView.Font, bItemDetails, rt, sf);
                                     rt.Offset(0, 1.1f * lineHeight);
                                 }
                                 if (item.Dimensions != Size.Empty || item.Resolution != SizeF.Empty)
@@ -217,19 +369,19 @@ namespace Manina.Windows.Forms
                                         text += item.GetSubItemText(ColumnType.Dimensions) + " pixels ";
                                     if (item.Resolution != SizeF.Empty)
                                         text += item.Resolution.Width + " dpi";
-                                    g.DrawString(text, mImageListView.Font, bItemDetails, rt, sf);
+                                    g.DrawString(text, ImageListView.Font, bItemDetails, rt, sf);
                                     rt.Offset(0, 1.1f * lineHeight);
                                 }
                                 if (item.FileSize != 0)
                                 {
                                     g.DrawString(item.GetSubItemText(ColumnType.FileSize),
-                                        mImageListView.Font, bItemDetails, rt, sf);
+                                        ImageListView.Font, bItemDetails, rt, sf);
                                     rt.Offset(0, 1.1f * lineHeight);
                                 }
                                 if (item.DateModified != DateTime.MinValue)
                                 {
                                     g.DrawString(item.GetSubItemText(ColumnType.DateModified),
-                                        mImageListView.Font, bItemDetails, rt, sf);
+                                        ImageListView.Font, bItemDetails, rt, sf);
                                 }
                             }
                         }
@@ -240,14 +392,14 @@ namespace Manina.Windows.Forms
                     {
                         Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
                     }
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
                         {
                             Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
                         }
                     }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
                         {
@@ -262,7 +414,7 @@ namespace Manina.Windows.Forms
                         }
                     }
 
-                    if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
                     {
                         using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
                         {
@@ -271,7 +423,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Focus rectangle
-                    if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                     {
                         ControlPaint.DrawFocusRectangle(g, bounds);
                     }
@@ -292,20 +444,20 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the item measurement should be made.</param>
-            public override Size MeasureItem(View view)
+            public override Size MeasureItem(Manina.Windows.Forms.View view)
             {
                 Size itemSize = new Size();
 
                 // Reference text height
-                int textHeight = mImageListView.Font.Height;
+                int textHeight = ImageListView.Font.Height;
 
-                if (view == View.Details)
+                if (view == Manina.Windows.Forms.View.Details)
                     return base.MeasureItem(view);
                 else
                 {
                     // Calculate item size
                     Size itemPadding = new Size(4, 4);
-                    itemSize = mImageListView.ThumbnailSize + itemPadding + itemPadding;
+                    itemSize = ImageListView.ThumbnailSize + itemPadding + itemPadding;
                     itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3) + itemPadding.Height; // textHeight / 3 = vertical space between thumbnail and text
                     return itemSize;
                 }
@@ -325,7 +477,7 @@ namespace Manina.Windows.Forms
                     g.FillRectangle(bItemBack, bounds);
                 }
 
-                if (mImageListView.View != View.Details)
+                if (ImageListView.View != Manina.Windows.Forms.View.Details)
                 {
                     Size itemPadding = new Size(4, 4);
 
@@ -333,21 +485,21 @@ namespace Manina.Windows.Forms
                     Image img = item.ThumbnailImage;
                     if (img != null)
                     {
-                        int x = bounds.Left + itemPadding.Width + (mImageListView.ThumbnailSize.Width - img.Width) / 2;
-                        int y = bounds.Top + itemPadding.Height + (mImageListView.ThumbnailSize.Height - img.Height) / 2;
-                        Rectangle imageBounds = new Rectangle(bounds.Location + itemPadding, mImageListView.ThumbnailSize);
+                        int x = bounds.Left + itemPadding.Width + (ImageListView.ThumbnailSize.Width - img.Width) / 2;
+                        int y = bounds.Top + itemPadding.Height + (ImageListView.ThumbnailSize.Height - img.Height) / 2;
+                        Rectangle imageBounds = new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize);
                         g.DrawImageUnscaled(img, x, y);
                         // Draw image border
                         if (img.Width > 32)
                         {
-                            if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                            if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                             {
                                 using (Pen pen = new Pen(SystemColors.Highlight, 3))
                                 {
                                     g.DrawRectangle(pen, imageBounds);
                                 }
                             }
-                            else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                            else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                             {
                                 using (Pen pen = new Pen(SystemColors.GrayText, 3))
                                 {
@@ -366,41 +518,41 @@ namespace Manina.Windows.Forms
                     }
 
                     // Draw item text
-                    SizeF szt = TextRenderer.MeasureText(item.Text, mImageListView.Font);
+                    SizeF szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
                     RectangleF rt;
                     using (StringFormat sf = new StringFormat())
                     {
-                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 3 * itemPadding.Height + mImageListView.ThumbnailSize.Height, mImageListView.ThumbnailSize.Width, szt.Height);
+                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 3 * itemPadding.Height + ImageListView.ThumbnailSize.Height, ImageListView.ThumbnailSize.Width, szt.Height);
                         sf.Alignment = StringAlignment.Center;
                         sf.FormatFlags = StringFormatFlags.NoWrap;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         rt.Width += 1;
                         rt.Inflate(1, 2);
-                        if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                        if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                             rt.Inflate(-1, -1);
-                        if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                        if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                         {
                             g.FillRectangle(SystemBrushes.Highlight, rt);
                         }
-                        else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                        else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                         {
                             g.FillRectangle(SystemBrushes.GrayText, rt);
                         }
                         if (((state & ItemState.Selected) != ItemState.None))
                         {
-                            g.DrawString(item.Text, mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                            g.DrawString(item.Text, ImageListView.Font, SystemBrushes.HighlightText, rt, sf);
                         }
                         else
                         {
                             using (Brush bItemFore = new SolidBrush(item.ForeColor))
                             {
-                                g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                                g.DrawString(item.Text, ImageListView.Font, bItemFore, rt, sf);
                             }
                         }
                     }
 
-                    if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                     {
                         Rectangle fRect = Rectangle.Round(rt);
                         fRect.Inflate(1, 1);
@@ -409,16 +561,16 @@ namespace Manina.Windows.Forms
                 }
                 else
                 {
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         g.FillRectangle(SystemBrushes.Highlight, bounds);
                     }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         g.FillRectangle(SystemBrushes.GrayText, bounds);
                     }
 
-                    Size offset = new Size(2, (bounds.Height - mImageListView.Font.Height) / 2);
+                    Size offset = new Size(2, (bounds.Height - ImageListView.Font.Height) / 2);
                     using (StringFormat sf = new StringFormat())
                     {
                         sf.FormatFlags = StringFormatFlags.NoWrap;
@@ -426,7 +578,7 @@ namespace Manina.Windows.Forms
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         // Sub text
-                        List<ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetUIColumns();
+                        List<ImageListView.ImageListViewColumnHeader> uicolumns = ImageListView.Columns.GetDisplayedColumns();
                         RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
                         foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                         {
@@ -434,15 +586,15 @@ namespace Manina.Windows.Forms
                             using (Brush bItemFore = new SolidBrush(item.ForeColor))
                             {
                                 if ((state & ItemState.Selected) == ItemState.None)
-                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, SystemBrushes.HighlightText, rt, sf);
                             }
                             rt.X += column.Width;
                         }
                     }
 
-                    if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                         ControlPaint.DrawFocusRectangle(g, bounds);
                 }
             }
@@ -456,7 +608,7 @@ namespace Manina.Windows.Forms
             public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
                 // Calculate image bounds
-                Size itemMargin = MeasureItemMargin(mImageListView.View);
+                Size itemMargin = MeasureItemMargin(ImageListView.View);
                 float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
                 float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
                 float scale = Math.Min(xscale, yscale);
@@ -540,10 +692,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="view">The view mode for which the item measurement should be made.</param>
             /// <returns></returns>
-            public override Size MeasureItem(View view)
+            public override Size MeasureItem(Manina.Windows.Forms.View view)
             {
-                if (view == View.Thumbnails)
-                    return mImageListView.ThumbnailSize + new Size(8, 8);
+                if (view == Manina.Windows.Forms.View.Thumbnails)
+                    return ImageListView.ThumbnailSize + new Size(8, 8);
                 else
                     return base.MeasureItem(view);
             }
@@ -556,7 +708,7 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
             public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
-                if (ImageListView.View == View.Thumbnails)
+                if (ImageListView.View == Manina.Windows.Forms.View.Thumbnails)
                 {
                     // Zoom on mouse over
                     if ((state & ItemState.Hovered) != ItemState.None)
@@ -586,15 +738,15 @@ namespace Manina.Windows.Forms
 
                     // Allocate space for item text
                     if ((state & ItemState.Hovered) != ItemState.None &&
-                        (bounds.Height - imageHeight) / 2 < mImageListView.Font.Height + 8)
+                        (bounds.Height - imageHeight) / 2 < ImageListView.Font.Height + 8)
                     {
-                        int delta = (mImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
+                        int delta = (ImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
                         bounds.Height += 2 * delta;
                         imageY += delta;
                     }
 
                     // Paint background
-                    using (Brush bBack = new SolidBrush(mImageListView.BackColor))
+                    using (Brush bBack = new SolidBrush(ImageListView.BackColor))
                     {
                         Utility.FillRoundedRectangle(g, bBack, bounds, 5);
                     }
@@ -602,15 +754,15 @@ namespace Manina.Windows.Forms
                     {
                         Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
                     }
-                    if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
-                        (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
+                    if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                        (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                     {
                         using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                         {
                             Utility.FillRoundedRectangle(g, bSelected, bounds, 5);
                         }
                     }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
                         {
@@ -657,7 +809,7 @@ namespace Manina.Windows.Forms
                             sf.Trimming = StringTrimming.EllipsisCharacter;
                             using (Brush bItemFore = new SolidBrush(item.ForeColor))
                             {
-                                g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                                g.DrawString(item.Text, ImageListView.Font, bItemFore, rt, sf);
                             }
                             rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
                             string details = "";
@@ -667,7 +819,7 @@ namespace Manina.Windows.Forms
                                 details += item.GetSubItemText(ColumnType.FileSize);
                             using (Brush bGrayText = new SolidBrush(Color.Gray))
                             {
-                                g.DrawString(details, mImageListView.Font, bGrayText, rt, sf);
+                                g.DrawString(details, ImageListView.Font, bGrayText, rt, sf);
                             }
                         }
                     }
@@ -677,14 +829,14 @@ namespace Manina.Windows.Forms
                     {
                         Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
                     }
-                    if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
                         {
                             Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
                         }
                     }
-                    else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
                         {
@@ -699,7 +851,7 @@ namespace Manina.Windows.Forms
                         }
                     }
 
-                    if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
+                    if (ImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
                     {
                         using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
                         {
