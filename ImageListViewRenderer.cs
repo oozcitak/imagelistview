@@ -619,7 +619,7 @@ namespace Manina.Windows.Forms
                     Rectangle bounds = mImageListView.layoutManager.ClientArea;
                     Rectangle filler = new Rectangle(bounds.Right, bounds.Bottom, mImageListView.vScrollBar.Width, mImageListView.hScrollBar.Height);
                     g.SetClip(filler);
-                    DrawScrollBarFiller(g, filler);
+                    g.FillRectangle(SystemBrushes.Control, filler);
                 }
 
                 // Draw on to the control
@@ -657,7 +657,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Releases buffered graphics objects.
             /// </summary>
-            public void Dispose()
+            void IDisposable.Dispose()
             {
                 if (disposed) return;
                 disposed = true;
@@ -665,7 +665,7 @@ namespace Manina.Windows.Forms
                 if (bufferGraphics != null)
                     bufferGraphics.Dispose();
 
-                OnDispose();
+                Dispose();
             }
             #endregion
 
@@ -1189,15 +1189,6 @@ namespace Manina.Windows.Forms
                 g.DrawLine(SystemPens.ControlLightLight, bounds.Right - 1, bounds.Top + 1, bounds.Right - 1, bounds.Bottom - 2);
             }
             /// <summary>
-            /// Draws the area between the vertical and horizontal scrollbars.
-            /// </summary>
-            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
-            /// <param name="bounds">The bounding rectangle of the filler in client coordinates.</param>
-            public virtual void DrawScrollBarFiller(Graphics g, Rectangle bounds)
-            {
-                g.FillRectangle(SystemBrushes.Control, bounds);
-            }
-            /// <summary>
             /// Draws the insertion caret for drag and drop operations.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
@@ -1221,7 +1212,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Releases managed resources.
             /// </summary>
-            public virtual void OnDispose()
+            public virtual void Dispose()
             {
                 ;
             }

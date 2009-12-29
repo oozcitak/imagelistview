@@ -379,9 +379,9 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Releases managed resources.
             /// </summary>
-            public override void OnDispose()
+            public override void Dispose()
             {
-                base.OnDispose();
+                base.Dispose();
 
                 flake.Dispose();
                 terrain.Dispose();
