@@ -1,6 +1,13 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 3.3 (29 December 2009) =
+
+  * Fixed a bug in !NoirRenderer.!DrawGalleryImage where the image was tried to be drawn when the control was empty.
+  * !NoirRenderer now displays a nicer insertion caret.
+  * Renamed !ImageListViewRenderer.!OnDispose to Dispose.
+  * Removed !ImageListViewRenderer.!DrawScrollBarFiller virtual method.
+
 = 3.2 (29 December 2009) =
 
   * Added the new !NoirRenderer.
