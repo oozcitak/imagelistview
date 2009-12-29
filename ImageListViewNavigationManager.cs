@@ -551,7 +551,7 @@ namespace Manina.Windows.Forms
 
                     mImageListView.Refresh();
                 }
-                else if (lastMouseDownInPaneArea && lastMouseDownOverItem && HoveredItem != null && RightButton)
+                else if (lastMouseDownInItemArea && lastMouseDownOverItem && HoveredItem != null && RightButton)
                 {
                     if (!ControlKey && !HoveredItem.Selected)
                     {
@@ -624,7 +624,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void MouseLeave()
             {
-                if (HoveredSeparator != null || HoveredColumn != null || HoveredSeparator != null || HoveredPaneBorder != false)
+                if (HoveredItem != null || HoveredColumn != null || HoveredSeparator != null || HoveredPaneBorder != false)
                 {
                     HoveredItem = null;
                     HoveredColumn = null;

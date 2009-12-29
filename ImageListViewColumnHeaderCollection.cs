@@ -147,7 +147,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the columns as diplayed on the UI.
             /// </summary>
-            internal List<ImageListViewColumnHeader> GetUIColumns()
+            public List<ImageListViewColumnHeader> GetDisplayedColumns()
             {
                 List<ImageListViewColumnHeader> list = new List<ImageListViewColumnHeader>();
                 foreach (ImageListViewColumnHeader column in mItems)
