@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 3.2 (29 December 2009) =
+
+  * Added the new !NoirRenderer.
+
 = 3.1 (28 December 2009) =
 
   * XPRenderer now works in Pane view mode. (Issue 8)
