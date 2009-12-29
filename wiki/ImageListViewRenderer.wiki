@@ -251,7 +251,7 @@ public virtual void OnLayout(LayoutEventArgs e)
 }
 }}}
 
-==== !Dispose ====
+==== Dispose ====
 
 Releases managed resources. You can override this method to dispose the local managed resources you created. 
 
