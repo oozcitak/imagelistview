@@ -5,7 +5,7 @@
 
 = Introduction =
 
-The look of the ImageListView can be customized with renderers. If you would like to customize the appearance of the control you can either use one of the built-in custom renderers below, or write your own custom renderer by deriving from !ImageListViewRenderer.
+The look of ImageListView can be customized with renderers. You can either use one of the built-in custom renderers below, or write your own custom renderer by deriving from !ImageListViewRenderer.
 
 = Custom renderers =
 
