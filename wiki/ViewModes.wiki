@@ -23,6 +23,8 @@ http://imagelistview.googlecode.com/svn/wiki/ImageListView.gallery.jpg
 
 In this mode, a large preview image and image metadata is displayed in the left pane.
 
+http://imagelistview.googlecode.com/svn/wiki/ImageListView.pane.jpg
+
 == Details ==
 
 In this mode, columns with image details are shown. Thumbnail images are not displayed. The view can be scrolled vertically.

@@ -43,10 +43,6 @@ http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.tiles.jpg
 
 _Tiles renderer displays items with more details. Item states from top-to-bottom: selected, focused, mouse over._
 
-=== !PanelRenderer ===
-
-This renderer is removed. The new Pane view mode provides the functionality of !PanelRenderer.
-
 === !ZoomingRenderer ===
 
 You can set the zoom factor in the constructor.
@@ -61,6 +57,17 @@ http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.zooming.jpg
 
 _Zooming renderer displays large items on mouse over._
 
+=== !NoirRenderer ===
+
+Displays the control with a dark-theme.
+
+http://imagelistview.googlecode.com/svn/wiki/ImageListViewRenderer.noir.jpg
+
+_Noir renderer in action._
+
+=== !PanelRenderer ===
+
+This renderer is obsolote and is no longer included in the source code. The new Pane view mode provides the functionality of !PanelRenderer.
 
 == Writing a Custom Renderer ==
 
