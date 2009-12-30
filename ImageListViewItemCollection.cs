@@ -364,10 +364,12 @@ namespace Manina.Windows.Forms
 
                 // Sort items
                 mItems.Sort(new ImageListViewItemComparer(mImageListView.SortColumn, mImageListView.SortOrder));
+
                 // Update item indices
                 for (int i = 0; i < mItems.Count; i++)
                     mItems[i].mIndex = i;
 
+                // Restore previous cusrsor
                 mImageListView.Cursor = cursor;
             }
             #endregion
