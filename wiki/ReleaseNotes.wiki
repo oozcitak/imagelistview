@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 3.4 (04 January 2010) =
+
+  * Fixed a bug in drag and drop controller (Issue 11).
+
 = 3.3 (29 December 2009) =
 
   * Fixed a bug in !NoirRenderer.!DrawGalleryImage where the image was tried to be drawn when the control was empty.
