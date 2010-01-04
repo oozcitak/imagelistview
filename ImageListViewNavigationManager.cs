@@ -746,6 +746,8 @@ namespace Manina.Windows.Forms
                     int index = mImageListView.Items.Count;
                     if (DropTarget != null) index = DropTarget.Index;
                     if (DropToRight) index++;
+                    if (index > mImageListView.Items.Count)
+                        index = mImageListView.Items.Count;
                     int firstItemIndex = 0;
                     mImageListView.SelectedItems.Clear(false);
 
