@@ -3,7 +3,7 @@
 
 = 3.4 (04 January 2010) =
 
-  * Fixed a bug in drag and drop controller (Issue 11).
+  * Fixed a bug in drag and drop controller. (Issue 11)
 
 = 3.3 (29 December 2009) =
 
@@ -14,7 +14,7 @@
 
 = 3.2 (29 December 2009) =
 
-  * Added the new !NoirRenderer.
+  * Added the new !NoirRenderer. (Issue 10)
 
 = 3.1 (28 December 2009) =
 
@@ -66,7 +66,7 @@
   * Sorting properties now check if a sort is actually needed.
   * Removed the Hovered property from !ImageListViewItem and !ImageListViewColumnHeader.
   * The wait cursor is displayed while sorting items.
-  * Fixed issues with keyboard navigation and drag&drop logic.
+  * Fixed issues with keyboard navigation and drag&drop logic. (inc. Issue 1, Issue 4, Issue 5 and Issue 7)
 
 = 2.2 (13 December 2009) =
 
@@ -114,7 +114,7 @@
   * !PanelRenderer now displays some common Exif tags.
 
 = 1.0 (28 November 2009) =
-  * Added the Gallery view mode. 
+  * Added the Gallery view mode. (Issue 2)
   * Modified the hit testing, scrolling and the custom renderers to work with the Gallery view mode.
 
 = 0.18 (27 November 2009) =
