@@ -67,7 +67,7 @@ _Noir renderer in action._
 
 === !PanelRenderer ===
 
-This renderer is obsolote and is no longer included in the source code. The new Pane view mode provides the functionality of !PanelRenderer.
+This renderer is obsolete and is no longer included in the source code. The new Pane view mode provides the functionality of !PanelRenderer.
 
 == Writing a Custom Renderer ==
 
