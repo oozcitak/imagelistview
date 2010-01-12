@@ -82,6 +82,13 @@ namespace Manina.Windows.Forms
     /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void RetrieveVirtualItemImageEventHandler(object sender, VirtualItemImageEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the RetrieveVirtualItemDetails event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void RetrieveVirtualItemDetailsEventHandler(object sender, VirtualItemDetailsEventArgs e);
     #endregion
 
     #region Internal Delegates
@@ -90,6 +97,11 @@ namespace Manina.Windows.Forms
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void UpdateItemDetailsDelegateInternal(ImageListViewItem item, Utility.ShellImageFileInfo info);
+    /// <summary>
+    /// Updates item details.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void UpdateVirtualItemDetailsDelegateInternal(ImageListViewItem item, VirtualItemDetailsEventArgs e);
     /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
@@ -303,7 +315,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments related to virtual items.
+    /// Represents the event arguments related to virtual item images.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class VirtualItemImageEventArgs
@@ -317,6 +329,26 @@ namespace Manina.Windows.Forms
         /// represented by Key.
         /// </summary>
         public Image Image { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the LayoutEventArgs class.
+        /// </summary>
+        /// <param name="key">The key of the virtual item.</param>
+        public VirtualItemImageEventArgs(object key)
+        {
+            Key = key;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments related to virtual item details.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class VirtualItemDetailsEventArgs
+    {
+        /// <summary>
+        /// Gets the key of the virtual item.
+        /// </summary>
+        public object Key { get; private set; }
         /// <summary>
         /// Gets or sets the last access date of the image file represented by this item.
         /// </summary>
@@ -402,7 +434,7 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of the LayoutEventArgs class.
         /// </summary>
         /// <param name="key">The key of the virtual item.</param>
-        public VirtualItemImageEventArgs(object key)
+        public VirtualItemDetailsEventArgs(object key)
         {
             Key = key;
         }

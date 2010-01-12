@@ -61,8 +61,8 @@ namespace Manina.Windows.Forms
         private string mAperture;
         private string mUserComment;
         // Used for virtual items
+        internal bool isVirtualItem;
         internal object virtualItemKey;
-        private bool isVirtualItem;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
@@ -429,7 +429,7 @@ namespace Manina.Windows.Forms
             if (isVirtualItem)
             {
                 VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(virtualItemKey);
-                mImageListView.OnRetrieveVirtualItemImage(e);
+                mImageListView.RetrieveVirtualItemImageInternal(e);
                 img = e.Image;
             }
             else
@@ -618,6 +618,37 @@ namespace Manina.Windows.Forms
             mISOSpeed = info.ISOSpeed;
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.ApertureValue;
+            mUserComment = info.UserComment;
+
+            isDirty = false;
+        }
+        /// <summary>
+        /// Invoked by the worker thread to update item details.
+        /// </summary>
+        internal void UpdateDetailsInternal(VirtualItemDetailsEventArgs info)
+        {
+            if (!isDirty) return;
+
+            mDateAccessed = info.DateAccessed;
+            mDateCreated = info.DateCreated;
+            mDateModified = info.DateModified;
+            mFileName = info.FileName;
+            mFileSize = info.FileSize;
+            mFileType = info.FileType;
+            mFilePath = info.FilePath;
+            mDimensions = info.Dimensions;
+            mResolution = info.Resolution;
+            // Exif tags
+            mImageDescription = info.ImageDescription;
+            mEquipmentModel = info.EquipmentModel;
+            mDateTaken = info.DateTaken;
+            mArtist = info.Artist;
+            mCopyright = info.Copyright;
+            mExposureTime = info.ExposureTime;
+            mFNumber = info.FNumber;
+            mISOSpeed = info.ISOSpeed;
+            mShutterSpeed = info.ShutterSpeed;
+            mAperture = info.Aperture;
             mUserComment = info.UserComment;
 
             isDirty = false;
