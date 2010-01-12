@@ -295,7 +295,7 @@ namespace Manina.Windows.Forms
             internal void AddInternal(ImageListViewItem item)
             {
                 // Check if the file already exists
-                if (mImageListView != null && !mImageListView.AllowDuplicateFileNames)
+                if (mImageListView != null && !item.isVirtualItem && !mImageListView.AllowDuplicateFileNames)
                 {
                     if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
                         return;
