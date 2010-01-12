@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Drawing.Imaging;
 
 namespace Manina.Windows.Forms
 {
@@ -398,10 +399,23 @@ namespace Manina.Windows.Forms
                         }
 
                         // Set drag data
-                        string[] filenames = new string[mImageListView.SelectedItems.Count];
-                        for (int i = 0; i < mImageListView.SelectedItems.Count; i++)
-                            filenames[i] = mImageListView.SelectedItems[i].FileName;
-                        DataObject data = new DataObject(DataFormats.FileDrop, filenames);
+                        List<string> filenames = new List<string>();
+                        foreach (ImageListViewItem item in mImageListView.SelectedItems)
+                        {
+                            if (item.isVirtualItem)
+                            {
+                                // Get the virtual item source image
+                                VirtualItemImageEventArgs ve = new VirtualItemImageEventArgs(item.virtualItemKey);
+                                mImageListView.RetrieveVirtualItemImageInternal(ve);
+                                if (!string.IsNullOrEmpty(ve.FileName))
+                                    filenames.Add(ve.FileName);
+                            }
+                            else
+                            {
+                                filenames.Add(item.FileName);
+                            }
+                        }
+                        DataObject data = new DataObject(DataFormats.FileDrop, filenames.ToArray());
                         DropTarget = null;
                         selfDragging = true;
                         mImageListView.DoDragDrop(data, DragDropEffects.Copy);
@@ -832,7 +846,7 @@ namespace Manina.Windows.Forms
                         }
 
                         ImageListViewItem dragDropTarget = mImageListView.Items[index];
-                        
+
                         if (selfDragging && (dragDropTarget.Selected ||
                             (!dragCaretOnRight && index > 0 && mImageListView.Items[index - 1].Selected) ||
                             (dragCaretOnRight && index < mImageListView.Items.Count - 1 && mImageListView.Items[index + 1].Selected)))

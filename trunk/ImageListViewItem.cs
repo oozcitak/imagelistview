@@ -262,12 +262,15 @@ namespace Manina.Windows.Forms
                 if (mFileName != value)
                 {
                     mFileName = value;
-                    isDirty = true;
-                    if (mImageListView != null)
+                    if (!isVirtualItem)
                     {
-                        mImageListView.cacheManager.Remove(Guid);
-                        mImageListView.itemCacheManager.Add(this);
-                        mImageListView.Refresh();
+                        isDirty = true;
+                        if (mImageListView != null)
+                        {
+                            mImageListView.cacheManager.Remove(Guid);
+                            mImageListView.itemCacheManager.Add(this);
+                            mImageListView.Refresh();
+                        }
                     }
                 }
             }
@@ -430,7 +433,7 @@ namespace Manina.Windows.Forms
             {
                 VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(virtualItemKey);
                 mImageListView.RetrieveVirtualItemImageInternal(e);
-                img = e.Image;
+                img = Image.FromFile(e.FileName);
             }
             else
                 img = Image.FromFile(mFileName);
@@ -586,9 +589,20 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
-            Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
-            UpdateDetailsInternal(info);
-
+            if (isVirtualItem)
+            {
+                if (mImageListView != null )
+                {
+                    VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(virtualItemKey);
+                    mImageListView.RetrieveVirtualItemDetailsInternal(e);
+                    UpdateDetailsInternal(e);
+                }
+            }
+            else
+            {
+                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
+                UpdateDetailsInternal(info);
+            }
             isDirty = false;
         }
         /// <summary>

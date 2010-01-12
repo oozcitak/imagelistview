@@ -325,10 +325,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         public object Key { get; private set; }
         /// <summary>
-        /// Gets or sets the source image for the virtual item
+        /// Gets or sets the full path to the source image for the virtual item
         /// represented by Key.
         /// </summary>
-        public Image Image { get; set; }
+        public string FileName { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the LayoutEventArgs class.
