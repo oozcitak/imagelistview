@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.2 (12 January 2010) =
+
+  * An initial thumbnail image may now be specified while adding virtual items. (Issue 13)
+
 = 4.1 (12 January 2010) =
 
   * Virtual items now support drag and drop.
