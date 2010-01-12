@@ -1190,17 +1190,20 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Occurs when thumbnail image for a virtual item is requested.
         /// The lifetime of the image will be controlled by the control.
+        /// This event will be run in the worker thread context.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when thumbnail image for a virtual item is requested.")]
         public event RetrieveVirtualItemThumbnailEventHandler RetrieveVirtualItemThumbnail;
         /// <summary>
         /// Occurs when source image for a virtual item is requested.
         /// The lifetime of the image will be controlled by the control.
+        /// This event will be run in the worker thread context.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when source image for a virtual item is requested.")]
         public event RetrieveVirtualItemImageEventHandler RetrieveVirtualItemImage;
         /// <summary>
         /// Occurs when details of a virtual item are requested.
+        /// This event will be run in the worker thread context.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when details of a virtual item are requested.")]
         public event RetrieveVirtualItemDetailsEventHandler RetrieveVirtualItemDetails;
