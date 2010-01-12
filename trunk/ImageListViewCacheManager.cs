@@ -66,7 +66,9 @@ namespace Manina.Windows.Forms
             private Image mImage;
             private CacheState mState;
             private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
+            private bool mIsVirtualItem;
             private bool disposed;
+            private object mVirtualItemKey;
 
             /// <summary>
             /// Gets the guid of the item.
@@ -92,23 +94,89 @@ namespace Manina.Windows.Forms
             /// Gets embedded thumbnail extraction behavior.
             /// </summary>
             public UseEmbeddedThumbnails UseEmbeddedThumbnails { get { return mUseEmbeddedThumbnails; } }
+            /// <summary>
+            /// Gets whether this item represents a virtual ImageListViewItem.
+            /// </summary>
+            public bool IsVirtualItem { get { return mIsVirtualItem; } }
+            /// <summary>
+            /// Gets the public key for the virtual item.
+            /// </summary>
+            public object VirtualItemKey { get { return mVirtualItemKey; } }
 
+            /// <summary>
+            /// Initializes a new instance of the CacheItem class
+            /// for use with a virtual item.
+            /// </summary>
+            /// <param name="guid">The guid of the ImageListViewItem.</param>
+            /// <param name="key">The public key for the virtual item.</param>
+            /// <param name="size">The size of the requested thumbnail.</param>
+            /// <param name="image">The thumbnail image.</param>
+            /// <param name="state">The cache state of the item.</param>
+            public CacheItem(Guid guid, object key, Size size, Image image, CacheState state)
+                : this(guid, key, size, image, state, UseEmbeddedThumbnails.Auto)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the CacheItem class
+            /// for use with a virtual item.
+            /// </summary>
+            /// <param name="guid">The guid of the ImageListViewItem.</param>
+            /// <param name="key">The public key for the virtual item.</param>
+            /// <param name="size">The size of the requested thumbnail.</param>
+            /// <param name="image">The thumbnail image.</param>
+            /// <param name="state">The cache state of the item.</param>
+            /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+            public CacheItem(Guid guid, object key, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
+            {
+                mGuid = guid;
+                mVirtualItemKey = key;
+                mFileName = string.Empty;
+                mSize = size;
+                mImage = image;
+                mState = state;
+                mUseEmbeddedThumbnails = useEmbeddedThumbnails;
+                mIsVirtualItem = true;
+                disposed = false;
+            }
+            /// <summary>
+            /// Initializes a new instance of the CacheItem class.
+            /// </summary>
+            /// <param name="guid">The guid of the ImageListViewItem.</param>
+            /// <param name="filename">The file system path to the image file.</param>
+            /// <param name="size">The size of the requested thumbnail.</param>
+            /// <param name="image">The thumbnail image.</param>
+            /// <param name="state">The cache state of the item.</param>
             public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state)
+                : this(guid, filename, size, image, state, UseEmbeddedThumbnails.Auto)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the CacheItem class.
+            /// </summary>
+            /// <param name="guid">The guid of the ImageListViewItem.</param>
+            /// <param name="filename">The file system path to the image file.</param>
+            /// <param name="size">The size of the requested thumbnail.</param>
+            /// <param name="image">The thumbnail image.</param>
+            /// <param name="state">The cache state of the item.</param>
+            /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+            public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
             {
                 mGuid = guid;
                 mFileName = filename;
                 mSize = size;
                 mImage = image;
                 mState = state;
+                mUseEmbeddedThumbnails = useEmbeddedThumbnails;
+                mIsVirtualItem = false;
                 disposed = false;
             }
 
-            public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails)
-                : this(guid, filename, size, image, state)
-            {
-                mUseEmbeddedThumbnails = useEmbeddedThumbnails;
-            }
-
+            /// <summary>
+            /// Performs application-defined tasks associated with 
+            /// freeing, releasing, or resetting unmanaged resources.
+            /// </summary>
             public void Dispose()
             {
                 if (!disposed)
@@ -202,15 +270,37 @@ namespace Manina.Windows.Forms
         /// their original images will be seperately cached
         /// instead of fetching them from the file.
         /// </summary>
-        /// <param name="guid">The GUID of the item</param>
+        /// <param name="guid">The guid representing the item</param>
         /// <param name="filename">The image filename.</param>
         public void BeginItemEdit(Guid guid, string filename)
         {
             lock (lockObject)
             {
-                using (Image img = Image.FromFile(filename))
+                if (!editCache.ContainsKey(guid))
                 {
-                    editCache.Add(guid, new Bitmap(img));
+                    using (Image img = Image.FromFile(filename))
+                    {
+                        editCache.Add(guid, new Bitmap(img));
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Starts editing a virtual item. While items are edited,
+        /// their original images will be seperately cached
+        /// instead of fetching them from the file.
+        /// </summary>
+        /// <param name="guid">The guid representing the item</param>
+        public void BeginItemEdit(Guid guid)
+        {
+            lock (lockObject)
+            {
+                if (!editCache.ContainsKey(guid))
+                {
+                    VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mImageListView.Items[guid].virtualItemKey);
+                    mImageListView.OnRetrieveVirtualItemImage(e);
+                    if (e.Image != null)
+                        editCache.Add(guid, e.Image);
                 }
             }
         }
@@ -219,7 +309,7 @@ namespace Manina.Windows.Forms
         /// image will be continued to be fetched from the
         /// file.
         /// </summary>
-        /// <param name="guid"></param>
+        /// <param name="guid">The guid representing the item.</param>
         public void EndItemEdit(Guid guid)
         {
             lock (lockObject)
@@ -240,6 +330,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the cache state of the specified item.
         /// </summary>
+        /// <param name="guid">The guid representing the item.</param>
         public CacheState GetCacheState(Guid guid)
         {
             lock (lockObject)
@@ -324,6 +415,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Adds the image to the cache queue.
         /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="filename">Filesystem path to the image file.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         public void Add(Guid guid, string filename, Size thumbSize,
             UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
@@ -348,8 +443,42 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Adds the image to the renderer cache.
+        /// Adds a virtual item to the cache queue.
         /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="key">The key of this item.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        public void Add(Guid guid, object key, Size thumbSize,
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            lock (lockObject)
+            {
+                // Already cached?
+                CacheItem item = null;
+                if (thumbCache.TryGetValue(guid, out item))
+                {
+                    if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                        return;
+                    else
+                    {
+                        item.Dispose();
+                        thumbCache.Remove(guid);
+                    }
+                }
+                // Add to cache
+                toCache.Push(new CacheItem(guid, key, thumbSize, null,
+                    CacheState.Unknown, useEmbeddedThumbnails));
+                Monitor.Pulse(lockObject);
+            }
+        }
+        /// <summary>
+        /// Adds the image to the renderer cache queue.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="filename">Filesystem path to the image file.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         public void AddToRendererCache(Guid guid, string filename,
             Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
@@ -370,9 +499,38 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Adds the virtual item image to the renderer cache queue.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="key">The key of this item.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        public void AddToRendererCache(Guid guid, object key, Size thumbSize,
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            lock (lockObject)
+            {
+                // Already cached?
+                if (rendererGuid == guid && rendererItem != null &&
+                    rendererItem.Size == thumbSize &&
+                    rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                    return;
+
+                // Renderer cache holds one item only.
+                rendererToCache.Clear();
+
+                rendererToCache.Push(new CacheItem(guid, key, thumbSize,
+                    null, CacheState.Unknown, useEmbeddedThumbnails));
+                Monitor.Pulse(lockObject);
+            }
+        }
+        /// <summary>
         /// Gets the image from the renderer cache. If the image is not cached,
         /// null will be returned.
         /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         public Image GetRendererImage(Guid guid, Size thumbSize,
             UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
@@ -389,6 +547,7 @@ namespace Manina.Windows.Forms
         /// Gets the image from the thumbnail cache. If the image is not cached,
         /// null will be returned.
         /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
         public Image GetImage(Guid guid)
         {
             lock (lockObject)
@@ -558,10 +717,23 @@ namespace Manina.Windows.Forms
                             thumb = Utility.ThumbnailFromImage(editSource,
                                 request.Size, Color.White);
 
-                        // Read from file
+                        // Read thumbnail image
                         if (thumb == null)
-                            thumb = Utility.ThumbnailFromFile(request.FileName,
-                                request.Size, request.UseEmbeddedThumbnails, Color.White);
+                        {
+                            if (request.IsVirtualItem)
+                            {
+                                VirtualItemThumbnailEventArgs e = new VirtualItemThumbnailEventArgs(
+                                    request.VirtualItemKey, request.Size);
+                                mImageListView.OnRetrieveVirtualItemThumbnail(e);
+                                if (e.ThumbnailImage != null)
+                                    thumb = e.ThumbnailImage;
+                            }
+                            else
+                            {
+                                thumb = Utility.ThumbnailFromFile(request.FileName,
+                                    request.Size, request.UseEmbeddedThumbnails, Color.White);
+                            }
+                        }
 
                         // Create the cache item
                         if (thumb == null)

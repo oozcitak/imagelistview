@@ -152,6 +152,15 @@ namespace Manina.Windows.Forms
                 Add(new ImageListViewItem(filename));
             }
             /// <summary>
+            /// Adds a virtual item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
+            public void Add(object key, string text)
+            {
+                Add(new ImageListViewItem(key, text));
+            }
+            /// <summary>
             /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             /// </summary>
             /// <param name="items">The items to add to the collection.</param>
