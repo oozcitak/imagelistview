@@ -69,11 +69,19 @@ namespace Manina.Windows.Forms
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ThumbnailCachedEventHandler(object sender, ItemEventArgs e);
     /// <summary>
-    /// Represents the method that will handle the ThumbnailCached event. 
+    /// Represents the method that will handle the RetrieveVirtualItemThumbnail event. 
     /// </summary>
-    /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid);
+    public delegate void RetrieveVirtualItemThumbnailEventHandler(object sender, VirtualItemThumbnailEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the RetrieveVirtualItemImage event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void RetrieveVirtualItemImageEventHandler(object sender, VirtualItemImageEventArgs e);
     #endregion
 
     #region Internal Delegates
@@ -81,7 +89,7 @@ namespace Manina.Windows.Forms
     /// Updates item details.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void UpdateItemDetailsDelegateInternal(ImageListViewItem item,Utility.ShellImageFileInfo info);
+    internal delegate void UpdateItemDetailsDelegateInternal(ImageListViewItem item, Utility.ShellImageFileInfo info);
     /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
@@ -98,6 +106,12 @@ namespace Manina.Windows.Forms
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void RefreshDelegateInternal();
+    /// <summary>
+    /// Represents the method that will handle the ThumbnailCached event. 
+    /// </summary>
+    /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid);
     #endregion
 
     #region Event Arguments
@@ -253,6 +267,144 @@ namespace Manina.Windows.Forms
         public LayoutEventArgs(Rectangle itemAreaBounds)
         {
             ItemAreaBounds = itemAreaBounds;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments related to virtual item 
+    /// thumbnail requests.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class VirtualItemThumbnailEventArgs
+    {
+        /// <summary>
+        /// Gets the key of the virtual item.
+        /// </summary>
+        public object Key { get; private set; }
+        /// <summary>
+        /// Gets the size of the thumbnail image for the virtual item
+        /// represented by Key.
+        /// </summary>
+        public Size ThumbnailDimensions { get; private set; }
+        /// <summary>
+        /// Gets or sets the thumbnail image for the virtual item
+        /// represented by Key.
+        /// </summary>
+        public Image ThumbnailImage { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the LayoutEventArgs class.
+        /// </summary>
+        /// <param name="key">The key of the virtual item.</param>
+        /// <param name="thumbnailDimensions">Requested thumbnail pixel dimensions.</param>
+        public VirtualItemThumbnailEventArgs(object key, Size thumbnailDimensions)
+        {
+            Key = key;
+            ThumbnailDimensions = thumbnailDimensions;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments related to virtual items.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class VirtualItemImageEventArgs
+    {
+        /// <summary>
+        /// Gets the key of the virtual item.
+        /// </summary>
+        public object Key { get; private set; }
+        /// <summary>
+        /// Gets or sets the source image for the virtual item
+        /// represented by Key.
+        /// </summary>
+        public Image Image { get; set; }
+        /// <summary>
+        /// Gets or sets the last access date of the image file represented by this item.
+        /// </summary>
+        public DateTime DateAccessed { get; set; }
+        /// <summary>
+        /// Gets or sets the creation date of the image file represented by this item.
+        /// </summary>
+        public DateTime DateCreated { get; set; }
+        /// <summary>
+        /// Gets or sets the modification date of the image file represented by this item.
+        /// </summary>
+        public DateTime DateModified { get; set; }
+        /// <summary>
+        /// Gets or sets the shell type of the image file represented by this item.
+        /// </summary>
+        public string FileType { get; set; }
+        /// <summary>
+        /// Gets or sets the name of the image fie represented by this item.
+        /// </summary>        
+        public string FileName { get; set; }
+        /// <summary>
+        /// Gets or sets the path of the image fie represented by this item.
+        /// </summary>        
+        public string FilePath { get; set; }
+        /// <summary>
+        /// Gets or sets file size in bytes.
+        /// </summary>
+        public long FileSize { get; set; }
+        /// <summary>
+        /// Gets or sets image dimensions.
+        /// </summary>
+        public Size Dimensions { get; set; }
+        /// <summary>
+        /// Gets or sets image resolution in pixels per inch.
+        /// </summary>
+        public SizeF Resolution { get; set; }
+        /// <summary>
+        /// Gets or sets image deascription.
+        /// </summary>
+        public string ImageDescription { get; set; }
+        /// <summary>
+        /// Gets or sets the camera model.
+        /// </summary>
+        public string EquipmentModel { get; set; }
+        /// <summary>
+        /// Gets or sets the date and time the image was taken.
+        /// </summary>
+        public DateTime DateTaken { get; set; }
+        /// <summary>
+        /// Gets or sets the name of the artist.
+        /// </summary>
+        public string Artist { get; set; }
+        /// <summary>
+        /// Gets or sets image copyright information.
+        /// </summary>
+        public string Copyright { get; set; }
+        /// <summary>
+        /// Gets or sets the exposure time in seconds.
+        /// </summary>
+        public string ExposureTime { get; set; }
+        /// <summary>
+        /// Gets or sets the F number.
+        /// </summary>
+        public float FNumber { get; set; }
+        /// <summary>
+        /// Gets or sets the ISO speed.
+        /// </summary>
+        public ushort ISOSpeed { get; set; }
+        /// <summary>
+        /// Gets or sets the shutter speed.
+        /// </summary>
+        public string ShutterSpeed { get; set; }
+        /// <summary>
+        /// Gets or sets the lens aperture value.
+        /// </summary>
+        public string Aperture { get; set; }
+        /// <summary>
+        /// Gets or sets user comments.
+        /// </summary>
+        public string UserComment { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the LayoutEventArgs class.
+        /// </summary>
+        /// <param name="key">The key of the virtual item.</param>
+        public VirtualItemImageEventArgs(object key)
+        {
+            Key = key;
         }
     }
     #endregion

@@ -28,6 +28,7 @@ namespace Manina.Windows.Forms
     public class ImageListViewItem
     {
         #region Member Variables
+        // Property backing fields
         internal int mIndex;
         private Color mBackColor;
         private Color mForeColor;
@@ -59,6 +60,9 @@ namespace Manina.Windows.Forms
         private string mShutterSpeed;
         private string mAperture;
         private string mUserComment;
+        // Used for virtual items
+        internal object virtualItemKey;
+        private bool isVirtualItem;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
@@ -206,22 +210,16 @@ namespace Manina.Windows.Forms
                 CacheState state = ThumbnailCacheState;
                 if (state == CacheState.Error)
                     return mImageListView.ErrorImage;
-                else if (state == CacheState.Cached)
-                {
-                    Image img = mImageListView.cacheManager.GetImage(Guid);
-                    if (img != null)
-                        return img;
-                    else
-                    {
-                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
-                        return mImageListView.DefaultImage;
-                    }
-                }
+
+                Image img = mImageListView.cacheManager.GetImage(Guid);
+                if (img != null)
+                    return img;
+
+                if (isVirtualItem)
+                    mImageListView.cacheManager.Add(Guid, virtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                 else
-                {
                     mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
-                    return mImageListView.DefaultImage;
-                }
+                return mImageListView.DefaultImage;
             }
         }
         /// <summary>
@@ -371,6 +369,9 @@ namespace Manina.Windows.Forms
             isDirty = true;
             defaultText = null;
             editing = false;
+
+            virtualItemKey = null;
+            isVirtualItem = false;
         }
         /// <summary>
         /// Initializes a new instance of the ImageListViewItem class.
@@ -382,6 +383,39 @@ namespace Manina.Windows.Forms
             mFileName = filename;
             defaultText = Path.GetFileName(filename);
         }
+        /// <summary>
+        /// Initializes a new instance of a virtual ImageListViewItem class.
+        /// </summary>
+        /// <param name="key">The key identifying this item.</param>
+        /// <param name="text">Text of this item.</param>
+        /// <param name="dimensions">Pixel dimensions of the source image.</param>
+        public ImageListViewItem(object key, string text, Size dimensions)
+            : this()
+        {
+            isVirtualItem = true;
+            virtualItemKey = key;
+            defaultText = text;
+            mDimensions = dimensions;
+        }
+        /// <summary>
+        /// Initializes a new instance of a virtual ImageListViewItem class.
+        /// </summary>
+        /// <param name="key">The key identifying this item.</param>
+        /// <param name="text">Text of this item.</param>
+        public ImageListViewItem(object key, string text)
+            : this(key, text, Size.Empty)
+        {
+            ;
+        }
+        /// <summary>
+        /// Initializes a new instance of a virtual ImageListViewItem class.
+        /// </summary>
+        /// <param name="key">The key identifying this item.</param>
+        public ImageListViewItem(object key)
+            : this(key, string.Empty, Size.Empty)
+        {
+            ;
+        }
         #endregion
 
         #region Instance Methods
@@ -391,7 +425,15 @@ namespace Manina.Windows.Forms
         public Image GetImage()
         {
             if (!editing) BeginEdit();
-            Image img = Image.FromFile(mFileName);
+            Image img = null;
+            if (isVirtualItem)
+            {
+                VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(virtualItemKey);
+                mImageListView.OnRetrieveVirtualItemImage(e);
+                img = e.Image;
+            }
+            else
+                img = Image.FromFile(mFileName);
             if (!editing) EndEdit();
             return img;
         }

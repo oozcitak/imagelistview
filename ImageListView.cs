@@ -402,7 +402,7 @@ namespace Manina.Windows.Forms
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque | 
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
             Size = new Size(120, 100);
             mThumbnailSize = new Size(96, 96);
@@ -1087,9 +1087,27 @@ namespace Manina.Windows.Forms
             if (ThumbnailCaching != null)
                 ThumbnailCaching(this, e);
         }
+        /// <summary>
+        /// Raises the RetrieveVirtualItem event.
+        /// </summary>
+        /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
+        internal virtual void OnRetrieveVirtualItemThumbnail(VirtualItemThumbnailEventArgs e)
+        {
+            if (RetrieveVirtualItemThumbnail != null)
+                RetrieveVirtualItemThumbnail(this, e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItemImage event.
+        /// </summary>
+        /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
+        internal virtual void OnRetrieveVirtualItemImage(VirtualItemImageEventArgs e)
+        {
+            if (RetrieveVirtualItemImage != null)
+                RetrieveVirtualItemImage(this, e);
+        }
         #endregion
 
-        #region Exposed Events
+        #region Public Events
         /// <summary>
         /// Occurs after the user successfully resized a column header.
         /// </summary>
@@ -1125,6 +1143,18 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs before an item thumbnail is cached.")]
         public event ThumbnailCachingEventHandler ThumbnailCaching;
+        /// <summary>
+        /// Occurs when thumbnail image for a virtual item is requested.
+        /// The lifetime of the image will be controlled by the control.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs when thumbnail image for a virtual item is requested.")]
+        public event RetrieveVirtualItemThumbnailEventHandler RetrieveVirtualItemThumbnail;
+        /// <summary>
+        /// Occurs when source image for a virtual item is requested.
+        /// The lifetime of the image will be controlled by the control.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs when source image for a virtual item is requested.")]
+        public event RetrieveVirtualItemImageEventHandler RetrieveVirtualItemImage;
         #endregion
     }
 }
