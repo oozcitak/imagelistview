@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.1 (12 January 2010) =
+
+  * Virtual items now support drag and drop.
+
 = 4.0 (12 January 2010) =
 
   * Added support for virtual items. (Issue 12)
