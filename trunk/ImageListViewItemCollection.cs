@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Collections;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace Manina.Windows.Forms
 {
@@ -159,6 +160,22 @@ namespace Manina.Windows.Forms
             public void Add(object key, string text)
             {
                 Add(new ImageListViewItem(key, text));
+            }
+            /// <summary>
+            /// Adds a virtual item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            public void Add(object key, string text, Image initialThumbnail)
+            {
+                ImageListViewItem item = new ImageListViewItem(key, text);
+                Add(item);
+                if (mImageListView != null)
+                {
+                    mImageListView.cacheManager.Add(item.Guid, key, mImageListView.ThumbnailSize,
+                        initialThumbnail, mImageListView.UseEmbeddedThumbnails);
+                }
             }
             /// <summary>
             /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.

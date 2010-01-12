@@ -473,6 +473,55 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Adds a virtual item to the cache.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="key">The key of this item.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="thumb">Thumbnail image to add to cache.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        public void Add(Guid guid, object key, Size thumbSize, Image thumb,
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            lock (lockObject)
+            {
+                // Already cached?
+                CacheItem item = null;
+                if (thumbCache.TryGetValue(guid, out item))
+                {
+                    if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                        return;
+                    else
+                    {
+                        item.Dispose();
+                        thumbCache.Remove(guid);
+                    }
+                }
+                // Add to cache
+                thumbCache.Add(guid, new CacheItem(guid, key, thumbSize, thumb,
+                    CacheState.Cached, useEmbeddedThumbnails));
+            }
+
+            try
+            {
+                if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                {
+                    mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                        mImageListView.OnThumbnailCachedInternal), guid);
+                    mImageListView.Invoke(new RefreshDelegateInternal(
+                        mImageListView.OnRefreshInternal));
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                if (!Stopping) throw;
+            }
+            catch (InvalidOperationException)
+            {
+                if (!Stopping) throw;
+            }
+        }
+        /// <summary>
         /// Adds the image to the renderer cache queue.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
@@ -680,8 +729,8 @@ namespace Manina.Windows.Forms
                         {
                             if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                             {
-                                isvisible = (bool)mImageListView.Invoke(
-                                    new CheckItemVisibleDelegateInternal(mImageListView.IsItemVisible), guid);
+                                isvisible = (bool)mImageListView.Invoke(new CheckItemVisibleDelegateInternal(
+                                    mImageListView.IsItemVisible), guid);
                             }
                         }
                         catch (ObjectDisposedException)
@@ -807,8 +856,8 @@ namespace Manina.Windows.Forms
                         {
                             if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                             {
-                                mImageListView.Invoke(
-                                    new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                                mImageListView.Invoke(new RefreshDelegateInternal(
+                                    mImageListView.OnRefreshInternal));
                             }
                             sw.Reset();
                         }
@@ -884,8 +933,7 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                         {
-                            mImageListView.Invoke(
-                                new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
+                            mImageListView.Invoke(new RefreshDelegateInternal(mImageListView.OnRefreshInternal));
                         }
                     }
                     catch (ObjectDisposedException)
