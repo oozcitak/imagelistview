@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.0 (12 January 2010) =
+
+  * Added support for virtual items. (Issue 12)
+
 = 3.4 (04 January 2010) =
 
   * Fixed a bug in drag and drop controller. (Issue 11)
