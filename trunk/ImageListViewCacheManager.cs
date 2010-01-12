@@ -298,7 +298,7 @@ namespace Manina.Windows.Forms
                 if (!editCache.ContainsKey(guid))
                 {
                     VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mImageListView.Items[guid].virtualItemKey);
-                    mImageListView.OnRetrieveVirtualItemImage(e);
+                    mImageListView.RetrieveVirtualItemImageInternal(e);
                     if (e.Image != null)
                         editCache.Add(guid, e.Image);
                 }
@@ -724,7 +724,8 @@ namespace Manina.Windows.Forms
                             {
                                 VirtualItemThumbnailEventArgs e = new VirtualItemThumbnailEventArgs(
                                     request.VirtualItemKey, request.Size);
-                                mImageListView.OnRetrieveVirtualItemThumbnail(e);
+                                if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                                    mImageListView.RetrieveVirtualItemThumbnailInternal(e);
                                 if (e.ThumbnailImage != null)
                                     thumb = e.ThumbnailImage;
                             }

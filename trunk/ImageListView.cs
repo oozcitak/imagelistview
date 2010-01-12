@@ -1079,6 +1079,14 @@ namespace Manina.Windows.Forms
             item.UpdateDetailsInternal(info);
         }
         /// <summary>
+        /// Updates item details.
+        /// This method is invoked from the item cache thread.
+        /// </summary>
+        internal void UpdateItemDetailsInternal(ImageListViewItem item, VirtualItemDetailsEventArgs info)
+        {
+            item.UpdateDetailsInternal(info);
+        }
+        /// <summary>
         /// Raises the ThumbnailCaching event.
         /// </summary>
         /// <param name="e">A ItemEventArgs that contains event data.</param>
@@ -1091,7 +1099,7 @@ namespace Manina.Windows.Forms
         /// Raises the RetrieveVirtualItem event.
         /// </summary>
         /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
-        internal virtual void OnRetrieveVirtualItemThumbnail(VirtualItemThumbnailEventArgs e)
+        protected virtual void OnRetrieveVirtualItemThumbnail(VirtualItemThumbnailEventArgs e)
         {
             if (RetrieveVirtualItemThumbnail != null)
                 RetrieveVirtualItemThumbnail(this, e);
@@ -1100,10 +1108,46 @@ namespace Manina.Windows.Forms
         /// Raises the RetrieveVirtualItemImage event.
         /// </summary>
         /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
-        internal virtual void OnRetrieveVirtualItemImage(VirtualItemImageEventArgs e)
+        protected virtual void OnRetrieveVirtualItemImage(VirtualItemImageEventArgs e)
         {
             if (RetrieveVirtualItemImage != null)
                 RetrieveVirtualItemImage(this, e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItemDetails event.
+        /// </summary>
+        /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
+        protected virtual void OnRetrieveVirtualItemDetails(VirtualItemDetailsEventArgs e)
+        {
+            if (RetrieveVirtualItemDetails != null)
+                RetrieveVirtualItemDetails(this, e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItem event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
+        internal virtual void RetrieveVirtualItemThumbnailInternal(VirtualItemThumbnailEventArgs e)
+        {
+            OnRetrieveVirtualItemThumbnail(e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItemImage event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
+        internal virtual void RetrieveVirtualItemImageInternal(VirtualItemImageEventArgs e)
+        {
+            OnRetrieveVirtualItemImage(e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItemDetails event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
+        internal virtual void RetrieveVirtualItemDetailsInternal(VirtualItemDetailsEventArgs e)
+        {
+            OnRetrieveVirtualItemDetails(e);
         }
         #endregion
 
@@ -1155,6 +1199,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when source image for a virtual item is requested.")]
         public event RetrieveVirtualItemImageEventHandler RetrieveVirtualItemImage;
+        /// <summary>
+        /// Occurs when details of a virtual item are requested.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs when details of a virtual item are requested.")]
+        public event RetrieveVirtualItemDetailsEventHandler RetrieveVirtualItemDetails;
         #endregion
     }
 }

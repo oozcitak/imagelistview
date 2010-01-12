@@ -51,6 +51,8 @@ namespace Manina.Windows.Forms
         {
             private ImageListViewItem mItem;
             private string mFileName;
+            private bool mIsVirtualItem;
+            private object mVirtualItemKey;
 
             /// <summary>
             /// Gets the ImageListViewItem associated with this request.
@@ -60,6 +62,14 @@ namespace Manina.Windows.Forms
             /// Gets the name of the image file.
             /// </summary>
             public string FileName { get { return mFileName; } }
+            /// <summary>
+            /// Gets whether Item is a virtual item.
+            /// </summary>
+            public bool IsVirtualItem { get { return mIsVirtualItem; } }
+            /// <summary>
+            /// Gets the public key for the virtual item.
+            /// </summary>
+            public object VirtualItemKey { get { return mVirtualItemKey; } }
 
             /// <summary>
             /// Initializes a new instance of the CacheItem class.
@@ -69,6 +79,8 @@ namespace Manina.Windows.Forms
             public CacheItem(ImageListViewItem item)
             {
                 mItem = item;
+                mIsVirtualItem = item.isVirtualItem;
+                mVirtualItemKey = item.virtualItemKey;
                 mFileName = item.FileName;
             }
         }
@@ -210,25 +222,38 @@ namespace Manina.Windows.Forms
                 // Read file info
                 if (item != null)
                 {
-                    Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
-                    // Update file info
-                    if (!Stopping)
+                    if (item.IsVirtualItem)
                     {
-                        try
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                         {
-                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                            VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(item.VirtualItemKey);
+                            mImageListView.RetrieveVirtualItemDetailsInternal(e);
+                            mImageListView.Invoke(new UpdateVirtualItemDetailsDelegateInternal(
+                                mImageListView.UpdateItemDetailsInternal), item.Item, e);
+                        }
+                    }
+                    else
+                    {
+                        Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
+                        // Update file info
+                        if (!Stopping)
+                        {
+                            try
                             {
-                                mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
-                                    mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                                if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                                {
+                                    mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
+                                        mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                                }
                             }
-                        }
-                        catch (ObjectDisposedException)
-                        {
-                            if (!Stopping) throw;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            if (!Stopping) throw;
+                            catch (ObjectDisposedException)
+                            {
+                                if (!Stopping) throw;
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                if (!Stopping) throw;
+                            }
                         }
                     }
                 }
