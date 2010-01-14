@@ -351,12 +351,22 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Removes the given item without raising a selection changed event.
             /// </summary>
+            /// <param name="item">The item to remove.</param>
             internal void RemoveInternal(ImageListViewItem item)
+            {
+                RemoveInternal(item, true);
+            }
+            /// <summary>
+            /// Removes the given item without raising a selection changed event.
+            /// </summary>
+            /// <param name="item">The item to remove.</param>
+            /// <param name="removeFromCache">true to remove item image from cache; otherwise false.</param>
+            internal void RemoveInternal(ImageListViewItem item, bool removeFromCache)
             {
                 for (int i = item.mIndex; i < mItems.Count; i++)
                     mItems[i].mIndex--;
                 if (item == mFocused) mFocused = null;
-                if (mImageListView != null)
+                if (removeFromCache && mImageListView != null)
                     mImageListView.cacheManager.Remove(item.Guid);
                 bool ret = mItems.Remove(item);
             }
