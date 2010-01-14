@@ -743,7 +743,7 @@ namespace Manina.Windows.Forms
                     {
                         if (item.Index <= i) i--;
                         draggedItems.Add(item);
-                        mImageListView.Items.RemoveInternal(item);
+                        mImageListView.Items.RemoveInternal(item, false);
                     }
                     if (i < 0) i = 0;
                     if (i > mImageListView.Items.Count - 1) i = mImageListView.Items.Count - 1;
