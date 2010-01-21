@@ -810,6 +810,7 @@ namespace Manina.Windows.Forms
                         {
                             lock (lockObject)
                             {
+                                thumbCache.Remove(guid);
                                 thumbCache.Add(guid, result);
 
                                 if (thumb != null)
