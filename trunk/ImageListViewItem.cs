@@ -37,7 +37,6 @@ namespace Manina.Windows.Forms
         internal bool mSelected;
         private string mText;
         private int mZOrder;
-        private string defaultText;
         // File info
         private DateTime mDateAccessed;
         private DateTime mDateCreated;
@@ -181,10 +180,7 @@ namespace Manina.Windows.Forms
         {
             get
             {
-                if (string.IsNullOrEmpty(mText))
-                    return defaultText;
-                else
-                    return mText;
+                return mText;
             }
             set
             {
@@ -370,7 +366,6 @@ namespace Manina.Windows.Forms
             Selected = false;
 
             isDirty = true;
-            defaultText = null;
             editing = false;
 
             virtualItemKey = null;
@@ -384,7 +379,7 @@ namespace Manina.Windows.Forms
             : this()
         {
             mFileName = filename;
-            defaultText = Path.GetFileName(filename);
+            mText = Path.GetFileName(filename);
         }
         /// <summary>
         /// Initializes a new instance of a virtual ImageListViewItem class.
@@ -397,7 +392,7 @@ namespace Manina.Windows.Forms
         {
             isVirtualItem = true;
             virtualItemKey = key;
-            defaultText = text;
+            mText = text;
             mDimensions = dimensions;
         }
         /// <summary>
@@ -591,7 +586,7 @@ namespace Manina.Windows.Forms
 
             if (isVirtualItem)
             {
-                if (mImageListView != null )
+                if (mImageListView != null)
                 {
                     VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(virtualItemKey);
                     mImageListView.RetrieveVirtualItemDetailsInternal(e);
@@ -618,7 +613,7 @@ namespace Manina.Windows.Forms
             mFileSize = info.Size;
             mFileType = info.TypeName;
             mFilePath = info.DirectoryName;
-            defaultText = info.DisplayName;
+            mText = info.DisplayName;
             mDimensions = info.Dimensions;
             mResolution = info.Resolution;
             // Exif tags
