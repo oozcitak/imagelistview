@@ -884,7 +884,7 @@ namespace Manina.Windows.Forms
                 hScrollBar.Value = newXOffset;
             }
 
-            Refresh();
+            Refresh(true);
             mRenderer.ResumePaint();
 
             base.OnMouseWheel(e);

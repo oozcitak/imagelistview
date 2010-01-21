@@ -814,6 +814,35 @@ namespace Manina.Windows.Forms
                         // Calculate the location of the insertion cursor
                         Point pt = new Point(e.X, e.Y);
                         pt = mImageListView.PointToClient(pt);
+
+                        // Do we need to scroll the view?
+                        if (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll &&
+                            pt.Y > mImageListView.ClientRectangle.Bottom - 20)
+                        {
+                            scrollTimer.Tag = -120;
+                            scrollTimer.Enabled = true;
+                        }
+                        else if (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll &&
+                            pt.Y < mImageListView.ClientRectangle.Top + 20)
+                        {
+                            scrollTimer.Tag = 120;
+                            scrollTimer.Enabled = true;
+                        }
+                        else if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
+                            pt.X > mImageListView.ClientRectangle.Right - 20)
+                        {
+                            scrollTimer.Tag = -120;
+                            scrollTimer.Enabled = true;
+                        }
+                        else if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
+                            pt.X < mImageListView.ClientRectangle.Left + 20)
+                        {
+                            scrollTimer.Tag = 120;
+                            scrollTimer.Enabled = true;
+                        }
+                        else
+                            scrollTimer.Enabled = false;
+
                         // Normalize to item area coordinates
                         pt.X -= mImageListView.layoutManager.ItemAreaBounds.Left;
                         pt.Y -= mImageListView.layoutManager.ItemAreaBounds.Top;
@@ -879,8 +908,11 @@ namespace Manina.Windows.Forms
                 if (mImageListView.AllowDrag && selfDragging)
                 {
                     DropTarget = null;
-                    mImageListView.Refresh();
+                    mImageListView.Refresh(true);
                 }
+
+                if(scrollTimer.Enabled)
+                    scrollTimer.Enabled = false;
             }
             #endregion
 
