@@ -1,6 +1,15 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.4 (21 January 2010) =
+
+  * The control is now scrolled while dragging items to the edges of the client area.
+
+= 4.3 (21 January 2010) =
+
+  * Fixed an issue where item text was not set in virtual mode. (Issue 14)
+  * Fixed an issue where the !ImageListViewItemCollection.Clear method did not immediately empty the thumbnail cache. (Issue 15)
+
 = 4.2 (12 January 2010) =
 
   * An initial thumbnail image may now be specified while adding virtual items. (Issue 13)
