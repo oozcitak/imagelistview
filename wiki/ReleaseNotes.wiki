@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.5 (26 January 2010) =
+
+  * Fixed a raced condition that occurred if an initial thumbnail image was supplied for a virtual item.
+  * Added the !RetryOnError property to the control. When set to true, the cache thread will continuously poll the item for a valid thumbnail, until it gets a valid image.
+
 = 4.4 (21 January 2010) =
 
   * The control is now scrolled while dragging items to the edges of the client area.
