@@ -65,9 +65,9 @@ namespace Manina.Windows.Forms
     /// Represents the method that will handle the ThumbnailCached event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
-    /// <param name="e">A ItemEventArgs that contains event data.</param>
+    /// <param name="e">A ThumbnailCachedEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void ThumbnailCachedEventHandler(object sender, ItemEventArgs e);
+    public delegate void ThumbnailCachedEventHandler(object sender, ThumbnailCachedEventArgs e);
     /// <summary>
     /// Represents the method that will handle the RetrieveVirtualItemThumbnail event. 
     /// </summary>
@@ -122,8 +122,9 @@ namespace Manina.Windows.Forms
     /// Represents the method that will handle the ThumbnailCached event. 
     /// </summary>
     /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+    /// <param name="error">Determimes whether an error occurred during thumbnail extraction.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid);
+    internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid, bool error);
     #endregion
 
     #region Event Arguments
@@ -279,6 +280,35 @@ namespace Manina.Windows.Forms
         public LayoutEventArgs(Rectangle itemAreaBounds)
         {
             ItemAreaBounds = itemAreaBounds;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for the thumbnail cached event.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class ThumbnailCachedEventArgs
+    {
+        private ImageListViewItem mItem;
+        private bool mError;
+
+        /// <summary>
+        /// Gets the ImageListViewItem that is the target of the event.
+        /// </summary>
+        public ImageListViewItem Item { get { return mItem; } }
+        /// <summary>
+        /// Gets whether an error occurred during thumbnail extraction.
+        /// </summary>
+        public bool Error { get { return mError; } }
+
+        /// <summary>
+        /// Initializes a new instance of the ItemEventArgs class.
+        /// </summary>
+        /// <param name="item">The item that is the target of this event.</param>
+        /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
+        public ThumbnailCachedEventArgs(ImageListViewItem item, bool error)
+        {
+            mItem = item;
+            mError = error;
         }
     }
     /// <summary>

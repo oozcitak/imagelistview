@@ -74,6 +74,7 @@ namespace Manina.Windows.Forms
         private ImageListViewItemCollection mItems;
         private int mPaneWidth;
         internal ImageListViewRenderer mRenderer;
+        private bool mRetryOnError;
         internal ImageListViewSelectedItemCollection mSelectedItems;
         private ColumnType mSortColumn;
         private SortOrder mSortOrder;
@@ -236,11 +237,28 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets whether the control will retry loading thumbnails on an error.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether the control will retry loading thumbnails on an error."), DefaultValue(true)]
+        public bool RetryOnError 
+        {
+            get 
+            {
+                return mRetryOnError; 
+            }
+            set
+            {
+                mRetryOnError = value;
+                if (cacheManager != null)
+                    cacheManager.RetryOnError = mRetryOnError;
+            }
+        }
+        /// <summary>
         /// Gets the collection of selected items contained in the image list view.
         /// </summary>
         [Browsable(false), Category("Behavior"), Description("Gets the collection of selected items contained in the image list view.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ImageListView.ImageListViewSelectedItemCollection SelectedItems { get { return mSelectedItems; } }
+        public ImageListViewSelectedItemCollection SelectedItems { get { return mSelectedItems; } }
         /// <summary>
         /// Gets or sets the sort column.
         /// </summary>
@@ -399,6 +417,7 @@ namespace Manina.Windows.Forms
             HeaderFont = this.Font;
             mItems = new ImageListViewItemCollection(this);
             mPaneWidth = 240;
+            mRetryOnError = true;
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;
@@ -1045,8 +1064,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the ThumbnailCached event.
         /// </summary>
-        /// <param name="e">A ItemEventArgs that contains event data.</param>
-        protected virtual void OnThumbnailCached(ItemEventArgs e)
+        /// <param name="e">A ThumbnailCachedEventArgs that contains event data.</param>
+        protected virtual void OnThumbnailCached(ThumbnailCachedEventArgs e)
         {
             if (ThumbnailCached != null)
                 ThumbnailCached(this, e);
@@ -1056,11 +1075,12 @@ namespace Manina.Windows.Forms
         /// This method is invoked from the thumbnail thread.
         /// </summary>
         /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
-        internal void OnThumbnailCachedInternal(Guid guid)
+        /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
+        internal void OnThumbnailCachedInternal(Guid guid, bool error)
         {
             int itemIndex = Items.IndexOf(guid);
             if (itemIndex != -1)
-                OnThumbnailCached(new ItemEventArgs(Items[itemIndex]));
+                OnThumbnailCached(new ThumbnailCachedEventArgs(Items[itemIndex], error));
         }
         /// <summary>
         /// Raises the refresh event.
