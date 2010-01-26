@@ -170,12 +170,12 @@ namespace Manina.Windows.Forms
             public void Add(object key, string text, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(key, text);
-                Add(item);
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Add(item.Guid, key, mImageListView.ThumbnailSize,
                         initialThumbnail, mImageListView.UseEmbeddedThumbnails);
                 }
+                Add(item);
             }
             /// <summary>
             /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.

@@ -36,6 +36,7 @@ namespace Manina.Windows.Forms
         private Thread mThread;
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
+        private bool mRetryOnError;
 
         private Stack<CacheItem> toCache;
         private Dictionary<Guid, CacheItem> thumbCache;
@@ -194,6 +195,10 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
+        /// Determines whether the cache manager retries loading items on errors.
+        /// </summary>
+        public bool RetryOnError { get { return mRetryOnError; } set { mRetryOnError = value; } }
+        /// <summary>
         /// Determines whether the cache thread is being stopped.
         /// </summary>
         private bool Stopping { get { lock (lockObject) { return stopping; } } }
@@ -239,6 +244,7 @@ namespace Manina.Windows.Forms
             mImageListView = owner;
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 20 * 1024 * 1024;
+            mRetryOnError = owner.RetryOnError;
 
             toCache = new Stack<CacheItem>();
             thumbCache = new Dictionary<Guid, CacheItem>();
@@ -507,7 +513,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                 {
                     mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
-                        mImageListView.OnThumbnailCachedInternal), guid);
+                        mImageListView.OnThumbnailCachedInternal), guid, false);
                     mImageListView.Invoke(new RefreshDelegateInternal(
                         mImageListView.OnRefreshInternal));
                 }
@@ -787,39 +793,51 @@ namespace Manina.Windows.Forms
 
                         // Create the cache item
                         if (thumb == null)
-                            result = new CacheItem(guid, request.FileName,
-                                request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
-                        else
-                            result = new CacheItem(guid, request.FileName,
-                                request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
-                        thumbnailCreated = true;
-
-                        if (rendererRequest)
                         {
-                            lock (lockObject)
+                            if (!mRetryOnError)
                             {
-                                if (rendererItem != null)
-                                    rendererItem.Dispose();
-
-                                rendererGuid = guid;
-                                rendererItem = result;
-                                rendererRequest = false;
+                                result = new CacheItem(guid, request.FileName,
+                                    request.Size, null, CacheState.Error, request.UseEmbeddedThumbnails);
                             }
+                            else
+                                result = null;
                         }
                         else
                         {
-                            lock (lockObject)
-                            {
-                                thumbCache.Remove(guid);
-                                thumbCache.Add(guid, result);
+                            result = new CacheItem(guid, request.FileName,
+                                request.Size, thumb, CacheState.Cached, request.UseEmbeddedThumbnails);
+                            thumbnailCreated = true;
+                        }
 
-                                if (thumb != null)
+                        if (result != null)
+                        {
+                            if (rendererRequest)
+                            {
+                                lock (lockObject)
                                 {
-                                    // Did we exceed the cache limit?
-                                    memoryUsed += thumb.Width * thumb.Height * 24 / 8;
-                                    if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
-                                        (mCacheLimitAsItemCount != 0 && thumbCache.Count > mCacheLimitAsItemCount))
-                                        cleanupRequired = true;
+                                    if (rendererItem != null)
+                                        rendererItem.Dispose();
+
+                                    rendererGuid = guid;
+                                    rendererItem = result;
+                                    rendererRequest = false;
+                                }
+                            }
+                            else
+                            {
+                                lock (lockObject)
+                                {
+                                    thumbCache.Remove(guid);
+                                    thumbCache.Add(guid, result);
+
+                                    if (thumb != null)
+                                    {
+                                        // Did we exceed the cache limit?
+                                        memoryUsed += thumb.Width * thumb.Height * 24 / 8;
+                                        if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
+                                            (mCacheLimitAsItemCount != 0 && thumbCache.Count > mCacheLimitAsItemCount))
+                                            cleanupRequired = true;
+                                    }
                                 }
                             }
                         }
@@ -829,7 +847,7 @@ namespace Manina.Windows.Forms
                             if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                             {
                                 mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
-                                    mImageListView.OnThumbnailCachedInternal), guid);
+                                    mImageListView.OnThumbnailCachedInternal), guid, (result == null));
                             }
                         }
                         catch (ObjectDisposedException)
