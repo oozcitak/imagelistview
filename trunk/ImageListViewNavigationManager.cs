@@ -573,9 +573,9 @@ namespace Manina.Windows.Forms
                         mImageListView.SelectedItems.Clear(false);
                         HoveredItem.mSelected = true;
                         mImageListView.OnSelectionChangedInternal();
-                        mImageListView.OnItemClick(new ItemClickEventArgs(HoveredItem, e.Location, e.Button));
                     }
 
+                    mImageListView.OnItemClick(new ItemClickEventArgs(HoveredItem, e.Location, e.Button));
                     mImageListView.Items.FocusedItem = HoveredItem;
                 }
                 else if (lastMouseDownInItemArea && inItemArea && HoveredItem == null && (LeftButton || RightButton))
