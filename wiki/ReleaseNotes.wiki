@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.6 (27 January 2010) =
+
+  * Fixed a bug in renderers where virtual item thumbnails were drawn without regards to the !ThumbnailSize property (Issue 17).
+  * Fixed a bug where the item click fired only if the item was not selected (Issue 18).
+
 = 4.5 (26 January 2010) =
 
   * Fixed a race condition that occurred if an initial thumbnail image was supplied for a virtual item (Issue 16).
