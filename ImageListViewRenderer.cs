@@ -837,21 +837,20 @@ namespace Manina.Windows.Forms
                     Image img = item.ThumbnailImage;
                     if (img != null)
                     {
-                        int x = bounds.Left + itemPadding.Width + (mImageListView.ThumbnailSize.Width - img.Width) / 2;
-                        int y = bounds.Top + itemPadding.Height + (mImageListView.ThumbnailSize.Height - img.Height) / 2;
-                        g.DrawImageUnscaled(img, x, y);
+                        Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, mImageListView.ThumbnailSize));
+                        g.DrawImage(img, pos);
                         // Draw image border
-                        if (img.Width > 32)
+                        if (Math.Min(pos.Width, pos.Height) > 32)
                         {
                             using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                             {
-                                g.DrawRectangle(pGray128, x, y, img.Width, img.Height);
+                                g.DrawRectangle(pGray128, pos);
                             }
                             if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
                             {
                                 using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
                                 {
-                                    g.DrawRectangle(pWhite128, x + 1, y + 1, img.Width - 2, img.Height - 2);
+                                    g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
                                 }
                             }
                         }
@@ -1054,32 +1053,25 @@ namespace Manina.Windows.Forms
                 {
                     // Calculate image bounds
                     Size itemMargin = MeasureItemMargin(mImageListView.View);
-                    float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
-                    float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
-                    float scale = Math.Min(xscale, yscale);
-                    if (scale > 1.0f) scale = 1.0f;
-                    int imageWidth = (int)((float)image.Width * scale);
-                    int imageHeight = (int)((float)image.Height * scale);
-                    int imageX = bounds.Left + itemMargin.Width;
-                    int imageY = bounds.Top + itemMargin.Height;
+                    Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin), 50.0f, 0.0f);
                     // Draw image
-                    g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
+                    g.DrawImage(image, pos);
                     // Draw image border
-                    if (image.Width > 32)
+                    if (Math.Min(pos.Width, pos.Height) > 32)
                     {
                         using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                         {
-                            g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                            g.DrawRectangle(pGray128, pos);
                         }
                         using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
                         {
-                            g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                            g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
                         }
                     }
                     bounds.X += itemMargin.Width;
                     bounds.Width -= 2 * itemMargin.Width;
-                    bounds.Y = imageHeight + 16;
-                    bounds.Height -= imageHeight + 16;
+                    bounds.Y = pos.Height + 16;
+                    bounds.Height -= pos.Height + 16;
 
                     // Item text
                     if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
@@ -1143,26 +1135,19 @@ namespace Manina.Windows.Forms
                 {
                     // Calculate image bounds
                     Size itemMargin = MeasureItemMargin(mImageListView.View);
-                    float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
-                    float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
-                    float scale = Math.Min(xscale, yscale);
-                    if (scale > 1.0f) scale = 1.0f;
-                    int imageWidth = (int)((float)image.Width * scale);
-                    int imageHeight = (int)((float)image.Height * scale);
-                    int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
-                    int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
+                    Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin));
                     // Draw image
-                    g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
+                    g.DrawImage(image, pos);
                     // Draw image border
-                    if (Math.Min(imageWidth, imageHeight) > 32)
+                    if (Math.Min(pos.Width, pos.Height) > 32)
                     {
                         using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                         {
-                            g.DrawRectangle(pGray128, imageX, imageY, imageWidth, imageHeight);
+                            g.DrawRectangle(pGray128, pos);
                         }
                         using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
                         {
-                            g.DrawRectangle(pWhite128, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                            g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
                         }
                     }
                 }
