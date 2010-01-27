@@ -215,26 +215,30 @@ namespace Manina.Windows.Forms
                 {
                     // Align images to bottom of bounds
                     Image img = item.ThumbnailImage;
-                    int x = bounds.Left + (bounds.Width - img.Width) / 2;
-                    int y = bounds.Bottom - img.Height - mReflectionSize - padding;
+                    Rectangle pos = Utility.GetSizedImageBounds(img,
+                        new Rectangle(bounds.X + padding, bounds.Y + padding, bounds.Width - 2 * padding, bounds.Height - 2 * padding - mReflectionSize),
+                        50.0f, 100.0f);
+
+                    int x = pos.X;
+                    int y = pos.Y;
 
                     // Item background
                     if ((state & ItemState.Selected) == ItemState.Selected)
                     {
                         using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
                             Color.FromArgb(64, 96, 160), Color.FromArgb(16, 16, 16)))
                         {
-                            g.FillRectangle(brush, x - padding, y - padding, img.Width + 2 * padding, img.Height + 2 * padding);
+                            g.FillRectangle(brush, x - padding, y - padding, pos.Width + 2 * padding, pos.Height + 2 * padding);
                         }
                     }
                     else if ((state & ItemState.Hovered) == ItemState.Hovered)
                     {
                         using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
                             Color.FromArgb(64, Color.White), Color.FromArgb(16, 16, 16)))
                         {
-                            g.FillRectangle(brush, x - padding, y - padding, img.Width + 2 * padding, img.Height + 2 * padding);
+                            g.FillRectangle(brush, x - padding, y - padding, pos.Width + 2 * padding, pos.Height + 2 * padding);
                         }
                     }
 
@@ -242,27 +246,33 @@ namespace Manina.Windows.Forms
                     if ((state & ItemState.Hovered) == ItemState.Hovered)
                     {
                         using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
                             Color.FromArgb(128, Color.White), Color.FromArgb(16, 16, 16)))
                         using (Pen pen = new Pen(brush))
                         {
-                            g.DrawRectangle(pen, x - padding, y - padding + 1, img.Width + 2 * padding - 1, img.Height + 2 * padding - 1);
+                            g.DrawRectangle(pen, x - padding, y - padding + 1, pos.Width + 2 * padding - 1, pos.Height + 2 * padding - 1);
                         }
                     }
                     else if ((state & ItemState.Selected) == ItemState.Selected)
                     {
                         using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + img.Height + 2 * padding),
+                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
                             Color.FromArgb(96, 144, 240), Color.FromArgb(16, 16, 16)))
                         using (Pen pen = new Pen(brush))
                         {
-                            g.DrawRectangle(pen, x - padding, y - padding + 1, img.Width + 2 * padding - 1, img.Height + 2 * padding - 1);
+                            g.DrawRectangle(pen, x - padding, y - padding + 1, pos.Width + 2 * padding - 1, pos.Height + 2 * padding - 1);
                         }
                     }
 
                     // Draw item image
-                    DrawImageWithReflection(g, img, x, y, mReflectionSize);
+                    DrawImageWithReflection(g, img, pos, mReflectionSize);
 
+                    // Highlight
+                    using (Pen pen = new Pen(Color.FromArgb(160, Color.White)))
+                    {
+                        g.DrawLine(pen, pos.X, pos.Y + 1, pos.X + pos.Width - 1, pos.Y + 1);
+                        g.DrawLine(pen, pos.X, pos.Y + 1, pos.X, pos.Y + pos.Height);
+                    }
                 }
             }
             /// <summary>
@@ -373,13 +383,9 @@ namespace Manina.Windows.Forms
             {
                 if (item != null && image != null)
                 {
-                    float scale = (float)(image.Height - 2 * padding - mReflectionSize) / (float)image.Height;
-                    if (scale < 0.0f) scale = 0.0f;
-                    int width = (int)((float)image.Width * scale);
-                    int height = (int)((float)image.Height * scale);
-                    int x = bounds.Left + (bounds.Width - width) / 2;
-                    int y = bounds.Bottom - height - mReflectionSize - padding;
-                    DrawImageWithReflection(g, image, x, y, width, height, mReflectionSize);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
+                    Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.X + itemMargin.Width, bounds.Y + itemMargin.Height, bounds.Width - 2 * itemMargin.Width, bounds.Height - 2 * itemMargin.Height - mReflectionSize), 50.0f, 100.0f);
+                    DrawImageWithReflection(g, image, pos, mReflectionSize);
                 }
             }
             /// <summary>
@@ -401,22 +407,15 @@ namespace Manina.Windows.Forms
                 if (item != null && image != null)
                 {
                     // Calculate image bounds
-                    Size itemMargin = MeasureItemMargin(mImageListView.View);
-                    float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
-                    float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
-                    float scale = Math.Min(xscale, yscale);
-                    if (scale > 1.0f) scale = 1.0f;
-                    int imageWidth = (int)((float)image.Width * scale);
-                    int imageHeight = (int)((float)image.Height * scale);
-                    int imageX = bounds.Left + itemMargin.Width;
-                    int imageY = bounds.Top + itemMargin.Height;
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
+                    Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin), 50.0f, 0.0f);
                     // Draw image
-                    g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
+                    g.DrawImage(image, pos);
 
                     bounds.X += itemMargin.Width;
                     bounds.Width -= 2 * itemMargin.Width;
-                    bounds.Y = imageHeight + 16;
-                    bounds.Height -= imageHeight + 16;
+                    bounds.Y = pos.Height + 16;
+                    bounds.Height -= pos.Height + 16;
 
                     // Item text
                     if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
@@ -575,6 +574,17 @@ namespace Manina.Windows.Forms
                     }
                 }
             }
+            /// <summary>
+            /// Draws an image with a reflection effect at the bottom.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            /// <param name="img">The image to draw.</param>
+            /// <param name="bounds">The target bounding rectangle.</param>
+            /// <param name="reflection">Height of the reflection.</param>
+            private void DrawImageWithReflection(Graphics g, Image img, Rectangle bounds, int reflection)
+            {
+                DrawImageWithReflection(g, img, bounds.X, bounds.Y, bounds.Width, bounds.Height, reflection);
+            }
         }
         #endregion
 
@@ -696,22 +706,18 @@ namespace Manina.Windows.Forms
                     Image img = item.ThumbnailImage;
                     if (img != null)
                     {
-                        int x = bounds.Left + itemPadding.Width + (ImageListView.ThumbnailSize.Width - img.Width) / 2;
-                        int y = bounds.Top + itemPadding.Height + (ImageListView.ThumbnailSize.Height - img.Height) / 2;
-                        g.DrawImageUnscaled(img, x, y);
+                        Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize), 0.0f, 50.0f);
+                        g.DrawImage(img, pos);
                         // Draw image border
-                        if (img.Width > 32)
+                        if (Math.Min(pos.Width, pos.Height) > 32)
                         {
                             using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                             {
-                                g.DrawRectangle(pGray128, x, y, img.Width, img.Height);
+                                g.DrawRectangle(pGray128, pos);
                             }
-                            if (System.Math.Min(ImageListView.ThumbnailSize.Width, ImageListView.ThumbnailSize.Height) > 32)
+                            using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
                             {
-                                using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                                {
-                                    g.DrawRectangle(pWhite128, x + 1, y + 1, img.Width - 2, img.Height - 2);
-                                }
+                                g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
                             }
                         }
 
@@ -863,34 +869,31 @@ namespace Manina.Windows.Forms
                     Image img = item.ThumbnailImage;
                     if (img != null)
                     {
-                        int x = bounds.Left + itemPadding.Width + (ImageListView.ThumbnailSize.Width - img.Width) / 2;
-                        int y = bounds.Top + itemPadding.Height + (ImageListView.ThumbnailSize.Height - img.Height) / 2;
-                        Rectangle imageBounds = new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize);
-                        g.DrawImageUnscaled(img, x, y);
+                        Rectangle border = new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize);
+                        Rectangle pos = Utility.GetSizedImageBounds(img, border);
+                        g.DrawImage(img, pos);
+
                         // Draw image border
-                        if (img.Width > 32)
+                        if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                         {
-                            if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                            using (Pen pen = new Pen(SystemColors.Highlight, 3))
                             {
-                                using (Pen pen = new Pen(SystemColors.Highlight, 3))
-                                {
-                                    g.DrawRectangle(pen, imageBounds);
-                                }
+                                g.DrawRectangle(pen, border);
                             }
-                            else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                        }
+                        else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                        {
+                            using (Pen pen = new Pen(SystemColors.GrayText, 3))
                             {
-                                using (Pen pen = new Pen(SystemColors.GrayText, 3))
-                                {
-                                    pen.Alignment = PenAlignment.Center;
-                                    g.DrawRectangle(pen, imageBounds);
-                                }
+                                pen.Alignment = PenAlignment.Center;
+                                g.DrawRectangle(pen, border);
                             }
-                            else
+                        }
+                        else
+                        {
+                            using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
                             {
-                                using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
-                                {
-                                    g.DrawRectangle(pGray128, imageBounds);
-                                }
+                                g.DrawRectangle(pGray128, border);
                             }
                         }
                     }
@@ -986,23 +989,17 @@ namespace Manina.Windows.Forms
             public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
                 // Calculate image bounds
-                Size itemMargin = MeasureItemMargin(ImageListView.View);
-                float xscale = (float)(bounds.Width - 2 * itemMargin.Width) / (float)image.Width;
-                float yscale = (float)(bounds.Height - 2 * itemMargin.Height) / (float)image.Height;
-                float scale = Math.Min(xscale, yscale);
-                if (scale > 1.0f) scale = 1.0f;
-                int imageWidth = (int)((float)image.Width * scale);
-                int imageHeight = (int)((float)image.Height * scale);
-                int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
-                int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
+                Size itemMargin = MeasureItemMargin(mImageListView.View);
+                Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin));
                 // Draw image
-                g.DrawImage(image, imageX, imageY, imageWidth, imageHeight);
+                g.DrawImage(image, pos);
+
                 // Draw image border
-                if (image.Width > 32)
+                if (Math.Min(pos.Width, pos.Height) > 32)
                 {
                     using (Pen pBorder = new Pen(Color.Black))
                     {
-                        g.DrawRectangle(pBorder, imageX, imageY, imageWidth, imageHeight);
+                        g.DrawRectangle(pBorder, pos);
                     }
                 }
             }
@@ -1109,10 +1106,11 @@ namespace Manina.Windows.Forms
                     if (img == null) img = item.ThumbnailImage;
 
                     // Calculate image bounds
-                    int imageWidth = img.Width;
-                    int imageHeight = img.Height;
-                    int imageX = bounds.Left + (bounds.Width - imageWidth) / 2;
-                    int imageY = bounds.Top + (bounds.Height - imageHeight) / 2;
+                    Rectangle pos = Utility.GetSizedImageBounds(img, Rectangle.Inflate(bounds, -4, -4));
+                    int imageWidth = pos.Width;
+                    int imageHeight = pos.Height;
+                    int imageX = pos.X;
+                    int imageY = pos.Y;
 
                     // Allocate space for item text
                     if ((state & ItemState.Hovered) != ItemState.None &&
@@ -1159,7 +1157,7 @@ namespace Manina.Windows.Forms
                     g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
 
                     // Draw image border
-                    if (imageWidth > 32)
+                    if (Math.Min(imageWidth, imageHeight) > 32)
                     {
                         using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
                         {

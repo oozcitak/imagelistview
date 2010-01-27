@@ -405,11 +405,8 @@ namespace Manina.Windows.Forms
             Image thumb = null;
             try
             {
-                float f = System.Math.Max((float)image.Width / (float)size.Width, (float)image.Height / (float)size.Height);
-                if (f < 1.0f) f = 1.0f; // Do not upsize small images
-                int width = (int)System.Math.Round((float)image.Width / f);
-                int height = (int)System.Math.Round((float)image.Height / f);
-                thumb = new Bitmap(width, height);
+                Size scaled = GetSizedImageBounds(image, size);
+                thumb = new Bitmap(scaled.Width, scaled.Height);
                 using (Graphics g = Graphics.FromImage(thumb))
                 {
                     g.PixelOffsetMode = PixelOffsetMode.None;
@@ -417,10 +414,10 @@ namespace Manina.Windows.Forms
 
                     using (Brush brush = new SolidBrush(backColor))
                     {
-                        g.FillRectangle(Brushes.White, 0, 0, width, height);
+                        g.FillRectangle(Brushes.White, 0, 0, scaled.Width, scaled.Height);
                     }
 
-                    g.DrawImage(image, 0, 0, width, height);
+                    g.DrawImage(image, 0, 0, scaled.Width, scaled.Height);
                 }
             }
             catch
@@ -552,17 +549,14 @@ namespace Manina.Windows.Forms
             // Create the thumbnail
             try
             {
-                float f = System.Math.Max((float)source.Width / (float)size.Width, (float)source.Height / (float)size.Height);
-                if (f < 1.0f) f = 1.0f; // Do not upsize small images
-                int width = (int)System.Math.Round((float)source.Width / f);
-                int height = (int)System.Math.Round((float)source.Height / f);
-                thumb = new Bitmap(source, width, height);
+                Size scaled = GetSizedImageBounds(source, size);
+                thumb = new Bitmap(source, scaled.Width, scaled.Height);
                 using (Graphics g = Graphics.FromImage(thumb))
                 {
                     g.PixelOffsetMode = PixelOffsetMode.None;
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     g.Clear(backColor);
-                    g.DrawImage(source, 0, 0, width, height);
+                    g.DrawImage(source, 0, 0, scaled.Width, scaled.Height);
                 }
             }
             catch
@@ -582,6 +576,50 @@ namespace Manina.Windows.Forms
             }
 
             return thumb;
+        }
+        /// <summary>
+        /// Gets the scaled size of an image required to fit
+        /// in to the given size keeping the image aspect ratio.
+        /// </summary>
+        /// <param name="image">The source image.</param>
+        /// <param name="fit">The size to fit in to.</param>
+        /// <returns></returns>
+        internal static Size GetSizedImageBounds(Image image, Size fit)
+        {
+            float f = System.Math.Max((float)image.Width / (float)fit.Width, (float)image.Height / (float)fit.Height);
+            if (f < 1.0f) f = 1.0f; // Do not upsize small images
+            int width = (int)System.Math.Round((float)image.Width / f);
+            int height = (int)System.Math.Round((float)image.Height / f);
+            return new Size(width, height);
+        }
+        /// <summary>
+        /// Gets the bounding rectangle of an image required to fit
+        /// in to the given rectangle keeping the image aspect ratio.
+        /// </summary>
+        /// <param name="image">The source image.</param>
+        /// <param name="fit">The rectangle to fit in to.</param>
+        /// <param name="hAlign">Horizontal image aligment in percent.</param>
+        /// <param name="vAlign">Vertical image aligment in percent.</param>
+        /// <returns></returns>
+        internal static Rectangle GetSizedImageBounds(Image image, Rectangle fit, float hAlign, float vAlign)
+        {
+            Size scaled = GetSizedImageBounds(image, fit.Size);
+            int x = fit.Left + (int)(hAlign / 100.0f * (float)(fit.Width - scaled.Width));
+            int y = fit.Top + (int)(vAlign / 100.0f * (float)(fit.Height - scaled.Height));
+
+            return new Rectangle(x, y, scaled.Width, scaled.Height);
+        }
+        /// <summary>
+        /// Gets the bounding rectangle of an image required to fit
+        /// in to the given rectangle keeping the image aspect ratio.
+        /// The image will be centered in the fit box.
+        /// </summary>
+        /// <param name="image">The source image.</param>
+        /// <param name="fit">The rectangle to fit in to.</param>
+        /// <returns></returns>
+        internal static Rectangle GetSizedImageBounds(Image image, Rectangle fit)
+        {
+            return GetSizedImageBounds(image, fit, 50.0f, 50.0f);
         }
         /// <summary>
         /// Gets a path representing a rounded rectangle.
