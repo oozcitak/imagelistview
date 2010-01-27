@@ -4,7 +4,7 @@
 = 4.5 (26 January 2010) =
 
   * Fixed a race condition that occurred if an initial thumbnail image was supplied for a virtual item (Issue 16).
-  * Added the !RetryOnError property to the control. When set to true, the cache thread will continuously poll the item for a valid thumbnail, until it gets a valid image.
+  * Added the !RetryOnError property to the control. When set to true, the cache thread will continuously poll the item for a valid thumbnail, until it gets a valid image. When sets to false, the cache thread will give up after the first error and display the !ErrorImage.
 
 = 4.4 (21 January 2010) =
 
