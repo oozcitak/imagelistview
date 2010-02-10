@@ -240,11 +240,11 @@ namespace Manina.Windows.Forms
         /// Gets or sets whether the control will retry loading thumbnails on an error.
         /// </summary>
         [Category("Behavior"), Description("Gets or sets whether the control will retry loading thumbnails on an error."), DefaultValue(true)]
-        public bool RetryOnError 
+        public bool RetryOnError
         {
-            get 
+            get
             {
-                return mRetryOnError; 
+                return mRetryOnError;
             }
             set
             {
@@ -1012,6 +1012,35 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the ColumnWidthChanged event.
         /// </summary>
+        /// <param name="e">A DropFileEventArgs that contains event data.</param>
+        protected virtual void OnDropFiles(DropFileEventArgs e)
+        {
+            if (DropFiles != null)
+                DropFiles(this, e);
+
+            if (e.Cancel) 
+                return;
+
+            int index = e.Index;
+            int firstItemIndex = 0;
+            mSelectedItems.Clear(false);
+
+            // Add items
+            foreach (string filename in e.FileNames)
+            {
+                ImageListViewItem item = new ImageListViewItem(filename);
+                item.mSelected = true;
+                mItems.InsertInternal(index, item);
+                if (firstItemIndex == 0) firstItemIndex = item.Index;
+                index++;
+            }
+
+            EnsureVisible(firstItemIndex);
+            OnSelectionChangedInternal();
+        }
+        /// <summary>
+        /// Raises the ColumnWidthChanged event.
+        /// </summary>
         /// <param name="e">A ColumnEventArgs that contains event data.</param>
         protected virtual void OnColumnWidthChanged(ColumnEventArgs e)
         {
@@ -1190,6 +1219,11 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Public Events
+        /// <summary>
+        /// Occurs after the user drops files on to the control.
+        /// </summary>
+        [Category("Drag Drop"), Browsable(true), Description("Occurs after the user drops files on to the control.")]
+        public event DropFilesEventHandler DropFiles;
         /// <summary>
         /// Occurs after the user successfully resized a column header.
         /// </summary>
