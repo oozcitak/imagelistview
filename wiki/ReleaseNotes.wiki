@@ -3,8 +3,8 @@
 
 = 4.7 (10 February 2010) =
 
-  * Added the ItemHover and ColumnHover events (Issue 23).
-  * Added the DropFiles event (Issue 19).
+  * Added the !ItemHover and !ColumnHover events (Issue 23).
+  * Added the !DropFiles event (Issue 19).
 
 = 4.6 (27 January 2010) =
 
