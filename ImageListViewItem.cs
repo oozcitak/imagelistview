@@ -613,7 +613,6 @@ namespace Manina.Windows.Forms
             mFileSize = info.Size;
             mFileType = info.TypeName;
             mFilePath = info.DirectoryName;
-            mText = info.DisplayName;
             mDimensions = info.Dimensions;
             mResolution = info.Resolution;
             // Exif tags

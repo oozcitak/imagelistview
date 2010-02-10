@@ -773,21 +773,10 @@ namespace Manina.Windows.Forms
                     if (DropToRight) index++;
                     if (index > mImageListView.Items.Count)
                         index = mImageListView.Items.Count;
-                    int firstItemIndex = 0;
-                    mImageListView.SelectedItems.Clear(false);
 
-                    // Add items
-                    foreach (string filename in (string[])e.Data.GetData(DataFormats.FileDrop))
-                    {
-                        ImageListViewItem item = new ImageListViewItem(filename);
-                        item.mSelected = true;
-                        mImageListView.Items.InsertInternal(index, item);
-                        if (firstItemIndex == 0) firstItemIndex = item.Index;
-                        index++;
-                    }
+                    string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                    mImageListView.EnsureVisible(firstItemIndex);
-                    mImageListView.OnSelectionChangedInternal();
+                    mImageListView.OnDropFiles(new DropFileEventArgs(index, filenames));
                 }
 
                 DropTarget = null;
