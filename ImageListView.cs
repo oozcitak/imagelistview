@@ -1028,6 +1028,15 @@ namespace Manina.Windows.Forms
                 ColumnClick(this, e);
         }
         /// <summary>
+        /// Raises the ColumnHover event.
+        /// </summary>
+        /// <param name="e">A ColumnClickEventArgs that contains event data.</param>
+        protected virtual void OnColumnHover(ColumnHoverEventArgs e)
+        {
+            if (ColumnHover != null)
+                ColumnHover(this, e);
+        }
+        /// <summary>
         /// Raises the ItemClick event.
         /// </summary>
         /// <param name="e">A ItemClickEventArgs that contains event data.</param>
@@ -1035,6 +1044,15 @@ namespace Manina.Windows.Forms
         {
             if (ItemClick != null)
                 ItemClick(this, e);
+        }
+        /// <summary>
+        /// Raises the ItemHover event.
+        /// </summary>
+        /// <param name="e">A ItemClickEventArgs that contains event data.</param>
+        protected virtual void OnItemHover(ItemHoverEventArgs e)
+        {
+            if (ItemHover != null)
+                ItemHover(this, e);
         }
         /// <summary>
         /// Raises the ItemDoubleClick event.
@@ -1183,10 +1201,20 @@ namespace Manina.Windows.Forms
         [Category("Action"), Browsable(true), Description("Occurs when the user clicks a column header.")]
         public event ColumnClickEventHandler ColumnClick;
         /// <summary>
+        /// Occurs when the user moves the mouse over (and out of) a column header.
+        /// </summary>
+        [Category("Action"), Browsable(true), Description("Occurs when the user moves the mouse over (and out of) a column header.")]
+        public event ColumnHoverEventHandler ColumnHover;
+        /// <summary>
         /// Occurs when the user clicks an item.
         /// </summary>
         [Category("Action"), Browsable(true), Description("Occurs when the user clicks an item.")]
         public event ItemClickEventHandler ItemClick;
+        /// <summary>
+        /// Occurs when the user moves the mouse over (and out of) an item.
+        /// </summary>
+        [Category("Action"), Browsable(true), Description("Occurs when the user moves the mouse over (and out of) an item.")]
+        public event ItemHoverEventHandler ItemHover;
         /// <summary>
         /// Occurs when the user double-clicks an item.
         /// </summary>
