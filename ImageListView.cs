@@ -1010,7 +1010,7 @@ namespace Manina.Windows.Forms
 
         #region Virtual Functions
         /// <summary>
-        /// Raises the ColumnWidthChanged event.
+        /// Raises the DropFiles event.
         /// </summary>
         /// <param name="e">A DropFileEventArgs that contains event data.</param>
         protected virtual void OnDropFiles(DropFileEventArgs e)
