@@ -452,6 +452,12 @@ namespace Manina.Windows.Forms
                     !ReferenceEquals(HoveredSeparator, oldHoveredSeparator))
                 {
                     // Hovered item changed
+                    if (!ReferenceEquals(HoveredItem, oldHoveredItem))
+                        mImageListView.OnItemHover(new ItemHoverEventArgs(HoveredItem, oldHoveredItem));
+
+                    if (!ReferenceEquals(HoveredColumn, oldHoveredColumn))
+                        mImageListView.OnColumnHover(new ColumnHoverEventArgs(HoveredColumn, oldHoveredColumn));
+
                     mImageListView.Refresh();
                 }
 
@@ -640,6 +646,11 @@ namespace Manina.Windows.Forms
             {
                 if (HoveredItem != null || HoveredColumn != null || HoveredSeparator != null || HoveredPaneBorder != false)
                 {
+                    if (HoveredItem != null)
+                        mImageListView.OnItemHover(new ItemHoverEventArgs(null, HoveredItem));
+                    if (HoveredColumn != null)
+                        mImageListView.OnColumnHover(new ColumnHoverEventArgs(null, HoveredColumn));
+
                     HoveredItem = null;
                     HoveredColumn = null;
                     HoveredSeparator = null;
@@ -911,7 +922,7 @@ namespace Manina.Windows.Forms
                     mImageListView.Refresh(true);
                 }
 
-                if(scrollTimer.Enabled)
+                if (scrollTimer.Enabled)
                     scrollTimer.Enabled = false;
             }
             #endregion

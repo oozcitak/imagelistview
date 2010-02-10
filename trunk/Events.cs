@@ -34,6 +34,13 @@ namespace Manina.Windows.Forms
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ColumnClickEventHandler(object sender, ColumnClickEventArgs e);
     /// <summary>
+    /// Represents the method that will handle the ColumnHover event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A ColumnHoverEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void ColumnHoverEventHandler(object sender, ColumnHoverEventArgs e);
+    /// <summary>
     /// Represents the method that will handle the ColumnWidthChanged event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
@@ -47,6 +54,13 @@ namespace Manina.Windows.Forms
     /// <param name="e">A ItemClickEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ItemClickEventHandler(object sender, ItemClickEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the ItemHover event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A ItemHoverEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void ItemHoverEventHandler(object sender, ItemHoverEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ItemDoubleClick event. 
     /// </summary>
@@ -196,6 +210,37 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
+    /// Represents the event arguments for column hover related events.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class ColumnHoverEventArgs
+    {
+        private ImageListView.ImageListViewColumnHeader mPreviousColumn;
+        private ImageListView.ImageListViewColumnHeader mColumn;
+
+        /// <summary>
+        /// Gets the ImageListViewColumnHeader that was previously hovered.
+        /// Returns null if there was no previously hovered column.
+        /// </summary>
+        public ImageListView.ImageListViewColumnHeader PreviousColumn { get { return mPreviousColumn; } }
+        /// <summary>
+        /// Gets the currently hovered ImageListViewColumnHeader.
+        /// Returns null if there is no hovered column.
+        /// </summary>
+        public ImageListView.ImageListViewColumnHeader Column { get { return mColumn; } }
+
+        /// <summary>
+        /// Initializes a new instance of the ColumnHoverEventArgs class.
+        /// </summary>
+        /// <param name="column">The currently hovered column.</param>
+        /// <param name="previousColumn">The previously hovered column.</param>
+        public ColumnHoverEventArgs(ImageListView.ImageListViewColumnHeader column, ImageListView.ImageListViewColumnHeader previousColumn)
+        {
+            mColumn = column;
+            mPreviousColumn = previousColumn;
+        }
+    }
+    /// <summary>
     /// Represents the event arguments for item related events.
     /// </summary>
     [Serializable, ComVisible(true)]
@@ -218,7 +263,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for item related events.
+    /// Represents the event arguments for item click related events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class ItemClickEventArgs
@@ -260,6 +305,37 @@ namespace Manina.Windows.Forms
             mItem = item;
             mLocation = location;
             mButtons = buttons;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for item hover related events.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class ItemHoverEventArgs
+    {
+        private ImageListViewItem mPreviousItem;
+        private ImageListViewItem mItem;
+
+        /// <summary>
+        /// Gets the ImageListViewItem that was previously hovered.
+        /// Returns null if there was no previously hovered item.
+        /// </summary>
+        public ImageListViewItem PreviousItem { get { return mPreviousItem; } }
+        /// <summary>
+        /// Gets the currently hovered ImageListViewItem.
+        /// Returns null if there is no hovered item.
+        /// </summary>
+        public ImageListViewItem Item { get { return mItem; } }
+
+        /// <summary>
+        /// Initializes a new instance of the ItemEventArgs class.
+        /// </summary>
+        /// <param name="item">The currently hovered item.</param>
+        /// <param name="previousItem">The previously hovered item.</param>
+        public ItemHoverEventArgs(ImageListViewItem item, ImageListViewItem previousItem)
+        {
+            mItem = item;
+            mPreviousItem = previousItem;
         }
     }
     /// <summary>
