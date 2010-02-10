@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.7 (10 February 2010) =
+
+  * Added the ItemHover and ColumnHover events (Issue 23).
+  * Added the DropFiles event (Issue 19).
+
 = 4.6 (27 January 2010) =
 
   * Fixed a bug in renderers where virtual item thumbnails were drawn without regards to the !ThumbnailSize property (Issue 17).
