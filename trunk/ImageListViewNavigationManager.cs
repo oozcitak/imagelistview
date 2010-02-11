@@ -405,7 +405,7 @@ namespace Manina.Windows.Forms
                             if (item.isVirtualItem)
                             {
                                 // Get the virtual item source image
-                                VirtualItemImageEventArgs ve = new VirtualItemImageEventArgs(item.virtualItemKey);
+                                VirtualItemImageEventArgs ve = new VirtualItemImageEventArgs(item.mVirtualItemKey);
                                 mImageListView.RetrieveVirtualItemImageInternal(ve);
                                 if (!string.IsNullOrEmpty(ve.FileName))
                                     filenames.Add(ve.FileName);

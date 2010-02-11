@@ -61,7 +61,7 @@ namespace Manina.Windows.Forms
         private string mUserComment;
         // Used for virtual items
         internal bool isVirtualItem;
-        internal object virtualItemKey;
+        internal object mVirtualItemKey;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
@@ -136,6 +136,12 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the unique identifier for this item.")]
         internal Guid Guid { get { return mGuid; } private set { mGuid = value; } }
+        /// <summary>
+        /// Gets the virtual item key associated with this item.
+        /// Returns null if the item is not a virtual item.
+        /// </summary>
+        [Category("Behavior"), Browsable(false), Description("Gets the virtual item key associated with this item.")]
+        public object VirtualItemKey { get { return mVirtualItemKey; } }
         /// <summary>
         /// Gets the ImageListView owning this item.
         /// </summary>
@@ -212,7 +218,7 @@ namespace Manina.Windows.Forms
                     return img;
 
                 if (isVirtualItem)
-                    mImageListView.cacheManager.Add(Guid, virtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                 else
                     mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                 return mImageListView.DefaultImage;
@@ -368,7 +374,7 @@ namespace Manina.Windows.Forms
             isDirty = true;
             editing = false;
 
-            virtualItemKey = null;
+            mVirtualItemKey = null;
             isVirtualItem = false;
         }
         /// <summary>
@@ -391,7 +397,7 @@ namespace Manina.Windows.Forms
             : this()
         {
             isVirtualItem = true;
-            virtualItemKey = key;
+            mVirtualItemKey = key;
             mText = text;
             mDimensions = dimensions;
         }
@@ -426,7 +432,7 @@ namespace Manina.Windows.Forms
             Image img = null;
             if (isVirtualItem)
             {
-                VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(virtualItemKey);
+                VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mVirtualItemKey);
                 mImageListView.RetrieveVirtualItemImageInternal(e);
                 img = Image.FromFile(e.FileName);
             }
@@ -588,7 +594,7 @@ namespace Manina.Windows.Forms
             {
                 if (mImageListView != null)
                 {
-                    VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(virtualItemKey);
+                    VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(mVirtualItemKey);
                     mImageListView.RetrieveVirtualItemDetailsInternal(e);
                     UpdateDetailsInternal(e);
                 }
