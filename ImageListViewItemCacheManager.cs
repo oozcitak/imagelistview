@@ -80,7 +80,7 @@ namespace Manina.Windows.Forms
             {
                 mItem = item;
                 mIsVirtualItem = item.isVirtualItem;
-                mVirtualItemKey = item.virtualItemKey;
+                mVirtualItemKey = item.mVirtualItemKey;
                 mFileName = item.FileName;
             }
         }

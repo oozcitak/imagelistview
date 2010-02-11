@@ -303,7 +303,7 @@ namespace Manina.Windows.Forms
             {
                 if (!editCache.ContainsKey(guid))
                 {
-                    VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mImageListView.Items[guid].virtualItemKey);
+                    VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mImageListView.Items[guid].mVirtualItemKey);
                     mImageListView.RetrieveVirtualItemImageInternal(e);
                     if (!string.IsNullOrEmpty(e.FileName))
                         editCache.Add(guid, Image.FromFile(e.FileName));

@@ -117,7 +117,7 @@ namespace Manina.Windows.Forms
             /// Gets the item with the specified Guid.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item with the specified Guid.")]
-            public ImageListViewItem this[Guid guid]
+            internal ImageListViewItem this[Guid guid]
             {
                 get
                 {
@@ -159,7 +159,7 @@ namespace Manina.Windows.Forms
             /// <param name="text">Text of the item.</param>
             public void Add(object key, string text)
             {
-                Add(new ImageListViewItem(key, text));
+                Add(key, text, null);
             }
             /// <summary>
             /// Adds a virtual item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -170,7 +170,7 @@ namespace Manina.Windows.Forms
             public void Add(object key, string text, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(key, text);
-                if (mImageListView != null)
+                if (mImageListView != null && initialThumbnail != null)
                 {
                     mImageListView.cacheManager.Add(item.Guid, key, mImageListView.ThumbnailSize,
                         initialThumbnail, mImageListView.UseEmbeddedThumbnails);
