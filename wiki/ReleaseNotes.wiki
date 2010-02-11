@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 4.8 (11 February 2010) =
+
+  * Added the public !VirtualItemKey property to !ImageListViewItem (Issue 24).
+
 = 4.7 (10 February 2010) =
 
   * Added the !ItemHover and !ColumnHover events (Issue 23).
