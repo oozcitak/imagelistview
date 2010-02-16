@@ -368,7 +368,7 @@ namespace Manina.Windows.Forms
                 if (item == mFocused) mFocused = null;
                 if (removeFromCache && mImageListView != null)
                     mImageListView.cacheManager.Remove(item.Guid);
-                bool ret = mItems.Remove(item);
+                mItems.Remove(item);
             }
             /// <summary>
             /// Returns the index of the specified item.
