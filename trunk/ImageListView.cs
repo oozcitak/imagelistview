@@ -423,7 +423,7 @@ namespace Manina.Windows.Forms
             mSortOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
-            Size = new Size(120, 100);
+			Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
             mView = View.Thumbnails;
@@ -435,8 +435,6 @@ namespace Manina.Windows.Forms
             vScrollBar.Visible = false;
             hScrollBar.Scroll += new ScrollEventHandler(hScrollBar_Scroll);
             vScrollBar.Scroll += new ScrollEventHandler(vScrollBar_Scroll);
-            Controls.Add(hScrollBar);
-            Controls.Add(vScrollBar);
             layoutManager = new ImageListViewLayoutManager(this);
             forceRefresh = false;
 
@@ -768,6 +766,20 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Event Handlers
+		/// <summary>
+        /// Handles the CreateControl event.
+        /// </summary>
+		protected override void OnCreateControl ()
+		{
+			base.OnCreateControl();
+			
+			Size = new Size(120, 100);
+			if(!Controls.Contains(hScrollBar))
+			{
+            	Controls.Add(hScrollBar);
+            	Controls.Add(vScrollBar);
+			}
+		}
         /// <summary>
         /// Handles the DragOver event.
         /// </summary>
@@ -883,7 +895,6 @@ namespace Manina.Windows.Forms
                     newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
                 if (newYOffset < 0)
                     newYOffset = 0;
-                int delta = newYOffset - mViewOffset.Y;
                 if (newYOffset < vScrollBar.Minimum) newYOffset = vScrollBar.Minimum;
                 if (newYOffset > vScrollBar.Maximum) newYOffset = vScrollBar.Maximum;
                 mViewOffset.Y = newYOffset;
@@ -896,7 +907,6 @@ namespace Manina.Windows.Forms
                     newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;
                 if (newXOffset < 0)
                     newXOffset = 0;
-                int delta = newXOffset - mViewOffset.X;
                 if (newXOffset < hScrollBar.Minimum) newXOffset = hScrollBar.Minimum;
                 if (newXOffset > hScrollBar.Maximum) newXOffset = hScrollBar.Maximum;
                 mViewOffset.X = newXOffset;
