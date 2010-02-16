@@ -22,6 +22,21 @@ namespace Manina.Windows.Forms
 {
     #region Public Enums
     /// <summary>
+    /// Represents the cache mode.
+    /// </summary>
+    public enum CacheMode
+    {
+        /// <summary>
+        /// Item thumbnails will be generated only when requested.
+        /// </summary>
+        OnDemand,
+        /// <summary>
+        /// Item thumbnails will be continuously generated. Setting
+        /// the CacheMode to Continuous disables the CacheLimit.
+        /// </summary>
+        Continuous,
+    }
+    /// <summary>
     /// Represents the cache state of a thumbnail image.
     /// </summary>
     public enum CacheState

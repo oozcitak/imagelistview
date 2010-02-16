@@ -34,6 +34,7 @@ namespace Manina.Windows.Forms
 
         private ImageListView mImageListView;
         private Thread mThread;
+        private CacheMode mCacheMode;
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
         private bool mRetryOnError;
@@ -207,12 +208,31 @@ namespace Manina.Windows.Forms
         /// </summary>
         public bool Stopped { get { lock (lockObject) { return stopped; } } }
         /// <summary>
+        /// Gets or sets the cache mode.
+        /// </summary>
+        public CacheMode CacheMode
+        {
+            get { return mCacheMode; }
+            set
+            {
+                lock (lockObject)
+                {
+                    mCacheMode = value;
+                    if (mCacheMode == CacheMode.Continuous)
+                    {
+                        mCacheLimitAsItemCount = 0;
+                        mCacheLimitAsMemory = 0;
+                    }
+                }
+            }
+        }
+        /// <summary>
         /// Gets or sets the cache limit as count of items.
         /// </summary>
         public int CacheLimitAsItemCount
         {
             get { return mCacheLimitAsItemCount; }
-            set { lock (lockObject) { mCacheLimitAsItemCount = value; mCacheLimitAsMemory = 0; } }
+            set { lock (lockObject) { mCacheLimitAsItemCount = value; mCacheLimitAsMemory = 0; mCacheMode = CacheMode.OnDemand; } }
         }
         /// <summary>
         /// Gets or sets the cache limit as allocated memory in MB.
@@ -220,7 +240,7 @@ namespace Manina.Windows.Forms
         public long CacheLimitAsMemory
         {
             get { return mCacheLimitAsMemory; }
-            set { lock (lockObject) { mCacheLimitAsMemory = value; mCacheLimitAsItemCount = 0; } }
+            set { lock (lockObject) { mCacheLimitAsMemory = value; mCacheLimitAsItemCount = 0; mCacheMode = CacheMode.OnDemand; } }
         }
         /// <summary>
         /// Gets the approximate amount of memory used by the cache.
@@ -242,6 +262,7 @@ namespace Manina.Windows.Forms
             lockObject = new object();
 
             mImageListView = owner;
+            mCacheMode = CacheMode.OnDemand;
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 20 * 1024 * 1024;
             mRetryOnError = owner.RetryOnError;
@@ -728,8 +749,8 @@ namespace Manina.Windows.Forms
                     }
 
                     // Is it outside visible area?
-                    bool isvisible = false;
-                    if (request != null)
+                    bool isvisible = true;
+                    if (request != null && mCacheMode == CacheMode.OnDemand)
                     {
                         try
                         {
