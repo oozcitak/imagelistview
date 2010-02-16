@@ -65,6 +65,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         // Properties
         private BorderStyle mBorderStyle;
+        private CacheMode mCacheMode;
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
         private ImageListViewColumnHeaderCollection mColumns;
@@ -136,9 +137,34 @@ namespace Manina.Windows.Forms
         [Category("Appearance"), Description("Gets or sets the border style of the control."), DefaultValue(typeof(BorderStyle), "Fixed3D")]
         public BorderStyle BorderStyle { get { return mBorderStyle; } set { mBorderStyle = value; UpdateStyles(); } }
         /// <summary>
+        /// Gets or sets the cache mode. Setting the the CacheMode to Continuous disables the CacheLimit.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets the cache mode."), DefaultValue(typeof(CacheMode), "OnDemand"), RefreshProperties(RefreshProperties.All)]
+        public CacheMode CacheMode
+        {
+            get
+            {
+                return mCacheMode;
+            }
+            set
+            {
+                if (mCacheMode != value)
+                {
+                    mCacheMode = value;
+                    if (mCacheMode == CacheMode.Continuous)
+                    {
+                        mCacheLimitAsItemCount = 0;
+                        mCacheLimitAsMemory = 0;
+                    }
+                    if (cacheManager != null)
+                        cacheManager.CacheMode = mCacheMode;
+                }
+            }
+        }
+        /// <summary>
         /// Gets or sets the cache limit as either the count of thumbnail images or the memory allocated for cache (e.g. 10MB).
         /// </summary>
-        [Category("Behavior"), Description("Gets or sets the cache limit as either the count of thumbnail images or the memory allocated for cache (e.g. 10MB)."), DefaultValue("20MB")]
+        [Category("Behavior"), Description("Gets or sets the cache limit as either the count of thumbnail images or the memory allocated for cache (e.g. 10MB)."), DefaultValue("20MB"), RefreshProperties(RefreshProperties.All)]
         public string CacheLimit
         {
             get
@@ -152,6 +178,7 @@ namespace Manina.Windows.Forms
             {
                 string slimit = value;
                 int limit = 0;
+                mCacheMode = CacheMode.OnDemand;
                 if ((slimit.EndsWith("MB", StringComparison.OrdinalIgnoreCase) &&
                     int.TryParse(slimit.Substring(0, slimit.Length - 2).Trim(), out limit)) ||
                     (slimit.EndsWith("MiB", StringComparison.OrdinalIgnoreCase) &&
@@ -407,6 +434,7 @@ namespace Manina.Windows.Forms
             AllowPaneResize = true;
             BackColor = SystemColors.Window;
             mBorderStyle = BorderStyle.Fixed3D;
+            mCacheMode = CacheMode.OnDemand;
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 20 * 1024 * 1024;
             mColumns = new ImageListViewColumnHeaderCollection(this);
@@ -423,7 +451,7 @@ namespace Manina.Windows.Forms
             mSortOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
-			Text = string.Empty;
+            Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
             mView = View.Thumbnails;
@@ -766,20 +794,20 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Event Handlers
-		/// <summary>
+        /// <summary>
         /// Handles the CreateControl event.
         /// </summary>
-		protected override void OnCreateControl ()
-		{
-			base.OnCreateControl();
-			
-			Size = new Size(120, 100);
-			if(!Controls.Contains(hScrollBar))
-			{
-            	Controls.Add(hScrollBar);
-            	Controls.Add(vScrollBar);
-			}
-		}
+        protected override void OnCreateControl()
+        {
+            base.OnCreateControl();
+
+            Size = new Size(120, 100);
+            if (!Controls.Contains(hScrollBar))
+            {
+                Controls.Add(hScrollBar);
+                Controls.Add(vScrollBar);
+            }
+        }
         /// <summary>
         /// Handles the DragOver event.
         /// </summary>
@@ -1028,7 +1056,7 @@ namespace Manina.Windows.Forms
             if (DropFiles != null)
                 DropFiles(this, e);
 
-            if (e.Cancel) 
+            if (e.Cancel)
                 return;
 
             int index = e.Index;
