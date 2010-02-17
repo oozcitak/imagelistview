@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 5.0 (17 February 2010) =
+
+  * Added the !CacheMode property. (Issue 22).
+  * Added Mono support. (Issue 25).
+
 = 4.8 (11 February 2010) =
 
   * Added the public !VirtualItemKey property to !ImageListViewItem (Issue 24).
