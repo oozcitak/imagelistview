@@ -6,7 +6,7 @@
 ImageListView was tested on Mono 2.6.1. The control is almost feature complete on Mono with two exceptions:
 
   * The Type column is not populated. This is a known issue and will be addressed in a future release.
-  * Thumbnail generation with large images is slower than on Windows, due to the fact that a [http://msdn.microsoft.com/en-us/library/21zw9ah6.aspx particular overload] of the Image.!FromStream method used by the control is not yet supported on Mono.
+  * Thumbnail generation with large images is slower than on .NET, due to the fact that a [http://msdn.microsoft.com/en-us/library/21zw9ah6.aspx particular overload] of the Image.!FromStream method used by the control is not yet supported on Mono.
 
 http://imagelistview.googlecode.com/svn/wiki/MonoSupport.demo.jpg
 
