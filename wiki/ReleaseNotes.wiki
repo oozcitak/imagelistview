@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 5.1 (25 February 2010) =
+
+  * Fixed a bug where source image files were being kept locked (Issue 26).
+  * Removed the !ImageListViewItem.!GetImage method (Issue 27).
+
 = 5.0 (17 February 2010) =
 
   * Added the !CacheMode property. (Issue 22).
