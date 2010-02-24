@@ -429,16 +429,18 @@ namespace Manina.Windows.Forms
         public Image GetImage()
         {
             if (!editing) BeginEdit();
-            Image img = null;
+            Image sourceImage = null;
             if (isVirtualItem)
             {
                 VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mVirtualItemKey);
                 mImageListView.RetrieveVirtualItemImageInternal(e);
-                img = Image.FromFile(e.FileName);
+                sourceImage = Image.FromFile(e.FileName);
             }
             else
-                img = Image.FromFile(mFileName);
+                sourceImage = Image.FromFile(mFileName);
             if (!editing) EndEdit();
+            Bitmap img = new Bitmap(sourceImage);
+            sourceImage.Dispose();
             return img;
         }
         /// <summary>

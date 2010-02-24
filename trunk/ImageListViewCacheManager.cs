@@ -327,7 +327,12 @@ namespace Manina.Windows.Forms
                     VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mImageListView.Items[guid].mVirtualItemKey);
                     mImageListView.RetrieveVirtualItemImageInternal(e);
                     if (!string.IsNullOrEmpty(e.FileName))
-                        editCache.Add(guid, Image.FromFile(e.FileName));
+                    {
+                        using (Image img = Image.FromFile(e.FileName))
+                        {
+                            editCache.Add(guid, new Bitmap(img));
+                        }
+                    }
                 }
             }
         }
