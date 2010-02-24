@@ -529,17 +529,22 @@ namespace Manina.Windows.Forms
 
             // Revert to source image if an embedded thumbnail of required size
             // was not found.
+            FileStream sourceStream = null;
             if (source == null)
             {
                 try
                 {
-                    source = Image.FromFile(filename);
+                    sourceStream = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                    source = Image.FromStream(sourceStream);
                 }
                 catch
                 {
                     if (source != null)
                         source.Dispose();
+                    if (sourceStream != null)
+                        sourceStream.Dispose(); 
                     source = null;
+                    sourceStream = null;
                 }
             }
 
@@ -570,6 +575,9 @@ namespace Manina.Windows.Forms
                 if (source != null)
                     source.Dispose();
                 source = null;
+                if (sourceStream != null)
+                    sourceStream.Dispose();
+                sourceStream = null;
                 if (streamCopy != null)
                     streamCopy.Dispose();
                 streamCopy = null;

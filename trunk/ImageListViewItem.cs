@@ -424,26 +424,6 @@ namespace Manina.Windows.Forms
 
         #region Instance Methods
         /// <summary>
-        /// Gets the item image.
-        /// </summary>
-        public Image GetImage()
-        {
-            if (!editing) BeginEdit();
-            Image sourceImage = null;
-            if (isVirtualItem)
-            {
-                VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mVirtualItemKey);
-                mImageListView.RetrieveVirtualItemImageInternal(e);
-                sourceImage = Image.FromFile(e.FileName);
-            }
-            else
-                sourceImage = Image.FromFile(mFileName);
-            if (!editing) EndEdit();
-            Bitmap img = new Bitmap(sourceImage);
-            sourceImage.Dispose();
-            return img;
-        }
-        /// <summary>
         /// Begins editing the item.
         /// This method must be used while editing the item
         /// to prevent collisions with the cache manager.
