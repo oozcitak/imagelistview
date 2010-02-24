@@ -305,9 +305,12 @@ namespace Manina.Windows.Forms
             {
                 if (!editCache.ContainsKey(guid))
                 {
-                    using (Image img = Image.FromFile(filename))
+                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
                     {
-                        editCache.Add(guid, new Bitmap(img));
+                        using (Image img = Image.FromStream(stream))
+                        {
+                            editCache.Add(guid, new Bitmap(img));
+                        }
                     }
                 }
             }
@@ -328,9 +331,12 @@ namespace Manina.Windows.Forms
                     mImageListView.RetrieveVirtualItemImageInternal(e);
                     if (!string.IsNullOrEmpty(e.FileName))
                     {
-                        using (Image img = Image.FromFile(e.FileName))
+                        using (FileStream stream = new FileStream(e.FileName, FileMode.Open, FileAccess.Read))
                         {
-                            editCache.Add(guid, new Bitmap(img));
+                            using (Image img = Image.FromStream(stream))
+                            {
+                                editCache.Add(guid, new Bitmap(img));
+                            }
                         }
                     }
                 }
