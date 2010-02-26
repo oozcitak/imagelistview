@@ -236,14 +236,14 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void Clear()
             {
+                mItems.Clear();
+                mFocused = null;
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Clear();
                     mImageListView.SelectedItems.Clear();
                     mImageListView.Refresh();
                 }
-                mItems.Clear();
-                mFocused = null;
             }
             /// <summary>
             /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
