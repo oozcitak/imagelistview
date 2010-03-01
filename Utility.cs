@@ -70,6 +70,10 @@ namespace Manina.Windows.Forms
                 }
             }
         }
+        // DestroyIcon
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DestroyIcon(IntPtr hIcon);
         // SHGetFileInfo
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr SHGetFileInfo(string pszPath, FileAttributes dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, SHGFI uFlags);
@@ -128,7 +132,7 @@ namespace Manina.Windows.Forms
                 sized /= mod;
             }
 
-            return string.Format("{0} {1}", System.Math.Round(sized, 2), units[i]);
+            return string.Format("{0} {1}", Math.Round(sized, 2), units[i]);
         }
         #endregion
 
@@ -193,6 +197,32 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Shell Utilities
+        /// <summary>
+        /// Gets the file icon.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="largeIcon">If set to true returns the large icon, 
+        /// otherwise returns the small icon.</param>
+        internal static Image GetFileIcon(string fileName, bool largeIcon)
+        {
+            SHGFI flags = SHGFI.SmallIcon;
+
+            if (largeIcon)
+                flags = SHGFI.LargeIcon;
+
+            SHFILEINFO shinfo = new SHFILEINFO();
+            IntPtr hImgSmall = SHGetFileInfo(fileName, (FileAttributes)0, out shinfo,
+                (uint)Marshal.SizeOf(shinfo), SHGFI.Icon | flags);
+
+            if (hImgSmall == IntPtr.Zero)
+                return null;
+
+            Image icon = (Image)((Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone()).ToBitmap();
+
+            DestroyIcon(shinfo.hIcon);
+
+            return icon;
+        }
         /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
@@ -309,45 +339,82 @@ namespace Manina.Windows.Forms
                 }
             }
         }
-        // Convert Exif types
+        /// <summary>
+        /// Converts the given Exif data to a byte.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static byte ReadExifByte(byte[] value)
         {
             return value[0];
         }
+        /// <summary>
+        /// Converts the given Exif data to an ASCII encoded string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static string ReadExifAscii(byte[] value)
         {
             int len = Array.IndexOf(value, (byte)0);
             if (len == -1) len = value.Length;
             return Encoding.ASCII.GetString(value, 0, len);
         }
+        /// <summary>
+        /// Converts the given Exif data to DateTime.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static DateTime ReadExifDateTime(byte[] value)
         {
             return DateTime.ParseExact(ReadExifAscii(value),
                 "yyyy:MM:dd HH:mm:ss",
                 System.Globalization.CultureInfo.InvariantCulture);
         }
+        /// <summary>
+        /// Converts the given Exif data to an 16-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static ushort ReadExifUShort(byte[] value)
         {
             return BitConverter.ToUInt16(value, 0);
         }
+        /// <summary>
+        /// Converts the given Exif data to an 32-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static uint ReadExifUInt(byte[] value)
         {
             return BitConverter.ToUInt32(value, 0);
         }
+        /// <summary>
+        /// Converts the given Exif data to an 32-bit signed integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static int ReadExifInt(byte[] value)
         {
             return BitConverter.ToInt32(value, 0);
         }
+        /// <summary>
+        /// Converts the given Exif data to an unsigned rational value
+        /// represented as a string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static string ReadExifURational(byte[] value)
         {
             return BitConverter.ToUInt32(value, 0).ToString() + "/" +
                     BitConverter.ToUInt32(value, 4).ToString();
         }
+        /// <summary>
+        /// Converts the given Exif data to a signed rational value
+        /// represented as a string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static string ReadExifRational(byte[] value)
         {
             return BitConverter.ToInt32(value, 0).ToString() + "/" +
                     BitConverter.ToInt32(value, 4).ToString();
         }
+        /// <summary>
+        /// Converts the given Exif data to a floating-point number.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
         private static float ReadExifFloat(byte[] value)
         {
             uint num = BitConverter.ToUInt32(value, 0);
@@ -542,9 +609,27 @@ namespace Manina.Windows.Forms
                     if (source != null)
                         source.Dispose();
                     if (sourceStream != null)
-                        sourceStream.Dispose(); 
+                        sourceStream.Dispose();
                     source = null;
                     sourceStream = null;
+                }
+            }
+
+            // Get the shell icon if the source file is not an image file
+            if (source == null)
+            {
+                try
+                {
+                    bool large = false;
+                    if (size.Width > 32 || size.Height > 32)
+                        large = true;
+                    source = GetFileIcon(filename, large);
+                }
+                catch
+                {
+                    if (source != null)
+                        source.Dispose();
+                    source = null;
                 }
             }
 
@@ -659,7 +744,6 @@ namespace Manina.Windows.Forms
                 graphics.FillPath(brush, path);
             }
         }
-
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
@@ -667,7 +751,6 @@ namespace Manina.Windows.Forms
         {
             FillRoundedRectangle(graphics, brush, (int)x, (int)y, (int)width, (int)height, (int)radius);
         }
-
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
@@ -675,7 +758,6 @@ namespace Manina.Windows.Forms
         {
             FillRoundedRectangle(graphics, brush, rect.Left, rect.Top, rect.Width, rect.Height, radius);
         }
-
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
@@ -683,7 +765,6 @@ namespace Manina.Windows.Forms
         {
             FillRoundedRectangle(graphics, brush, (int)rect.Left, (int)rect.Top, (int)rect.Width, (int)rect.Height, (int)radius);
         }
-
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
@@ -694,7 +775,6 @@ namespace Manina.Windows.Forms
                 graphics.DrawPath(pen, path);
             }
         }
-
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
@@ -702,7 +782,6 @@ namespace Manina.Windows.Forms
         {
             DrawRoundedRectangle(graphics, pen, (int)x, (int)y, (int)width, (int)height, (int)radius);
         }
-
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
@@ -710,7 +789,6 @@ namespace Manina.Windows.Forms
         {
             DrawRoundedRectangle(graphics, pen, rect.Left, rect.Top, rect.Width, rect.Height, radius);
         }
-
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
