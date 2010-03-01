@@ -1,0 +1,5 @@
+Contributors to ImageListView
+=============================
+
+ * Ozgur Ozcitak
+ * Robby (Thumbnail extraction fallback with shell icons)
