@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 5.2 (01 March 2010) =
+
+  * Fixed a bug where the control was not refreshed after removing all items(Issue 29).
+  * !ImageListView now falls back to shell icons if it cannot extract image thumbnails (Issue 30). Contributed by Robby.
+  * Exif properties of !ImageListViewItem are now marked as browsable (Issue 31).
+
 = 5.1 (25 February 2010) =
 
   * Fixed a bug where source image files were being kept locked (Issue 26).
