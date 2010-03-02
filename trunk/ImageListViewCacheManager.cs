@@ -537,7 +537,7 @@ namespace Manina.Windows.Forms
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
-                    Utility.ThumbnailFromImage(thumb, thumbSize, Color.White),
+                    Utility.ThumbnailFromImage(thumb, thumbSize),
                     CacheState.Cached, useEmbeddedThumbnails));
             }
 
@@ -802,8 +802,7 @@ namespace Manina.Windows.Forms
                                 editSource = null;
                         }
                         if (editSource != null)
-                            thumb = Utility.ThumbnailFromImage(editSource,
-                                request.Size, Color.White);
+                            thumb = Utility.ThumbnailFromImage(editSource, request.Size);
 
                         // Read thumbnail image
                         if (thumb == null)
@@ -820,7 +819,7 @@ namespace Manina.Windows.Forms
                             else
                             {
                                 thumb = Utility.ThumbnailFromFile(request.FileName,
-                                    request.Size, request.UseEmbeddedThumbnails, Color.White);
+                                    request.Size, request.UseEmbeddedThumbnails);
                             }
                         }
 
