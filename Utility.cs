@@ -462,9 +462,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="image">The source image.</param>
         /// <param name="size">Requested image size.</param>
-        /// <param name="backColor">Background color of returned thumbnail.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image ThumbnailFromImage(Image image, Size size, Color backColor)
+        internal static Image ThumbnailFromImage(Image image, Size size)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -478,11 +477,7 @@ namespace Manina.Windows.Forms
                 {
                     g.PixelOffsetMode = PixelOffsetMode.None;
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-                    using (Brush brush = new SolidBrush(backColor))
-                    {
-                        g.FillRectangle(Brushes.White, 0, 0, scaled.Width, scaled.Height);
-                    }
+                    g.Clear(Color.Transparent);
 
                     g.DrawImage(image, 0, 0, scaled.Width, scaled.Height);
                 }
@@ -502,9 +497,8 @@ namespace Manina.Windows.Forms
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
-        /// <param name="backColor">Background color of returned thumbnail.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, Color backColor)
+        internal static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -645,7 +639,7 @@ namespace Manina.Windows.Forms
                 {
                     g.PixelOffsetMode = PixelOffsetMode.None;
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.Clear(backColor);
+                    g.Clear(Color.Transparent);
                     g.DrawImage(source, 0, 0, scaled.Width, scaled.Height);
                 }
             }
