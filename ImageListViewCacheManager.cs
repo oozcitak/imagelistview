@@ -536,7 +536,8 @@ namespace Manina.Windows.Forms
                     }
                 }
                 // Add to cache
-                thumbCache.Add(guid, new CacheItem(guid, key, thumbSize, thumb,
+                thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
+                    Utility.ThumbnailFromImage(thumb, thumbSize, Color.White),
                     CacheState.Cached, useEmbeddedThumbnails));
             }
 
