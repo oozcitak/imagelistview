@@ -1,9 +1,13 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 5.3 (02 March 2010) =
+
+  * Initial thumbnails of virtual items are now sized down to control's !ThumbnailSize property on item add. (Issue 33).
+
 = 5.2 (01 March 2010) =
 
-  * Fixed a bug where the control was not refreshed after removing all items(Issue 29).
+  * Fixed a bug where the control was not refreshed after removing all items (Issue 29).
   * !ImageListView now falls back to shell icons if it cannot extract image thumbnails (Issue 30). Contributed by Robby.
   * Exif properties of !ImageListViewItem are now marked as browsable (Issue 31).
 
