@@ -244,6 +244,11 @@ namespace Manina.Windows.Forms
         [Browsable(false), Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
         public ImageListView.ImageListViewItemCollection Items { get { return mItems; } }
         /// <summary>
+        /// Gets or sets whether multiple items can be selected.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether multiple items can be selected."), DefaultValue(true)]
+        public bool MultiSelect { get; set; }
+        /// <summary>
         /// Gets or sets the width of the left pane.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the width of the left pane."), DefaultValue(240)]
@@ -449,6 +454,7 @@ namespace Manina.Windows.Forms
             mErrorImage = manager.GetObject("ErrorImage") as Image;
             HeaderFont = this.Font;
             mItems = new ImageListViewItemCollection(this);
+            MultiSelect = true;
             mPaneWidth = 240;
             mRetryOnError = true;
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
