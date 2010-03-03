@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 5.4 (03 March 2010) =
+
+  * Added the !MultiSelect property. (Issue 32).
+  * Fixed an issue where transparent images were always drawn with a white background  (Issue 35).
+  * Scrollbars can now be hidden with the new !ScrollBars property. (Issue 36).
+
 = 5.3 (02 March 2010) =
 
   * Initial thumbnails of virtual items are now sized down to control's !ThumbnailSize property on item add. (Issue 33).
