@@ -379,7 +379,7 @@ namespace Manina.Windows.Forms
                     ((Math.Abs(e.Location.X - lastMouseDownLocation.X) > SelectionTolerance ||
                     Math.Abs(e.Location.Y - lastMouseDownLocation.Y) > SelectionTolerance)))
                 {
-                    if (!lastMouseDownOverItem && HoveredItem == null)
+                    if (mImageListView.MultiSelect && !lastMouseDownOverItem && HoveredItem == null)
                     {
                         // Start mouse selection
                         MouseSelecting = true;
@@ -693,7 +693,7 @@ namespace Manina.Windows.Forms
                         {
                             // Just move the focus
                         }
-                        else if (ShiftKey)
+                        else if (mImageListView.MultiSelect && ShiftKey)
                         {
                             int startIndex = 0;
                             int endIndex = 0;
