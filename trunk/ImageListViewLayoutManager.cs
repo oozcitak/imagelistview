@@ -49,6 +49,7 @@ namespace Manina.Windows.Forms
         private int cachedHeaderHeight;
         private Size cachedItemMargin;
         private int cachedPaneWidth;
+        private bool cachedScrollBars;
         private Dictionary<Guid, bool> cachedVisibleItems;
 
         private bool vScrollVisible;
@@ -127,6 +128,8 @@ namespace Manina.Windows.Forms
                     return true;
                 else if (mImageListView.PaneWidth != cachedPaneWidth)
                     return true;
+                else if (mImageListView.ScrollBars != cachedScrollBars)
+                    return true;
                 else
                     return false;
             }
@@ -203,6 +206,7 @@ namespace Manina.Windows.Forms
             cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
             cachedItemMargin = mImageListView.mRenderer.MeasureItemMargin(mImageListView.View);
             cachedPaneWidth = mImageListView.PaneWidth;
+            cachedScrollBars = mImageListView.ScrollBars;
             cachedVisibleItems.Clear();
 
             // Calculate drawing area
@@ -273,10 +277,13 @@ namespace Manina.Windows.Forms
 
             // Check if we need the horizontal scroll bar
             bool hScrollRequired = false;
-            if (mImageListView.View == View.Gallery)
-                hScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
-            else
-                hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mCols * mItemSizeWithMargin.Width);
+            if (mImageListView.ScrollBars)
+            {
+                if (mImageListView.View == View.Gallery)
+                    hScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
+                else
+                    hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mCols * mItemSizeWithMargin.Width);
+            }
             if (hScrollRequired != hScrollVisible)
             {
                 hScrollVisible = hScrollRequired;
@@ -287,10 +294,13 @@ namespace Manina.Windows.Forms
 
             // Check if we need the vertical scroll bar
             bool vScrollRequired = false;
-            if (mImageListView.View == View.Gallery)
-                vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < mRows * mItemSizeWithMargin.Height);
-            else
-                vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
+            if (mImageListView.ScrollBars)
+            {
+                if (mImageListView.View == View.Gallery)
+                    vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < mRows * mItemSizeWithMargin.Height);
+                else
+                    vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
+            }
             if (vScrollRequired != vScrollVisible)
             {
                 vScrollVisible = vScrollRequired;
