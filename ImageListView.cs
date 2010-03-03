@@ -281,6 +281,11 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets whether the scrollbars should be shown.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets whether the scrollbars should be shown."), DefaultValue(true)]
+        public bool ScrollBars { get; set; }
+        /// <summary>
         /// Gets the collection of selected items contained in the image list view.
         /// </summary>
         [Browsable(false), Category("Behavior"), Description("Gets the collection of selected items contained in the image list view.")]
@@ -451,6 +456,7 @@ namespace Manina.Windows.Forms
             mSortOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
+            ScrollBars = true;
             Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
