@@ -1,4 +1,4 @@
-﻿// ImageListView - A listview control for image files
+// ImageListView - A listview control for image files
 // Copyright (C) 2009 Ozgur Ozcitak
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +68,7 @@ namespace Manina.Windows.Forms
         private CacheMode mCacheMode;
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
+        private ImageListViewColor mColors;
         private ImageListViewColumnHeaderCollection mColumns;
         private Image mDefaultImage;
         private Image mErrorImage;
@@ -130,7 +131,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color of the control.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color of the control."), DefaultValue(typeof(Color), "Window")]
-        public override Color BackColor { get { return base.BackColor; } set { base.BackColor = value; Refresh(); } }
+        public override Color BackColor { get { return mColors.ControlBackColor; } set { mColors.ControlBackColor = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the border style of the control.
         /// </summary>
@@ -200,6 +201,20 @@ namespace Manina.Windows.Forms
                     throw new ArgumentException("Cache limit must be specified as either the count of thumbnail images or the memory allocated for cache (eg 10MB)", "value");
             }
         }
+        /// <summary>
+        /// Gets or sets the color palette of the ImageListView.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the color palette of the ImageListView.")]
+        public ImageListViewColor Colors
+        {
+            get { return mColors; }
+            set
+            {
+                mColors = value;
+                Refresh();
+            }
+        }
+
         /// <summary>
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
@@ -435,6 +450,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ImageListView()
         {
+            mColors = new ImageListViewColor();
             SetRenderer(new ImageListViewRenderer());
 
             AllowColumnClick = true;
@@ -442,7 +458,6 @@ namespace Manina.Windows.Forms
             AllowDrag = false;
             AllowDuplicateFileNames = false;
             AllowPaneResize = true;
-            BackColor = SystemColors.Window;
             mBorderStyle = BorderStyle.Fixed3D;
             mCacheMode = CacheMode.OnDemand;
             mCacheLimitAsItemCount = 0;
