@@ -15,6 +15,7 @@
 //
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 //
+// Theme support coded by Robby
 
 using System.ComponentModel;
 using System.Drawing;
@@ -363,10 +364,18 @@ namespace Manina.Windows.Forms
 
         #region Static Members
         /// <summary>
+        /// Represents the default color theme.
+        /// </summary>
+        public static ImageListViewColor Default = ImageListViewColor.GetDefaultTheme();
+        /// <summary>
+        /// Represents the noir color theme.
+        /// </summary>
+        public static ImageListViewColor Noir = ImageListViewColor.GetNoirTheme();
+  
+        /// <summary>
         /// Sets the controls color palette to default colors.
         /// </summary>
-        /// <returns></returns>
-        public static ImageListViewColor Default()
+        private static ImageListViewColor GetDefaultTheme()
         {
             return new ImageListViewColor();
         }
@@ -375,7 +384,7 @@ namespace Manina.Windows.Forms
         /// Sets the controls color palette to noir colors.
         /// </summary>
         /// <returns></returns>
-        public static ImageListViewColor Noir()
+        private static ImageListViewColor GetNoirTheme()
         {
             ImageListViewColor c = new ImageListViewColor();
 
