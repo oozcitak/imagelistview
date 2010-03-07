@@ -52,6 +52,7 @@ namespace Manina.Windows.Forms
         #region NoirRenderer
         /// <summary>
         /// A renderer with a dark theme.
+        /// This renderer cannot be themed.
         /// </summary>
         public class NoirRenderer : ImageListView.ImageListViewRenderer
         {
@@ -675,28 +676,28 @@ namespace Manina.Windows.Forms
                     Size itemPadding = new Size(4, 4);
 
                     // Paint background
-                    using (Brush bItemBack = new SolidBrush(item.BackColor))
+                    using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
                     {
                         g.FillRectangle(bItemBack, bounds);
                     }
                     if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
                         (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                     {
-                        using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
+                        using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
                         {
                             Utility.FillRoundedRectangle(g, bSelected, bounds, 4);
                         }
                     }
                     else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
-                        using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
+                        using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.UnFocusedColor1, ImageListView.Colors.UnFocusedColor2, LinearGradientMode.Vertical))
                         {
                             Utility.FillRoundedRectangle(g, bGray64, bounds, 4);
                         }
                     }
                     if (((state & ItemState.Hovered) != ItemState.None))
                     {
-                        using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(8, SystemColors.Highlight), Color.FromArgb(32, SystemColors.Highlight), LinearGradientMode.Vertical))
+                        using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.HoverColor1, ImageListView.Colors.HoverColor2, LinearGradientMode.Vertical))
                         {
                             Utility.FillRoundedRectangle(g, bHovered, bounds, 4);
                         }
@@ -711,13 +712,16 @@ namespace Manina.Windows.Forms
                         // Draw image border
                         if (Math.Min(pos.Width, pos.Height) > 32)
                         {
-                            using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                            using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
                             {
                                 g.DrawRectangle(pGray128, pos);
                             }
-                            using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                            if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
                             {
-                                g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                                using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
+                                {
+                                    g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                                }
                             }
                         }
 
@@ -733,11 +737,11 @@ namespace Manina.Windows.Forms
                             sf.FormatFlags = StringFormatFlags.NoWrap;
                             sf.LineAlignment = StringAlignment.Center;
                             sf.Trimming = StringTrimming.EllipsisCharacter;
-                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
                             {
                                 g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
                             }
-                            using (Brush bItemDetails = new SolidBrush(Color.Gray))
+                            using (Brush bItemDetails = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                             {
                                 rt.Offset(0, 1.5f * lineHeight);
                                 if (!string.IsNullOrEmpty(item.FileType))
@@ -772,27 +776,27 @@ namespace Manina.Windows.Forms
                     }
 
                     // Item border
-                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, ImageListView.Colors.ControlBackColor)))
                     {
                         Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
                     }
                     if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
-                        using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
+                        using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                         {
                             Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
                         }
                     }
                     else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
-                        using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
+                        using (Pen pGray128 = new Pen(ImageListView.Colors.UnFocusedBorderColor))
                         {
                             Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
                         }
                     }
                     else if ((state & ItemState.Selected) == ItemState.None)
                     {
-                        using (Pen pGray64 = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
+                        using (Pen pGray64 = new Pen(ImageListView.Colors.BorderColor))
                         {
                             Utility.DrawRoundedRectangle(g, pGray64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
                         }
@@ -800,7 +804,7 @@ namespace Manina.Windows.Forms
 
                     if (ImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
                     {
-                        using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
+                        using (Pen pHighlight64 = new Pen(ImageListView.Colors.HoverBorderColor))
                         {
                             Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
                         }

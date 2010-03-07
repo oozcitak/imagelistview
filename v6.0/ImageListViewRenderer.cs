@@ -804,7 +804,7 @@ namespace Manina.Windows.Forms
             public virtual void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
                 Size itemPadding = new Size(4, 4);
-
+                
                 // Paint background
                 using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
                 {
