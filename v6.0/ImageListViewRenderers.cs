@@ -113,13 +113,10 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
             public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
-                // Fill with item background color
-                if (item.BackColor != Color.Transparent)
+                // Item background color
+                using (Brush brush = new SolidBrush(Color.Black))
                 {
-                    using (Brush brush = new SolidBrush(item.BackColor))
-                    {
-                        g.FillRectangle(brush, bounds);
-                    }
+                    g.FillRectangle(brush, bounds);
                 }
 
                 if (ImageListView.View == View.Details)
@@ -714,13 +711,13 @@ namespace Manina.Windows.Forms
                         {
                             using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
                             {
-                                g.DrawRectangle(pGray128, pos);
+                                g.DrawRectangle(pOuterBorder, pos);
                             }
                             if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
                             {
                                 using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                                 {
-                                    g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                                    g.DrawRectangle(pInnerBorder, Rectangle.Inflate(pos, -1, -1));
                                 }
                             }
                         }
@@ -825,6 +822,7 @@ namespace Manina.Windows.Forms
         #region XPRenderer
         /// <summary>
         /// Mimics Windows XP appearance.
+        /// This renderer cannot be themed.
         /// </summary>
         public class XPRenderer : ImageListView.ImageListViewRenderer
         {
@@ -860,7 +858,7 @@ namespace Manina.Windows.Forms
             public override void DrawItem(System.Drawing.Graphics g, ImageListViewItem item, ItemState state, System.Drawing.Rectangle bounds)
             {
                 // Paint background
-                using (Brush bItemBack = new SolidBrush(item.BackColor))
+                using (Brush bItemBack = new SolidBrush(SystemColors.Window))
                 {
                     g.FillRectangle(bItemBack, bounds);
                 }
@@ -930,7 +928,7 @@ namespace Manina.Windows.Forms
                         }
                         else
                         {
-                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            using (Brush bItemFore = new SolidBrush(SystemColors.WindowText))
                             {
                                 g.DrawString(item.Text, ImageListView.Font, bItemFore, rt, sf);
                             }
@@ -968,7 +966,7 @@ namespace Manina.Windows.Forms
                         foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
-                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            using (Brush bItemFore = new SolidBrush(SystemColors.WindowText))
                             {
                                 if ((state & ItemState.Selected) == ItemState.None)
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
@@ -1001,7 +999,7 @@ namespace Manina.Windows.Forms
                 // Draw image border
                 if (Math.Min(pos.Width, pos.Height) > 32)
                 {
-                    using (Pen pBorder = new Pen(Color.Black))
+                    using (Pen pBorder = new Pen(SystemColors.WindowText))
                     {
                         g.DrawRectangle(pBorder, pos);
                     }
