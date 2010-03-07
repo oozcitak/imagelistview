@@ -15,9 +15,6 @@
 //
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 //
-// Change Log:
-// 2010-03-05 replaced inline colors with ImageListViewColor properties
-// 2010-03-05 DrawItem() item borders will not be painted in View.Details
 
 using System;
 using System.Collections.Generic;
@@ -811,7 +808,6 @@ namespace Manina.Windows.Forms
                 using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
                 {
                     g.FillRectangle(bItemBack, bounds);
-                    //g.FillRectangle(bItemBack, bounds);
                 }
 
                 // Paint background Selected
@@ -824,10 +820,10 @@ namespace Manina.Windows.Forms
                     }
                 }
 
-                // Paint background Focused
+                // Paint background unfocused
                 else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
-                    using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.FocusedColor1, ImageListView.Colors.FocusedColor2, LinearGradientMode.Vertical))
+                    using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.UnFocusedColor1, ImageListView.Colors.UnFocusedColor2, LinearGradientMode.Vertical))
                     {
                         Utility.FillRoundedRectangle(g, bGray64, bounds, (mImageListView.View == View.Details ? 2 : 4));
                     }
@@ -853,15 +849,15 @@ namespace Manina.Windows.Forms
                         // Draw image border
                         if (Math.Min(pos.Width, pos.Height) > 32)
                         {
-                            using (Pen pGray128 = new Pen(ImageListView.Colors.ImageOuterBorderColor))
+                            using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
                             {
-                                g.DrawRectangle(pGray128, pos);
+                                g.DrawRectangle(pOuterBorder, pos);
                             }
                             if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
                             {
-                                using (Pen pWhite128 = new Pen(ImageListView.Colors.ImageInnerBorderColor))
+                                using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                                 {
-                                    g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                                    g.DrawRectangle(pInnerBorder, Rectangle.Inflate(pos, -1, -1));
                                 }
                             }
                         }
@@ -941,7 +937,6 @@ namespace Manina.Windows.Forms
                 }
 
                 // Item border
-                // Robby modified: if (mImageListView.View != View.Details) {..}
                 if (mImageListView.View != View.Details)
                 {
                     using (Pen pWhite128 = new Pen(Color.FromArgb(128, ImageListView.Colors.ControlBackColor)))
@@ -951,14 +946,14 @@ namespace Manina.Windows.Forms
                 }
                 if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
-                    using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
+                    using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
                 else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
-                    using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
+                    using (Pen pGray128 = new Pen(ImageListView.Colors.UnFocusedBorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
@@ -973,7 +968,7 @@ namespace Manina.Windows.Forms
 
                 if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
                 {
-                    using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
+                    using (Pen pHighlight64 = new Pen(ImageListView.Colors.HoverBorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
@@ -1045,7 +1040,10 @@ namespace Manina.Windows.Forms
                         sf.Alignment = StringAlignment.Near;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
-                        g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor), bounds, sf);
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
+                        {
+                            g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), bText, bounds, sf);
+                        }
                     }
                 }
             }
@@ -1096,19 +1094,26 @@ namespace Manina.Windows.Forms
                     // Item text
                     if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
-                        int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font,
-                            SystemBrushes.GrayText, new SolidBrush(ImageListView.Colors.ForeColor));
-                        bounds.Y += 2 * y;
-                        bounds.Height -= 2 * y;
+                        using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
+                        {
+                            int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font, bLabel, bText);
+                            bounds.Y += 2 * y;
+                            bounds.Height -= 2 * y;
+                        }
                     }
 
                     // File type
                     if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
-                        int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
-                            item.FileType, mImageListView.Font, SystemBrushes.GrayText, new SolidBrush(ImageListView.Colors.ForeColor));
-                        bounds.Y += y;
-                        bounds.Height -= y;
+                        using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
+                        {
+                            int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
+                                item.FileType, mImageListView.Font, bLabel, bText);
+                            bounds.Y += y;
+                            bounds.Height -= y;
+                        }
                     }
 
                     // Metatada
@@ -1133,10 +1138,14 @@ namespace Manina.Windows.Forms
                             string text = item.GetSubItemText(column.Type);
                             if (!string.IsNullOrEmpty(text))
                             {
-                                int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
-                                    mImageListView.Font, SystemBrushes.GrayText, new SolidBrush(ImageListView.Colors.ForeColor));
-                                bounds.Y += y;
-                                bounds.Height -= y;
+                                using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                                using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
+                                {
+                                    int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
+                                        mImageListView.Font, bLabel, bText);
+                                    bounds.Y += y;
+                                    bounds.Height -= y;
+                                }
                             }
                         }
                     }
@@ -1161,13 +1170,11 @@ namespace Manina.Windows.Forms
                     // Draw image border
                     if (Math.Min(pos.Width, pos.Height) > 32)
                     {
-                        using (Pen pGray128 = new Pen(ImageListView.Colors.ImageOuterBorderColor))
+                        using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
+                        using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                         {
-                            g.DrawRectangle(pGray128, pos);
-                        }
-                        using (Pen pWhite128 = new Pen(ImageListView.Colors.ImageInnerBorderColor))
-                        {
-                            g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                            g.DrawRectangle(pOuterBorder, pos);
+                            g.DrawRectangle(pInnerBorder, Rectangle.Inflate(pos, -1, -1));
                         }
                     }
                 }

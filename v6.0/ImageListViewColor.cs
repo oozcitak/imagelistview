@@ -1,7 +1,23 @@
-using System;
+// ImageListView - A listview control for image files
+// Copyright (C) 2009 Ozgur Ozcitak
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// Ozgur Ozcitak (ozcitak@yahoo.com)
+//
+
 using System.ComponentModel;
 using System.Drawing;
-using System.Text;
 
 namespace Manina.Windows.Forms
 {
@@ -16,14 +32,17 @@ namespace Manina.Windows.Forms
 
         Color mBackColor;
         Color mBorderColor;
-        Color mFocusedColor1;
-        Color mFocusedColor2;
+        Color mUnFocusedColor1;
+        Color mUnFocusedColor2;
+        Color mUnFocusedBorderColor;
         Color mForeColor;
         Color mHoverColor1;
         Color mHoverColor2;
+        Color mHoverBorderColor;
         Color mInsertionCaretColor;
         Color mSelectedColor1;
         Color mSelectedColor2;
+        Color mSelectedBorderColor;
 
         // thumbnail & pane
         Color mImageInnerBorderColor;
@@ -42,6 +61,7 @@ namespace Manina.Windows.Forms
         // pane
         Color mPaneBackColor;
         Color mPaneSeparatorColor;
+        Color mPaneLabelColor;
 
         #endregion
 
@@ -83,22 +103,31 @@ namespace Manina.Windows.Forms
             set { mForeColor = value; }
         }
         /// <summary>
-        /// Gets or sets the background gradient color1 if the ImageListViewItem is focused.
+        /// Gets or sets the background gradient color1 of the ImageListViewItem if the control is not focused.
         /// </summary>
-        [Category("Appearance"), Description("Gets or sets the background gradient color1 if the ImageListViewItem is focused.")]
-        public Color FocusedColor1
+        [Category("Appearance"), Description("Gets or sets the background gradient color1 of the ImageListViewItem if the control is not focused.")]
+        public Color UnFocusedColor1
         {
-            get { return mFocusedColor1; }
-            set { mFocusedColor1 = value; }
+            get { return mUnFocusedColor1; }
+            set { mUnFocusedColor1 = value; }
         }
         /// <summary>
-        /// Gets or sets the background gradient color2 if the ImageListViewItem is focused.
+        /// Gets or sets the background gradient color2 of the ImageListViewItem if the control is not focused.
         /// </summary>
-        [Category("Appearance"), Description("Gets or sets the background gradient color2 if the ImageListViewItem is focused.")]
-        public Color FocusedColor2
+        [Category("Appearance"), Description("Gets or sets the background gradient color2 of the ImageListViewItem if the control is not focused.")]
+        public Color UnFocusedColor2
         {
-            get { return mFocusedColor2; }
-            set { mFocusedColor1 = value; }
+            get { return mUnFocusedColor2; }
+            set { mUnFocusedColor1 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the border color of the ImageListViewItem if the control is not focused.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the control is not focused.")]
+        public Color UnFocusedBorderColor
+        {
+            get { return mUnFocusedBorderColor; }
+            set { mUnFocusedBorderColor = value; }
         }
         /// <summary>
         /// Gets or sets the background gradient color1 if the ImageListViewItem is hovered.
@@ -117,6 +146,15 @@ namespace Manina.Windows.Forms
         {
             get { return mHoverColor2; }
             set { mHoverColor2 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the border color of the ImageListViewItem if the item is hovered.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is hovered.")]
+        public Color HoverBorderColor
+        {
+            get { return mHoverBorderColor; }
+            set { mHoverBorderColor = value; }
         }
         /// <summary>
         /// Gets or sets the color of the insertion caret.
@@ -144,6 +182,15 @@ namespace Manina.Windows.Forms
         {
             get { return mSelectedColor2; }
             set { mSelectedColor2 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the border color of the ImageListViewItem if the item is selected.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is selected.")]
+        public Color SelectedBorderColor
+        {
+            get { return mSelectedBorderColor; }
+            set { mSelectedBorderColor = value; }
         }
         /// <summary>
         /// Gets or sets the background gradient color1 of the column header.
@@ -220,7 +267,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the background color of the image pane.
         /// </summary>
-        [Category("Appearance Pane"), Description("Gets or sets the background color of the image pane.")]
+        [Category("Appearance Pane View"), Description("Gets or sets the background color of the image pane.")]
         public Color PaneBackColor
         {
             get { return mPaneBackColor; }
@@ -229,11 +276,20 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the separator line color between image pane and thumbnail view.
         /// </summary>
-        [Category("Appearance Pane"), Description("Gets or sets the separator line color between image pane and thumbnail view.")]
+        [Category("Appearance Pane View"), Description("Gets or sets the separator line color between image pane and thumbnail view.")]
         public Color PaneSeparatorColor
         {
             get { return mPaneSeparatorColor; }
             set { mPaneSeparatorColor = value; }
+        }
+        /// <summary>
+        /// Gets or sets the color of labels in pane view.
+        /// </summary>
+        [Category("Appearance Pane View"), Description("Gets or sets the color of labels in pane view.")]
+        public Color PaneLabelColor
+        {
+            get { return mPaneLabelColor; }
+            set { mPaneLabelColor = value; }
         }
         /// <summary>
         /// Gets or sets the image inner border color for thumbnails and pane.
@@ -270,14 +326,17 @@ namespace Manina.Windows.Forms
 
             mBorderColor = Color.FromArgb(64, SystemColors.GrayText);
             
-            mFocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
-            mFocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
+            mUnFocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
+            mUnFocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
+            mUnFocusedBorderColor = Color.FromArgb(128, SystemColors.GrayText);
 
             mHoverColor1 = Color.FromArgb(8, SystemColors.Highlight);
             mHoverColor2 = Color.FromArgb(64, SystemColors.Highlight);
-            
+            mHoverBorderColor = Color.FromArgb(64, SystemColors.Highlight);
+
             mSelectedColor1 = Color.FromArgb(16, SystemColors.Highlight);
             mSelectedColor2 = Color.FromArgb(128, SystemColors.Highlight);
+            mSelectedBorderColor = Color.FromArgb(128, SystemColors.Highlight);
 
             mInsertionCaretColor = SystemColors.Highlight;
 
@@ -298,6 +357,7 @@ namespace Manina.Windows.Forms
             // image pane
             mPaneBackColor = Color.FromArgb(16, SystemColors.GrayText);
             mPaneSeparatorColor = Color.FromArgb(128, SystemColors.GrayText);
+            mPaneLabelColor = SystemColors.GrayText;
         }
         #endregion
 
@@ -328,14 +388,17 @@ namespace Manina.Windows.Forms
 
             c.BorderColor = Color.DarkGray;
 
-            c.FocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
-            c.FocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
+            c.UnFocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
+            c.UnFocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
+            c.UnFocusedBorderColor = Color.FromArgb(128, SystemColors.GrayText);
 
             c.HoverColor1 = Color.FromArgb(64, Color.White);
             c.HoverColor2 = Color.FromArgb(16, Color.White);
-            
+            c.HoverBorderColor = Color.FromArgb(64, SystemColors.Highlight);
+
             c.SelectedColor1 = Color.FromArgb(64, 96, 160);
             c.SelectedColor2 = Color.FromArgb(64, 64, 96, 160);
+            c.SelectedBorderColor = Color.FromArgb(128, SystemColors.Highlight);
 
             c.InsertionCaretColor = Color.FromArgb(96, 144, 240);
 
@@ -356,6 +419,7 @@ namespace Manina.Windows.Forms
             // image pane
             c.PaneBackColor = Color.FromArgb(0x31, 0x31, 0x31);
             c.PaneSeparatorColor = Color.Gold;
+            c.PaneLabelColor = SystemColors.GrayText;
 
             return c;
         }
