@@ -64,6 +64,11 @@ namespace Manina.Windows.Forms
         Color mPaneSeparatorColor;
         Color mPaneLabelColor;
 
+        // selection rectangle
+        Color mSelectionRectangleColor1;
+        Color mSelectionRectangleColor2;
+        Color mSelectionRectangleBorderColor;
+
         #endregion
 
         #region Properties
@@ -310,6 +315,33 @@ namespace Manina.Windows.Forms
             get { return mImageOuterBorderColor; }
             set { mImageOuterBorderColor = value; }
         }
+        /// <summary>
+        /// Gets or sets the background color1 of the selection rectangle.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the background color1 of the selection rectangle.")]
+        public Color SelectionRectangleColor1
+        {
+            get { return mSelectionRectangleColor1; }
+            set { mSelectionRectangleColor1 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the background color2 of the selection rectangle.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the background color2 of the selection rectangle.")]
+        public Color SelectionRectangleColor2
+        {
+            get { return mSelectionRectangleColor2; }
+            set { mSelectionRectangleColor2 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the color of the selection rectangle border.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the color of the selection rectangle border.")]
+        public Color SelectionRectangleBorderColor
+        {
+            get { return mSelectionRectangleBorderColor; }
+            set { mSelectionRectangleBorderColor = value; }
+        }
         #endregion
 
         #region Constructor
@@ -326,7 +358,7 @@ namespace Manina.Windows.Forms
             mForeColor = SystemColors.ControlText;
 
             mBorderColor = Color.FromArgb(64, SystemColors.GrayText);
-            
+
             mUnFocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
             mUnFocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
             mUnFocusedBorderColor = Color.FromArgb(128, SystemColors.GrayText);
@@ -354,11 +386,16 @@ namespace Manina.Windows.Forms
             mColumnSelectColor = Color.FromArgb(16, SystemColors.GrayText);
             mColumnSeparatorColor = Color.FromArgb(32, SystemColors.GrayText);
             mCellForeColor = SystemColors.ControlText;
-            
+
             // image pane
             mPaneBackColor = Color.FromArgb(16, SystemColors.GrayText);
             mPaneSeparatorColor = Color.FromArgb(128, SystemColors.GrayText);
             mPaneLabelColor = SystemColors.GrayText;
+
+            // selection rectangle
+            mSelectionRectangleColor1 = Color.FromArgb(128, SystemColors.Highlight);
+            mSelectionRectangleColor2 = Color.FromArgb(128, SystemColors.Highlight);
+            mSelectionRectangleBorderColor = SystemColors.Highlight;
         }
         #endregion
 
@@ -366,24 +403,15 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents the default color theme.
         /// </summary>
-        public static ImageListViewColor Default = ImageListViewColor.GetDefaultTheme();
+        public static ImageListViewColor Default = new ImageListViewColor();
         /// <summary>
         /// Represents the noir color theme.
         /// </summary>
         public static ImageListViewColor Noir = ImageListViewColor.GetNoirTheme();
-  
-        /// <summary>
-        /// Sets the controls color palette to default colors.
-        /// </summary>
-        private static ImageListViewColor GetDefaultTheme()
-        {
-            return new ImageListViewColor();
-        }
 
         /// <summary>
         /// Sets the controls color palette to noir colors.
         /// </summary>
-        /// <returns></returns>
         private static ImageListViewColor GetNoirTheme()
         {
             ImageListViewColor c = new ImageListViewColor();
@@ -429,6 +457,11 @@ namespace Manina.Windows.Forms
             c.PaneBackColor = Color.FromArgb(0x31, 0x31, 0x31);
             c.PaneSeparatorColor = Color.Gold;
             c.PaneLabelColor = SystemColors.GrayText;
+
+            // selection rectangke
+            c.SelectionRectangleColor1 = Color.FromArgb(160, 96, 144, 240);
+            c.SelectionRectangleColor2 = Color.FromArgb(32, 96, 144, 240);
+            c.SelectionRectangleBorderColor = Color.FromArgb(64, 96, 144, 240);
 
             return c;
         }

@@ -787,10 +787,11 @@ namespace Manina.Windows.Forms
             /// <param name="selection">The client coordinates of the selection rectangle.</param>
             public virtual void DrawSelectionRectangle(Graphics g, Rectangle selection)
             {
-                using (Brush bSelection = new SolidBrush(ImageListView.Colors.SelectedColor2))
+                using (SolidBrush brush = new SolidBrush(ImageListView.Colors.SelectionRectangleColor1))
+                using (Pen pen = new Pen(ImageListView.Colors.SelectionRectangleBorderColor))
                 {
-                    g.FillRectangle(bSelection, selection);
-                    g.DrawRectangle(SystemPens.Highlight, selection);
+                    g.FillRectangle(brush, selection);
+                    g.DrawRectangle(pen, selection);
                 }
             }
             /// <summary>
