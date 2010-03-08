@@ -30,8 +30,6 @@ namespace Manina.Windows.Forms
         #region Member Variables
         // Property backing fields
         internal int mIndex;
-        private Color mBackColor;
-        private Color mForeColor;
         private Guid mGuid;
         internal ImageListView mImageListView;
         internal bool mSelected;
@@ -70,26 +68,6 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
-        /// Gets or sets the background color of the item.
-        /// </summary>
-        [Category("Appearance"), Browsable(true), Description("Gets or sets the background color of the item."), DefaultValue(typeof(Color), "Transparent")]
-        public Color BackColor
-        {
-            get
-            {
-                return mBackColor;
-            }
-            set
-            {
-                if (value != mBackColor)
-                {
-                    mBackColor = value;
-                    if (mImageListView != null)
-                        mImageListView.Refresh();
-                }
-            }
-        }
-        /// <summary>
         /// Gets the cache state of the item thumbnail.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the cache state of the item thumbnail.")]
@@ -109,26 +87,6 @@ namespace Manina.Windows.Forms
             {
                 if (owner != null)
                     owner.FocusedItem = this;
-            }
-        }
-        /// <summary>
-        /// Gets or sets the foreground color of the item.
-        /// </summary>
-        [Category("Appearance"), Browsable(true), Description("Gets or sets the foreground color of the item."), DefaultValue(typeof(Color), "WindowText")]
-        public Color ForeColor
-        {
-            get
-            {
-                return mForeColor;
-            }
-            set
-            {
-                if (value != mForeColor)
-                {
-                    mForeColor = value;
-                    if (mImageListView != null)
-                        mImageListView.Refresh();
-                }
             }
         }
         /// <summary>
@@ -363,8 +321,6 @@ namespace Manina.Windows.Forms
             mIndex = -1;
             owner = null;
 
-            mBackColor = Color.Transparent;
-            mForeColor = SystemColors.WindowText;
             mZOrder = 0;
 
             Guid = Guid.NewGuid();

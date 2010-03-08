@@ -1026,8 +1026,11 @@ namespace Manina.Windows.Forms
                         img = ImageListViewResources.SortAscending;
                     else if (mImageListView.SortOrder == SortOrder.Descending)
                         img = ImageListViewResources.SortDescending;
-                    g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
-                    textOffset += img.Width;
+                    if (img != null)
+                    {
+                        g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
+                        textOffset += img.Width;
+                    }
                 }
 
                 // Text
@@ -1187,7 +1190,6 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of extender column in client coordinates.</param>
             public virtual void DrawColumnExtender(Graphics g, Rectangle bounds)
             {
-
                 // Paint background
                 using (Brush bBack = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderBackColor1, ImageListView.Colors.ColumnHeaderBackColor2, LinearGradientMode.Vertical))
                 {
