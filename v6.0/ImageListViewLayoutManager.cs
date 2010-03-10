@@ -313,7 +313,7 @@ namespace Manina.Windows.Forms
             if (mImageListView.View == View.Gallery)
             {
                 mImageListView.hScrollBar.SmallChange = mItemSizeWithMargin.Width;
-                mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
+                mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * (mItemAreaBounds.Width / mItemSizeWithMargin.Width);
                 mImageListView.hScrollBar.Minimum = 0;
                 mImageListView.hScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mRows) * mItemSizeWithMargin.Width - 1);
             }
@@ -341,7 +341,7 @@ namespace Manina.Windows.Forms
             else
             {
                 mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
-                mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
+                mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * (mItemAreaBounds.Height / mItemSizeWithMargin.Height);
                 mImageListView.vScrollBar.Minimum = 0;
                 mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
             }
