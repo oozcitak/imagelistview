@@ -968,6 +968,7 @@ namespace Manina.Windows.Forms
                 hScrollBar.Value = newXOffset;
             }
 
+            navigationManager.MouseMove(e);
             Refresh(true);
             mRenderer.ResumePaint();
 
