@@ -168,6 +168,21 @@ namespace Manina.Windows.Forms
                 Add(new ImageListViewItem(filename));
             }
             /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="filename">The name of the image file.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            public void Add(string filename, Image initialThumbnail)
+            {
+                ImageListViewItem item = new ImageListViewItem(filename);
+                if (mImageListView != null && initialThumbnail != null)
+                {
+                    mImageListView.cacheManager.Add(item.Guid, filename, mImageListView.ThumbnailSize,
+                        initialThumbnail, mImageListView.UseEmbeddedThumbnails);
+                }
+                Add(item);
+            }
+            /// <summary>
             /// Adds a virtual item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             /// </summary>
             /// <param name="key">The key identifying the item.</param>
