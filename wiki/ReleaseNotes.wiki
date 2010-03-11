@@ -1,15 +1,23 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.0 (10 March 2010) =
+
+  * Added support for color themes. (Issue 37) Contributed by Robby.
+  * Added file icons that can be displayed over items. (Issue 39, Issue 45, Issue 46) Contributed by Robby.
+  * Added checkboxes to items. (Issue 40, Issue 46) Contributed by Robby.
+  * Fixed a bug where the hovered item was not updated while scrolling with the mouse wheel. (Issue 42)
+  * Scrollbars large change property now calculated as a multiple of item height. (Issue 43)
+
 = 5.4 (03 March 2010) =
 
-  * Added the !MultiSelect property. (Issue 32).
-  * Fixed an issue where transparent images were always drawn with a white background  (Issue 35).
-  * Scrollbars can now be hidden with the new !ScrollBars property. (Issue 36).
+  * Added the !MultiSelect property. (Issue 32)
+  * Fixed an issue where transparent images were always drawn with a white background  (Issue 35)
+  * Scrollbars can now be hidden with the new !ScrollBars property. (Issue 36)
 
 = 5.3 (02 March 2010) =
 
-  * Initial thumbnails of virtual items are now sized down to control's !ThumbnailSize property on item add. (Issue 33).
+  * Initial thumbnails of virtual items are now sized down to control's !ThumbnailSize property on item add. (Issue 33)
 
 = 5.2 (01 March 2010) =
 
@@ -24,8 +32,8 @@
 
 = 5.0 (17 February 2010) =
 
-  * Added the !CacheMode property. (Issue 22).
-  * Added Mono support. (Issue 25).
+  * Added the !CacheMode property. (Issue 22)
+  * Added Mono support. (Issue 25)
 
 = 4.8 (11 February 2010) =
 
