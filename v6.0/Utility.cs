@@ -228,11 +228,23 @@ namespace Manina.Windows.Forms
         /// </summary>
         internal class ShellImageFileInfo
         {
-            private static Dictionary<string, string> cachedFileTypes;
+            /// <summary>
+            /// Represents the results of the SHGetFileInfo function.
+            /// </summary>
+            private struct CachedFileType
+            {
+                public string TypeName;
+                public Icon SmallIcon;
+                public Icon LargeIcon;
+            }
+
+            private static Dictionary<string, CachedFileType> cachedFileTypes;
             private uint structSize = 0;
 
             public bool Error { get; private set; }
             public FileAttributes FileAttributes { get; private set; }
+            public Icon SmallIcon { get; private set; }
+            public Icon LargeIcon { get; private set; }
             public DateTime CreationTime { get; private set; }
             public DateTime LastAccessTime { get; private set; }
             public DateTime LastWriteTime { get; private set; }
@@ -259,7 +271,7 @@ namespace Manina.Windows.Forms
             public ShellImageFileInfo(string path)
             {
                 if (cachedFileTypes == null)
-                    cachedFileTypes = new Dictionary<string, string>();
+                    cachedFileTypes = new Dictionary<string, CachedFileType>();
 
                 try
                 {
@@ -273,16 +285,39 @@ namespace Manina.Windows.Forms
                     DisplayName = info.Name;
                     Extension = info.Extension;
 
-                    string typeName;
-                    if (!cachedFileTypes.TryGetValue(Extension, out typeName))
+                    CachedFileType fileType;
+                    if (!cachedFileTypes.TryGetValue(Extension, out fileType))
                     {
                         SHFILEINFO shinfo = new SHFILEINFO();
                         if (structSize == 0) structSize = (uint)Marshal.SizeOf(shinfo);
-                        SHGetFileInfo(path, (FileAttributes)0, out shinfo, structSize, SHGFI.TypeName);
-                        typeName = shinfo.szTypeName;
-                        cachedFileTypes.Add(Extension, typeName);
+
+                        // Get the small icon and shell file type
+                        IntPtr hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                            structSize, SHGFI.TypeName | SHGFI.Icon | SHGFI.SmallIcon);
+
+                        fileType.TypeName = shinfo.szTypeName;
+
+                        if (hImg != IntPtr.Zero)
+                        {
+                            fileType.SmallIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                            DestroyIcon(shinfo.hIcon);
+                        }
+
+                        // Get the large icon
+                        hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                            structSize, SHGFI.Icon | SHGFI.LargeIcon);
+
+                        if (hImg != IntPtr.Zero)
+                        {
+                            fileType.LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                            DestroyIcon(shinfo.hIcon);
+                        }
+
+                        cachedFileTypes.Add(Extension, fileType);
                     }
-                    TypeName = typeName;
+                    TypeName = fileType.TypeName;
+                    SmallIcon = fileType.SmallIcon;
+                    LargeIcon = fileType.LargeIcon;
                     using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
                     {
                         using (Image img = Image.FromStream(stream, false, false))

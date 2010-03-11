@@ -30,6 +30,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public bool ItemHit { get { return ItemIndex != -1; } }
             /// <summary>
+            /// Gets whether an item checkbox is under the hit point.
+            /// </summary>
+            public bool CheckBoxHit { get; private set; }
+            /// <summary>
             /// Gets whether a column is under the hit point.
             /// </summary>
             public bool ColumnHit { get { return ColumnIndex != (ColumnType)(-1); } }
@@ -74,15 +78,17 @@ namespace Manina.Windows.Forms
             /// Initializes a new instance of the HitInfo class.
             /// </summary>
             /// <param name="itemIndex">Index of the item.</param>
+            /// <param name="checkBoxHit">if set to true the mouse cursor is over a checkbox.</param>
             /// <param name="columnIndex">Type of the column.</param>
             /// <param name="columnSeparator">The column separator.</param>
             /// <param name="paneBorder">if set to true the mouse cursor is over the left-pane border.</param>
             /// <param name="inItemArea">if set to true the mouse is in the item area.</param>
             /// <param name="inHeaderArea">if set to true the mouse cursor is in the column header area.</param>
             /// <param name="inPaneArea">if set to true the mouse cursor is in the left-pane area.</param>
-            private HitInfo(int itemIndex, ColumnType columnIndex, ColumnType columnSeparator, bool paneBorder, bool inItemArea, bool inHeaderArea, bool inPaneArea)
+            private HitInfo(int itemIndex, bool checkBoxHit, ColumnType columnIndex, ColumnType columnSeparator, bool paneBorder, bool inItemArea, bool inHeaderArea, bool inPaneArea)
             {
                 ItemIndex = itemIndex;
+                CheckBoxHit = checkBoxHit;
                 ColumnIndex = columnIndex;
                 ColumnSeparator = columnSeparator;
 
@@ -97,8 +103,9 @@ namespace Manina.Windows.Forms
             /// Used when the control registered an item hit.
             /// </summary>
             /// <param name="itemIndex">Index of the item.</param>
-            internal HitInfo(int itemIndex)
-                : this(itemIndex, (ColumnType)(-1), (ColumnType)(-1), false, true, false, false)
+            /// <param name="checkBoxHit">if set to true the mouse cursor is over a checkbox.</param>
+            internal HitInfo(int itemIndex, bool checkBoxHit)
+                : this(itemIndex, checkBoxHit, (ColumnType)(-1), (ColumnType)(-1), false, true, false, false)
             {
                 ;
             }
@@ -109,7 +116,7 @@ namespace Manina.Windows.Forms
             /// <param name="columnIndex">Type of the column.</param>
             /// <param name="columnSeparator">The column separator.</param>
             internal HitInfo(ColumnType columnIndex, ColumnType columnSeparator)
-                : this(-1, columnIndex, columnSeparator, false, false, true, false)
+                : this(-1, false, columnIndex, columnSeparator, false, false, true, false)
             {
                 ;
             }
@@ -120,7 +127,7 @@ namespace Manina.Windows.Forms
             /// <param name="paneBorder">True if the hit point is over the left-pane 
             /// border, false otherwise.</param>
             internal HitInfo(bool paneBorder)
-                : this(-1, (ColumnType)(-1), (ColumnType)(-1), paneBorder, false, false, true)
+                : this(-1, false, (ColumnType)(-1), (ColumnType)(-1), paneBorder, false, false, true)
             {
                 ;
             }

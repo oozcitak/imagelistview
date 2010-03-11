@@ -32,10 +32,13 @@ namespace Manina.Windows.Forms
         internal int mIndex;
         private Guid mGuid;
         internal ImageListView mImageListView;
+        internal bool mChecked;
         internal bool mSelected;
         private string mText;
         private int mZOrder;
         // File info
+        private Icon mSmallIcon;
+        private Icon mLargeIcon;
         private DateTime mDateAccessed;
         private DateTime mDateCreated;
         private DateTime mDateModified;
@@ -110,6 +113,26 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the index of the item."), EditorBrowsable(EditorBrowsableState.Advanced)]
         public int Index { get { return mIndex; } }
+        /// <summary>
+        /// Gets or sets a value determining if the item is checked.
+        /// </summary>
+        [Category("Appearance"), Browsable(false), Description("Gets or sets a value determining if the item is checked."), DefaultValue(false)]
+        public bool Checked
+        {
+            get 
+            { 
+                return mChecked; 
+            }
+            set 
+            {
+                if (value != mChecked)
+                {
+                    mChecked = value;
+                    if (mImageListView != null)
+                        mImageListView.OnItemCheckBoxClickInternal(this);
+                }
+            }
+        }
         /// <summary>
         /// Gets or sets a value determining if the item is selected.
         /// </summary>
@@ -187,6 +210,16 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Appearance"), Browsable(true), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
         public int ZOrder { get { return mZOrder; } set { mZOrder = value; } }
+        /// <summary>
+        /// Gets the small shell icon of the image file represented by this item.
+        /// </summary>
+        [Category("Data"), Browsable(true), Description("Gets the small shell icon of the image file represented by this item.")]
+        public Icon SmallIcon { get { UpdateFileInfo(); return mSmallIcon; } }
+        /// <summary>
+        /// Gets the large shell icon of the image file represented by this item.
+        /// </summary>
+        [Category("Data"), Browsable(true), Description("Gets the large shell icon of the image file represented by this item.")]
+        public Icon LargeIcon { get { UpdateFileInfo(); return mLargeIcon; } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>
@@ -325,6 +358,7 @@ namespace Manina.Windows.Forms
 
             Guid = Guid.NewGuid();
             ImageListView = null;
+            Checked = false;
             Selected = false;
 
             isDirty = true;
@@ -551,6 +585,8 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
+            mSmallIcon = info.SmallIcon;
+            mLargeIcon = info.LargeIcon;
             mDateAccessed = info.LastAccessTime;
             mDateCreated = info.CreationTime;
             mDateModified = info.LastWriteTime;
@@ -581,6 +617,8 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
+            mSmallIcon = info.SmallIcon;
+            mLargeIcon = info.LargeIcon;
             mDateAccessed = info.DateAccessed;
             mDateCreated = info.DateCreated;
             mDateModified = info.DateModified;

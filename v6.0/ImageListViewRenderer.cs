@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using System.ComponentModel;
+using System.Windows.Forms.VisualStyles;
 
 namespace Manina.Windows.Forms
 {
@@ -504,7 +505,15 @@ namespace Manina.Windows.Forms
                         }
                         else
                             g.SetClip(mImageListView.layoutManager.ClientArea);
+
+                        // Draw the item
                         DrawItem(g, param.Item, param.State, param.Bounds);
+
+                        // Draw the checkbox and file icon
+                        if (ImageListView.ShowCheckBoxes)
+                            DrawCheckBox(g, param.Item, ImageListView.layoutManager.GetCheckBoxBounds(param.Item.Index));
+                        if (ImageListView.ShowFileIcons)
+                            DrawFileIcon(g, param.Item, ImageListView.layoutManager.GetIconBounds(param.Item.Index));
                     }
                 }
 
@@ -804,7 +813,7 @@ namespace Manina.Windows.Forms
             public virtual void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
                 Size itemPadding = new Size(4, 4);
-                
+
                 // Paint background
                 using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
                 {
@@ -930,7 +939,21 @@ namespace Manina.Windows.Forms
                             rt.Width = column.Width - 2 * offset.Width;
                             using (Brush bItemFore = new SolidBrush(ImageListView.Colors.CellForeColor))
                             {
+                                int iconOffset = 0;
+                                if (column.Type == ColumnType.Name)
+                                {
+                                    // Allocate space for checkbox and file icon
+                                    if (ImageListView.ShowCheckBoxes)
+                                        iconOffset += 16 + 2 * ImageListView.CheckBoxPadding.Width;
+                                    if (ImageListView.ShowFileIcons)
+                                        iconOffset += 16 + 2 * ImageListView.IconPadding.Width;
+                                }
+                                rt.X += iconOffset;
+                                rt.Width -= iconOffset;
+
                                 g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+
+                                rt.X -= iconOffset;
                             }
                             rt.X += column.Width;
                         }
@@ -980,6 +1003,30 @@ namespace Manina.Windows.Forms
                 {
                     ControlPaint.DrawFocusRectangle(g, bounds);
                 }
+            }
+            /// <summary>
+            /// Draws the checkbox icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the checkbox in client coordinates.</param>
+            public virtual void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                Size size = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal);
+                Point pt = new Point(bounds.X + (bounds.Width - size.Width) / 2, bounds.Y + (bounds.Height - size.Height) / 2);
+                CheckBoxState state = item.Checked ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
+                CheckBoxRenderer.DrawCheckBox(g, pt, state);
+            }
+            /// <summary>
+            /// Draws the file icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the file icon in client coordinates.</param>
+            public virtual void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                if (item.SmallIcon != null)
+                    g.DrawIcon(item.SmallIcon, bounds.Left + (bounds.Width - 16) / 2, bounds.Top + (bounds.Height - 16) / 2);
             }
             /// <summary>
             /// Draws the column headers.
