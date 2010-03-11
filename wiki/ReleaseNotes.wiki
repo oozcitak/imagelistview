@@ -13,7 +13,7 @@
   * Added file icons that can be displayed over items. (Issue 39, Issue 45, Issue 46) Contributed by Robby.
   * Added checkboxes to items. (Issue 40, Issue 46) Contributed by Robby.
   * Fixed a bug where the hovered item was not updated while scrolling with the mouse wheel. (Issue 42)
-  * Scrollbars large change property now calculated as a multiple of item height. (Issue 43)
+  * Scrollbars' large change property now calculated as a multiple of item height. (Issue 43)
 
 = 5.4 (03 March 2010) =
 
