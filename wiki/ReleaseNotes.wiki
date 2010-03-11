@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.1 (11 March 2010) =
+
+  * Added !CheckedItems property to !ImageListView to iterate checked items. (Issue 47)
+  * Added a new overload for the Items.Add method to provide an initial thumbnail for regular items (similar to virtual items). (Issue 49)
+  * Fixed an issue where checkbox and icon padding resulted in weird rendering in details view. (Issue 50)
+
 = 6.0 (10 March 2010) =
 
   * Added support for color themes. (Issue 37) Contributed by Robby.
