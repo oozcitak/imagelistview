@@ -274,6 +274,26 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
+            /// Draws the checkbox icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the checkbox in client coordinates.</param>
+            public override void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                ;
+            }
+            /// <summary>
+            /// Draws the file icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the file icon in client coordinates.</param>
+            public override void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                ;
+            }
+            /// <summary>
             /// Draws the column headers.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
@@ -951,7 +971,7 @@ namespace Manina.Windows.Forms
                         ControlPaint.DrawFocusRectangle(g, fRect);
                     }
                 }
-                else
+                else // if (ImageListView.View == Manina.Windows.Forms.View.Details)
                 {
                     if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
@@ -977,10 +997,24 @@ namespace Manina.Windows.Forms
                             rt.Width = column.Width - 2 * offset.Width;
                             using (Brush bItemFore = new SolidBrush(SystemColors.WindowText))
                             {
+                                int iconOffset = 0;
+                                if (column.Type == ColumnType.Name)
+                                {
+                                    // Allocate space for checkbox and file icon
+                                    if (ImageListView.ShowCheckBoxes)
+                                        iconOffset += 16 + 2 * ImageListView.CheckBoxPadding.Width;
+                                    if (ImageListView.ShowFileIcons)
+                                        iconOffset += 16 + 2 * ImageListView.IconPadding.Width;
+                                }
+                                rt.X += iconOffset;
+                                rt.Width -= iconOffset;
+
                                 if ((state & ItemState.Selected) == ItemState.None)
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+
+                                rt.X -= iconOffset;
                             }
                             rt.X += column.Width;
                         }
@@ -1463,6 +1497,28 @@ namespace Manina.Windows.Forms
                 }
                 else
                     base.DrawItem(g, item, state, bounds);
+            }
+            /// <summary>
+            /// Draws the checkbox icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the checkbox in client coordinates.</param>
+            public override void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                if (ImageListView.View == View.Details)
+                    base.DrawCheckBox(g, item, bounds);
+            }
+            /// <summary>
+            /// Draws the file icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the file icon in client coordinates.</param>
+            public override void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                if (ImageListView.View == View.Details)
+                    base.DrawFileIcon(g, item, bounds);
             }
         }
         #endregion
