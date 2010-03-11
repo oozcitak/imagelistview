@@ -198,32 +198,6 @@ namespace Manina.Windows.Forms
 
         #region Shell Utilities
         /// <summary>
-        /// Gets the file icon.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="largeIcon">If set to true returns the large icon, 
-        /// otherwise returns the small icon.</param>
-        internal static Image GetFileIcon(string fileName, bool largeIcon)
-        {
-            SHGFI flags = SHGFI.SmallIcon;
-
-            if (largeIcon)
-                flags = SHGFI.LargeIcon;
-
-            SHFILEINFO shinfo = new SHFILEINFO();
-            IntPtr hImgSmall = SHGetFileInfo(fileName, (FileAttributes)0, out shinfo,
-                (uint)Marshal.SizeOf(shinfo), SHGFI.Icon | flags);
-
-            if (hImgSmall == IntPtr.Zero)
-                return null;
-
-            Image icon = (Image)((Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone()).ToBitmap();
-
-            DestroyIcon(shinfo.hIcon);
-
-            return icon;
-        }
-        /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
         internal class ShellImageFileInfo
@@ -641,24 +615,6 @@ namespace Manina.Windows.Forms
                         sourceStream.Dispose();
                     source = null;
                     sourceStream = null;
-                }
-            }
-
-            // Get the shell icon if the source file is not an image file
-            if (source == null)
-            {
-                try
-                {
-                    bool large = false;
-                    if (size.Width > 32 || size.Height > 32)
-                        large = true;
-                    source = GetFileIcon(filename, large);
-                }
-                catch
-                {
-                    if (source != null)
-                        source.Dispose();
-                    source = null;
                 }
             }
 

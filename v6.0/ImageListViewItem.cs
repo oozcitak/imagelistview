@@ -119,11 +119,11 @@ namespace Manina.Windows.Forms
         [Category("Appearance"), Browsable(false), Description("Gets or sets a value determining if the item is checked."), DefaultValue(false)]
         public bool Checked
         {
-            get 
-            { 
-                return mChecked; 
+            get
+            {
+                return mChecked;
             }
-            set 
+            set
             {
                 if (value != mChecked)
                 {
@@ -202,6 +202,12 @@ namespace Manina.Windows.Forms
                     mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                 else
                     mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+
+                if (mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
+                    return mLargeIcon.ToBitmap();
+                else if (mSmallIcon != null)
+                    return mSmallIcon.ToBitmap();
+
                 return mImageListView.DefaultImage;
             }
         }
