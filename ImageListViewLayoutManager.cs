@@ -184,6 +184,81 @@ namespace Manina.Windows.Forms
             return rec;
         }
         /// <summary>
+        /// Returns the item checkbox bounds.
+        /// This method assumes a checkbox icon size of 16x16
+        /// </summary>
+        public Rectangle GetCheckBoxBounds(int itemIndex)
+        {
+            Rectangle bounds = GetWidgetBounds(GetItemBounds(itemIndex), new Size(16, 16),
+                mImageListView.CheckBoxPadding, mImageListView.CheckBoxAlignment);
+
+            // If the checkbox and the icon have the same alignment,
+            // move the checkbox horizontally away from the icon
+            if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
+            {
+                ContentAlignment alignment = mImageListView.CheckBoxAlignment;
+                if (alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.TopCenter)
+                    bounds.X -= 8 + mImageListView.IconPadding.Width / 2;
+                else if (alignment == ContentAlignment.BottomRight || alignment == ContentAlignment.MiddleRight || alignment == ContentAlignment.TopRight)
+                    bounds.X -= 16 + mImageListView.IconPadding.Width;
+            }
+
+            return bounds;
+        }
+        /// <summary>
+        /// Returns the item icon bounds.
+        /// This method assumes an icon size of 16x16
+        /// </summary>
+        public Rectangle GetIconBounds(int itemIndex)
+        {
+            Rectangle bounds = GetWidgetBounds(GetItemBounds(itemIndex), new Size(16, 16),
+                mImageListView.IconPadding, mImageListView.IconAlignment);
+
+            // If the checkbox and the icon have the same alignment,
+            // or in details view move the icon horizontally away from the checkbox
+            if (mImageListView.View == View.Details)
+                bounds.X += 16 + mImageListView.IconPadding.Width;
+            else if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
+            {
+                ContentAlignment alignment = mImageListView.CheckBoxAlignment;
+                if (alignment == ContentAlignment.BottomLeft || alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.TopLeft)
+                    bounds.X += 16 + mImageListView.IconPadding.Width;
+                else if (alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.TopCenter)
+                    bounds.X += 8 + mImageListView.IconPadding.Width / 2;
+            }
+
+            return bounds;
+        }
+        /// <summary>
+        /// Returns the bounds of a widget.
+        /// Used to calculate the bounds of checkboxes and icons.
+        /// </summary>
+        private Rectangle GetWidgetBounds(Rectangle bounds, Size size, Size padding, ContentAlignment alignment)
+        {
+            // Apply padding
+            bounds.Inflate(-padding.Width, -padding.Height);
+
+            int x = 0;
+            if (mImageListView.View == View.Details)
+                x = bounds.Left;
+            else if (alignment == ContentAlignment.BottomLeft || alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.TopLeft)
+                x = bounds.Left;
+            else if (alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.TopCenter)
+                x = bounds.Left + bounds.Width / 2 - size.Width / 2;
+            else // if (alignment == ContentAlignment.BottomRight || alignment == ContentAlignment.MiddleRight || alignment == ContentAlignment.TopRight)
+                x = bounds.Right - size.Width;
+
+            int y = 0;
+            if (alignment == ContentAlignment.BottomLeft || alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.BottomRight)
+                y = bounds.Bottom - size.Height;
+            else if (alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.MiddleRight)
+                y = bounds.Top + bounds.Height / 2 - size.Height / 2;
+            else // if (alignment == ContentAlignment.TopLeft || alignment == ContentAlignment.TopCenter || alignment == ContentAlignment.TopRight)
+                y = bounds.Top;
+
+            return new Rectangle(x, y, size.Width, size.Height);
+        }
+        /// <summary>
         /// Recalculates the control layout.
         /// </summary>
         public void Update()
@@ -313,7 +388,7 @@ namespace Manina.Windows.Forms
             if (mImageListView.View == View.Gallery)
             {
                 mImageListView.hScrollBar.SmallChange = mItemSizeWithMargin.Width;
-                mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
+                mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * (mItemAreaBounds.Width / mItemSizeWithMargin.Width);
                 mImageListView.hScrollBar.Minimum = 0;
                 mImageListView.hScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mRows) * mItemSizeWithMargin.Width - 1);
             }
@@ -341,7 +416,7 @@ namespace Manina.Windows.Forms
             else
             {
                 mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
-                mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
+                mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * (mItemAreaBounds.Height / mItemSizeWithMargin.Height);
                 mImageListView.vScrollBar.Minimum = 0;
                 mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
             }

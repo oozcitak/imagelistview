@@ -62,6 +62,13 @@ namespace Manina.Windows.Forms
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ItemClickEventHandler(object sender, ItemClickEventArgs e);
     /// <summary>
+    /// Represents the method that will handle the ItemCheckBoxClick event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A ItemEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void ItemCheckBoxClickEventHandler(object sender, ItemEventArgs e);
+    /// <summary>
     /// Represents the method that will handle the ItemHover event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
@@ -500,6 +507,14 @@ namespace Manina.Windows.Forms
         /// Gets the key of the virtual item.
         /// </summary>
         public object Key { get; private set; }
+        /// <summary>
+        /// Gets the small shell icon of the image file represented by this item.
+        /// </summary>
+        public Icon SmallIcon { get; set; }
+        /// <summary>
+        /// Gets the large shell icon of the image file represented by this item.
+        /// </summary>
+        public Icon LargeIcon { get; set; }
         /// <summary>
         /// Gets or sets the last access date of the image file represented by this item.
         /// </summary>

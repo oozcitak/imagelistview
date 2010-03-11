@@ -124,7 +124,7 @@ namespace Manina.Windows.Forms
                         }
                         mImageListView.itemCacheManager.Add(item);
                         if (item.Selected != oldSelected)
-                            mImageListView.OnSelectionChangedInternal();
+                            mImageListView.OnSelectionChanged(new EventArgs());
                     }
                 }
             }

@@ -42,6 +42,7 @@ namespace Manina.Windows.Forms
             private ImageListView mImageListView;
 
             private bool inItemArea;
+            private bool overCheckBox;
             private bool inHeaderArea;
             private bool inPaneArea;
 
@@ -58,6 +59,7 @@ namespace Manina.Windows.Forms
             private bool lastMouseDownInPaneArea;
 
             private bool lastMouseDownOverItem;
+            private bool lastMouseDownOverCheckBox;
             private bool lastMouseDownOverColumn;
             private bool lastMouseDownOverSeparator;
             private bool lastMouseDownOverPaneBorder;
@@ -216,6 +218,7 @@ namespace Manina.Windows.Forms
                 lastMouseDownInColumnHeaderArea = inHeaderArea;
                 lastMouseDownInPaneArea = inPaneArea;
                 lastMouseDownOverItem = (HoveredItem != null);
+                lastMouseDownOverCheckBox = overCheckBox;
                 lastMouseDownOverColumn = (HoveredColumn != null);
                 lastMouseDownOverSeparator = (HoveredSeparator != null);
                 lastMouseDownOverPaneBorder = HoveredPaneBorder;
@@ -516,6 +519,31 @@ namespace Manina.Windows.Forms
 
                     MouseSelecting = false;
 
+                    mImageListView.Refresh();
+                }
+                else if (lastMouseDownInItemArea && lastMouseDownOverCheckBox && HoveredItem != null && overCheckBox && LeftButton)
+                {
+                    Rectangle bounds = mImageListView.layoutManager.GetItemBounds(HoveredItem.Index);
+                    Rectangle checkBoxRec = mImageListView.layoutManager.GetCheckBoxBounds(HoveredItem.Index);
+
+                    if (HoveredItem.Selected)
+                    {
+                        // if multiple items selected and Hovered item among selected,
+                        // then give all selected check state !HoveredItem.Checked
+                        bool check = !HoveredItem.Checked;
+                        foreach (ImageListViewItem item in mImageListView.Items)
+                        {
+                            if (item.Selected)
+                                item.Checked = check;
+                        }
+                    }
+                    else
+                    {
+                        // if multiple items selected and HoveredItem NOT among selected,
+                        // or if only HoveredItem selected or hovered
+                        // then toggle HoveredItem.Checked
+                        HoveredItem.Checked = !HoveredItem.Checked;
+                    }
                     mImageListView.Refresh();
                 }
                 else if (lastMouseDownInItemArea && lastMouseDownOverItem && HoveredItem != null && LeftButton)
@@ -946,6 +974,7 @@ namespace Manina.Windows.Forms
                     HoveredPaneBorder = false;
 
                 inItemArea = h.InItemArea;
+                overCheckBox = h.CheckBoxHit;
                 inHeaderArea = h.InHeaderArea;
                 inPaneArea = h.InPaneArea;
             }

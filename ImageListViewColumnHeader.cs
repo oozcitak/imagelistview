@@ -228,6 +228,16 @@ namespace Manina.Windows.Forms
                     int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(Type), mImageListView.Font).Width;
                     width = System.Math.Max(width, itemwidth);
                 }
+
+                // Add space for checkboxes and file icon
+                if (mType == ColumnType.Name)
+                {
+                    if (mImageListView.ShowCheckBoxes)
+                        width += 16 + 2 * mImageListView.CheckBoxPadding.Width;
+                    if (mImageListView.ShowFileIcons)
+                        width += 16 + 2 * mImageListView.IconPadding.Width;
+                }
+
                 this.Width = width + 8;
                 mImageListView.Refresh();
             }
