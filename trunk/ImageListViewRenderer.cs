@@ -1,4 +1,4 @@
-﻿// ImageListView - A listview control for image files
+// ImageListView - A listview control for image files
 // Copyright (C) 2009 Ozgur Ozcitak
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 // Ozgur Ozcitak (ozcitak@yahoo.com)
+//
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using System.ComponentModel;
+using System.Windows.Forms.VisualStyles;
 
 namespace Manina.Windows.Forms
 {
@@ -503,7 +505,15 @@ namespace Manina.Windows.Forms
                         }
                         else
                             g.SetClip(mImageListView.layoutManager.ClientArea);
+
+                        // Draw the item
                         DrawItem(g, param.Item, param.State, param.Bounds);
+
+                        // Draw the checkbox and file icon
+                        if (ImageListView.ShowCheckBoxes)
+                            DrawCheckBox(g, param.Item, ImageListView.layoutManager.GetCheckBoxBounds(param.Item.Index));
+                        if (ImageListView.ShowFileIcons)
+                            DrawFileIcon(g, param.Item, ImageListView.layoutManager.GetIconBounds(param.Item.Index));
                     }
                 }
 
@@ -738,7 +748,7 @@ namespace Manina.Windows.Forms
             public virtual void DrawBackground(Graphics g, Rectangle bounds)
             {
                 // Clear the background
-                g.Clear(mImageListView.BackColor);
+                g.Clear(ImageListView.Colors.ControlBackColor);
 
                 // Draw the background image
                 if (ImageListView.BackgroundImage != null)
@@ -786,10 +796,11 @@ namespace Manina.Windows.Forms
             /// <param name="selection">The client coordinates of the selection rectangle.</param>
             public virtual void DrawSelectionRectangle(Graphics g, Rectangle selection)
             {
-                using (Brush bSelection = new SolidBrush(Color.FromArgb(128, SystemColors.Highlight)))
+                using (SolidBrush brush = new SolidBrush(ImageListView.Colors.SelectionRectangleColor1))
+                using (Pen pen = new Pen(ImageListView.Colors.SelectionRectangleBorderColor))
                 {
-                    g.FillRectangle(bSelection, selection);
-                    g.DrawRectangle(SystemPens.Highlight, selection);
+                    g.FillRectangle(brush, selection);
+                    g.DrawRectangle(pen, selection);
                 }
             }
             /// <summary>
@@ -804,28 +815,34 @@ namespace Manina.Windows.Forms
                 Size itemPadding = new Size(4, 4);
 
                 // Paint background
-                using (Brush bItemBack = new SolidBrush(item.BackColor))
+                using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
                 {
                     g.FillRectangle(bItemBack, bounds);
                 }
+
+                // Paint background Selected
                 if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
                     (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                 {
-                    using (Brush bSelected = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
+                    using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
                     {
                         Utility.FillRoundedRectangle(g, bSelected, bounds, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
+
+                // Paint background unfocused
                 else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
-                    using (Brush bGray64 = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.GrayText), Color.FromArgb(64, SystemColors.GrayText), LinearGradientMode.Vertical))
+                    using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.UnFocusedColor1, ImageListView.Colors.UnFocusedColor2, LinearGradientMode.Vertical))
                     {
                         Utility.FillRoundedRectangle(g, bGray64, bounds, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
+
+                // Paint background Hovered
                 if ((state & ItemState.Hovered) != ItemState.None)
                 {
-                    using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(8, SystemColors.Highlight), Color.FromArgb(32, SystemColors.Highlight), LinearGradientMode.Vertical))
+                    using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.HoverColor1, ImageListView.Colors.HoverColor2, LinearGradientMode.Vertical))
                     {
                         Utility.FillRoundedRectangle(g, bHovered, bounds, (mImageListView.View == View.Details ? 2 : 4));
                     }
@@ -842,15 +859,15 @@ namespace Manina.Windows.Forms
                         // Draw image border
                         if (Math.Min(pos.Width, pos.Height) > 32)
                         {
-                            using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                            using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
                             {
-                                g.DrawRectangle(pGray128, pos);
+                                g.DrawRectangle(pOuterBorder, pos);
                             }
                             if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
                             {
-                                using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                                using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                                 {
-                                    g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                                    g.DrawRectangle(pInnerBorder, Rectangle.Inflate(pos, -1, -1));
                                 }
                             }
                         }
@@ -866,7 +883,7 @@ namespace Manina.Windows.Forms
                         sf.FormatFlags = StringFormatFlags.NoWrap;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
-                        using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                        using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
                             g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
                         }
@@ -875,6 +892,7 @@ namespace Manina.Windows.Forms
                 else // if (mImageListView.View == View.Details)
                 {
                     List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
+
                     // Shade sort column
                     int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
                     foreach (ImageListViewColumnHeader column in uicolumns)
@@ -885,7 +903,7 @@ namespace Manina.Windows.Forms
                             Rectangle subItemBounds = bounds;
                             subItemBounds.X = x;
                             subItemBounds.Width = column.Width;
-                            using (Brush bGray16 = new SolidBrush(Color.FromArgb(16, SystemColors.GrayText)))
+                            using (Brush bGray16 = new SolidBrush(ImageListView.Colors.ColumnSelectColor))
                             {
                                 g.FillRectangle(bGray16, subItemBounds);
                             }
@@ -893,6 +911,7 @@ namespace Manina.Windows.Forms
                         }
                         x += column.Width;
                     }
+
                     // Separators 
                     x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
                     foreach (ImageListViewColumnHeader column in uicolumns)
@@ -900,7 +919,7 @@ namespace Manina.Windows.Forms
                         x += column.Width;
                         if (!ReferenceEquals(column, uicolumns[uicolumns.Count - 1]))
                         {
-                            using (Pen pGray32 = new Pen(Color.FromArgb(32, SystemColors.GrayText)))
+                            using (Pen pGray32 = new Pen(ImageListView.Colors.ColumnSeparatorColor))
                             {
                                 g.DrawLine(pGray32, x, bounds.Top, x, bounds.Bottom);
                             }
@@ -918,9 +937,23 @@ namespace Manina.Windows.Forms
                         foreach (ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
-                            using (Brush bItemFore = new SolidBrush(item.ForeColor))
+                            using (Brush bItemFore = new SolidBrush(ImageListView.Colors.CellForeColor))
                             {
+                                int iconOffset = 0;
+                                if (column.Type == ColumnType.Name)
+                                {
+                                    // Allocate space for checkbox and file icon
+                                    if (ImageListView.ShowCheckBoxes)
+                                        iconOffset += 16 + 2 * ImageListView.CheckBoxPadding.Width;
+                                    if (ImageListView.ShowFileIcons)
+                                        iconOffset += 16 + 2 * ImageListView.IconPadding.Width;
+                                }
+                                rt.X += iconOffset;
+                                rt.Width -= iconOffset;
+
                                 g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+
+                                rt.X -= iconOffset;
                             }
                             rt.X += column.Width;
                         }
@@ -928,27 +961,30 @@ namespace Manina.Windows.Forms
                 }
 
                 // Item border
-                using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                if (mImageListView.View != View.Details)
                 {
-                    Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, (mImageListView.View == View.Details ? 2 : 4));
+                    using (Pen pWhite128 = new Pen(Color.FromArgb(128, ImageListView.Colors.ControlBackColor)))
+                    {
+                        Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, (mImageListView.View == View.Details ? 2 : 4));
+                    }
                 }
                 if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
-                    using (Pen pHighlight128 = new Pen(Color.FromArgb(128, SystemColors.Highlight)))
+                    using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
                 else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
-                    using (Pen pGray128 = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
+                    using (Pen pGray128 = new Pen(ImageListView.Colors.UnFocusedBorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
                 else if (mImageListView.View == View.Thumbnails && (state & ItemState.Selected) == ItemState.None)
                 {
-                    using (Pen pGray64 = new Pen(Color.FromArgb(64, SystemColors.GrayText)))
+                    using (Pen pGray64 = new Pen(ImageListView.Colors.BorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pGray64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
@@ -956,7 +992,7 @@ namespace Manina.Windows.Forms
 
                 if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
                 {
-                    using (Pen pHighlight64 = new Pen(Color.FromArgb(64, SystemColors.Highlight)))
+                    using (Pen pHighlight64 = new Pen(ImageListView.Colors.HoverBorderColor))
                     {
                         Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
@@ -967,6 +1003,30 @@ namespace Manina.Windows.Forms
                 {
                     ControlPaint.DrawFocusRectangle(g, bounds);
                 }
+            }
+            /// <summary>
+            /// Draws the checkbox icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the checkbox in client coordinates.</param>
+            public virtual void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                Size size = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal);
+                Point pt = new Point(bounds.X + (bounds.Width - size.Width) / 2, bounds.Y + (bounds.Height - size.Height) / 2);
+                CheckBoxState state = item.Checked ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
+                CheckBoxRenderer.DrawCheckBox(g, pt, state);
+            }
+            /// <summary>
+            /// Draws the file icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the file icon in client coordinates.</param>
+            public virtual void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                if (item.SmallIcon != null)
+                    g.DrawIcon(item.SmallIcon, bounds.Left + (bounds.Width - 16) / 2, bounds.Top + (bounds.Height - 16) / 2);
             }
             /// <summary>
             /// Draws the column headers.
@@ -980,26 +1040,29 @@ namespace Manina.Windows.Forms
                 // Paint background
                 if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
-                    using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
+                    using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderHoverColor1, ImageListView.Colors.ColumnHeaderHoverColor2, LinearGradientMode.Vertical))
                     {
                         g.FillRectangle(bHovered, bounds);
                     }
                 }
                 else
                 {
-                    using (Brush bNormal = new LinearGradientBrush(bounds, Color.FromArgb(32, SystemColors.Control), Color.FromArgb(196, SystemColors.Control), LinearGradientMode.Vertical))
+                    using (Brush bNormal = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderBackColor1, ImageListView.Colors.ColumnHeaderBackColor2, LinearGradientMode.Vertical))
                     {
                         g.FillRectangle(bNormal, bounds);
                     }
                 }
-                using (Brush bBorder = new LinearGradientBrush(bounds, SystemColors.ControlLightLight, SystemColors.ControlDark, LinearGradientMode.Vertical))
+                using (Brush bBorder = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderBackColor2, ImageListView.Colors.ColumnHeaderBackColor1, LinearGradientMode.Vertical))
                 using (Pen pBorder = new Pen(bBorder))
                 {
                     g.DrawLine(pBorder, bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
                     g.DrawLine(pBorder, bounds.Left, bounds.Bottom - 1, bounds.Right, bounds.Bottom - 1);
                 }
-                g.DrawLine(SystemPens.ControlLightLight, bounds.Left + 1, bounds.Top + 1, bounds.Left + 1, bounds.Bottom - 2);
-                g.DrawLine(SystemPens.ControlLightLight, bounds.Right - 1, bounds.Top + 1, bounds.Right - 1, bounds.Bottom - 2);
+                using (Pen pSpep = new Pen(ImageListView.Colors.ColumnHeaderBackColor1))
+                {
+                    g.DrawLine(pSpep, bounds.Left + 1, bounds.Top + 1, bounds.Left + 1, bounds.Bottom - 2);
+                    g.DrawLine(pSpep, bounds.Right - 1, bounds.Top + 1, bounds.Right - 1, bounds.Bottom - 2);
+                }
 
                 // Draw the sort arrow
                 int textOffset = 4;
@@ -1010,8 +1073,11 @@ namespace Manina.Windows.Forms
                         img = ImageListViewResources.SortAscending;
                     else if (mImageListView.SortOrder == SortOrder.Descending)
                         img = ImageListViewResources.SortDescending;
-                    g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
-                    textOffset += img.Width;
+                    if (img != null)
+                    {
+                        g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
+                        textOffset += img.Width;
+                    }
                 }
 
                 // Text
@@ -1025,7 +1091,10 @@ namespace Manina.Windows.Forms
                         sf.Alignment = StringAlignment.Near;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
-                        g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), SystemBrushes.WindowText, bounds, sf);
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
+                        {
+                            g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), bText, bounds, sf);
+                        }
                     }
                 }
             }
@@ -1039,11 +1108,11 @@ namespace Manina.Windows.Forms
             public virtual void DrawPane(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
                 // Draw pane background
-                using (Brush bGray16 = new SolidBrush(Color.FromArgb(16, SystemColors.GrayText)))
+                using (Brush bGray16 = new SolidBrush(ImageListView.Colors.PaneBackColor))
                 {
                     g.FillRectangle(bGray16, bounds);
                 }
-                using (Brush bBorder = new SolidBrush(Color.FromArgb(128, SystemColors.GrayText)))
+                using (Brush bBorder = new SolidBrush(ImageListView.Colors.PaneSeparatorColor))
                 {
                     g.FillRectangle(bBorder, bounds.Right - 2, bounds.Top, 2, bounds.Height);
                 }
@@ -1059,11 +1128,11 @@ namespace Manina.Windows.Forms
                     // Draw image border
                     if (Math.Min(pos.Width, pos.Height) > 32)
                     {
-                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                        using (Pen pGray128 = new Pen(ImageListView.Colors.ImageOuterBorderColor))
                         {
                             g.DrawRectangle(pGray128, pos);
                         }
-                        using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
+                        using (Pen pWhite128 = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                         {
                             g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
                         }
@@ -1076,19 +1145,26 @@ namespace Manina.Windows.Forms
                     // Item text
                     if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
-                        int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font,
-                            SystemBrushes.GrayText, SystemBrushes.WindowText);
-                        bounds.Y += 2 * y;
-                        bounds.Height -= 2 * y;
+                        using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
+                        {
+                            int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font, bLabel, bText);
+                            bounds.Y += 2 * y;
+                            bounds.Height -= 2 * y;
+                        }
                     }
 
                     // File type
                     if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
-                        int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
-                            item.FileType, mImageListView.Font, SystemBrushes.GrayText, SystemBrushes.WindowText);
-                        bounds.Y += y;
-                        bounds.Height -= y;
+                        using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
+                        {
+                            int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
+                                item.FileType, mImageListView.Font, bLabel, bText);
+                            bounds.Y += y;
+                            bounds.Height -= y;
+                        }
                     }
 
                     // Metatada
@@ -1113,10 +1189,14 @@ namespace Manina.Windows.Forms
                             string text = item.GetSubItemText(column.Type);
                             if (!string.IsNullOrEmpty(text))
                             {
-                                int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
-                                    mImageListView.Font, SystemBrushes.GrayText, SystemBrushes.WindowText);
-                                bounds.Y += y;
-                                bounds.Height -= y;
+                                using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                                using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
+                                {
+                                    int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
+                                        mImageListView.Font, bLabel, bText);
+                                    bounds.Y += y;
+                                    bounds.Height -= y;
+                                }
                             }
                         }
                     }
@@ -1141,13 +1221,11 @@ namespace Manina.Windows.Forms
                     // Draw image border
                     if (Math.Min(pos.Width, pos.Height) > 32)
                     {
-                        using (Pen pGray128 = new Pen(Color.FromArgb(128, Color.Gray)))
+                        using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
+                        using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                         {
-                            g.DrawRectangle(pGray128, pos);
-                        }
-                        using (Pen pWhite128 = new Pen(Color.FromArgb(128, Color.White)))
-                        {
-                            g.DrawRectangle(pWhite128, Rectangle.Inflate(pos, -1, -1));
+                            g.DrawRectangle(pOuterBorder, pos);
+                            g.DrawRectangle(pInnerBorder, Rectangle.Inflate(pos, -1, -1));
                         }
                     }
                 }
@@ -1160,18 +1238,20 @@ namespace Manina.Windows.Forms
             public virtual void DrawColumnExtender(Graphics g, Rectangle bounds)
             {
                 // Paint background
-                using (Brush bBack = new LinearGradientBrush(bounds, Color.FromArgb(32, SystemColors.Control), Color.FromArgb(196, SystemColors.Control), LinearGradientMode.Vertical))
+                using (Brush bBack = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderBackColor1, ImageListView.Colors.ColumnHeaderBackColor2, LinearGradientMode.Vertical))
                 {
                     g.FillRectangle(bBack, bounds);
                 }
-                using (Brush bBorder = new LinearGradientBrush(bounds, SystemColors.ControlLightLight, SystemColors.ControlDark, LinearGradientMode.Vertical))
+                using (Brush bBorder = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderBackColor2, ImageListView.Colors.ColumnHeaderBackColor1, LinearGradientMode.Vertical))
                 using (Pen pBorder = new Pen(bBorder))
                 {
                     g.DrawLine(pBorder, bounds.Left, bounds.Top, bounds.Left, bounds.Bottom);
                     g.DrawLine(pBorder, bounds.Left, bounds.Bottom - 1, bounds.Right, bounds.Bottom - 1);
                 }
-                g.DrawLine(SystemPens.ControlLightLight, bounds.Left + 1, bounds.Top + 1, bounds.Left + 1, bounds.Bottom - 2);
-                g.DrawLine(SystemPens.ControlLightLight, bounds.Right - 1, bounds.Top + 1, bounds.Right - 1, bounds.Bottom - 2);
+                using (Pen pSpep = new Pen(ImageListView.Colors.ColumnHeaderBackColor1))
+                {
+                    g.DrawLine(pSpep, bounds.Left + 1, bounds.Top + 1, bounds.Left + 1, bounds.Bottom - 2);
+                }
             }
             /// <summary>
             /// Draws the insertion caret for drag and drop operations.
@@ -1180,7 +1260,7 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the insertion caret.</param>
             public virtual void DrawInsertionCaret(Graphics g, Rectangle bounds)
             {
-                using (Brush b = new SolidBrush(SystemColors.Highlight))
+                using (Brush b = new SolidBrush(ImageListView.Colors.InsertionCaretColor))
                 {
                     g.FillRectangle(b, bounds);
                 }

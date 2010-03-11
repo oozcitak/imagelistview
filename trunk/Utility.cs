@@ -198,41 +198,27 @@ namespace Manina.Windows.Forms
 
         #region Shell Utilities
         /// <summary>
-        /// Gets the file icon.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="largeIcon">If set to true returns the large icon, 
-        /// otherwise returns the small icon.</param>
-        internal static Image GetFileIcon(string fileName, bool largeIcon)
-        {
-            SHGFI flags = SHGFI.SmallIcon;
-
-            if (largeIcon)
-                flags = SHGFI.LargeIcon;
-
-            SHFILEINFO shinfo = new SHFILEINFO();
-            IntPtr hImgSmall = SHGetFileInfo(fileName, (FileAttributes)0, out shinfo,
-                (uint)Marshal.SizeOf(shinfo), SHGFI.Icon | flags);
-
-            if (hImgSmall == IntPtr.Zero)
-                return null;
-
-            Image icon = (Image)((Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone()).ToBitmap();
-
-            DestroyIcon(shinfo.hIcon);
-
-            return icon;
-        }
-        /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
         internal class ShellImageFileInfo
         {
-            private static Dictionary<string, string> cachedFileTypes;
+            /// <summary>
+            /// Represents the results of the SHGetFileInfo function.
+            /// </summary>
+            private struct CachedFileType
+            {
+                public string TypeName;
+                public Icon SmallIcon;
+                public Icon LargeIcon;
+            }
+
+            private static Dictionary<string, CachedFileType> cachedFileTypes;
             private uint structSize = 0;
 
             public bool Error { get; private set; }
             public FileAttributes FileAttributes { get; private set; }
+            public Icon SmallIcon { get; private set; }
+            public Icon LargeIcon { get; private set; }
             public DateTime CreationTime { get; private set; }
             public DateTime LastAccessTime { get; private set; }
             public DateTime LastWriteTime { get; private set; }
@@ -259,7 +245,7 @@ namespace Manina.Windows.Forms
             public ShellImageFileInfo(string path)
             {
                 if (cachedFileTypes == null)
-                    cachedFileTypes = new Dictionary<string, string>();
+                    cachedFileTypes = new Dictionary<string, CachedFileType>();
 
                 try
                 {
@@ -273,16 +259,39 @@ namespace Manina.Windows.Forms
                     DisplayName = info.Name;
                     Extension = info.Extension;
 
-                    string typeName;
-                    if (!cachedFileTypes.TryGetValue(Extension, out typeName))
+                    CachedFileType fileType;
+                    if (!cachedFileTypes.TryGetValue(Extension, out fileType))
                     {
                         SHFILEINFO shinfo = new SHFILEINFO();
                         if (structSize == 0) structSize = (uint)Marshal.SizeOf(shinfo);
-                        SHGetFileInfo(path, (FileAttributes)0, out shinfo, structSize, SHGFI.TypeName);
-                        typeName = shinfo.szTypeName;
-                        cachedFileTypes.Add(Extension, typeName);
+
+                        // Get the small icon and shell file type
+                        IntPtr hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                            structSize, SHGFI.TypeName | SHGFI.Icon | SHGFI.SmallIcon);
+
+                        fileType.TypeName = shinfo.szTypeName;
+
+                        if (hImg != IntPtr.Zero)
+                        {
+                            fileType.SmallIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                            DestroyIcon(shinfo.hIcon);
+                        }
+
+                        // Get the large icon
+                        hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                            structSize, SHGFI.Icon | SHGFI.LargeIcon);
+
+                        if (hImg != IntPtr.Zero)
+                        {
+                            fileType.LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                            DestroyIcon(shinfo.hIcon);
+                        }
+
+                        cachedFileTypes.Add(Extension, fileType);
                     }
-                    TypeName = typeName;
+                    TypeName = fileType.TypeName;
+                    SmallIcon = fileType.SmallIcon;
+                    LargeIcon = fileType.LargeIcon;
                     using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
                     {
                         using (Image img = Image.FromStream(stream, false, false))
@@ -606,24 +615,6 @@ namespace Manina.Windows.Forms
                         sourceStream.Dispose();
                     source = null;
                     sourceStream = null;
-                }
-            }
-
-            // Get the shell icon if the source file is not an image file
-            if (source == null)
-            {
-                try
-                {
-                    bool large = false;
-                    if (size.Width > 32 || size.Height > 32)
-                        large = true;
-                    source = GetFileIcon(filename, large);
-                }
-                catch
-                {
-                    if (source != null)
-                        source.Dispose();
-                    source = null;
                 }
             }
 

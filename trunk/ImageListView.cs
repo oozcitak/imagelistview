@@ -1,4 +1,4 @@
-﻿// ImageListView - A listview control for image files
+// ImageListView - A listview control for image files
 // Copyright (C) 2009 Ozgur Ozcitak
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +68,7 @@ namespace Manina.Windows.Forms
         private CacheMode mCacheMode;
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
+        private ImageListViewColor mColors;
         private ImageListViewColumnHeaderCollection mColumns;
         private Image mDefaultImage;
         private Image mErrorImage;
@@ -79,6 +80,12 @@ namespace Manina.Windows.Forms
         internal ImageListViewSelectedItemCollection mSelectedItems;
         private ColumnType mSortColumn;
         private SortOrder mSortOrder;
+        private bool mShowFileIcons;
+        private bool mShowCheckBoxes;
+        private ContentAlignment mIconAlignment;
+        private Size mIconPadding;
+        private ContentAlignment mCheckBoxAlignment;
+        private Size mCheckBoxPadding;
         private Size mThumbnailSize;
         private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
         private View mView;
@@ -130,7 +137,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color of the control.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color of the control."), DefaultValue(typeof(Color), "Window")]
-        public override Color BackColor { get { return base.BackColor; } set { base.BackColor = value; Refresh(); } }
+        public override Color BackColor { get { return mColors.ControlBackColor; } set { mColors.ControlBackColor = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the border style of the control.
         /// </summary>
@@ -200,6 +207,20 @@ namespace Manina.Windows.Forms
                     throw new ArgumentException("Cache limit must be specified as either the count of thumbnail images or the memory allocated for cache (eg 10MB)", "value");
             }
         }
+        /// <summary>
+        /// Gets or sets the color palette of the ImageListView.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the color palette of the ImageListView.")]
+        public ImageListViewColor Colors
+        {
+            get { return mColors; }
+            set
+            {
+                mColors = value;
+                Refresh();
+            }
+        }
+
         /// <summary>
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
@@ -296,6 +317,60 @@ namespace Manina.Windows.Forms
         [Browsable(false), Category("Behavior"), Description("Gets the collection of selected items contained in the image list view.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public ImageListViewSelectedItemCollection SelectedItems { get { return mSelectedItems; } }
+        /// <summary>
+        /// Gets or sets whether to display the file icons.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets whether to display the file icons."), DefaultValue(false)]
+        public bool ShowFileIcons
+        {
+            get { return mShowFileIcons; }
+            set { mShowFileIcons = value; Refresh(); }
+        }
+        /// <summary>
+        /// Gets or sets whether to display the item checkboxes.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets whether to display the item checkboxes."), DefaultValue(false)]
+        public bool ShowCheckBoxes
+        {
+            get { return mShowCheckBoxes; }
+            set { mShowCheckBoxes = value; Refresh(); }
+        }
+        /// <summary>
+        /// Gets or sets alignment of file icons.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets alignment of file icons."), DefaultValue(ContentAlignment.TopRight)]
+        public ContentAlignment IconAlignment
+        {
+            get { return mIconAlignment; }
+            set { mIconAlignment = value; Refresh(); }
+        }
+        /// <summary>
+        /// Gets or sets file icon padding.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets file icon padding."), DefaultValue(typeof(Size), "2,2")]
+        public Size IconPadding
+        {
+            get { return mIconPadding; }
+            set { mIconPadding = value; Refresh(); }
+        }
+        /// <summary>
+        /// Gets or sets alignment of item checkboxes.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets alignment of item checkboxes."), DefaultValue(ContentAlignment.BottomRight)]
+        public ContentAlignment CheckBoxAlignment
+        {
+            get { return mCheckBoxAlignment; }
+            set { mCheckBoxAlignment = value; Refresh(); }
+        }
+        /// <summary>
+        /// Gets or sets item checkbox padding.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets item checkbox padding."), DefaultValue(typeof(Size), "2,2")]
+        public Size CheckBoxPadding
+        {
+            get { return mCheckBoxPadding; }
+            set { mCheckBoxPadding = value; Refresh(); }
+        }
         /// <summary>
         /// Gets or sets the sort column.
         /// </summary>
@@ -435,6 +510,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ImageListView()
         {
+            mColors = new ImageListViewColor();
             SetRenderer(new ImageListViewRenderer());
 
             AllowColumnClick = true;
@@ -442,7 +518,6 @@ namespace Manina.Windows.Forms
             AllowDrag = false;
             AllowDuplicateFileNames = false;
             AllowPaneResize = true;
-            BackColor = SystemColors.Window;
             mBorderStyle = BorderStyle.Fixed3D;
             mCacheMode = CacheMode.OnDemand;
             mCacheLimitAsItemCount = 0;
@@ -463,6 +538,12 @@ namespace Manina.Windows.Forms
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
             ScrollBars = true;
+            mShowCheckBoxes = false;
+            mCheckBoxAlignment = ContentAlignment.BottomRight;
+            mCheckBoxPadding = new Size(2, 2);
+            mShowFileIcons = false;
+            mIconAlignment = ContentAlignment.TopRight;
+            mIconPadding = new Size(2, 2);
             Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
@@ -643,6 +724,7 @@ namespace Manina.Windows.Forms
             else
             {
                 int itemIndex = -1;
+                bool checkBoxHit = false;
 
                 // Normalize to item area coordinates
                 pt.X -= layoutManager.ItemAreaBounds.Left;
@@ -662,11 +744,17 @@ namespace Manina.Windows.Forms
                             Rectangle bounds = layoutManager.GetItemBounds(index);
                             if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
                                 itemIndex = index;
+                            if (ShowCheckBoxes)
+                            {
+                                Rectangle checkBoxBounds = layoutManager.GetCheckBoxBounds(index);
+                                if (checkBoxBounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                                    checkBoxHit = true;
+                            }
                         }
                     }
                 }
 
-                hitInfo = new HitInfo(itemIndex);
+                hitInfo = new HitInfo(itemIndex, checkBoxHit);
             }
         }
         /// <summary>
@@ -953,6 +1041,7 @@ namespace Manina.Windows.Forms
                 hScrollBar.Value = newXOffset;
             }
 
+            navigationManager.MouseMove(e);
             Refresh(true);
             mRenderer.ResumePaint();
 
@@ -1125,6 +1214,23 @@ namespace Manina.Windows.Forms
                 ItemClick(this, e);
         }
         /// <summary>
+        /// Raises the ItemCheckBoxClick event.
+        /// </summary>
+        /// <param name="e">A ItemEventArgs that contains event data.</param>
+        protected virtual void OnItemCheckBoxClick(ItemEventArgs e)
+        {
+            if (ItemCheckBoxClick != null)
+                ItemCheckBoxClick(this, e);
+        }
+        /// <summary>
+        /// Raises the ItemCheckBoxClick event.
+        /// </summary>
+        /// <param name="item">The checked item.</param>
+        internal virtual void OnItemCheckBoxClickInternal(ImageListViewItem item)
+        {
+            OnItemCheckBoxClick(new ItemEventArgs(item));
+        }
+        /// <summary>
         /// Raises the ItemHover event.
         /// </summary>
         /// <param name="e">A ItemClickEventArgs that contains event data.</param>
@@ -1294,6 +1400,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Action"), Browsable(true), Description("Occurs when the user clicks an item.")]
         public event ItemClickEventHandler ItemClick;
+        /// <summary>
+        /// Occurs when the user clicks an item checkbox.
+        /// </summary>
+        [Category("Action"), Browsable(true), Description("Occurs when the user clicks an item checkbox.")]
+        public event ItemCheckBoxClickEventHandler ItemCheckBoxClick;
         /// <summary>
         /// Occurs when the user moves the mouse over (and out of) an item.
         /// </summary>
