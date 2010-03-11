@@ -5,3 +5,5 @@ Contributors to ImageListView
  * Robby 
    - Thumbnail extraction fallback with shell icons
    - Theming support with the ImageListViewColor class.
+   - Checkboxes for imagelistview items.
+   - File icons for imagelistview items.
