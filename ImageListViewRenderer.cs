@@ -1,4 +1,4 @@
-// ImageListView - A listview control for image files
+﻿// ImageListView - A listview control for image files
 // Copyright (C) 2009 Ozgur Ozcitak
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -943,10 +943,12 @@ namespace Manina.Windows.Forms
                                 if (column.Type == ColumnType.Name)
                                 {
                                     // Allocate space for checkbox and file icon
-                                    if (ImageListView.ShowCheckBoxes)
-                                        iconOffset += 16 + 2 * ImageListView.CheckBoxPadding.Width;
-                                    if (ImageListView.ShowFileIcons)
-                                        iconOffset += 16 + 2 * ImageListView.IconPadding.Width;
+                                    if (ImageListView.ShowCheckBoxes && ImageListView.ShowFileIcons)
+                                        iconOffset += 2 * 16 + 3 * 2;
+                                    else if (ImageListView.ShowCheckBoxes)
+                                        iconOffset += 16 + 2 * 2;
+                                    else if (ImageListView.ShowFileIcons)
+                                        iconOffset += 16 + 2 * 2;
                                 }
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;
@@ -1013,9 +1015,10 @@ namespace Manina.Windows.Forms
             public virtual void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
             {
                 Size size = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal);
-                Point pt = new Point(bounds.X + (bounds.Width - size.Width) / 2, bounds.Y + (bounds.Height - size.Height) / 2);
+                PointF pt = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
+                    (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
                 CheckBoxState state = item.Checked ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
-                CheckBoxRenderer.DrawCheckBox(g, pt, state);
+                CheckBoxRenderer.DrawCheckBox(g, Point.Round(pt), state);
             }
             /// <summary>
             /// Draws the file icon for the specified item on the given graphics.
@@ -1026,7 +1029,13 @@ namespace Manina.Windows.Forms
             public virtual void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
             {
                 if (item.SmallIcon != null)
-                    g.DrawIcon(item.SmallIcon, bounds.Left + (bounds.Width - 16) / 2, bounds.Top + (bounds.Height - 16) / 2);
+                {
+                    Size size = item.SmallIcon.Size;
+                    PointF ptf = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
+                        (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
+                    Point pt = Point.Round(ptf);
+                    g.DrawIcon(item.SmallIcon, pt.X, pt.Y);
+                }
             }
             /// <summary>
             /// Draws the column headers.

@@ -1,4 +1,4 @@
-// ImageListView - A listview control for image files
+﻿// ImageListView - A listview control for image files
 // Copyright (C) 2009 Ozgur Ozcitak
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,6 +78,7 @@ namespace Manina.Windows.Forms
         internal ImageListViewRenderer mRenderer;
         private bool mRetryOnError;
         internal ImageListViewSelectedItemCollection mSelectedItems;
+        internal ImageListViewCheckedItemCollection mCheckedItems;
         private ColumnType mSortColumn;
         private SortOrder mSortOrder;
         private bool mShowFileIcons;
@@ -318,6 +319,12 @@ namespace Manina.Windows.Forms
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public ImageListViewSelectedItemCollection SelectedItems { get { return mSelectedItems; } }
         /// <summary>
+        /// Gets the collection of checked items contained in the image list view.
+        /// </summary>
+        [Browsable(false), Category("Behavior"), Description("Gets the collection of checked items contained in the image list view.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public ImageListViewCheckedItemCollection CheckedItems { get { return mCheckedItems; } }
+        /// <summary>
         /// Gets or sets whether to display the file icons.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets whether to display the file icons."), DefaultValue(false)]
@@ -533,6 +540,7 @@ namespace Manina.Windows.Forms
             mPaneWidth = 240;
             mRetryOnError = true;
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
+            mCheckedItems = new ImageListViewCheckedItemCollection(this);
             mSortColumn = ColumnType.Name;
             mSortOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |

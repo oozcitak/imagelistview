@@ -194,7 +194,7 @@ namespace Manina.Windows.Forms
 
             // If the checkbox and the icon have the same alignment,
             // move the checkbox horizontally away from the icon
-            if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
+            if (mImageListView.View != View.Details && mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
             {
                 ContentAlignment alignment = mImageListView.CheckBoxAlignment;
                 if (alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.TopCenter)
@@ -217,7 +217,7 @@ namespace Manina.Windows.Forms
             // If the checkbox and the icon have the same alignment,
             // or in details view move the icon horizontally away from the checkbox
             if (mImageListView.View == View.Details)
-                bounds.X += 16 + mImageListView.IconPadding.Width;
+                bounds.X += 16 + 2;
             else if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
             {
                 ContentAlignment alignment = mImageListView.CheckBoxAlignment;
@@ -236,7 +236,10 @@ namespace Manina.Windows.Forms
         private Rectangle GetWidgetBounds(Rectangle bounds, Size size, Size padding, ContentAlignment alignment)
         {
             // Apply padding
-            bounds.Inflate(-padding.Width, -padding.Height);
+            if (mImageListView.View == View.Details)
+                bounds.Inflate(-2, -2);
+            else
+                bounds.Inflate(-padding.Width, -padding.Height);
 
             int x = 0;
             if (mImageListView.View == View.Details)
@@ -249,7 +252,9 @@ namespace Manina.Windows.Forms
                 x = bounds.Right - size.Width;
 
             int y = 0;
-            if (alignment == ContentAlignment.BottomLeft || alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.BottomRight)
+            if (mImageListView.View == View.Details)
+                y = bounds.Top + bounds.Height / 2 - size.Height / 2;
+            else if (alignment == ContentAlignment.BottomLeft || alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.BottomRight)
                 y = bounds.Bottom - size.Height;
             else if (alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.MiddleRight)
                 y = bounds.Top + bounds.Height / 2 - size.Height / 2;
