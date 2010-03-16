@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.2 (16 March 2010) =
+
+  * Fixed a bug where virtual items could not be inserted if !AllowDuplicateFileNames was set to true. (Issue 51)
+
 = 6.1 (11 March 2010) =
 
   * Added !CheckedItems property to !ImageListView to iterate checked items. (Issue 47)
