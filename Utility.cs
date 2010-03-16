@@ -21,7 +21,6 @@ using System.Drawing;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
-using System.Reflection;
 using System.Drawing.Imaging;
 using System.Text;
 

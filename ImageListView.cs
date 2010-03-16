@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 using System.ComponentModel.Design.Serialization;
 using System.Resources;
 using System.Reflection;

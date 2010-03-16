@@ -21,8 +21,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Threading;
-using System.ComponentModel;
 using System.Windows.Forms.VisualStyles;
 
 namespace Manina.Windows.Forms
