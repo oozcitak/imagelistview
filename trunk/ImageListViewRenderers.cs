@@ -1001,10 +1001,12 @@ namespace Manina.Windows.Forms
                                 if (column.Type == ColumnType.Name)
                                 {
                                     // Allocate space for checkbox and file icon
-                                    if (ImageListView.ShowCheckBoxes)
-                                        iconOffset += 16 + 2 * ImageListView.CheckBoxPadding.Width;
-                                    if (ImageListView.ShowFileIcons)
-                                        iconOffset += 16 + 2 * ImageListView.IconPadding.Width;
+                                    if (ImageListView.ShowCheckBoxes && ImageListView.ShowFileIcons)
+                                        iconOffset += 2 * 16 + 3 * 2;
+                                    else if (ImageListView.ShowCheckBoxes)
+                                        iconOffset += 16 + 2 * 2;
+                                    else if (ImageListView.ShowFileIcons)
+                                        iconOffset += 16 + 2 * 2;
                                 }
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;

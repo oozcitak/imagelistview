@@ -232,10 +232,12 @@ namespace Manina.Windows.Forms
                 // Add space for checkboxes and file icon
                 if (mType == ColumnType.Name)
                 {
-                    if (mImageListView.ShowCheckBoxes)
-                        width += 16 + 2 * mImageListView.CheckBoxPadding.Width;
-                    if (mImageListView.ShowFileIcons)
-                        width += 16 + 2 * mImageListView.IconPadding.Width;
+                    if (ImageListView.ShowCheckBoxes && ImageListView.ShowFileIcons)
+                        width += 2 * 16 + 3 * 2;
+                    else if (ImageListView.ShowCheckBoxes)
+                        width += 16 + 2 * 2;
+                    else if (ImageListView.ShowFileIcons)
+                        width += 16 + 2 * 2;
                 }
 
                 this.Width = width + 8;

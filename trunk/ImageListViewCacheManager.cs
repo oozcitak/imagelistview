@@ -481,6 +481,56 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Adds the image to the cache queue.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="filename">Filesystem path to the image file.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="thumb">Thumbnail image to add to cache.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        public void Add(Guid guid, string filename, Size thumbSize, Image thumb,
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            lock (lockObject)
+            {
+                // Already cached?
+                CacheItem item = null;
+                if (thumbCache.TryGetValue(guid, out item))
+                {
+                    if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                        return;
+                    else
+                    {
+                        item.Dispose();
+                        thumbCache.Remove(guid);
+                    }
+                }
+                // Add to cache
+                thumbCache.Add(guid, new CacheItem(guid, filename, thumbSize,
+                    Utility.ThumbnailFromImage(thumb, thumbSize),
+                    CacheState.Cached));
+            }
+
+            try
+            {
+                if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                {
+                    mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                        mImageListView.OnThumbnailCachedInternal), guid, false);
+                    mImageListView.Invoke(new RefreshDelegateInternal(
+                        mImageListView.OnRefreshInternal));
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                if (!Stopping) throw;
+            }
+            catch (InvalidOperationException)
+            {
+                if (!Stopping) throw;
+            }
+        }
+        /// <summary>
         /// Adds a virtual item to the cache queue.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
