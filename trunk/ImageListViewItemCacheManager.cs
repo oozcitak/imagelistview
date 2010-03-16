@@ -15,11 +15,9 @@
 //
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Threading;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Manina.Windows.Forms
 {
