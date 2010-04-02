@@ -156,7 +156,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the user-defined data associated with the item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets or sets the user-defined data associated with the item.")]
+        [Category("Data"), Browsable(false), Description("Gets or sets the user-defined data associated with the item."), TypeConverter(typeof(StringConverter))]
         public object Tag { get; set; }
         /// <summary>
         /// Gets or sets the text associated with this item. If left blank, item Text 
@@ -214,42 +214,42 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the draw order of the item.
         /// </summary>
-        [Category("Appearance"), Browsable(true), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
+        [Category("Appearance"), Browsable(false), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
         public int ZOrder { get { return mZOrder; } set { mZOrder = value; } }
         /// <summary>
         /// Gets the small shell icon of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the small shell icon of the image file represented by this item.")]
+        [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
         public Icon SmallIcon { get { UpdateFileInfo(); return mSmallIcon; } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the large shell icon of the image file represented by this item.")]
+        [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
         public Icon LargeIcon { get { UpdateFileInfo(); return mLargeIcon; } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the last access date of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the last access date of the image file represented by this item.")]
         public DateTime DateAccessed { get { UpdateFileInfo(); return mDateAccessed; } }
         /// <summary>
         /// Gets the creation date of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the creation date of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the creation date of the image file represented by this item.")]
         public DateTime DateCreated { get { UpdateFileInfo(); return mDateCreated; } }
         /// <summary>
         /// Gets the modification date of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the modification date of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the modification date of the image file represented by this item.")]
         public DateTime DateModified { get { UpdateFileInfo(); return mDateModified; } }
         /// <summary>
         /// Gets the shell type of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the shell type of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the shell type of the image file represented by this item.")]
         public string FileType { get { UpdateFileInfo(); return mFileType; } }
         /// <summary>
         /// Gets or sets the name of the image file represented by this item.
         /// </summary>        
-        [Category("Data"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
         public string FileName
         {
             get
@@ -277,77 +277,77 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the path of the image file represented by this item.
         /// </summary>        
-        [Category("Data"), Browsable(true), Description("Gets the path of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the path of the image file represented by this item.")]
         public string FilePath { get { UpdateFileInfo(); return mFilePath; } }
         /// <summary>
         /// Gets file size in bytes.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets file size in bytes.")]
+        [Category("File Properties"), Browsable(true), Description("Gets file size in bytes.")]
         public long FileSize { get { UpdateFileInfo(); return mFileSize; } }
         /// <summary>
         /// Gets image dimensions.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image dimensions.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image dimensions.")]
         public Size Dimensions { get { UpdateFileInfo(); return mDimensions; } }
         /// <summary>
         /// Gets image resolution in pixels per inch.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image resolution in pixels per inch.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image resolution in pixels per inch.")]
         public SizeF Resolution { get { UpdateFileInfo(); return mResolution; } }
         /// <summary>
         /// Gets image description.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image description.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image description.")]
         public string ImageDescription { get { UpdateFileInfo(); return mImageDescription; } }
         /// <summary>
         /// Gets the camera model.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the camera model.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the camera model.")]
         public string EquipmentModel { get { UpdateFileInfo(); return mEquipmentModel; } }
         /// <summary>
         /// Gets the date and time the image was taken.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the date and time the image was taken.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets the date and time the image was taken.")]
         public DateTime DateTaken { get { UpdateFileInfo(); return mDateTaken; } }
         /// <summary>
         /// Gets the name of the artist.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the name of the artist.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets the name of the artist.")]
         public string Artist { get { UpdateFileInfo(); return mArtist; } }
         /// <summary>
         /// Gets image copyright information.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image copyright information.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image copyright information.")]
         public string Copyright { get { UpdateFileInfo(); return mCopyright; } }
         /// <summary>
         /// Gets the exposure time in seconds.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the exposure time in seconds.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the exposure time in seconds.")]
         public string ExposureTime { get { UpdateFileInfo(); return mExposureTime; } }
         /// <summary>
         /// Gets the F number.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the F number.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the F number.")]
         public float FNumber { get { UpdateFileInfo(); return mFNumber; } }
         /// <summary>
         /// Gets the ISO speed.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the ISO speed.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the ISO speed.")]
         public ushort ISOSpeed { get { UpdateFileInfo(); return mISOSpeed; } }
         /// <summary>
         /// Gets the shutter speed.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the shutter speed.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the shutter speed.")]
         public string ShutterSpeed { get { UpdateFileInfo(); return mShutterSpeed; } }
         /// <summary>
         /// Gets the lens aperture value.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the lens aperture value.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the lens aperture value.")]
         public string Aperture { get { UpdateFileInfo(); return mAperture; } }
         /// <summary>
         /// Gets user comments.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets user comments.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets user comments.")]
         public string UserComment { get { UpdateFileInfo(); return mUserComment; } }
         #endregion
 
