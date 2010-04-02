@@ -192,7 +192,14 @@ namespace Manina.Windows.Forms
 
                 CacheState state = ThumbnailCacheState;
                 if (state == CacheState.Error)
-                    return mImageListView.ErrorImage;
+                {
+                    if (mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
+                        return mLargeIcon.ToBitmap();
+                    else if (mSmallIcon != null)
+                        return mSmallIcon.ToBitmap();
+                    else
+                        return mImageListView.ErrorImage;
+                }
 
                 Image img = mImageListView.cacheManager.GetImage(Guid);
                 if (img != null)
