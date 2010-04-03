@@ -160,7 +160,7 @@ namespace Manina.Windows.Forms
         /// Represents the Exif tag for date and time the picture 
         /// was taken.
         /// </summary>        
-        private const int PropertyTagDateTime = 0x0132;
+        private const int PropertyTagDateTimeOriginal = 0x9003;
         /// <summary>
         /// Represents the Exif tag for the artist.
         /// </summary>
@@ -308,7 +308,7 @@ namespace Manina.Windows.Forms
                                     case PropertyTagEquipmentModel:
                                         EquipmentModel = ReadExifAscii(prop.Value);
                                         break;
-                                    case PropertyTagDateTime:
+                                    case PropertyTagDateTimeOriginal:
                                         DateTaken = ReadExifDateTime(prop.Value);
                                         break;
                                     case PropertyTagArtist:
