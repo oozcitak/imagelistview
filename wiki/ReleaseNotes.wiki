@@ -4,7 +4,7 @@
 = 6.3 (03 April 2010) =
 
   * Public properties of !ImageListViewItem are now properly categorized. (Issue 60)
-  * Fixed an issue where the wrong exif tag was read for the !DateTaken property. The Exif DateTime tag was being read instead of DateTimeOriginal. (Issue 62)
+  * Fixed an issue where the wrong exif tag was read for the !DateTaken property. The Exif !DateTime tag was being read instead of !DateTimeOriginal. (Issue 62)
 
 = 6.2 (16 March 2010) =
 
