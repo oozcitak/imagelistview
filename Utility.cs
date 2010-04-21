@@ -279,7 +279,7 @@ namespace Manina.Windows.Forms
                     // Get the large icon
                     hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
                         structSize, SHGFI.Icon | SHGFI.LargeIcon);
-
+                    
                     if (hImg != IntPtr.Zero)
                     {
                         LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();

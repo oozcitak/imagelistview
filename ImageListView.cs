@@ -1048,7 +1048,6 @@ namespace Manina.Windows.Forms
                 hScrollBar.Value = newXOffset;
             }
 
-            System.Diagnostics.Debug.Print("w:" + e.Location.Y.ToString());
             OnMouseMove(e);
             Refresh(true);
             mRenderer.ResumePaint();
