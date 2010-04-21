@@ -89,9 +89,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Image Image { get { return mImage; } }
             /// <summary>
-            /// Gets the state of the cache item.
+            /// Gets or sets the state of the cache item.
             /// </summary>
-            public CacheState State { get { return mState; } }
+            public CacheState State { get { return mState; } set { mState = value; } }
             /// <summary>
             /// Gets embedded thumbnail extraction behavior.
             /// </summary>
@@ -381,6 +381,19 @@ namespace Manina.Windows.Forms
             return CacheState.Unknown;
         }
         /// <summary>
+        /// Rebuilds the thumbnail cache.
+        /// Old thumbnails will be kept until they are overwritten
+        /// by new ones.
+        /// </summary>
+        public void Rebuild()
+        {
+            lock (lockObject)
+            {
+                foreach (CacheItem item in thumbCache.Values)
+                    item.State = CacheState.Unknown;
+            }
+        }
+        /// <summary>
         /// Clears the thumbnail cache.
         /// </summary>
         public void Clear()
@@ -468,11 +481,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 toCache.Push(new CacheItem(guid, filename,
@@ -499,11 +507,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, filename, thumbSize,
@@ -548,11 +551,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 toCache.Push(new CacheItem(guid, key, thumbSize, null,
@@ -579,11 +577,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
@@ -797,8 +790,6 @@ namespace Manina.Windows.Forms
                             {
                                 if (existing.Size == request.Size)
                                     request = null;
-                                else
-                                    thumbCache.Remove(guid);
                             }
                         }
                         else if (rendererToCache.Count != 0)
@@ -909,7 +900,12 @@ namespace Manina.Windows.Forms
                             {
                                 lock (lockObject)
                                 {
-                                    thumbCache.Remove(guid);
+                                    CacheItem existing = null;
+                                    if (thumbCache.TryGetValue(guid, out existing))
+                                    {
+                                        existing.Dispose();
+                                        thumbCache.Remove(guid);
+                                    }
                                     thumbCache.Add(guid, result);
 
                                     if (thumb != null)
