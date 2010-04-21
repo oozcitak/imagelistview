@@ -265,8 +265,8 @@ namespace Manina.Windows.Forms
 
                     if (!fileTypeCached)
                     {
-                        cachedFileTypes.Add(Extension, fileType);
                         fileType = shinfo.szTypeName;
+                        cachedFileTypes.Add(Extension, fileType);
                     }
                     TypeName = fileType;
 
