@@ -435,7 +435,7 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
-                    cacheManager.Clear();
+                    cacheManager.Rebuild();
                     Refresh();
                 }
             }
@@ -455,7 +455,7 @@ namespace Manina.Windows.Forms
                 if (mUseEmbeddedThumbnails != value)
                 {
                     mUseEmbeddedThumbnails = value;
-                    cacheManager.Clear();
+                    cacheManager.Rebuild();
                     Refresh();
                 }
             }
