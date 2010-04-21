@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.4 (21 April 2010) =
+
+  * !ImageListView now tries to guess the image format before attempting to load images. (Issue 61)
+  * When changing the thumbnail size property of the control, old thumbnails will no longer be cleared immediately. They will be replaced after new thumbnails are created.  (Issue 64)
+  * Shell icons are no longer cached per file extension, they are read for every item in the control. (Issue 65)
+
 = 6.3 (03 April 2010) =
 
   * Public properties of !ImageListViewItem are now properly categorized. (Issue 60)
