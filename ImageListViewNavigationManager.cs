@@ -1032,12 +1032,9 @@ namespace Manina.Windows.Forms
             private void scrollTimer_Tick(object sender, EventArgs e)
             {
                 int delta = (int)scrollTimer.Tag;
-                if (MouseSelecting)
-                {
-                    Point location = mImageListView.PointToClient(Control.MousePosition);
-                    mImageListView.OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
-                }
-                mImageListView.OnMouseWheel(new MouseEventArgs(MouseButtons.None, 0, 0, 0, delta));
+                Point location = mImageListView.PointToClient(Control.MousePosition);
+                mImageListView.OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
+                mImageListView.OnMouseWheel(new MouseEventArgs(MouseButtons.None, 0, location.X, location.Y, delta));
             }
             #endregion
         }
