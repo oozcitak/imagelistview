@@ -201,17 +201,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         internal class ShellImageFileInfo
         {
-            /// <summary>
-            /// Represents the results of the SHGetFileInfo function.
-            /// </summary>
-            private struct CachedFileType
-            {
-                public string TypeName;
-                public Icon SmallIcon;
-                public Icon LargeIcon;
-            }
-
-            private static Dictionary<string, CachedFileType> cachedFileTypes;
+            private static Dictionary<string, string> cachedFileTypes;
             private uint structSize = 0;
 
             public bool Error { get; private set; }
@@ -244,7 +234,7 @@ namespace Manina.Windows.Forms
             public ShellImageFileInfo(string path)
             {
                 if (cachedFileTypes == null)
-                    cachedFileTypes = new Dictionary<string, CachedFileType>();
+                    cachedFileTypes = new Dictionary<string, string>();
 
                 try
                 {
@@ -258,83 +248,91 @@ namespace Manina.Windows.Forms
                     DisplayName = info.Name;
                     Extension = info.Extension;
 
-                    CachedFileType fileType;
+                    SHFILEINFO shinfo = new SHFILEINFO();
+                    if (structSize == 0) structSize = (uint)Marshal.SizeOf(shinfo);
+                    SHGFI flags = SHGFI.Icon | SHGFI.SmallIcon;
+
+                    string fileType = string.Empty;
+                    bool fileTypeCached = false;
                     if (!cachedFileTypes.TryGetValue(Extension, out fileType))
+                        flags |= SHGFI.TypeName;
+                    else
+                        fileTypeCached = true;
+
+                    // Get the small icon and shell file type
+                    IntPtr hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                        structSize, flags);
+
+                    if (!fileTypeCached)
                     {
-                        SHFILEINFO shinfo = new SHFILEINFO();
-                        if (structSize == 0) structSize = (uint)Marshal.SizeOf(shinfo);
-
-                        // Get the small icon and shell file type
-                        IntPtr hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
-                            structSize, SHGFI.TypeName | SHGFI.Icon | SHGFI.SmallIcon);
-
-                        fileType.TypeName = shinfo.szTypeName;
-
-                        if (hImg != IntPtr.Zero)
-                        {
-                            fileType.SmallIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
-                            DestroyIcon(shinfo.hIcon);
-                        }
-
-                        // Get the large icon
-                        hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
-                            structSize, SHGFI.Icon | SHGFI.LargeIcon);
-
-                        if (hImg != IntPtr.Zero)
-                        {
-                            fileType.LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
-                            DestroyIcon(shinfo.hIcon);
-                        }
-
                         cachedFileTypes.Add(Extension, fileType);
+                        fileType = shinfo.szTypeName;
                     }
-                    TypeName = fileType.TypeName;
-                    SmallIcon = fileType.SmallIcon;
-                    LargeIcon = fileType.LargeIcon;
+                    TypeName = fileType;
+
+                    if (hImg != IntPtr.Zero)
+                    {
+                        SmallIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                        DestroyIcon(shinfo.hIcon);
+                    }
+
+                    // Get the large icon
+                    hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                        structSize, SHGFI.Icon | SHGFI.LargeIcon);
+
+                    if (hImg != IntPtr.Zero)
+                    {
+                        LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                        DestroyIcon(shinfo.hIcon);
+                    }
+
                     using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
                     {
-                        using (Image img = Image.FromStream(stream, false, false))
+                        if (IsImage(stream))
                         {
-                            Dimensions = img.Size;
-                            Resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
-                            // Read exif properties
-                            foreach (PropertyItem prop in img.PropertyItems)
+                            using (Image img = Image.FromStream(stream, false, false))
                             {
-                                switch (prop.Id)
+                                Dimensions = img.Size;
+                                Resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
+                                // Read exif properties
+                                foreach (PropertyItem prop in img.PropertyItems)
                                 {
-                                    case PropertyTagImageDescription:
-                                        ImageDescription = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagEquipmentModel:
-                                        EquipmentModel = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagDateTimeOriginal:
-                                        DateTaken = ReadExifDateTime(prop.Value);
-                                        break;
-                                    case PropertyTagArtist:
-                                        Artist = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagCopyright:
-                                        Copyright = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagExposureTime:
-                                        ExposureTime = ReadExifURational(prop.Value);
-                                        break;
-                                    case PropertyTagFNumber:
-                                        FNumber = ReadExifFloat(prop.Value);
-                                        break;
-                                    case PropertyTagISOSpeed:
-                                        ISOSpeed = ReadExifUShort(prop.Value);
-                                        break;
-                                    case PropertyTagShutterSpeed:
-                                        ShutterSpeed = ReadExifRational(prop.Value);
-                                        break;
-                                    case PropertyTagAperture:
-                                        ApertureValue = ReadExifURational(prop.Value);
-                                        break;
-                                    case PropertyTagUserComment:
-                                        UserComment = ReadExifAscii(prop.Value);
-                                        break;
+                                    switch (prop.Id)
+                                    {
+                                        case PropertyTagImageDescription:
+                                            ImageDescription = ReadExifAscii(prop.Value);
+                                            break;
+                                        case PropertyTagEquipmentModel:
+                                            EquipmentModel = ReadExifAscii(prop.Value);
+                                            break;
+                                        case PropertyTagDateTimeOriginal:
+                                            DateTaken = ReadExifDateTime(prop.Value);
+                                            break;
+                                        case PropertyTagArtist:
+                                            Artist = ReadExifAscii(prop.Value);
+                                            break;
+                                        case PropertyTagCopyright:
+                                            Copyright = ReadExifAscii(prop.Value);
+                                            break;
+                                        case PropertyTagExposureTime:
+                                            ExposureTime = ReadExifURational(prop.Value);
+                                            break;
+                                        case PropertyTagFNumber:
+                                            FNumber = ReadExifFloat(prop.Value);
+                                            break;
+                                        case PropertyTagISOSpeed:
+                                            ISOSpeed = ReadExifUShort(prop.Value);
+                                            break;
+                                        case PropertyTagShutterSpeed:
+                                            ShutterSpeed = ReadExifRational(prop.Value);
+                                            break;
+                                        case PropertyTagAperture:
+                                            ApertureValue = ReadExifURational(prop.Value);
+                                            break;
+                                        case PropertyTagUserComment:
+                                            UserComment = ReadExifAscii(prop.Value);
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -580,10 +578,17 @@ namespace Manina.Windows.Forms
                 throw new ArgumentException();
 
             // Check if this is an image file
-            using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+            try
             {
-                if (!IsImage(stream))
-                    return null;
+                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                {
+                    if (!IsImage(stream))
+                        return null;
+                }
+            }
+            catch
+            {
+                return null;
             }
 
             Image source = null;

@@ -198,7 +198,6 @@ namespace Manina.Windows.Forms
         {
             while (!Stopping)
             {
-
                 CacheItem item = null;
                 lock (lockObject)
                 {
