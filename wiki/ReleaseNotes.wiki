@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.5 (21 April 2010) =
+
+  * Fixed a bug where file types were not being cached after the first item. (Issue 66)
+  * Fixed a bug where moving the mouse to the edges of the control resulted in the selection rectangle to jump to the top.  (Issue 67)
+
 = 6.4 (21 April 2010) =
 
   * !ImageListView now tries to guess the image format before attempting to load images. (Issue 61)
