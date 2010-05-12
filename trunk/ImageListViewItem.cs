@@ -149,7 +149,10 @@ namespace Manina.Windows.Forms
                 {
                     mSelected = value;
                     if (mImageListView != null)
+                    {
                         mImageListView.OnSelectionChangedInternal();
+                        mImageListView.Refresh();
+                    }
                 }
             }
         }
