@@ -545,6 +545,7 @@ namespace Manina.Windows.Forms
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
             ScrollBars = true;
+            Size = new Size(120, 100);
             mShowCheckBoxes = false;
             mCheckBoxAlignment = ContentAlignment.BottomRight;
             mCheckBoxPadding = new Size(2, 2);
@@ -908,7 +909,6 @@ namespace Manina.Windows.Forms
         {
             base.OnCreateControl();
 
-            Size = new Size(120, 100);
             if (!Controls.Contains(hScrollBar))
             {
                 Controls.Add(hScrollBar);
