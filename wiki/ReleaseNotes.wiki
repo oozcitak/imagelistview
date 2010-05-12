@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.6 (12 May 2010) =
+
+  * Fixed a bug where changing the Selected property of items did not refresh the control. (Issue 68)
+  * Fixed a bug where switching between designer and run-time resized the control to its initial size. (Issue 70)
+
 = 6.5 (21 April 2010) =
 
   * Fixed a bug where file types were not being cached after the first item. (Issue 66)
