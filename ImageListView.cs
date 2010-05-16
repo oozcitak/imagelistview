@@ -260,10 +260,15 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets whether scrollbars scroll by an amount which is a multiple of item height.
+        /// </summary>
+        [Browsable(true), Category("Behavior"), Description("Gets or sets whether scrollbars scroll by an amount which is a multiple of item height."), DefaultValue(true)]
+        public bool IntegralScroll { get; set; }
+        /// <summary>
         /// Gets the collection of items contained in the image list view.
         /// </summary>
         [Browsable(false), Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
-        public ImageListView.ImageListViewItemCollection Items { get { return mItems; } }
+        public ImageListViewItemCollection Items { get { return mItems; } }
         /// <summary>
         /// Gets or sets whether multiple items can be selected.
         /// </summary>
@@ -533,6 +538,7 @@ namespace Manina.Windows.Forms
             mDefaultImage = manager.GetObject("DefaultImage") as Image;
             mErrorImage = manager.GetObject("ErrorImage") as Image;
             HeaderFont = this.Font;
+            IntegralScroll = true;
             mItems = new ImageListViewItemCollection(this);
             MultiSelect = true;
             mPaneWidth = 240;
