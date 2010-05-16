@@ -92,8 +92,8 @@ namespace Manina.Windows.Forms
         private Point mViewOffset;
 
         // Layout variables
-        internal System.Windows.Forms.HScrollBar hScrollBar;
-        internal System.Windows.Forms.VScrollBar vScrollBar;
+        internal HScrollBar hScrollBar;
+        internal VScrollBar vScrollBar;
         internal ImageListViewLayoutManager layoutManager;
         private bool disposed;
         private bool forceRefresh;
@@ -492,8 +492,6 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the required creation parameters when the control handle is created.
         /// </summary>
-        /// <value></value>
-        /// <returns>A CreateParams that contains the required creation parameters.</returns>
         protected override CreateParams CreateParams
         {
             get
@@ -519,6 +517,7 @@ namespace Manina.Windows.Forms
             mColors = new ImageListViewColor();
             SetRenderer(new ImageListViewRenderer());
 
+            // Property defaults
             AllowColumnClick = true;
             AllowColumnResize = true;
             AllowDrag = false;
@@ -556,14 +555,19 @@ namespace Manina.Windows.Forms
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
             mView = View.Thumbnails;
-
             mViewOffset = new Point(0, 0);
+
+            // Child controls
             hScrollBar = new HScrollBar();
             vScrollBar = new VScrollBar();
             hScrollBar.Visible = false;
             vScrollBar.Visible = false;
             hScrollBar.Scroll += new ScrollEventHandler(hScrollBar_Scroll);
             vScrollBar.Scroll += new ScrollEventHandler(vScrollBar_Scroll);
+            Controls.Add(hScrollBar);
+            Controls.Add(vScrollBar);
+
+            // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
             forceRefresh = false;
 
@@ -903,19 +907,6 @@ namespace Manina.Windows.Forms
 
         #region Event Handlers
         /// <summary>
-        /// Handles the CreateControl event.
-        /// </summary>
-        protected override void OnCreateControl()
-        {
-            base.OnCreateControl();
-
-            if (!Controls.Contains(hScrollBar))
-            {
-                Controls.Add(hScrollBar);
-                Controls.Add(vScrollBar);
-            }
-        }
-        /// <summary>
         /// Handles the DragOver event.
         /// </summary>
         protected override void OnDragOver(DragEventArgs e)
@@ -974,10 +965,9 @@ namespace Manina.Windows.Forms
             if (!disposed && mRenderer != null)
                 mRenderer.RecreateBuffer();
 
-            if (hScrollBar == null)
-                return;
+            if (hScrollBar != null && layoutManager != null)
+                layoutManager.Update();
 
-            layoutManager.Update();
             Refresh();
         }
         /// <summary>
