@@ -46,6 +46,7 @@ namespace Manina.Windows.Forms
         private int cachedItemCount;
         private Size cachedItemSize;
         private int cachedHeaderHeight;
+        private bool cachedIntegralScroll;
         private Size cachedItemMargin;
         private int cachedPaneWidth;
         private bool cachedScrollBars;
@@ -128,6 +129,8 @@ namespace Manina.Windows.Forms
                 else if (mImageListView.PaneWidth != cachedPaneWidth)
                     return true;
                 else if (mImageListView.ScrollBars != cachedScrollBars)
+                    return true;
+                else if (mImageListView.IntegralScroll != cachedIntegralScroll)
                     return true;
                 else
                     return false;
@@ -281,6 +284,7 @@ namespace Manina.Windows.Forms
             cachedViewOffset = mImageListView.ViewOffset;
             cachedSize = mImageListView.ClientSize;
             cachedItemCount = mImageListView.Items.Count;
+            cachedIntegralScroll = mImageListView.IntegralScroll;
             cachedItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
             cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
             cachedItemMargin = mImageListView.mRenderer.MeasureItemMargin(mImageListView.View);
@@ -387,12 +391,15 @@ namespace Manina.Windows.Forms
                 Update(true);
                 return;
             }
-            
+
             // Horizontal scroll range
             if (mImageListView.View == View.Gallery)
             {
                 mImageListView.hScrollBar.SmallChange = mItemSizeWithMargin.Width;
-                mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * (mItemAreaBounds.Width / mItemSizeWithMargin.Width);
+                if (!mImageListView.IntegralScroll)
+                    mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
+                else
+                    mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * (mItemAreaBounds.Width / mItemSizeWithMargin.Width);
                 mImageListView.hScrollBar.Minimum = 0;
                 mImageListView.hScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mRows) * mItemSizeWithMargin.Width - 1);
             }
@@ -420,7 +427,10 @@ namespace Manina.Windows.Forms
             else
             {
                 mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
-                mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * (mItemAreaBounds.Height / mItemSizeWithMargin.Height);
+                if (!mImageListView.IntegralScroll)
+                    mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
+                else 
+                    mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * (mItemAreaBounds.Height / mItemSizeWithMargin.Height);
                 mImageListView.vScrollBar.Minimum = 0;
                 mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
             }
@@ -441,7 +451,7 @@ namespace Manina.Windows.Forms
                 mImageListView.vScrollBar.Value = 0;
                 mImageListView.ViewOffset = new Point(0, 0);
             }
-            
+
             // Horizontal scrollbar position
             mImageListView.hScrollBar.Left = 0;
             mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom - mImageListView.hScrollBar.Height;
