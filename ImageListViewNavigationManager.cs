@@ -747,6 +747,7 @@ namespace Manina.Windows.Forms
                         }
                         mImageListView.Items.FocusedItem = mImageListView.Items[newindex];
                         mImageListView.EnsureVisible(newindex);
+                        mImageListView.Refresh();
                     }
                 }
 

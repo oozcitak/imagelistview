@@ -387,7 +387,7 @@ namespace Manina.Windows.Forms
                 Update(true);
                 return;
             }
-
+            
             // Horizontal scroll range
             if (mImageListView.View == View.Gallery)
             {
@@ -441,7 +441,7 @@ namespace Manina.Windows.Forms
                 mImageListView.vScrollBar.Value = 0;
                 mImageListView.ViewOffset = new Point(0, 0);
             }
-
+            
             // Horizontal scrollbar position
             mImageListView.hScrollBar.Left = 0;
             mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom - mImageListView.hScrollBar.Height;

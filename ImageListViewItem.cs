@@ -151,7 +151,8 @@ namespace Manina.Windows.Forms
                     if (mImageListView != null)
                     {
                         mImageListView.OnSelectionChangedInternal();
-                        mImageListView.Refresh();
+                        if (mImageListView.IsItemVisible(mGuid))
+                            mImageListView.Refresh();
                     }
                 }
             }
@@ -175,7 +176,7 @@ namespace Manina.Windows.Forms
             set
             {
                 mText = value;
-                if (mImageListView != null)
+                if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
                     mImageListView.Refresh();
             }
         }
@@ -220,7 +221,7 @@ namespace Manina.Windows.Forms
                     mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
 
                 if (img != null)
-                    return img; 
+                    return img;
                 else if (mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16 && mLargeIcon != null)
                     return mLargeIcon.ToBitmap();
                 else if (mSmallIcon != null)
@@ -286,7 +287,8 @@ namespace Manina.Windows.Forms
                         {
                             mImageListView.cacheManager.Remove(Guid);
                             mImageListView.itemCacheManager.Add(this);
-                            mImageListView.Refresh();
+                            if (mImageListView.IsItemVisible(mGuid))
+                                mImageListView.Refresh();
                         }
                     }
                 }
