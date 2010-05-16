@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.7 (17 May 2010) =
+
+  * Fixed a bug where scrollbars were not created with the control. (Issue 71)
+  * Added the !IntegralScroll property to the control. When set to true, the scrollbars' large change property will be calculated as a multiple of item height. This however, has a slightly unpleasant side effect of the item area of the control sized somewhat larger than the minimum required. Setting !IntegralScroll to false prevents this.
+
 = 6.6 (12 May 2010) =
 
   * Fixed a bug where changing the Selected property of items did not refresh the control. (Issue 68)
