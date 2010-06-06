@@ -205,11 +205,7 @@ namespace Manina.Windows.Forms
                 {
                     // Wait until we have items waiting to be cached
                     if (toCache.Count == 0)
-                    {
-                        sw.Stop();
-                        sw.Reset();
                         Monitor.Wait(lockObject);
-                    }
 
                     sw.Start();
                     // Get an item from the queue
