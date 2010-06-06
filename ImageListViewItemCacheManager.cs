@@ -196,6 +196,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void DoWork()
         {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+
             while (!Stopping)
             {
                 CacheItem item = null;
@@ -203,8 +205,13 @@ namespace Manina.Windows.Forms
                 {
                     // Wait until we have items waiting to be cached
                     if (toCache.Count == 0)
+                    {
+                        sw.Stop();
+                        sw.Reset();
                         Monitor.Wait(lockObject);
+                    }
 
+                    sw.Start();
                     // Get an item from the queue
                     if (toCache.Count != 0)
                     {
@@ -253,6 +260,44 @@ namespace Manina.Windows.Forms
                             }
                         }
                     }
+                }
+
+                // Check if the cache is exhausted
+                bool queueFull = true;
+                lock (lockObject)
+                {
+                    if (toCache.Count == 0)
+                        queueFull = false;
+                }
+
+                // Do we need a refresh?
+                sw.Stop();
+                if (!queueFull || sw.ElapsedMilliseconds > 100)
+                {
+                    try
+                    {
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        {
+                            mImageListView.Invoke(new RefreshDelegateInternal(
+                                mImageListView.OnRefreshInternal));
+                        }
+                        sw.Reset();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        if (!Stopping) throw;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        if (!Stopping) throw;
+                    }
+                }
+                if (queueFull)
+                    sw.Start();
+                else
+                {
+                    sw.Stop();
+                    sw.Reset();
                 }
             }
 

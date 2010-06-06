@@ -971,8 +971,8 @@ namespace Manina.Windows.Forms
                         sw.Start();
                     else
                     {
-                        sw.Reset();
                         sw.Stop();
+                        sw.Reset();
                     }
                 }
 
