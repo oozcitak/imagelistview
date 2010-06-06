@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.8 (07 June 2010) =
+
+  * Fixed a bug where multiple items could be selected with the shift/ctrl+mouse even when the !MultiSelect property was set to false. (Issue 72)
+  * Fixed a bug where the control was not refreshed after reading shell icons for non-image files. (Issue 73)
+  * Added the ShellIconFallback property to disable the display of shell icons in place of thumbnails. (Issue 74)
+
 = 6.7 (17 May 2010) =
 
   * Fixed a bug where scrollbars were not created with the control. (Issue 71)
