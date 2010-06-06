@@ -547,7 +547,18 @@ namespace Manina.Windows.Forms
                 else if (lastMouseDownInItemArea && lastMouseDownOverItem && HoveredItem != null && LeftButton)
                 {
                     // Select the item under the cursor
-                    if (ControlKey)
+                    if (!mImageListView.MultiSelect && ControlKey)
+                    {
+                        bool oldSelected = HoveredItem.Selected;
+                        mImageListView.SelectedItems.Clear(false);
+                        HoveredItem.mSelected = !oldSelected;
+                    }
+                    else if (!mImageListView.MultiSelect)
+                    {
+                        mImageListView.SelectedItems.Clear(false);
+                        HoveredItem.mSelected = true;
+                    }
+                    else if (ControlKey)
                     {
                         HoveredItem.mSelected = !HoveredItem.mSelected;
                     }
