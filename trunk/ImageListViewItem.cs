@@ -223,9 +223,9 @@ namespace Manina.Windows.Forms
 
                 if (img != null)
                     return img;
-                else if (mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16 && mLargeIcon != null)
+                else if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16 && mLargeIcon != null)
                     return mLargeIcon.ToBitmap();
-                else if (mSmallIcon != null)
+                else if (mImageListView.ShellIconFallback && mSmallIcon != null)
                     return mSmallIcon.ToBitmap();
                 else
                     return mImageListView.DefaultImage;
