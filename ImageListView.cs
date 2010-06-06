@@ -71,6 +71,8 @@ namespace Manina.Windows.Forms
         private ImageListViewColumnHeaderCollection mColumns;
         private Image mDefaultImage;
         private Image mErrorImage;
+        private Image mRatingImage;
+        private Image mEmptyRatingImage;
         private Font mHeaderFont;
         private ImageListViewItemCollection mItems;
         private int mPaneWidth;
@@ -294,6 +296,16 @@ namespace Manina.Windows.Forms
                 }
             }
         }
+        /// <summary>
+        /// Gets or sets the rating image.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the rating image.")]
+        public Image RatingImage { get { return mRatingImage; } set { mRatingImage = value; Refresh(); } }
+        /// <summary>
+        /// Gets or sets the empty rating image.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the empty rating image.")]
+        public Image EmptyRatingImage { get { return mEmptyRatingImage; } set { mEmptyRatingImage = value; Refresh(); } }
         /// <summary>
         /// Gets or sets whether the control will retry loading thumbnails on an error.
         /// </summary>
@@ -537,6 +549,8 @@ namespace Manina.Windows.Forms
                 Assembly.GetExecutingAssembly());
             mDefaultImage = manager.GetObject("DefaultImage") as Image;
             mErrorImage = manager.GetObject("ErrorImage") as Image;
+            mRatingImage = manager.GetObject("RatingImage") as Image;
+            mEmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
             HeaderFont = this.Font;
             IntegralScroll = true;
             mItems = new ImageListViewItemCollection(this);

@@ -223,10 +223,18 @@ namespace Manina.Windows.Forms
                     throw new InvalidOperationException("Cannot calculate column width. Owner image list view is null.");
 
                 int width = 0;
-                foreach (ImageListViewItem item in mImageListView.Items)
+                if (mType == ColumnType.Rating)
                 {
-                    int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(Type), mImageListView.Font).Width;
-                    width = System.Math.Max(width, itemwidth);
+                    if (mImageListView.RatingImage != null)
+                        width = mImageListView.RatingImage.Width * 5;
+                }
+                else
+                {
+                    foreach (ImageListViewItem item in mImageListView.Items)
+                    {
+                        int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(Type), mImageListView.Font).Width;
+                        width = System.Math.Max(width, itemwidth);
+                    }
                 }
 
                 // Add space for checkboxes and file icon

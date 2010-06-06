@@ -107,6 +107,7 @@ namespace Manina.Windows.Forms
                     new ImageListViewColumnHeader(ColumnType.ShutterSpeed),
                     new ImageListViewColumnHeader(ColumnType.Aperture),
                     new ImageListViewColumnHeader(ColumnType.UserComment),
+                    new ImageListViewColumnHeader(ColumnType.Rating),
                };
                 for (int i = 0; i < mItems.Length; i++)
                 {

@@ -193,6 +193,14 @@ namespace Manina.Windows.Forms
         /// Represents the Exif tag for user comments.
         /// </summary>
         private const int PropertyTagUserComment = 0x9286;
+        /// <summary>
+        /// Represents the Exif tag for rating between 1-5 (Windows specific).
+        /// </summary>
+        private const int PropertyTagRating = 0x4746;
+        /// <summary>
+        /// Represents the Exif tag for rating between 1-99 (Windows specific).
+        /// </summary>
+        private const int PropertyTagRatingPercent = 0x4749;
         #endregion
 
         #region Shell Utilities
@@ -230,6 +238,8 @@ namespace Manina.Windows.Forms
             public string ShutterSpeed { get; private set; }
             public string ApertureValue { get; private set; }
             public string UserComment { get; private set; }
+            public ushort Rating { get; private set; }
+            public ushort RatingPercent { get; private set; }
 
             public ShellImageFileInfo(string path)
             {
@@ -331,6 +341,12 @@ namespace Manina.Windows.Forms
                                             break;
                                         case PropertyTagUserComment:
                                             UserComment = ReadExifAscii(prop.Value);
+                                            break;
+                                        case PropertyTagRating:
+                                            Rating = ReadExifUShort(prop.Value);
+                                            break;
+                                        case PropertyTagRatingPercent:
+                                            RatingPercent = ReadExifUShort(prop.Value);
                                             break;
                                     }
                                 }

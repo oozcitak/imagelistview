@@ -60,6 +60,7 @@ namespace Manina.Windows.Forms
         private string mShutterSpeed;
         private string mAperture;
         private string mUserComment;
+        private ushort mRating;
         // Used for virtual items
         internal bool isVirtualItem;
         internal object mVirtualItemKey;
@@ -369,6 +370,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Image Properties"), Browsable(true), Description("Gets user comments.")]
         public string UserComment { get { UpdateFileInfo(); return mUserComment; } }
+        /// <summary>
+        /// Gets rating in percent (Windows specific).
+        /// </summary>
+        [Category("Image Properties"), Browsable(true), Description("Gets rating in percent.")]
+        public ushort Rating { get { UpdateFileInfo(); return mRating; } }
         #endregion
 
         #region Constructors
@@ -574,6 +580,11 @@ namespace Manina.Windows.Forms
                     return Aperture;
                 case ColumnType.UserComment:
                     return UserComment;
+                case ColumnType.Rating:
+                    if (Rating == 0)
+                        return "";
+                    else 
+                        return Rating.ToString();
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
@@ -633,6 +644,9 @@ namespace Manina.Windows.Forms
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.ApertureValue;
             mUserComment = info.UserComment;
+            mRating = info.RatingPercent;
+            if (mRating == 0 && info.Rating != 0)
+                mRating = (ushort)(info.Rating * 20);
 
             isDirty = false;
         }
@@ -666,6 +680,7 @@ namespace Manina.Windows.Forms
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.Aperture;
             mUserComment = info.UserComment;
+            mRating = info.Rating;
 
             isDirty = false;
         }

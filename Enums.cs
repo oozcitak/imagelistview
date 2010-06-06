@@ -166,6 +166,10 @@ namespace Manina.Windows.Forms
         /// User comment (Exif tag).
         /// </summary>
         UserComment,
+        /// <summary>
+        /// Rating (Windows Exif tag).
+        /// </summary>
+        Rating,
     }
     /// <summary>
     /// Represents the order by which items are drawn.
