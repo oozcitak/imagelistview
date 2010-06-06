@@ -595,6 +595,10 @@ namespace Manina.Windows.Forms
         /// Gets or sets user comments.
         /// </summary>
         public string UserComment { get; set; }
+        /// <summary>
+        /// Gets or sets rating between 0-100.
+        /// </summary>
+        public ushort Rating { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the LayoutEventArgs class.

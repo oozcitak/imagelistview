@@ -553,6 +553,9 @@ namespace Manina.Windows.Forms
                         case ColumnType.UserComment:
                             result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
                             break;
+                        case ColumnType.Rating:
+                            result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
+                            break;
                         default:
                             result = 0;
                             break;

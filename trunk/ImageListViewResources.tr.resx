@@ -180,4 +180,7 @@
   <data name="UserComment" xml:space="preserve">
     <value>Notlar</value>
   </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Derece</value>
+  </data>
 </root>

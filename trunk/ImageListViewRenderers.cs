@@ -182,7 +182,20 @@ namespace Manina.Windows.Forms
                             rt.Width = column.Width - 2 * offset.Width;
                             using (Brush bItemFore = new SolidBrush(Color.White))
                             {
-                                g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                                if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
+                                {
+                                    int w = mImageListView.RatingImage.Width;
+                                    int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                    int rating = (int)Math.Ceiling((float)item.Rating / 20.0f);
+                                    if (rating < 0) rating = 0;
+                                    if (rating > 5) rating = 5;
+                                    for (int i = 1; i <= rating; i++)
+                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                    for (int i = rating + 1; i <= 5; i++)
+                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                }
+                                else
+                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
                             }
                             rt.X += column.Width;
                         }
@@ -1006,7 +1019,19 @@ namespace Manina.Windows.Forms
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;
 
-                                if ((state & ItemState.Selected) == ItemState.None)
+                                if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
+                                {
+                                    int w = mImageListView.RatingImage.Width;
+                                    int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                    int rating = (int)Math.Ceiling((float)item.Rating / 20.0f);
+                                    if (rating < 0) rating = 0;
+                                    if (rating > 5) rating = 5;
+                                    for (int i = 1; i <= rating; i++)
+                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                    for (int i = rating + 1; i <= 5; i++)
+                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                }
+                                else if ((state & ItemState.Selected) == ItemState.None)
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, SystemBrushes.HighlightText, rt, sf);

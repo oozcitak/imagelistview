@@ -139,6 +139,13 @@ namespace Manina.Windows.Forms {
             }
         }
         
+        internal static System.Drawing.Bitmap EmptyRatingImage {
+            get {
+                object obj = ResourceManager.GetObject("EmptyRatingImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Camera.
         /// </summary>
@@ -233,6 +240,13 @@ namespace Manina.Windows.Forms {
         internal static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        internal static System.Drawing.Bitmap RatingImage {
+            get {
+                object obj = ResourceManager.GetObject("RatingImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
