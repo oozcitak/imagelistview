@@ -6,6 +6,7 @@
   * Fixed a bug where multiple items could be selected with the shift/ctrl+mouse even when the !MultiSelect property was set to false. (Issue 72)
   * Fixed a bug where the control was not refreshed after reading shell icons for non-image files. (Issue 73)
   * Added the !ShellIconFallback property to disable the display of shell icons in place of thumbnails. (Issue 74)
+  * Added the rating column (Issue 54).
 
 = 6.7 (17 May 2010) =
 
