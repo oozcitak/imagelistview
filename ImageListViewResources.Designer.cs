@@ -243,6 +243,15 @@ namespace Manina.Windows.Forms {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Rating.
+        /// </summary>
+        internal static string Rating {
+            get {
+                return ResourceManager.GetString("Rating", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap RatingImage {
             get {
                 object obj = ResourceManager.GetObject("RatingImage", resourceCulture);
