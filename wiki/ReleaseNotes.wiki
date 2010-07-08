@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.9 (08 Juny 2010) =
+
+  * Fixed a bug where large thumbnail images of *virtual items* in gallery and pane view modes were not being loaded. (Issue 79)
+
 = 6.8 (07 June 2010) =
 
   * Fixed a bug where multiple items could be selected with the shift/ctrl+mouse even when the !MultiSelect property was set to false. (Issue 72)
