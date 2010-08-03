@@ -789,7 +789,7 @@ namespace Manina.Windows.Forms
                             CacheItem existing = null;
                             if (thumbCache.TryGetValue(guid, out existing))
                             {
-                                if (existing.Size == request.Size)
+                                if (existing.Size == mImageListView.ThumbnailSize)
                                     request = null;
                             }
                         }
@@ -823,13 +823,13 @@ namespace Manina.Windows.Forms
                             if (!Stopping) throw;
                         }
                     }
-                    
+
                     lock (lockObject)
                     {
                         if (!rendererRequest && !isvisible)
                             request = null;
                     }
-                    
+
                     // Proceed if we have a valid request
                     CacheItem result = null;
                     if (request != null)
@@ -912,10 +912,10 @@ namespace Manina.Windows.Forms
                                     if (thumb != null)
                                     {
                                         // Did the thumbnail size change while we were
-                                        // creating the thumbnail                                        
+                                        // creating the thumbnail?                                    
                                         if (result.Size != mImageListView.ThumbnailSize)
                                             result.State = CacheState.Unknown;
-                                        
+
                                         // Did we exceed the cache limit?
                                         memoryUsed += thumb.Width * thumb.Height * 24 / 8;
                                         if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||

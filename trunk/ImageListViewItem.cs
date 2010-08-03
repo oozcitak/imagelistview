@@ -208,12 +208,6 @@ namespace Manina.Windows.Forms
 
                 Image img = mImageListView.cacheManager.GetImage(Guid);
 
-                // The cache manager is responsible for the life times
-                // of the thumbnails. However we do not want it to
-                // dispose the thumbnail before we hand it to the user.
-                if (img != null)
-                    img = (Image)img.Clone();
-
                 if (state == CacheState.Cached)
                     return img;
 
