@@ -38,6 +38,7 @@ namespace Manina.Windows.Forms
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
         private bool mRetryOnError;
+        private Size mCurrentThumbnailSize;
 
         private Stack<CacheItem> toCache;
         private Dictionary<Guid, CacheItem> thumbCache;
@@ -250,6 +251,14 @@ namespace Manina.Windows.Forms
         /// Returns the count of items in the cache.
         /// </summary>
         public long CacheSize { get { lock (lockObject) { return thumbCache.Count; } } }
+        /// <summary>
+        /// Gets or sets the current thumbnail size.
+        /// </summary>
+        public Size CurrentThumbnailSize
+        {
+            get { return mCurrentThumbnailSize; }
+            set { lock (lockObject) { mCurrentThumbnailSize = value; } }
+        }
         #endregion
 
         #region Constructor
@@ -789,7 +798,7 @@ namespace Manina.Windows.Forms
                             CacheItem existing = null;
                             if (thumbCache.TryGetValue(guid, out existing))
                             {
-                                if (existing.Size == mImageListView.ThumbnailSize)
+                                if (existing.Size == mCurrentThumbnailSize)
                                     request = null;
                             }
                         }
@@ -913,7 +922,7 @@ namespace Manina.Windows.Forms
                                     {
                                         // Did the thumbnail size change while we were
                                         // creating the thumbnail?                                    
-                                        if (result.Size != mImageListView.ThumbnailSize)
+                                        if (result.Size != mCurrentThumbnailSize)
                                             result.State = CacheState.Unknown;
 
                                         // Did we exceed the cache limit?

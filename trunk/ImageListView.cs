@@ -457,6 +457,7 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
+                    cacheManager.CurrentThumbnailSize = mThumbnailSize;
                     cacheManager.Rebuild();
                     Refresh();
                 }
@@ -600,6 +601,7 @@ namespace Manina.Windows.Forms
             navigationManager = new ImageListViewNavigationManager(this);
 
             cacheManager = new ImageListViewCacheManager(this);
+            cacheManager.CurrentThumbnailSize = mThumbnailSize;
             itemCacheManager = new ImageListViewItemCacheManager(this);
 
             disposed = false;
