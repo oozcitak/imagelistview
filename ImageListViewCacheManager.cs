@@ -910,6 +910,11 @@ namespace Manina.Windows.Forms
 
                                     if (thumb != null)
                                     {
+                                        // Did the thumbnail size change while we were
+                                        // creating the thumbnail                                        
+                                        if (thumb.Size != mImageListView.ThumbnailSize)
+                                            result.State = CacheState.Unknown;
+                                        
                                         // Did we exceed the cache limit?
                                         memoryUsed += thumb.Width * thumb.Height * 24 / 8;
                                         if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
