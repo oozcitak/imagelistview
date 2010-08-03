@@ -1148,6 +1148,9 @@ namespace Manina.Windows.Forms
         /// false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
+            if (!IsHandleCreated || IsDisposed || InvokeRequired)
+                return;
+
             if (!disposed)
             {
                 if (disposing)
