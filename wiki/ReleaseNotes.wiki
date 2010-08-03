@@ -3,7 +3,7 @@
 
 = 6.10 (03 August 2010) =
 
-  * Fixed a bug where the old thumbnail size was used if the thumbnail size was changed whike the cache manager was working. (Issue 80)
+  * Fixed a bug where the old thumbnail size was used if the thumbnail size was changed while the cache manager was working. (Issue 80)
   * Fixed a bug where items added while the control was invisible did not result in a layout update. (Issue 81)
   * Fixed Issue 77.
 
