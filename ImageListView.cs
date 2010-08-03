@@ -933,6 +933,14 @@ namespace Manina.Windows.Forms
 
         #region Event Handlers
         /// <summary>
+        /// Handles the VisibleChanged event.
+        /// </summary>
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+            layoutManager.Update(true);
+        }
+        /// <summary>
         /// Handles the DragOver event.
         /// </summary>
         protected override void OnDragOver(DragEventArgs e)

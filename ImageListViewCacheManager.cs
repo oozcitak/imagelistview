@@ -402,6 +402,7 @@ namespace Manina.Windows.Forms
             {
                 foreach (CacheItem item in thumbCache.Values)
                     item.Dispose();
+                toCache.Clear();
                 thumbCache.Clear();
                 removedItems.Clear();
 
@@ -822,13 +823,13 @@ namespace Manina.Windows.Forms
                             if (!Stopping) throw;
                         }
                     }
-
+                    
                     lock (lockObject)
                     {
                         if (!rendererRequest && !isvisible)
                             request = null;
                     }
-
+                    
                     // Proceed if we have a valid request
                     CacheItem result = null;
                     if (request != null)
@@ -912,7 +913,7 @@ namespace Manina.Windows.Forms
                                     {
                                         // Did the thumbnail size change while we were
                                         // creating the thumbnail                                        
-                                        if (thumb.Size != mImageListView.ThumbnailSize)
+                                        if (result.Size != mImageListView.ThumbnailSize)
                                             result.State = CacheState.Unknown;
                                         
                                         // Did we exceed the cache limit?
