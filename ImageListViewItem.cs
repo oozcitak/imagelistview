@@ -25,7 +25,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents an item in the image list view.
     /// </summary>
-    public class ImageListViewItem
+    public class ImageListViewItem : ICloneable
     {
         #region Member Variables
         // Property backing fields
@@ -578,7 +578,7 @@ namespace Manina.Windows.Forms
                 case ColumnType.Rating:
                     if (Rating == 0)
                         return "";
-                    else 
+                    else
                         return Rating.ToString();
                 default:
                     throw new ArgumentException("Unknown column type", "type");
@@ -678,6 +678,48 @@ namespace Manina.Windows.Forms
             mRating = info.Rating;
 
             isDirty = false;
+        }
+        #endregion
+
+        #region ICloneable Members
+        public object Clone()
+        {
+            ImageListViewItem item = new ImageListViewItem();
+
+            item.mText = mText;
+
+            // File info
+            item.mSmallIcon = mSmallIcon;
+            item.mLargeIcon = mLargeIcon;
+            item.mDateAccessed = mDateAccessed;
+            item.mDateCreated = mDateCreated;
+            item.mDateModified = mDateModified;
+            item.mFileType = mFileType;
+            item.mFileName = mFileName;
+            item.mFilePath = mFilePath;
+            item.mFileSize = mFileSize;
+            item.mDimensions = mDimensions;
+            item.mResolution = mResolution;
+
+            // Exif tags
+            item.mImageDescription = mImageDescription;
+            item.mEquipmentModel = mEquipmentModel;
+            item.mDateTaken = mDateTaken;
+            item.mArtist = mArtist;
+            item.mCopyright = mCopyright;
+            item.mExposureTime = mExposureTime;
+            item.mFNumber = mFNumber;
+            item.mISOSpeed = mISOSpeed;
+            item.mShutterSpeed = mShutterSpeed;
+            item.mAperture = mAperture;
+            item.mUserComment = mUserComment;
+            item.mRating = mRating;
+
+            // Virtual item properties
+            item.isVirtualItem = isVirtualItem;
+            item.mVirtualItemKey = mVirtualItemKey;
+
+            return item;
         }
         #endregion
     }
