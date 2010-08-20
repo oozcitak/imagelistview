@@ -698,7 +698,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public virtual int MeasureColumnHeaderHeight()
             {
-                if (mImageListView.HeaderFont == null)
+                if (mImageListView.disposed || mImageListView.HeaderFont == null)
                     return 24;
                 else
                     return System.Math.Max(mImageListView.HeaderFont.Height + 4, 24);
