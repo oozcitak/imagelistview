@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 6.11 (04 August 2010) =
+
+  * Fixed a bug where the layout update code was called after the control was disposed. (Issue 82)
+  * !ImageListViewItems's are now clone-able. Useful when copying items between different instances of the control. (Issue 83)
+
 = 6.10 (03 August 2010) =
 
   * Fixed a bug where the old thumbnail size was used if the thumbnail size was changed while the cache manager was working. (Issue 80)
