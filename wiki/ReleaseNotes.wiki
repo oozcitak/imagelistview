@@ -1,7 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
-= 6.11 (04 August 2010) =
+= 7.0 RC 1 (23 August 2010) =
+
+  * Added support for custom columns. (Issue 52, Issue 53, Issue 55, Issue 56)
+
+= 6.11 (20 August 2010) =
 
   * Fixed a bug where the layout update code was called after the control was disposed. (Issue 82)
   * !ImageListViewItems's are now clone-able. Useful when copying items between different instances of the control. (Issue 83)
