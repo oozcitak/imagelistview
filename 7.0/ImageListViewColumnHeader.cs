@@ -70,6 +70,9 @@ namespace Manina.Windows.Forms
                     {
                         mDisplayIndex = value;
 
+                        if (owner != null)
+                            owner.updateDisplayList = true;
+
                         if (mImageListView != null)
                             mImageListView.Refresh();
                     }
@@ -144,6 +147,10 @@ namespace Manina.Windows.Forms
                 set
                 {
                     mVisible = value;
+
+                    if (owner != null)
+                        owner.updateDisplayList = true;
+
                     if (mImageListView != null)
                         mImageListView.Refresh();
                 }

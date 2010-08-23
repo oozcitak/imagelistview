@@ -727,6 +727,7 @@ namespace Manina.Windows.Forms
             {
                 int itemIndex = -1;
                 bool checkBoxHit = false;
+                int subItemIndex = -1;
 
                 // Normalize to item area coordinates
                 pt.X -= layoutManager.ItemAreaBounds.Left;
@@ -754,9 +755,27 @@ namespace Manina.Windows.Forms
                             }
                         }
                     }
+
+                    // Calculate sub item index
+                    if (itemIndex != -1 && View == View.Details)
+                    {
+                        int xc1 = layoutManager.ColumnHeaderBounds.Left;
+                        int colIndex=0;
+                        foreach (ImageListViewColumnHeader column in mColumns.GetDisplayedColumns())
+                        {
+                            int xc2 = xc1 + column.Width;
+                            if (pt.X >= xc1 && pt.X < xc2)
+                            {
+                                subItemIndex = colIndex;
+                                break;
+                            }
+                            colIndex++;
+                            xc1 = xc2;
+                        }
+                    }
                 }
 
-                hitInfo = new HitInfo(itemIndex, checkBoxHit);
+                hitInfo = new HitInfo(itemIndex, subItemIndex, checkBoxHit);
             }
         }
         /// <summary>

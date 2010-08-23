@@ -35,6 +35,8 @@ namespace Manina.Windows.Forms
             #region Member Variables
             private ImageListView mImageListView;
             private List<ImageListViewColumnHeader> mItems;
+            private List<ImageListViewColumnHeader> mDisplayedItems;
+            internal bool updateDisplayList;
             #endregion
 
             #region Properties
@@ -78,6 +80,8 @@ namespace Manina.Windows.Forms
                             throw new InvalidOperationException("Owner control is null.");
                         mImageListView.Items.AddCustomColumn(newItem.columnID);
                     }
+
+                    updateDisplayList = true;
                 }
             }
             /// <summary>
@@ -115,6 +119,7 @@ namespace Manina.Windows.Forms
             {
                 mImageListView = owner;
                 mItems = new List<ImageListViewColumnHeader>();
+                updateDisplayList = true;
             }
             #endregion
 
@@ -130,13 +135,15 @@ namespace Manina.Windows.Forms
 
                 item.mImageListView = mImageListView;
                 item.owner = this;
-                if(item.DisplayIndex==-1)
+                if (item.DisplayIndex == -1)
                     item.DisplayIndex = mItems.Count;
 
                 mItems.Add(item);
 
                 if (item.Type == ColumnType.Custom)
                     mImageListView.Items.AddCustomColumn(item.columnID);
+
+                updateDisplayList = true;
             }
             /// <summary>
             /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -182,6 +189,7 @@ namespace Manina.Windows.Forms
                 mItems.Clear();
                 if (mImageListView != null)
                     mImageListView.Items.RemoveAllCustomColumns();
+                updateDisplayList = true;
             }
             /// <summary>
             /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
@@ -248,6 +256,8 @@ namespace Manina.Windows.Forms
                 mItems.Insert(index, item);
                 if (item.Type == ColumnType.Custom)
                     mImageListView.Items.AddCustomColumn(item.columnID);
+
+                updateDisplayList = true;
             }
             /// <summary>
             /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -265,6 +275,7 @@ namespace Manina.Windows.Forms
                         throw new InvalidOperationException("Owner control is null.");
                     mImageListView.Items.RemoveCustomColumn(item.columnID);
                 }
+                updateDisplayList = true;
                 return exists;
             }
             /// <summary>
@@ -281,22 +292,11 @@ namespace Manina.Windows.Forms
                         throw new InvalidOperationException("Owner control is null.");
                     mImageListView.Items.RemoveCustomColumn(item.columnID);
                 }
+                updateDisplayList = true;
             }
             #endregion
 
             #region Helper Methods
-            /// <summary>
-            /// Adds a set of default columns.
-            /// </summary>
-            /// <returns></returns>
-            internal void AddDefaultColumns()
-            {
-                Add(ColumnType.Name);
-                Add(ColumnType.FileSize);
-                Add(ColumnType.DateModified);
-                Add(ColumnType.Dimensions);
-                Add(ColumnType.Resolution);
-            }
             /// <summary>
             /// Determines whether the collection has the given column type.
             /// </summary>
@@ -316,14 +316,19 @@ namespace Manina.Windows.Forms
             /// </summary>
             public List<ImageListViewColumnHeader> GetDisplayedColumns()
             {
-                List<ImageListViewColumnHeader> list = new List<ImageListViewColumnHeader>();
+                if (mDisplayedItems != null && !updateDisplayList)
+                    return mDisplayedItems;
+
+                mDisplayedItems = new List<ImageListViewColumnHeader>();
                 foreach (ImageListViewColumnHeader column in mItems)
                 {
                     if (column.Visible)
-                        list.Add(column);
+                        mDisplayedItems.Add(column);
                 }
-                list.Sort(ColumnCompare);
-                return list;
+                mDisplayedItems.Sort(ColumnCompare);
+
+                updateDisplayList = false;
+                return mDisplayedItems;
             }
             /// <summary>
             /// Compares the columns by their display index.
@@ -449,6 +454,7 @@ namespace Manina.Windows.Forms
                     if (!(value is ImageListViewColumnHeader))
                         throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
                     this[index] = (ImageListViewColumnHeader)value;
+                    updateDisplayList = true;
                 }
             }
             #endregion
