@@ -760,7 +760,7 @@ namespace Manina.Windows.Forms
                     if (itemIndex != -1 && View == View.Details)
                     {
                         int xc1 = layoutManager.ColumnHeaderBounds.Left;
-                        int colIndex=0;
+                        int colIndex = 0;
                         foreach (ImageListViewColumnHeader column in mColumns.GetDisplayedColumns())
                         {
                             int xc2 = xc1 + column.Width;
