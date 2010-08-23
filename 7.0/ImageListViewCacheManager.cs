@@ -38,6 +38,7 @@ namespace Manina.Windows.Forms
         private int mCacheLimitAsItemCount;
         private long mCacheLimitAsMemory;
         private bool mRetryOnError;
+        private Size mCurrentThumbnailSize;
 
         private Stack<CacheItem> toCache;
         private Dictionary<Guid, CacheItem> thumbCache;
@@ -89,9 +90,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Image Image { get { return mImage; } }
             /// <summary>
-            /// Gets the state of the cache item.
+            /// Gets or sets the state of the cache item.
             /// </summary>
-            public CacheState State { get { return mState; } }
+            public CacheState State { get { return mState; } set { mState = value; } }
             /// <summary>
             /// Gets embedded thumbnail extraction behavior.
             /// </summary>
@@ -250,6 +251,14 @@ namespace Manina.Windows.Forms
         /// Returns the count of items in the cache.
         /// </summary>
         public long CacheSize { get { lock (lockObject) { return thumbCache.Count; } } }
+        /// <summary>
+        /// Gets or sets the current thumbnail size.
+        /// </summary>
+        public Size CurrentThumbnailSize
+        {
+            get { return mCurrentThumbnailSize; }
+            set { lock (lockObject) { mCurrentThumbnailSize = value; } }
+        }
         #endregion
 
         #region Constructor
@@ -381,6 +390,19 @@ namespace Manina.Windows.Forms
             return CacheState.Unknown;
         }
         /// <summary>
+        /// Rebuilds the thumbnail cache.
+        /// Old thumbnails will be kept until they are overwritten
+        /// by new ones.
+        /// </summary>
+        public void Rebuild()
+        {
+            lock (lockObject)
+            {
+                foreach (CacheItem item in thumbCache.Values)
+                    item.State = CacheState.Unknown;
+            }
+        }
+        /// <summary>
         /// Clears the thumbnail cache.
         /// </summary>
         public void Clear()
@@ -389,6 +411,7 @@ namespace Manina.Windows.Forms
             {
                 foreach (CacheItem item in thumbCache.Values)
                     item.Dispose();
+                toCache.Clear();
                 thumbCache.Clear();
                 removedItems.Clear();
 
@@ -468,11 +491,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 toCache.Push(new CacheItem(guid, filename,
@@ -499,11 +517,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, filename, thumbSize,
@@ -548,11 +561,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 toCache.Push(new CacheItem(guid, key, thumbSize, null,
@@ -579,11 +587,6 @@ namespace Manina.Windows.Forms
                 {
                     if (item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                         return;
-                    else
-                    {
-                        item.Dispose();
-                        thumbCache.Remove(guid);
-                    }
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
@@ -795,10 +798,8 @@ namespace Manina.Windows.Forms
                             CacheItem existing = null;
                             if (thumbCache.TryGetValue(guid, out existing))
                             {
-                                if (existing.Size == request.Size)
+                                if (existing.Size == mCurrentThumbnailSize)
                                     request = null;
-                                else
-                                    thumbCache.Remove(guid);
                             }
                         }
                         else if (rendererToCache.Count != 0)
@@ -909,11 +910,21 @@ namespace Manina.Windows.Forms
                             {
                                 lock (lockObject)
                                 {
-                                    thumbCache.Remove(guid);
+                                    CacheItem existing = null;
+                                    if (thumbCache.TryGetValue(guid, out existing))
+                                    {
+                                        existing.Dispose();
+                                        thumbCache.Remove(guid);
+                                    }
                                     thumbCache.Add(guid, result);
 
                                     if (thumb != null)
                                     {
+                                        // Did the thumbnail size change while we were
+                                        // creating the thumbnail?                                    
+                                        if (result.Size != mCurrentThumbnailSize)
+                                            result.State = CacheState.Unknown;
+
                                         // Did we exceed the cache limit?
                                         memoryUsed += thumb.Width * thumb.Height * 24 / 8;
                                         if ((mCacheLimitAsMemory != 0 && memoryUsed > mCacheLimitAsMemory) ||
@@ -975,8 +986,8 @@ namespace Manina.Windows.Forms
                         sw.Start();
                     else
                     {
-                        sw.Reset();
                         sw.Stop();
+                        sw.Reset();
                     }
                 }
 

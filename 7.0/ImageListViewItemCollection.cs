@@ -337,6 +337,32 @@ namespace Manina.Windows.Forms
 
             #region Helper Methods
             /// <summary>
+            /// Adds the (empty) subitem to each item for the given custom column.
+            /// </summary>
+            /// <param name="guid">Custom column ID.</param>
+            internal void AddCustomColumn(Guid guid)
+            {
+                foreach (ImageListViewItem item in mItems)
+                    item.AddSubItemText(guid);
+            }
+            /// <summary>
+            /// Removes the subitem of each item for the given custom column.
+            /// </summary>
+            /// <param name="guid">Custom column ID.</param>
+            internal void RemoveCustomColumn(Guid guid)
+            {
+                foreach (ImageListViewItem item in mItems)
+                    item.RemoveSubItemText(guid);
+            }
+            /// <summary>
+            /// Removes the subitem of each item for the given custom column.
+            /// </summary>
+            internal void RemoveAllCustomColumns()
+            {
+                foreach (ImageListViewItem item in mItems)
+                    item.RemoveAllSubItemTexts();
+            }
+            /// <summary>
             /// Adds the given item without raising a selection changed event.
             /// </summary>
             internal void AddInternal(ImageListViewItem item)
@@ -353,6 +379,10 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
+
+                    foreach (ImageListViewColumnHeader header in mImageListView.Columns)
+                        if (header.Type == ColumnType.Custom)
+                            item.AddSubItemText(header.columnID);
 
                     if (mImageListView.CacheMode == CacheMode.Continuous)
                     {
@@ -552,6 +582,9 @@ namespace Manina.Windows.Forms
                             break;
                         case ColumnType.UserComment:
                             result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.Rating:
+                            result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
                             break;
                         default:
                             result = 0;

@@ -292,7 +292,12 @@ namespace Manina.Windows.Forms
                 Image img = mImageListView.cacheManager.GetRendererImage(item.Guid, size, mImageListView.UseEmbeddedThumbnails);
 
                 if (img == null)
-                    mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
+                {
+                    if(item.isVirtualItem )
+                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.VirtualItemKey, size, mImageListView.UseEmbeddedThumbnails);
+                    else
+                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
+                }
 
                 return img;
             }
@@ -693,7 +698,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public virtual int MeasureColumnHeaderHeight()
             {
-                if (mImageListView.HeaderFont == null)
+                if (mImageListView.disposed || mImageListView.HeaderFont == null)
                     return 24;
                 else
                     return System.Math.Max(mImageListView.HeaderFont.Height + 4, 24);
@@ -951,7 +956,22 @@ namespace Manina.Windows.Forms
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;
 
-                                g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                                if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
+                                {
+                                    int w = mImageListView.RatingImage.Width;
+                                    int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                    int rating = (int)Math.Ceiling((float)item.Rating / 20.0f);
+                                    if (rating < 0) rating = 0;
+                                    if (rating > 5) rating = 5;
+                                    for (int i = 1; i <= rating; i++)
+                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i-1) * w, y);
+                                    for (int i = rating + 1; i <= 5; i++)
+                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i-1) * w, y);
+                                }
+                                else if(column.Type == ColumnType.Custom )
+                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
+                                else
+                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
 
                                 rt.X -= iconOffset;
                             }
@@ -1150,7 +1170,7 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
@@ -1162,7 +1182,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // File type
-                    if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
+                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))

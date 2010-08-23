@@ -41,8 +41,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColumnHeaderCollectionEditor.cs" />
-    <Compile Include="ColumnHeaderCollectionTypeConverter.cs" />
     <Compile Include="BonusRenderers.cs" />
     <Compile Include="ImageListViewCheckedItemCollection.cs">
       <SubType>Component</SubType>
@@ -85,7 +83,6 @@
     <Compile Include="ImageListViewSelectedItemCollection.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ImageListViewSerializer.cs" />
     <Compile Include="ImageListViewNavigationManager.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -125,6 +122,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\SortDescending.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\star.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\star_gray.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -82,6 +82,10 @@ namespace Manina.Windows.Forms
     public enum ColumnType
     {
         /// <summary>
+        /// A custom text column.
+        /// </summary>
+        Custom,
+        /// <summary>
         /// The text of the item, defaults to filename if
         /// the text is not provided.
         /// </summary>
@@ -166,6 +170,10 @@ namespace Manina.Windows.Forms
         /// User comment (Exif tag).
         /// </summary>
         UserComment,
+        /// <summary>
+        /// Rating (Windows Exif tag).
+        /// </summary>
+        Rating,
     }
     /// <summary>
     /// Represents the order by which items are drawn.

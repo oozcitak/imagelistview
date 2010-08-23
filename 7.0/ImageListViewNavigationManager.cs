@@ -547,7 +547,18 @@ namespace Manina.Windows.Forms
                 else if (lastMouseDownInItemArea && lastMouseDownOverItem && HoveredItem != null && LeftButton)
                 {
                     // Select the item under the cursor
-                    if (ControlKey)
+                    if (!mImageListView.MultiSelect && ControlKey)
+                    {
+                        bool oldSelected = HoveredItem.Selected;
+                        mImageListView.SelectedItems.Clear(false);
+                        HoveredItem.mSelected = !oldSelected;
+                    }
+                    else if (!mImageListView.MultiSelect)
+                    {
+                        mImageListView.SelectedItems.Clear(false);
+                        HoveredItem.mSelected = true;
+                    }
+                    else if (ControlKey)
                     {
                         HoveredItem.mSelected = !HoveredItem.mSelected;
                     }
@@ -747,6 +758,7 @@ namespace Manina.Windows.Forms
                         }
                         mImageListView.Items.FocusedItem = mImageListView.Items[newindex];
                         mImageListView.EnsureVisible(newindex);
+                        mImageListView.Refresh();
                     }
                 }
 
@@ -957,12 +969,12 @@ namespace Manina.Windows.Forms
                     HoveredItem = null;
 
                 if (h.ColumnHit)
-                    HoveredColumn = mImageListView.Columns[h.ColumnIndex];
+                    HoveredColumn = h.Column;
                 else
                     HoveredColumn = null;
 
                 if (h.ColumnSeparatorHit)
-                    HoveredSeparator = mImageListView.Columns[h.ColumnSeparator];
+                    HoveredSeparator = h.ColumnSeparator;
                 else
                     HoveredSeparator = null;
 
@@ -1032,12 +1044,9 @@ namespace Manina.Windows.Forms
             private void scrollTimer_Tick(object sender, EventArgs e)
             {
                 int delta = (int)scrollTimer.Tag;
-                if (MouseSelecting)
-                {
-                    Point location = mImageListView.PointToClient(Control.MousePosition);
-                    mImageListView.OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
-                }
-                mImageListView.OnMouseWheel(new MouseEventArgs(MouseButtons.None, 0, 0, 0, delta));
+                Point location = mImageListView.PointToClient(Control.MousePosition);
+                mImageListView.OnMouseMove(new MouseEventArgs(Control.MouseButtons, 0, location.X, location.Y, 0));
+                mImageListView.OnMouseWheel(new MouseEventArgs(MouseButtons.None, 0, location.X, location.Y, delta));
             }
             #endregion
         }

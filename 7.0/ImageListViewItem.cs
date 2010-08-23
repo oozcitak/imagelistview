@@ -19,13 +19,14 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Manina.Windows.Forms
 {
     /// <summary>
     /// Represents an item in the image list view.
     /// </summary>
-    public class ImageListViewItem
+    public class ImageListViewItem : ICloneable
     {
         #region Member Variables
         // Property backing fields
@@ -60,9 +61,12 @@ namespace Manina.Windows.Forms
         private string mShutterSpeed;
         private string mAperture;
         private string mUserComment;
+        private ushort mRating;
         // Used for virtual items
         internal bool isVirtualItem;
         internal object mVirtualItemKey;
+        // Used for custom columns
+        private Dictionary<Guid, string> subItems;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
@@ -149,14 +153,18 @@ namespace Manina.Windows.Forms
                 {
                     mSelected = value;
                     if (mImageListView != null)
+                    {
                         mImageListView.OnSelectionChangedInternal();
+                        if (mImageListView.IsItemVisible(mGuid))
+                            mImageListView.Refresh();
+                    }
                 }
             }
         }
         /// <summary>
         /// Gets or sets the user-defined data associated with the item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets or sets the user-defined data associated with the item.")]
+        [Category("Data"), Browsable(false), Description("Gets or sets the user-defined data associated with the item."), TypeConverter(typeof(StringConverter))]
         public object Tag { get; set; }
         /// <summary>
         /// Gets or sets the text associated with this item. If left blank, item Text 
@@ -172,7 +180,7 @@ namespace Manina.Windows.Forms
             set
             {
                 mText = value;
-                if (mImageListView != null)
+                if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
                     mImageListView.Refresh();
             }
         }
@@ -192,10 +200,18 @@ namespace Manina.Windows.Forms
 
                 CacheState state = ThumbnailCacheState;
                 if (state == CacheState.Error)
-                    return mImageListView.ErrorImage;
+                {
+                    if (mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
+                        return mLargeIcon.ToBitmap();
+                    else if (mSmallIcon != null)
+                        return mSmallIcon.ToBitmap();
+                    else
+                        return mImageListView.ErrorImage;
+                }
 
                 Image img = mImageListView.cacheManager.GetImage(Guid);
-                if (img != null)
+
+                if (state == CacheState.Cached)
                     return img;
 
                 if (isVirtualItem)
@@ -203,53 +219,55 @@ namespace Manina.Windows.Forms
                 else
                     mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
 
-                if (mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
+                if (img != null)
+                    return img;
+                else if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16 && mLargeIcon != null)
                     return mLargeIcon.ToBitmap();
-                else if (mSmallIcon != null)
+                else if (mImageListView.ShellIconFallback && mSmallIcon != null)
                     return mSmallIcon.ToBitmap();
-
-                return mImageListView.DefaultImage;
+                else
+                    return mImageListView.DefaultImage;
             }
         }
         /// <summary>
         /// Gets or sets the draw order of the item.
         /// </summary>
-        [Category("Appearance"), Browsable(true), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
+        [Category("Appearance"), Browsable(false), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
         public int ZOrder { get { return mZOrder; } set { mZOrder = value; } }
         /// <summary>
         /// Gets the small shell icon of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the small shell icon of the image file represented by this item.")]
+        [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
         public Icon SmallIcon { get { UpdateFileInfo(); return mSmallIcon; } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the large shell icon of the image file represented by this item.")]
+        [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
         public Icon LargeIcon { get { UpdateFileInfo(); return mLargeIcon; } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the last access date of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the last access date of the image file represented by this item.")]
         public DateTime DateAccessed { get { UpdateFileInfo(); return mDateAccessed; } }
         /// <summary>
         /// Gets the creation date of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the creation date of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the creation date of the image file represented by this item.")]
         public DateTime DateCreated { get { UpdateFileInfo(); return mDateCreated; } }
         /// <summary>
         /// Gets the modification date of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the modification date of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the modification date of the image file represented by this item.")]
         public DateTime DateModified { get { UpdateFileInfo(); return mDateModified; } }
         /// <summary>
         /// Gets the shell type of the image file represented by this item.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the shell type of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the shell type of the image file represented by this item.")]
         public string FileType { get { UpdateFileInfo(); return mFileType; } }
         /// <summary>
         /// Gets or sets the name of the image file represented by this item.
         /// </summary>        
-        [Category("Data"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
         public string FileName
         {
             get
@@ -268,7 +286,8 @@ namespace Manina.Windows.Forms
                         {
                             mImageListView.cacheManager.Remove(Guid);
                             mImageListView.itemCacheManager.Add(this);
-                            mImageListView.Refresh();
+                            if (mImageListView.IsItemVisible(mGuid))
+                                mImageListView.Refresh();
                         }
                     }
                 }
@@ -277,78 +296,83 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the path of the image file represented by this item.
         /// </summary>        
-        [Category("Data"), Browsable(true), Description("Gets the path of the image file represented by this item.")]
+        [Category("File Properties"), Browsable(true), Description("Gets the path of the image file represented by this item.")]
         public string FilePath { get { UpdateFileInfo(); return mFilePath; } }
         /// <summary>
         /// Gets file size in bytes.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets file size in bytes.")]
+        [Category("File Properties"), Browsable(true), Description("Gets file size in bytes.")]
         public long FileSize { get { UpdateFileInfo(); return mFileSize; } }
         /// <summary>
         /// Gets image dimensions.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image dimensions.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image dimensions.")]
         public Size Dimensions { get { UpdateFileInfo(); return mDimensions; } }
         /// <summary>
         /// Gets image resolution in pixels per inch.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image resolution in pixels per inch.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image resolution in pixels per inch.")]
         public SizeF Resolution { get { UpdateFileInfo(); return mResolution; } }
         /// <summary>
         /// Gets image description.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image description.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image description.")]
         public string ImageDescription { get { UpdateFileInfo(); return mImageDescription; } }
         /// <summary>
         /// Gets the camera model.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the camera model.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the camera model.")]
         public string EquipmentModel { get { UpdateFileInfo(); return mEquipmentModel; } }
         /// <summary>
         /// Gets the date and time the image was taken.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the date and time the image was taken.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets the date and time the image was taken.")]
         public DateTime DateTaken { get { UpdateFileInfo(); return mDateTaken; } }
         /// <summary>
         /// Gets the name of the artist.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the name of the artist.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets the name of the artist.")]
         public string Artist { get { UpdateFileInfo(); return mArtist; } }
         /// <summary>
         /// Gets image copyright information.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets image copyright information.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets image copyright information.")]
         public string Copyright { get { UpdateFileInfo(); return mCopyright; } }
         /// <summary>
         /// Gets the exposure time in seconds.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the exposure time in seconds.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the exposure time in seconds.")]
         public string ExposureTime { get { UpdateFileInfo(); return mExposureTime; } }
         /// <summary>
         /// Gets the F number.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the F number.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the F number.")]
         public float FNumber { get { UpdateFileInfo(); return mFNumber; } }
         /// <summary>
         /// Gets the ISO speed.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the ISO speed.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the ISO speed.")]
         public ushort ISOSpeed { get { UpdateFileInfo(); return mISOSpeed; } }
         /// <summary>
         /// Gets the shutter speed.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the shutter speed.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the shutter speed.")]
         public string ShutterSpeed { get { UpdateFileInfo(); return mShutterSpeed; } }
         /// <summary>
         /// Gets the lens aperture value.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets the lens aperture value.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets the lens aperture value.")]
         public string Aperture { get { UpdateFileInfo(); return mAperture; } }
         /// <summary>
         /// Gets user comments.
         /// </summary>
-        [Category("Data"), Browsable(true), Description("Gets user comments.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets user comments.")]
         public string UserComment { get { UpdateFileInfo(); return mUserComment; } }
+        /// <summary>
+        /// Gets rating in percent (Windows specific).
+        /// </summary>
+        [Category("Image Properties"), Browsable(true), Description("Gets rating in percent.")]
+        public ushort Rating { get { UpdateFileInfo(); return mRating; } }
         #endregion
 
         #region Constructors
@@ -372,6 +396,8 @@ namespace Manina.Windows.Forms
 
             mVirtualItemKey = null;
             isVirtualItem = false;
+
+            subItems = new Dictionary<Guid, string>();
         }
         /// <summary>
         /// Initializes a new instance of the ImageListViewItem class.
@@ -477,6 +503,52 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Returns the sub item item text corresponding to the custom column with the given index.
+        /// </summary>
+        /// <param name="index">Index of the custom column.</param>
+        /// <returns>Sub item text text for the given custom column type.</returns>
+        public string GetSubItemText(int index)
+        {
+            int i = 0;
+            foreach (string val in subItems.Values)
+            {
+                if (i == index)
+                    return val;
+                i++;
+            }
+
+            throw new IndexOutOfRangeException();
+        }
+        /// <summary>
+        /// Sets the sub item item text corresponding to the custom column with the given index.
+        /// </summary>
+        /// <param name="index">Index of the custom column.</param>
+        /// <param name="text">New sub item text</param>
+        public void SetSubItemText(int index, string text)
+        {
+            int i = 0;
+            Guid found = Guid.Empty;
+            foreach (Guid guid in subItems.Keys)
+            {
+                if (i == index)
+                {
+                    found = guid;
+                    break;
+                }
+
+                i++;
+            }
+
+            if (found != Guid.Empty)
+            {
+                subItems[found] = text;
+                if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
+                    mImageListView.Refresh();
+            }
+            else
+                throw new IndexOutOfRangeException();
+        }
+        /// <summary>
         /// Returns the sub item item text corresponding to the specified column type.
         /// </summary>
         /// <param name="type">The type of information to return.</param>
@@ -485,6 +557,8 @@ namespace Manina.Windows.Forms
         {
             switch (type)
             {
+                case ColumnType.Custom:
+                    throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
                 case ColumnType.DateAccessed:
                     if (DateAccessed == DateTime.MinValue)
                         return "";
@@ -554,6 +628,11 @@ namespace Manina.Windows.Forms
                     return Aperture;
                 case ColumnType.UserComment:
                     return UserComment;
+                case ColumnType.Rating:
+                    if (Rating == 0)
+                        return "";
+                    else
+                        return Rating.ToString();
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
@@ -561,6 +640,49 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Adds a new subitem for the specified custom column.
+        /// </summary>
+        /// <param name="guid">The Guid of the custom column.</param>
+        internal void AddSubItemText(Guid guid)
+        {
+            subItems.Add(guid, "");
+        }
+        /// <summary>
+        /// Returns the sub item item text corresponding to the specified custom column.
+        /// </summary>
+        /// <param name="guid">The Guid of the custom column.</param>
+        /// <returns>Formatted text for the given column.</returns>
+        internal string GetSubItemText(Guid guid)
+        {
+            return subItems[guid];
+        }
+        /// <summary>
+        /// Sets the sub item item text corresponding to the specified custom column.
+        /// </summary>
+        /// <param name="guid">The Guid of the custom column.</param>
+        /// <param name="text">The text of the subitem.</param>
+        /// <returns>Formatted text for the given column.</returns>
+        internal void SetSubItemText(Guid guid, string text)
+        {
+            subItems[guid] = text;
+        }
+        /// <summary>
+        /// Removes the sub item item text corresponding to the specified custom column.
+        /// </summary>
+        /// <param name="guid">The Guid of the custom column.</param>
+        /// <returns>true if the item was removed; otherwise false.</returns>
+        internal bool RemoveSubItemText(Guid guid)
+        {
+            return subItems.Remove(guid);
+        }
+        /// <summary>
+        /// Removes all sub item item texts.
+        /// </summary>
+        internal void RemoveAllSubItemTexts()
+        {
+            subItems.Clear();
+        }
         /// <summary>
         /// Updates file info for the image file represented by this item.
         /// </summary>
@@ -613,6 +735,9 @@ namespace Manina.Windows.Forms
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.ApertureValue;
             mUserComment = info.UserComment;
+            mRating = info.RatingPercent;
+            if (mRating == 0 && info.Rating != 0)
+                mRating = (ushort)(info.Rating * 20);
 
             isDirty = false;
         }
@@ -646,8 +771,54 @@ namespace Manina.Windows.Forms
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.Aperture;
             mUserComment = info.UserComment;
+            mRating = info.Rating;
 
             isDirty = false;
+        }
+        #endregion
+
+        #region ICloneable Members
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        public object Clone()
+        {
+            ImageListViewItem item = new ImageListViewItem();
+
+            item.mText = mText;
+
+            // File info
+            item.mSmallIcon = mSmallIcon;
+            item.mLargeIcon = mLargeIcon;
+            item.mDateAccessed = mDateAccessed;
+            item.mDateCreated = mDateCreated;
+            item.mDateModified = mDateModified;
+            item.mFileType = mFileType;
+            item.mFileName = mFileName;
+            item.mFilePath = mFilePath;
+            item.mFileSize = mFileSize;
+            item.mDimensions = mDimensions;
+            item.mResolution = mResolution;
+
+            // Exif tags
+            item.mImageDescription = mImageDescription;
+            item.mEquipmentModel = mEquipmentModel;
+            item.mDateTaken = mDateTaken;
+            item.mArtist = mArtist;
+            item.mCopyright = mCopyright;
+            item.mExposureTime = mExposureTime;
+            item.mFNumber = mFNumber;
+            item.mISOSpeed = mISOSpeed;
+            item.mShutterSpeed = mShutterSpeed;
+            item.mAperture = mAperture;
+            item.mUserComment = mUserComment;
+            item.mRating = mRating;
+
+            // Virtual item properties
+            item.isVirtualItem = isVirtualItem;
+            item.mVirtualItemKey = mVirtualItemKey;
+
+            return item;
         }
         #endregion
     }

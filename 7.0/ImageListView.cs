@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
-using System.ComponentModel.Design.Serialization;
 using System.Resources;
 using System.Reflection;
 
@@ -34,7 +33,6 @@ namespace Manina.Windows.Forms
     [DefaultEvent("ItemClick")]
     [DefaultProperty("Items")]
     [Designer(typeof(ImageListViewDesigner))]
-    [DesignerSerializer(typeof(ImageListViewSerializer), typeof(CodeDomSerializer))]
     [Docking(DockingBehavior.Ask)]
     public partial class ImageListView : Control
     {
@@ -71,6 +69,8 @@ namespace Manina.Windows.Forms
         private ImageListViewColumnHeaderCollection mColumns;
         private Image mDefaultImage;
         private Image mErrorImage;
+        private Image mRatingImage;
+        private Image mEmptyRatingImage;
         private Font mHeaderFont;
         private ImageListViewItemCollection mItems;
         private int mPaneWidth;
@@ -92,8 +92,8 @@ namespace Manina.Windows.Forms
         private Point mViewOffset;
 
         // Layout variables
-        internal System.Windows.Forms.HScrollBar hScrollBar;
-        internal System.Windows.Forms.VScrollBar vScrollBar;
+        internal HScrollBar hScrollBar;
+        internal VScrollBar vScrollBar;
         internal ImageListViewLayoutManager layoutManager;
         private bool disposed;
         private bool forceRefresh;
@@ -260,10 +260,15 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets whether scrollbars scroll by an amount which is a multiple of item height.
+        /// </summary>
+        [Browsable(true), Category("Behavior"), Description("Gets or sets whether scrollbars scroll by an amount which is a multiple of item height."), DefaultValue(true)]
+        public bool IntegralScroll { get; set; }
+        /// <summary>
         /// Gets the collection of items contained in the image list view.
         /// </summary>
         [Browsable(false), Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
-        public ImageListView.ImageListViewItemCollection Items { get { return mItems; } }
+        public ImageListViewItemCollection Items { get { return mItems; } }
         /// <summary>
         /// Gets or sets whether multiple items can be selected.
         /// </summary>
@@ -289,6 +294,16 @@ namespace Manina.Windows.Forms
                 }
             }
         }
+        /// <summary>
+        /// Gets or sets the rating image.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the rating image.")]
+        public Image RatingImage { get { return mRatingImage; } set { mRatingImage = value; Refresh(); } }
+        /// <summary>
+        /// Gets or sets the empty rating image.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the empty rating image.")]
+        public Image EmptyRatingImage { get { return mEmptyRatingImage; } set { mEmptyRatingImage = value; Refresh(); } }
         /// <summary>
         /// Gets or sets whether the control will retry loading thumbnails on an error.
         /// </summary>
@@ -323,6 +338,11 @@ namespace Manina.Windows.Forms
         [Browsable(false), Category("Behavior"), Description("Gets the collection of checked items contained in the image list view.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public ImageListViewCheckedItemCollection CheckedItems { get { return mCheckedItems; } }
+        /// <summary>
+        /// Gets or sets whether shell icons are displayed for non-image files.
+        /// </summary>
+        [Browsable(false), Category("Behavior"), Description("Gets or sets whether shell icons are displayed for non-image files."), DefaultValue(true)]
+        public bool ShellIconFallback { get; set; }
         /// <summary>
         /// Gets or sets whether to display the file icons.
         /// </summary>
@@ -435,7 +455,8 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
-                    cacheManager.Clear();
+                    cacheManager.CurrentThumbnailSize = mThumbnailSize;
+                    cacheManager.Rebuild();
                     Refresh();
                 }
             }
@@ -455,7 +476,7 @@ namespace Manina.Windows.Forms
                 if (mUseEmbeddedThumbnails != value)
                 {
                     mUseEmbeddedThumbnails = value;
-                    cacheManager.Clear();
+                    cacheManager.Rebuild();
                     Refresh();
                 }
             }
@@ -492,8 +513,6 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the required creation parameters when the control handle is created.
         /// </summary>
-        /// <value></value>
-        /// <returns>A CreateParams that contains the required creation parameters.</returns>
         protected override CreateParams CreateParams
         {
             get
@@ -519,6 +538,7 @@ namespace Manina.Windows.Forms
             mColors = new ImageListViewColor();
             SetRenderer(new ImageListViewRenderer());
 
+            // Property defaults
             AllowColumnClick = true;
             AllowColumnResize = true;
             AllowDrag = false;
@@ -533,7 +553,10 @@ namespace Manina.Windows.Forms
                 Assembly.GetExecutingAssembly());
             mDefaultImage = manager.GetObject("DefaultImage") as Image;
             mErrorImage = manager.GetObject("ErrorImage") as Image;
+            mRatingImage = manager.GetObject("RatingImage") as Image;
+            mEmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
             HeaderFont = this.Font;
+            IntegralScroll = true;
             mItems = new ImageListViewItemCollection(this);
             MultiSelect = true;
             mPaneWidth = 240;
@@ -545,6 +568,8 @@ namespace Manina.Windows.Forms
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
             ScrollBars = true;
+            ShellIconFallback = true;
+            Size = new Size(120, 100);
             mShowCheckBoxes = false;
             mCheckBoxAlignment = ContentAlignment.BottomRight;
             mCheckBoxPadding = new Size(2, 2);
@@ -555,20 +580,26 @@ namespace Manina.Windows.Forms
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
             mView = View.Thumbnails;
-
             mViewOffset = new Point(0, 0);
+
+            // Child controls
             hScrollBar = new HScrollBar();
             vScrollBar = new VScrollBar();
             hScrollBar.Visible = false;
             vScrollBar.Visible = false;
             hScrollBar.Scroll += new ScrollEventHandler(hScrollBar_Scroll);
             vScrollBar.Scroll += new ScrollEventHandler(vScrollBar_Scroll);
+            Controls.Add(hScrollBar);
+            Controls.Add(vScrollBar);
+
+            // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
             forceRefresh = false;
 
             navigationManager = new ImageListViewNavigationManager(this);
 
             cacheManager = new ImageListViewCacheManager(this);
+            cacheManager.CurrentThumbnailSize = mThumbnailSize;
             itemCacheManager = new ImageListViewItemCacheManager(this);
 
             disposed = false;
@@ -608,42 +639,6 @@ namespace Manina.Windows.Forms
             base.ResumeLayout(performLayout);
             if (performLayout) Refresh();
             mRenderer.ResumePaint(true);
-        }
-        /// <summary>
-        /// Sets the properties of the specified column header.
-        /// </summary>
-        /// <param name="type">The column header to modify.</param>
-        /// <param name="text">Column header text.</param>
-        /// <param name="width">Width (in pixels) of the column header.</param>
-        /// <param name="displayIndex">Display index of the column header.</param>
-        /// <param name="visible">true if the column header will be shown; otherwise false.</param>
-        public void SetColumnHeader(ColumnType type, string text, int width, int displayIndex, bool visible)
-        {
-            mRenderer.SuspendPaint();
-            ImageListViewColumnHeader col = Columns[type];
-            col.Text = text;
-            col.Width = width;
-            col.DisplayIndex = displayIndex;
-            col.Visible = visible;
-            Refresh();
-            mRenderer.ResumePaint();
-        }
-        /// <summary>
-        /// Sets the properties of the specified column header.
-        /// </summary>
-        /// <param name="type">The column header to modify.</param>
-        /// <param name="width">Width (in pixels) of the column header.</param>
-        /// <param name="displayIndex">Display index of the column header.</param>
-        /// <param name="visible">true if the column header will be shown; otherwise false.</param>
-        public void SetColumnHeader(ColumnType type, int width, int displayIndex, bool visible)
-        {
-            mRenderer.SuspendPaint();
-            ImageListViewColumnHeader col = Columns[type];
-            col.Width = width;
-            col.DisplayIndex = displayIndex;
-            col.Visible = visible;
-            Refresh();
-            mRenderer.ResumePaint();
         }
         /// <summary>
         /// Sets the renderer for this instance.
@@ -705,19 +700,19 @@ namespace Manina.Windows.Forms
             {
                 int i = 0;
                 int x = layoutManager.ColumnHeaderBounds.Left;
-                ColumnType colIndex = (ColumnType)(-1);
-                ColumnType sepIndex = (ColumnType)(-1);
+                ImageListViewColumnHeader colIndex = null;
+                ImageListViewColumnHeader sepIndex = null;
                 foreach (ImageListViewColumnHeader col in Columns.GetDisplayedColumns())
                 {
                     // Over a column?
                     if (pt.X >= x && pt.X < x + col.Width + SeparatorSize / 2)
-                        colIndex = col.Type;
+                        colIndex = col;
 
                     // Over a colummn separator?
                     if (pt.X > x + col.Width - SeparatorSize / 2 && pt.X < x + col.Width + SeparatorSize / 2)
-                        sepIndex = col.Type;
+                        sepIndex = col;
 
-                    if (colIndex != (ColumnType)(-1)) break;
+                    if (colIndex != null) break;
                     x += col.Width;
                     i++;
                 }
@@ -902,18 +897,12 @@ namespace Manina.Windows.Forms
 
         #region Event Handlers
         /// <summary>
-        /// Handles the CreateControl event.
+        /// Handles the VisibleChanged event.
         /// </summary>
-        protected override void OnCreateControl()
+        protected override void OnVisibleChanged(EventArgs e)
         {
-            base.OnCreateControl();
-
-            Size = new Size(120, 100);
-            if (!Controls.Contains(hScrollBar))
-            {
-                Controls.Add(hScrollBar);
-                Controls.Add(vScrollBar);
-            }
+            base.OnVisibleChanged(e);
+            layoutManager.Update(true);
         }
         /// <summary>
         /// Handles the DragOver event.
@@ -974,10 +963,9 @@ namespace Manina.Windows.Forms
             if (!disposed && mRenderer != null)
                 mRenderer.RecreateBuffer();
 
-            if (hScrollBar == null)
-                return;
+            if (hScrollBar != null && layoutManager != null)
+                layoutManager.Update();
 
-            layoutManager.Update();
             Refresh();
         }
         /// <summary>
@@ -1048,7 +1036,7 @@ namespace Manina.Windows.Forms
                 hScrollBar.Value = newXOffset;
             }
 
-            navigationManager.MouseMove(e);
+            OnMouseMove(e);
             Refresh(true);
             mRenderer.ResumePaint();
 
@@ -1132,6 +1120,9 @@ namespace Manina.Windows.Forms
         /// false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
+            if (!IsHandleCreated || IsDisposed || InvokeRequired)
+                return;
+
             if (!disposed)
             {
                 if (disposing)
