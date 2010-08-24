@@ -54,7 +54,7 @@ namespace Manina.Windows.Forms
         public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
         {
             if (destinationType == typeof(string) && value is ImageListViewColor)
-                return "Color Palette";
+                return "(Color Settings)";
 
             return base.ConvertTo(context, culture, value, destinationType);
         }
