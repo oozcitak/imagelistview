@@ -25,6 +25,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the color palette of the image list view.
     /// </summary>
+    [TypeConverter(typeof(ImageListViewColorTypeConverter))]
     public class ImageListViewColor
     {
         #region Member Variables
@@ -235,9 +236,9 @@ namespace Manina.Windows.Forms
             set { mColumnHeaderHoverColor2 = value; }
         }
         /// <summary>
-        /// Gets or sets the cells foreground color of the coumn header text.
+        /// Gets or sets the cells foreground color of the column header text.
         /// </summary>
-        [Category("Appearance Details View"), Description("Gets or sets the cells foreground color of the coumn header text.")]
+        [Category("Appearance Details View"), Description("Gets or sets the cells foreground color of the column header text.")]
         public Color ColumnHeaderForeColor
         {
             get { return mColumnHeaderForeColor; }
