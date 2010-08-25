@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.0 RC 2 (25 August 2010) =
+
+  * Custom columns can now be sorted.
+  * Fixed a bug where subitem hover state was not updated correctly.
+  * Added language resources for German. Thanks to Uwe.
+
 = 7.0 RC 1 (23 August 2010) =
 
   * Added support for custom columns. (Issue 52, Issue 53, Issue 55, Issue 56)
