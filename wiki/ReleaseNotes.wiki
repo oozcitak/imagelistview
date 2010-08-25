@@ -6,6 +6,7 @@
   * Custom columns can now be sorted.
   * Fixed a bug where subitem hover state was not updated correctly.
   * Added language resources for German. Thanks to Uwe.
+  * Added a !TypeConverter to !ImageListViewColor to make it possible to modify the color palette from the object browser.
 
 = 7.0 RC 1 (23 August 2010) =
 
