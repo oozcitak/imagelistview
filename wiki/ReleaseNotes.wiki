@@ -1,9 +1,14 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.0 RC 3 (25 August 2010) =
+
+  * Fixed built-in renderers to work with custom columns.
+  * The designer now displays a preview of items on the control.
+
 = 7.0 RC 2 (25 August 2010) =
 
-  * Custom columns can now be sorted.
+  * Custom columns can now be sorted. The !SortColumn property of the control is now an int value. *This is a breaking change.*
   * Fixed a bug where subitem hover state was not updated correctly.
   * Added language resources for German. Thanks to Uwe.
   * Added a !TypeConverter to !ImageListViewColor to make it possible to modify the color palette from the object browser.
