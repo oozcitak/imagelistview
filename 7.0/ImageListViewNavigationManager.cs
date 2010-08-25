@@ -104,7 +104,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the column whose separator is being dragged.
             /// </summary>
-            public ImageListView.ImageListViewColumnHeader SelectedSeperator { get; private set; }
+            public ImageListView.ImageListViewColumnHeader SelectedSeparator { get; private set; }
             /// <summary>
             /// Gets whether the mouse is over the pane border.
             /// </summary>
@@ -159,7 +159,7 @@ namespace Manina.Windows.Forms
                 HoveredSubItem = -1;
                 HoveredColumn = null;
                 HoveredSeparator = null;
-                SelectedSeperator = null;
+                SelectedSeparator = null;
                 HoveredPaneBorder = false;
 
                 MouseSelecting = false;
@@ -278,7 +278,7 @@ namespace Manina.Windows.Forms
                 if (DraggingSeperator)
                 {
                     int delta = e.Location.X - lastSeparatorDragLocation.X;
-                    int colwidth = SelectedSeperator.Width + delta;
+                    int colwidth = SelectedSeparator.Width + delta;
                     if (colwidth > 16)
                         lastSeparatorDragLocation = e.Location;
                     else
@@ -286,11 +286,11 @@ namespace Manina.Windows.Forms
                         lastSeparatorDragLocation = new Point(e.Location.X - colwidth + 16, e.Location.Y);
                         colwidth = 16;
                     }
-                    SelectedSeperator.Width = colwidth;
+                    SelectedSeparator.Width = colwidth;
 
                     HoveredItem = null;
-                    HoveredColumn = SelectedSeperator;
-                    HoveredSeparator = SelectedSeperator;
+                    HoveredColumn = SelectedSeparator;
+                    HoveredSeparator = SelectedSeparator;
                     mImageListView.Refresh();
                 }
                 else if (ResizingPane)
@@ -376,7 +376,7 @@ namespace Manina.Windows.Forms
 
                     HoveredColumn = null;
                     HoveredSeparator = null;
-                    SelectedSeperator = null;
+                    SelectedSeparator = null;
 
                     mImageListView.Refresh();
                 }
@@ -443,7 +443,7 @@ namespace Manina.Windows.Forms
                 {
                     // Start dragging a separator
                     DraggingSeperator = true;
-                    SelectedSeperator = HoveredSeparator;
+                    SelectedSeparator = HoveredSeparator;
                     lastSeparatorDragLocation = e.Location;
                 }
                 else if (!MouseSelecting && !DraggingSeperator && !ResizingPane &&
@@ -502,8 +502,8 @@ namespace Manina.Windows.Forms
 
                 if (DraggingSeperator)
                 {
-                    mImageListView.OnColumnWidthChanged(new ColumnEventArgs(SelectedSeperator));
-                    SelectedSeperator = null;
+                    mImageListView.OnColumnWidthChanged(new ColumnEventArgs(SelectedSeparator));
+                    SelectedSeparator = null;
                     DraggingSeperator = false;
                 }
                 else if (ResizingPane)

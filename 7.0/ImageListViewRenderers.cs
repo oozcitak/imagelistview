@@ -136,7 +136,7 @@ namespace Manina.Windows.Forms
 
                     // Shade sort column
                     List<ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
-                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    int x = bounds.Left - 1;
                     foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                     {
                         if (mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&

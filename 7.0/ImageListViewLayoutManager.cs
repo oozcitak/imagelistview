@@ -196,7 +196,8 @@ namespace Manina.Windows.Forms
 
             // If the checkbox and the icon have the same alignment,
             // move the checkbox horizontally away from the icon
-            if (mImageListView.View != View.Details && mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
+            if (mImageListView.View != View.Details && mImageListView.CheckBoxAlignment == mImageListView.IconAlignment &&
+                mImageListView.ShowCheckBoxes && mImageListView.ShowFileIcons)
             {
                 ContentAlignment alignment = mImageListView.CheckBoxAlignment;
                 if (alignment == ContentAlignment.BottomCenter || alignment == ContentAlignment.MiddleCenter || alignment == ContentAlignment.TopCenter)
@@ -220,7 +221,8 @@ namespace Manina.Windows.Forms
             // or in details view move the icon horizontally away from the checkbox
             if (mImageListView.View == View.Details)
                 bounds.X += 16 + 2;
-            else if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment)
+            else if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment &&
+                mImageListView.ShowCheckBoxes && mImageListView.ShowFileIcons)
             {
                 ContentAlignment alignment = mImageListView.CheckBoxAlignment;
                 if (alignment == ContentAlignment.BottomLeft || alignment == ContentAlignment.MiddleLeft || alignment == ContentAlignment.TopLeft)

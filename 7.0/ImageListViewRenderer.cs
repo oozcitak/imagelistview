@@ -416,7 +416,7 @@ namespace Manina.Windows.Forms
                             state |= ColumnState.Hovered;
                         if (ReferenceEquals(mImageListView.navigationManager.HoveredSeparator, column))
                             state |= ColumnState.SeparatorHovered;
-                        if (ReferenceEquals(mImageListView.navigationManager.SelectedSeperator, column))
+                        if (ReferenceEquals(mImageListView.navigationManager.SelectedSeparator, column))
                             state |= ColumnState.SeparatorSelected;
 
                         Rectangle bounds = new Rectangle(x, y, column.Width, h);
@@ -924,7 +924,7 @@ namespace Manina.Windows.Forms
                     List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
 
                     // Shade sort column
-                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    int x = bounds.Left - 1;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
                         if (mImageListView.SortOrder != SortOrder.None &&
@@ -945,7 +945,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Separators 
-                    x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    x = bounds.Left - 1;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
                         x += column.Width;
