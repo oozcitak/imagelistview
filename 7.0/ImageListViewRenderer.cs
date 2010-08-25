@@ -527,7 +527,8 @@ namespace Manina.Windows.Forms
                                 }
 
                                 // Check if the mouse is over the sub item
-                                bool subItemHovered = (mImageListView.navigationManager.HoveredSubItem == colIndex);
+                                bool subItemHovered = ((param.State & ItemState.Hovered) != ItemState.None) &&
+                                    (mImageListView.navigationManager.HoveredSubItem == colIndex);
 
                                 DrawSubItemItemOverlay(g, param.Item, param.State, colIndex, subItemHovered, subBounds);
 
