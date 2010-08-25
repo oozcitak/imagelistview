@@ -1031,7 +1031,7 @@ namespace Manina.Windows.Forms
                         Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                else if (mImageListView.View == View.Thumbnails && (state & ItemState.Selected) == ItemState.None)
+                else if (mImageListView.View != View.Details && (state & ItemState.Selected) == ItemState.None)
                 {
                     using (Pen pGray64 = new Pen(ImageListView.Colors.BorderColor))
                     {
@@ -1252,6 +1252,7 @@ namespace Manina.Windows.Forms
                         if (bounds.Height <= 0) break;
 
                         if (column.Visible &&
+                            column.Type != ColumnType.Custom &&
                             column.Type != ColumnType.FileType &&
                             column.Type != ColumnType.DateAccessed &&
                             column.Type != ColumnType.FileName &&

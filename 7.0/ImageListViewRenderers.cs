@@ -196,6 +196,8 @@ namespace Manina.Windows.Forms
                                     for (int i = rating + 1; i <= 5; i++)
                                         g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
+                                else if (column.Type == ColumnType.Custom)
+                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
                             }
@@ -481,6 +483,7 @@ namespace Manina.Windows.Forms
                         if (bounds.Height <= 0) break;
 
                         if (column.Visible &&
+                            column.Type != ColumnType.Custom &&
                             column.Type != ColumnType.FileType &&
                             column.Type != ColumnType.DateAccessed &&
                             column.Type != ColumnType.FileName &&
@@ -1035,10 +1038,10 @@ namespace Manina.Windows.Forms
                                     for (int i = rating + 1; i <= 5; i++)
                                         g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
-                                else if ((state & ItemState.Selected) == ItemState.None)
-                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
+                                else if (column.Type == ColumnType.Custom)
+                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
 
                                 rt.X -= iconOffset;
                             }
@@ -1151,6 +1154,7 @@ namespace Manina.Windows.Forms
                         if (bounds.Height <= 0) break;
 
                         if (column.Visible &&
+                            column.Type != ColumnType.Custom &&
                             column.Type != ColumnType.FileType &&
                             column.Type != ColumnType.DateAccessed &&
                             column.Type != ColumnType.FileName &&

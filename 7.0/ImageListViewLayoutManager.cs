@@ -429,7 +429,7 @@ namespace Manina.Windows.Forms
                 mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
                 if (!mImageListView.IntegralScroll)
                     mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
-                else 
+                else
                     mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * (mItemAreaBounds.Height / mItemSizeWithMargin.Height);
                 mImageListView.vScrollBar.Minimum = 0;
                 mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
