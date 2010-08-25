@@ -473,7 +473,8 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void Sort()
             {
-                if (mImageListView == null || mImageListView.SortOrder == SortOrder.None)
+                if (mImageListView == null || mImageListView.SortOrder == SortOrder.None ||
+                    mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count)
                     return;
 
                 // Display wait cursor while sorting
@@ -481,7 +482,7 @@ namespace Manina.Windows.Forms
                 mImageListView.Cursor = Cursors.WaitCursor;
 
                 // Sort items
-                mItems.Sort(new ImageListViewItemComparer(mImageListView.SortColumn, mImageListView.SortOrder));
+                mItems.Sort(new ImageListViewItemComparer(mImageListView.Columns[mImageListView.SortColumn], mImageListView.SortOrder));
 
                 // Update item indices
                 for (int i = 0; i < mItems.Count; i++)
@@ -498,10 +499,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             private class ImageListViewItemComparer : IComparer<ImageListViewItem>
             {
-                private ColumnType mSortColumn;
+                private ImageListViewColumnHeader mSortColumn;
                 private SortOrder mOrder;
 
-                public ImageListViewItemComparer(ColumnType sortColumn, SortOrder order)
+                public ImageListViewItemComparer(ImageListViewColumnHeader sortColumn, SortOrder order)
                 {
                     mSortColumn = sortColumn;
                     mOrder = order;
@@ -514,7 +515,7 @@ namespace Manina.Windows.Forms
                 {
                     int sign = (mOrder == SortOrder.Ascending ? 1 : -1);
                     int result = 0;
-                    switch (mSortColumn)
+                    switch (mSortColumn.Type)
                     {
                         case ColumnType.DateAccessed:
                             result = DateTime.Compare(x.DateAccessed, y.DateAccessed);
@@ -585,6 +586,9 @@ namespace Manina.Windows.Forms
                             break;
                         case ColumnType.Rating:
                             result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
+                            break;
+                        case ColumnType.Custom:
+                            result = string.Compare(x.GetSubItemText(mSortColumn.columnID), y.GetSubItemText(mSortColumn.columnID), StringComparison.InvariantCultureIgnoreCase);
                             break;
                         default:
                             result = 0;

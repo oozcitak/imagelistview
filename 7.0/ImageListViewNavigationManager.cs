@@ -640,7 +640,7 @@ namespace Manina.Windows.Forms
                     if (!suppressClick)
                     {
                         // Change the sort column
-                        if (mImageListView.SortColumn == HoveredColumn.Type)
+                        if (mImageListView.Columns[mImageListView.SortColumn].columnID == HoveredColumn.columnID)
                         {
                             if (mImageListView.SortOrder == SortOrder.Descending)
                                 mImageListView.SortOrder = SortOrder.Ascending;
@@ -649,7 +649,7 @@ namespace Manina.Windows.Forms
                         }
                         else
                         {
-                            mImageListView.mSortColumn = HoveredColumn.Type;
+                            mImageListView.mSortColumn = mImageListView.Columns.IndexOf(HoveredColumn);
                             mImageListView.mSortOrder = SortOrder.Ascending;
                             mImageListView.Sort();
                         }

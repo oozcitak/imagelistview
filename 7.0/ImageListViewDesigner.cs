@@ -98,7 +98,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the sort column of the designed ImageListView.
         /// </summary>
-        public ColumnType SortColumn
+        public int SortColumn
         {
             get { return imageListView.SortColumn; }
             set { SetProperty("SortColumn", value); }

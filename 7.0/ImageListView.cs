@@ -78,7 +78,7 @@ namespace Manina.Windows.Forms
         private bool mRetryOnError;
         internal ImageListViewSelectedItemCollection mSelectedItems;
         internal ImageListViewCheckedItemCollection mCheckedItems;
-        private ColumnType mSortColumn;
+        private int mSortColumn;
         private SortOrder mSortOrder;
         private bool mShowFileIcons;
         private bool mShowCheckBoxes;
@@ -398,10 +398,10 @@ namespace Manina.Windows.Forms
             set { mCheckBoxPadding = value; Refresh(); }
         }
         /// <summary>
-        /// Gets or sets the sort column.
+        /// Gets or sets the index of the sort column.
         /// </summary>
-        [Category("Appearance"), DefaultValue(typeof(ColumnType), "Name"), Description("Gets or sets the sort column.")]
-        public ColumnType SortColumn
+        [Category("Appearance"), DefaultValue(0), Description("Gets or sets the index of the sort column.")]
+        public int SortColumn
         {
             get
             {
@@ -563,7 +563,7 @@ namespace Manina.Windows.Forms
             mRetryOnError = true;
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mCheckedItems = new ImageListViewCheckedItemCollection(this);
-            mSortColumn = ColumnType.Name;
+            mSortColumn = 0;
             mSortOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);

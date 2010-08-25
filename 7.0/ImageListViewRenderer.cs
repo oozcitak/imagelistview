@@ -927,8 +927,10 @@ namespace Manina.Windows.Forms
                     int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
-                        if (mImageListView.SortColumn == column.Type && mImageListView.SortOrder != SortOrder.None &&
-                            (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None)
+                        if (mImageListView.SortOrder != SortOrder.None &&
+                            mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                            (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None &&
+                            mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
                         {
                             Rectangle subItemBounds = bounds;
                             subItemBounds.X = x;
@@ -1135,7 +1137,9 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None && mImageListView.SortColumn == column.Type)
+                if (mImageListView.SortOrder != SortOrder.None &&
+                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
                     if (mImageListView.SortOrder == SortOrder.Ascending)
