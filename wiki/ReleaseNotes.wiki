@@ -1,6 +1,19 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.0 (26 August 2010) =
+
+  * Added support for custom columns. (Issue 52, Issue 53, Issue 55, Issue 56)
+  * The !SortColumn property of the control is now an int value corresponding to column index. This change was necessary to support sorting of custom columns. *This is a breaking change.
+  * Added language resources for German. Thanks to Uwe.
+  * Added a !TypeConverter to !ImageListViewColor to make it possible to modify the color palette from the object browser.
+  * Added sub-items to items.
+  * Added hover and click events for sub items in details view.
+  * Improved the control designer. The designer now displays a preview of items on the control.
+  * Added item borders to the default renderer for Gallery and Pane view modes so that item display is consistent with the Thumbnail view mode.
+  * Fixed a bug where setting checkboxes and file icons the same alignment resulted in the checkboxes to move away from the icon location even when the !ShowFileIcons property was set to false.
+  * Fixed a bug in the scrollbar value calculation when the control had no items to display. (Issue 84)
+
 = 7.0 RC 3 (25 August 2010) =
 
   * Fixed built-in renderers to work with custom columns.
