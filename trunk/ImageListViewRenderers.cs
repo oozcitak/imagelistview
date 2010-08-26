@@ -78,6 +78,12 @@ namespace Manina.Windows.Forms
             }
 
             /// <summary>
+            /// Gets a value indicating whether this renderer can apply custom colors.
+            /// </summary>
+            /// <value></value>
+            public override bool CanApplyColors { get { return false; } }
+
+            /// <summary>
             /// Draws the background of the control.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
@@ -861,6 +867,12 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class XPRenderer : ImageListView.ImageListViewRenderer
         {
+            /// <summary>
+            /// Gets a value indicating whether this renderer can apply custom colors.
+            /// </summary>
+            /// <value></value>
+            public override bool CanApplyColors { get { return false; } }
+
             /// <summary>
             /// Returns item size for the given view mode.
             /// </summary>
