@@ -34,7 +34,7 @@ namespace Manina.Windows.Forms
     [DefaultProperty("Items")]
     [Designer(typeof(ImageListViewDesigner))]
     [Docking(DockingBehavior.Ask)]
-    public partial class ImageListView : Control
+    public partial class ImageListView : Control, IComponent
     {
         #region Constants
         /// <summary>
@@ -980,7 +980,7 @@ namespace Manina.Windows.Forms
             base.OnResize(e);
 
             if (!disposed && mRenderer != null)
-                mRenderer.RecreateBuffer();
+                mRenderer.ClearBuffer();
 
             if (hScrollBar != null && layoutManager != null)
                 layoutManager.Update();
@@ -1139,7 +1139,7 @@ namespace Manina.Windows.Forms
         /// false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            if (!IsHandleCreated || IsDisposed || InvokeRequired)
+            if (IsDisposed || InvokeRequired)
                 return;
 
             if (!disposed)
