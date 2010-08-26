@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0C295FB8-C6C6-4A40-9F19-05A43F353A04}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -122,10 +122,10 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\image.png" />
+    <None Include="Resources\DefaultImage.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\exclamation.png" />
+    <None Include="Resources\ErrorImage.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\SortAscending.png" />
@@ -134,10 +134,10 @@
     <None Include="Resources\SortDescending.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\star.png" />
+    <None Include="Resources\RatingImage.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\star_gray.png" />
+    <None Include="Resources\EmptyRatingImage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
