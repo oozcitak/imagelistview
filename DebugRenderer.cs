@@ -163,7 +163,7 @@ namespace Manina.Windows.Forms
                 tColor = Color.Black;
             using (Brush b = new SolidBrush(tColor))
             {
-                g.DrawString("InHeaderArea (" + h.ColumnIndex.ToString() + ")", mImageListView.Font, b, r.Location);
+                g.DrawString("InHeaderArea (" + h.Column.ToString() + ")", mImageListView.Font, b, r.Location);
             }
             r.Offset(0, 12);
 

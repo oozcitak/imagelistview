@@ -183,4 +183,7 @@
   <data name="Rating" xml:space="preserve">
     <value>Derece</value>
   </data>
+  <data name="Custom" xml:space="preserve">
+    <value>Özel</value>
+  </data>
 </root>

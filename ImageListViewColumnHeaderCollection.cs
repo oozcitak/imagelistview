@@ -30,13 +30,13 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents the collection of columns in an ImageListView control.
         /// </summary>
-        [Editor(typeof(ColumnHeaderCollectionEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(ColumnHeaderCollectionTypeConverter))]
-        public class ImageListViewColumnHeaderCollection : IEnumerable<ImageListViewColumnHeader>
+        public class ImageListViewColumnHeaderCollection : IList<ImageListViewColumnHeader>, ICollection, IList, IEnumerable
         {
             #region Member Variables
             private ImageListView mImageListView;
-            private ImageListViewColumnHeader[] mItems;
+            private List<ImageListViewColumnHeader> mItems;
+            private List<ImageListViewColumnHeader> mDisplayedItems;
+            internal bool updateDisplayList;
             #endregion
 
             #region Properties
@@ -44,7 +44,7 @@ namespace Manina.Windows.Forms
             /// Gets the number of columns in the collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets the number of columns in the collection.")]
-            public int Count { get { return mItems.Length; } }
+            public int Count { get { return mItems.Count; } }
             /// <summary>
             /// Gets the ImageListView owning this collection.
             /// </summary>
@@ -60,6 +60,29 @@ namespace Manina.Windows.Forms
                 {
                     return mItems[index];
                 }
+                set
+                {
+                    ImageListViewColumnHeader oldItem = mItems[index];
+
+                    if (oldItem.Type == ColumnType.Custom)
+                    {
+                        if (mImageListView == null)
+                            throw new InvalidOperationException("Owner control is null.");
+                        mImageListView.Items.RemoveCustomColumn(oldItem.columnID);
+                    }
+
+                    ImageListViewColumnHeader newItem = value;
+                    mItems[index] = newItem;
+
+                    if (newItem.Type == ColumnType.Custom)
+                    {
+                        if (mImageListView == null)
+                            throw new InvalidOperationException("Owner control is null.");
+                        mImageListView.Items.AddCustomColumn(newItem.columnID);
+                    }
+
+                    updateDisplayList = true;
+                }
             }
             /// <summary>
             /// Gets the column with the specified type within the collection.
@@ -69,10 +92,21 @@ namespace Manina.Windows.Forms
             {
                 get
                 {
+                    if (type == ColumnType.Custom)
+                        throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
+
                     foreach (ImageListViewColumnHeader column in this)
                         if (column.Type == type) return column;
                     throw new ArgumentException("Unknown column type.", "type");
                 }
+            }
+            /// <summary>
+            /// Gets a value indicating whether the Collection is read-only.
+            /// </summary>
+            [Category("Behavior"), Browsable(false), Description("Gets a value indicating whether the Collection is read-only.")]
+            public bool IsReadOnly
+            {
+                get { return false; }
             }
             #endregion
 
@@ -84,43 +118,90 @@ namespace Manina.Windows.Forms
             internal ImageListViewColumnHeaderCollection(ImageListView owner)
             {
                 mImageListView = owner;
-                // Create the default column set
-                mItems = new ImageListViewColumnHeader[] {
-                    new ImageListViewColumnHeader(ColumnType.Name),
-                    new ImageListViewColumnHeader(ColumnType.FileSize),
-                    new ImageListViewColumnHeader(ColumnType.DateModified),
-                    new ImageListViewColumnHeader(ColumnType.Dimensions),
-                    new ImageListViewColumnHeader(ColumnType.Resolution),
-                    new ImageListViewColumnHeader(ColumnType.FilePath),
-                    new ImageListViewColumnHeader(ColumnType.FileType),
-                    new ImageListViewColumnHeader(ColumnType.FileName),
-                    new ImageListViewColumnHeader(ColumnType.DateCreated),
-                    new ImageListViewColumnHeader(ColumnType.DateAccessed),
-                    new ImageListViewColumnHeader(ColumnType.ImageDescription),
-                    new ImageListViewColumnHeader(ColumnType.EquipmentModel),
-                    new ImageListViewColumnHeader(ColumnType.DateTaken),
-                    new ImageListViewColumnHeader(ColumnType.Artist),
-                    new ImageListViewColumnHeader(ColumnType.Copyright),
-                    new ImageListViewColumnHeader(ColumnType.ExposureTime),
-                    new ImageListViewColumnHeader(ColumnType.FNumber),
-                    new ImageListViewColumnHeader(ColumnType.ISOSpeed),
-                    new ImageListViewColumnHeader(ColumnType.ShutterSpeed),
-                    new ImageListViewColumnHeader(ColumnType.Aperture),
-                    new ImageListViewColumnHeader(ColumnType.UserComment),
-                    new ImageListViewColumnHeader(ColumnType.Rating),
-               };
-                for (int i = 0; i < mItems.Length; i++)
-                {
-                    ImageListViewColumnHeader col = mItems[i];
-                    col.mImageListView = mImageListView;
-                    col.owner = this;
-                    col.DisplayIndex = i;
-                    if (i >= 4) col.Visible = false;
-                }
+                mItems = new List<ImageListViewColumnHeader>();
+                updateDisplayList = true;
             }
             #endregion
 
             #region Instance Methods
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            public void Add(ImageListViewColumnHeader item)
+            {
+                if (mImageListView == null)
+                    throw new InvalidOperationException("Owner control is null.");
+
+                item.mImageListView = mImageListView;
+                item.owner = this;
+                if (item.DisplayIndex == -1)
+                    item.DisplayIndex = mItems.Count;
+
+                mItems.Add(item);
+
+                if (item.Type == ColumnType.Custom)
+                    mImageListView.Items.AddCustomColumn(item.columnID);
+
+                updateDisplayList = true;
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
+            public void Add(ColumnType type, string text, int width)
+            {
+                Add(new ImageListViewColumnHeader(type, text, width));
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
+            public void Add(ColumnType type, string text)
+            {
+                Add(new ImageListViewColumnHeader(type, text));
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
+            public void Add(ColumnType type, int width)
+            {
+                Add(new ImageListViewColumnHeader(type, width));
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            public void Add(ColumnType type)
+            {
+                Add(new ImageListViewColumnHeader(type));
+            }
+            /// <summary>
+            /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            public void Clear()
+            {
+                mItems.Clear();
+                if (mImageListView != null)
+                    mImageListView.Items.RemoveAllCustomColumns();
+                updateDisplayList = true;
+            }
+            /// <summary>
+            /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+            /// </summary>
+            /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            /// <returns>
+            /// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+            /// </returns>
+            public bool Contains(ImageListViewColumnHeader item)
+            {
+                return mItems.Contains(item);
+            }
             /// <summary>
             /// Gets the default column header text for the given column type.
             /// </summary>
@@ -141,22 +222,113 @@ namespace Manina.Windows.Forms
                     yield return column;
                 yield break;
             }
+            /// <summary>
+            /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            /// </summary>
+            /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+            /// <returns>
+            /// The index of <paramref name="item"/> if found in the list; otherwise, -1.
+            /// </returns>
+            public int IndexOf(ImageListViewColumnHeader item)
+            {
+                return mItems.IndexOf(item);
+            }
+            /// <summary>
+            /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+            public void Insert(int index, ImageListViewColumnHeader item)
+            {
+                if (mImageListView == null)
+                    throw new InvalidOperationException("Owner control is null.");
+
+                item.mImageListView = mImageListView;
+                item.owner = this;
+                if (item.DisplayIndex == -1)
+                {
+                    foreach (ImageListViewColumnHeader col in mItems)
+                        if (col.DisplayIndex >= index)
+                            col.DisplayIndex++;
+                    item.DisplayIndex = index;
+                }
+
+                mItems.Insert(index, item);
+                if (item.Type == ColumnType.Custom)
+                    mImageListView.Items.AddCustomColumn(item.columnID);
+
+                updateDisplayList = true;
+            }
+            /// <summary>
+            /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            /// <returns>
+            /// true if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </returns>
+            public bool Remove(ImageListViewColumnHeader item)
+            {
+                bool exists = mItems.Remove(item);
+                if (item.Type == ColumnType.Custom)
+                {
+                    if (mImageListView == null)
+                        throw new InvalidOperationException("Owner control is null.");
+                    mImageListView.Items.RemoveCustomColumn(item.columnID);
+                }
+                updateDisplayList = true;
+                return exists;
+            }
+            /// <summary>
+            /// Removes the <see cref="T:System.Collections.Generic.IList`1"/> item at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index of the item to remove.</param>
+            public void RemoveAt(int index)
+            {
+                mItems.RemoveAt(index);
+                ImageListViewColumnHeader item = mItems[index];
+                if (item.Type == ColumnType.Custom)
+                {
+                    if (mImageListView == null)
+                        throw new InvalidOperationException("Owner control is null.");
+                    mImageListView.Items.RemoveCustomColumn(item.columnID);
+                }
+                updateDisplayList = true;
+            }
             #endregion
 
             #region Helper Methods
+            /// <summary>
+            /// Determines whether the collection has the given column type.
+            /// </summary>
+            /// <param name="type">The type of column.</param>
+            internal bool HasType(ColumnType type)
+            {
+                if (type == ColumnType.Custom)
+                    throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
+
+                foreach (ImageListViewColumnHeader column in this)
+                    if (column.Type == type) return true;
+
+                return false;
+            }
             /// <summary>
             /// Gets the columns as diplayed on the UI.
             /// </summary>
             public List<ImageListViewColumnHeader> GetDisplayedColumns()
             {
-                List<ImageListViewColumnHeader> list = new List<ImageListViewColumnHeader>();
+                if (mDisplayedItems != null && !updateDisplayList)
+                    return mDisplayedItems;
+
+                mDisplayedItems = new List<ImageListViewColumnHeader>();
                 foreach (ImageListViewColumnHeader column in mItems)
                 {
                     if (column.Visible)
-                        list.Add(column);
+                        mDisplayedItems.Add(column);
                 }
-                list.Sort(ColumnCompare);
-                return list;
+                mDisplayedItems.Sort(ColumnCompare);
+
+                updateDisplayList = false;
+                return mDisplayedItems;
             }
             /// <summary>
             /// Compares the columns by their display index.
@@ -179,6 +351,111 @@ namespace Manina.Windows.Forms
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
+            }
+            /// <summary>
+            /// Copies the elements of the <see cref="T:System.Collections.ICollection"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+            /// </summary>
+            /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.ICollection"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param>
+            /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+            void ICollection.CopyTo(Array array, int index)
+            {
+                if (!(array is ImageListViewColumnHeader[]))
+                    throw new ArgumentException("An array of ImageListViewColumnHeader is required.", "array");
+                mItems.CopyTo((ImageListViewColumnHeader[])array, index);
+            }
+            /// <summary>
+            /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+            /// </summary>
+            /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param>
+            /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+            void ICollection<ImageListViewColumnHeader>.CopyTo(ImageListViewColumnHeader[] array, int arrayIndex)
+            {
+                mItems.CopyTo(array, arrayIndex);
+            }
+            /// <summary>
+            /// Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection"/> is synchronized (thread safe).
+            /// </summary>
+            bool ICollection.IsSynchronized
+            {
+                get { return false; }
+            }
+            /// <summary>
+            /// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection"/>.
+            /// </summary>
+            object ICollection.SyncRoot
+            {
+                get { throw new NotImplementedException(); }
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.IList"/>.
+            /// </summary>
+            int IList.Add(object value)
+            {
+                if (!(value is ImageListViewColumnHeader))
+                    throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
+                ImageListViewColumnHeader item = (ImageListViewColumnHeader)value;
+                Add(item);
+                return mItems.IndexOf(item);
+            }
+            /// <summary>
+            /// Determines whether the <see cref="T:System.Collections.IList"/> contains a specific value.
+            /// </summary>
+            bool IList.Contains(object value)
+            {
+                if (!(value is ImageListViewColumnHeader))
+                    throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
+                return mItems.Contains((ImageListViewColumnHeader)value);
+            }
+            /// <summary>
+            /// Determines the index of a specific item in the <see cref="T:System.Collections.IList"/>.
+            /// </summary>
+            int IList.IndexOf(object value)
+            {
+                if (!(value is ImageListViewColumnHeader))
+                    throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
+                return IndexOf((ImageListViewColumnHeader)value);
+            }
+            /// <summary>
+            /// Inserts an item to the <see cref="T:System.Collections.IList"/> at the specified index.
+            /// </summary>
+            void IList.Insert(int index, object value)
+            {
+                if (!(value is ImageListViewColumnHeader))
+                    throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
+                Insert(index, (ImageListViewColumnHeader)value);
+            }
+            /// <summary>
+            /// Gets a value indicating whether the <see cref="T:System.Collections.IList"/> has a fixed size.
+            /// </summary>
+            bool IList.IsFixedSize
+            {
+                get { return false; }
+            }
+            /// <summary>
+            /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.IList"/>.
+            /// </summary>
+            void IList.Remove(object value)
+            {
+                if (!(value is ImageListViewColumnHeader))
+                    throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
+                Remove((ImageListViewColumnHeader)value);
+            }
+            /// <summary>
+            /// Gets or sets the <see cref="System.Object"/> at the specified index.
+            /// </summary>
+            object IList.this[int index]
+            {
+                get
+                {
+                    return this[index];
+                }
+                set
+                {
+                    if (!(value is ImageListViewColumnHeader))
+                        throw new ArgumentException("An object of type ImageListViewColumnHeader is required.", "value");
+                    this[index] = (ImageListViewColumnHeader)value;
+                    updateDisplayList = true;
+                }
             }
             #endregion
         }

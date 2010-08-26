@@ -82,6 +82,10 @@ namespace Manina.Windows.Forms
     public enum ColumnType
     {
         /// <summary>
+        /// A custom text column.
+        /// </summary>
+        Custom,
+        /// <summary>
         /// The text of the item, defaults to filename if
         /// the text is not provided.
         /// </summary>

@@ -118,91 +118,72 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Aperture" xml:space="preserve">
-    <value>Aperture</value>
+    <value>Blende</value>
   </data>
   <data name="Artist" xml:space="preserve">
-    <value>Artist</value>
+    <value>Künstler</value>
   </data>
   <data name="Copyright" xml:space="preserve">
     <value>Copyright</value>
   </data>
+  <data name="Custom" xml:space="preserve">
+    <value>Benutzerdefiniert</value>
+  </data>
   <data name="DateAccessed" xml:space="preserve">
-    <value>Last Access</value>
+    <value>Letzter Zugriff</value>
   </data>
   <data name="DateCreated" xml:space="preserve">
-    <value>Created</value>
+    <value>Erstellt</value>
   </data>
   <data name="DateModified" xml:space="preserve">
-    <value>Modified</value>
+    <value>Geändert</value>
   </data>
   <data name="DateTaken" xml:space="preserve">
-    <value>Taken</value>
+    <value>Aufgenommen</value>
   </data>
   <data name="Dimensions" xml:space="preserve">
-    <value>Dimensions</value>
+    <value>Abmessungen</value>
   </data>
   <data name="EquipmentModel" xml:space="preserve">
-    <value>Camera</value>
+    <value>Kameramodell</value>
   </data>
   <data name="ExposureTime" xml:space="preserve">
-    <value>Exposure Time</value>
+    <value>Belichtungszeit</value>
   </data>
   <data name="FileName" xml:space="preserve">
-    <value>Filename</value>
+    <value>Dateiname</value>
   </data>
   <data name="FilePath" xml:space="preserve">
-    <value>Path</value>
+    <value>Pfad</value>
   </data>
   <data name="FileSize" xml:space="preserve">
-    <value>Size</value>
+    <value>Größe</value>
   </data>
   <data name="FileType" xml:space="preserve">
-    <value>Type</value>
+    <value>Typ</value>
   </data>
   <data name="FNumber" xml:space="preserve">
-    <value>F Number</value>
+    <value>Blendenzahl</value>
   </data>
   <data name="ImageDescription" xml:space="preserve">
-    <value>Description</value>
+    <value>Beschreibung</value>
   </data>
   <data name="ISOSpeed" xml:space="preserve">
-    <value>ISO Speed</value>
+    <value>ISO-Filmempfindlichkeit</value>
   </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Bewertung</value>
+  </data>
   <data name="Resolution" xml:space="preserve">
-    <value>Resolution</value>
+    <value>Auflösung</value>
   </data>
   <data name="ShutterSpeed" xml:space="preserve">
-    <value>Shutter Speed</value>
+    <value>Verschlusszeit</value>
   </data>
   <data name="UserComment" xml:space="preserve">
-    <value>Comments</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="DefaultImage" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\image.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ErrorImage" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\exclamation.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="SortAscending" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\SortAscending.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="SortDescending" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\SortDescending.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RatingImage" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\star.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="EmptyRatingImage" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\star_gray.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Rating" xml:space="preserve">
-    <value>Rating</value>
-  </data>
-  <data name="Custom" xml:space="preserve">
-    <value>Custom</value>
+    <value>Kommentare</value>
   </data>
 </root>
