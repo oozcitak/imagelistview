@@ -219,7 +219,7 @@ namespace Manina.Windows.Forms
 
             // If the checkbox and the icon have the same alignment,
             // or in details view move the icon horizontally away from the checkbox
-            if (mImageListView.View == View.Details)
+            if (mImageListView.View == View.Details && mImageListView.ShowCheckBoxes && mImageListView.ShowFileIcons)
                 bounds.X += 16 + 2;
             else if (mImageListView.CheckBoxAlignment == mImageListView.IconAlignment &&
                 mImageListView.ShowCheckBoxes && mImageListView.ShowFileIcons)
