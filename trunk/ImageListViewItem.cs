@@ -38,8 +38,8 @@ namespace Manina.Windows.Forms
         private string mText;
         private int mZOrder;
         // File info
-        private Icon mSmallIcon;
-        private Icon mLargeIcon;
+        private Image mSmallIcon;
+        private Image mLargeIcon;
         private DateTime mDateAccessed;
         private DateTime mDateCreated;
         private DateTime mDateModified;
@@ -201,10 +201,10 @@ namespace Manina.Windows.Forms
                 CacheState state = ThumbnailCacheState;
                 if (state == CacheState.Error)
                 {
-                    if (mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
-                        return mLargeIcon.ToBitmap();
-                    else if (mSmallIcon != null)
-                        return mSmallIcon.ToBitmap();
+                    if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
+                        return mLargeIcon;
+                    else if (mImageListView.ShellIconFallback && mSmallIcon != null)
+                        return mSmallIcon;
                     else
                         return mImageListView.ErrorImage;
                 }
@@ -222,9 +222,9 @@ namespace Manina.Windows.Forms
                 if (img != null)
                     return img;
                 else if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16 && mLargeIcon != null)
-                    return mLargeIcon.ToBitmap();
+                    return mLargeIcon;
                 else if (mImageListView.ShellIconFallback && mSmallIcon != null)
-                    return mSmallIcon.ToBitmap();
+                    return mSmallIcon;
                 else
                     return mImageListView.DefaultImage;
             }
@@ -238,12 +238,12 @@ namespace Manina.Windows.Forms
         /// Gets the small shell icon of the image file represented by this item.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
-        public Icon SmallIcon { get { UpdateFileInfo(); return mSmallIcon; } }
+        public Image SmallIcon { get { UpdateFileInfo(); return mSmallIcon; } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
-        public Icon LargeIcon { get { UpdateFileInfo(); return mLargeIcon; } }
+        public Image LargeIcon { get { UpdateFileInfo(); return mLargeIcon; } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>

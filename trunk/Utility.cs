@@ -302,8 +302,8 @@ namespace Manina.Windows.Forms
 
             public bool Error { get; private set; }
             public FileAttributes FileAttributes { get; private set; }
-            public Icon SmallIcon { get; private set; }
-            public Icon LargeIcon { get; private set; }
+            public Image SmallIcon { get; private set; }
+            public Image LargeIcon { get; private set; }
             public DateTime CreationTime { get; private set; }
             public DateTime LastAccessTime { get; private set; }
             public DateTime LastWriteTime { get; private set; }
@@ -370,7 +370,10 @@ namespace Manina.Windows.Forms
 
                     if (hImg != IntPtr.Zero)
                     {
-                        SmallIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                        using (Icon newIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
+                        {
+                            SmallIcon = newIcon.ToBitmap();
+                        }
                         DestroyIcon(shinfo.hIcon);
                     }
 
@@ -380,7 +383,10 @@ namespace Manina.Windows.Forms
 
                     if (hImg != IntPtr.Zero)
                     {
-                        LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+                        using (Icon newIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
+                        {
+                            LargeIcon = newIcon.ToBitmap();
+                        }
                         DestroyIcon(shinfo.hIcon);
                     }
 
