@@ -425,7 +425,7 @@ namespace Manina.Windows.Forms
                         DataObject data = new DataObject(DataFormats.FileDrop, filenames.ToArray());
                         DropTarget = null;
                         selfDragging = true;
-                        mImageListView.DoDragDrop(data, DragDropEffects.Copy);
+                        mImageListView.DoDragDrop(data, DragDropEffects.All);
                         selfDragging = false;
 
                         // Since the MouseUp event will be eaten by DoDragDrop we will not receive
@@ -930,7 +930,7 @@ namespace Manina.Windows.Forms
                             dragDropTarget = null;
                         }
                         else if (selfDragging)
-                            e.Effect = DragDropEffects.Copy;
+                            e.Effect = DragDropEffects.Move;
                         else
                             e.Effect = DragDropEffects.Copy;
 
