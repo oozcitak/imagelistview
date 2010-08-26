@@ -72,6 +72,7 @@ namespace Manina.Windows.Forms
         private Image mRatingImage;
         private Image mEmptyRatingImage;
         private Font mHeaderFont;
+        private bool mIntegralScroll;
         private ImageListViewItemCollection mItems;
         private int mPaneWidth;
         internal ImageListViewRenderer mRenderer;
@@ -263,7 +264,21 @@ namespace Manina.Windows.Forms
         /// Gets or sets whether scrollbars scroll by an amount which is a multiple of item height.
         /// </summary>
         [Browsable(true), Category("Behavior"), Description("Gets or sets whether scrollbars scroll by an amount which is a multiple of item height."), DefaultValue(true)]
-        public bool IntegralScroll { get; set; }
+        public bool IntegralScroll
+        {
+            get
+            {
+                return mIntegralScroll;
+            }
+            set
+            {
+                if (mIntegralScroll != value)
+                {
+                    mIntegralScroll = value;
+                    Refresh();
+                }
+            }
+        }
         /// <summary>
         /// Gets the collection of items contained in the image list view.
         /// </summary>
@@ -556,7 +571,7 @@ namespace Manina.Windows.Forms
             mRatingImage = manager.GetObject("RatingImage") as Image;
             mEmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
             HeaderFont = this.Font;
-            IntegralScroll = true;
+            mIntegralScroll = true;
             mItems = new ImageListViewItemCollection(this);
             MultiSelect = true;
             mPaneWidth = 240;
