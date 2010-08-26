@@ -400,20 +400,20 @@ namespace Manina.Windows.Forms
                 // Horizontal scroll range
                 if (mImageListView.View == View.Gallery)
                 {
-                    mImageListView.hScrollBar.SmallChange = mItemSizeWithMargin.Width;
+                    mImageListView.hScrollBar.Minimum = 0;
+                    mImageListView.hScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mRows) * mItemSizeWithMargin.Width - 1);
                     if (!mImageListView.IntegralScroll)
                         mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
                     else
-                        mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * (mItemAreaBounds.Width / mItemSizeWithMargin.Width);
-                    mImageListView.hScrollBar.Minimum = 0;
-                    mImageListView.hScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mRows) * mItemSizeWithMargin.Width - 1);
+                        mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * mCols;
+                    mImageListView.hScrollBar.SmallChange = mItemSizeWithMargin.Width;
                 }
                 else
                 {
-                    mImageListView.hScrollBar.SmallChange = 1;
-                    mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
                     mImageListView.hScrollBar.Minimum = 0;
                     mImageListView.hScrollBar.Maximum = mCols * mItemSizeWithMargin.Width;
+                    mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
+                    mImageListView.hScrollBar.SmallChange = 1;
                 }
                 if (mImageListView.ViewOffset.X > mImageListView.hScrollBar.Maximum - mImageListView.hScrollBar.LargeChange + 1)
                 {
@@ -424,20 +424,20 @@ namespace Manina.Windows.Forms
                 // Vertical scroll range
                 if (mImageListView.View == View.Gallery)
                 {
-                    mImageListView.vScrollBar.SmallChange = 1;
-                    mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
                     mImageListView.vScrollBar.Minimum = 0;
                     mImageListView.vScrollBar.Maximum = mRows * mItemSizeWithMargin.Height;
+                    mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
+                    mImageListView.vScrollBar.SmallChange = 1;
                 }
                 else
                 {
-                    mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
+                    mImageListView.vScrollBar.Minimum = 0;
+                    mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
                     if (!mImageListView.IntegralScroll)
                         mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
                     else
-                        mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * (mItemAreaBounds.Height / mItemSizeWithMargin.Height);
-                    mImageListView.vScrollBar.Minimum = 0;
-                    mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
+                        mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * mRows;
+                    mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
                 }
                 if (mImageListView.ViewOffset.Y > mImageListView.vScrollBar.Maximum - mImageListView.vScrollBar.LargeChange + 1)
                 {
