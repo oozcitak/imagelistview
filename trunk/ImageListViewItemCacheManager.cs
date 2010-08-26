@@ -234,10 +234,10 @@ namespace Manina.Windows.Forms
                     }
                     else
                     {
-                        Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
                         // Update file info
                         if (!Stopping)
                         {
+                            Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
                             try
                             {
                                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
