@@ -35,7 +35,6 @@ namespace Manina.Windows.Forms
             #region Member Variables
             private bool mClip;
             internal ImageListView mImageListView;
-            private BufferedGraphicsContext bufferContext;
             private BufferedGraphics bufferGraphics;
             private bool disposed;
             private bool suspended;
@@ -392,7 +391,7 @@ namespace Manina.Windows.Forms
 
                 if (bufferGraphics == null)
                 {
-                    if (!RecreateBuffer()) return;
+                    if (!RecreateBuffer(graphics)) return;
                 }
 
                 // Update the layout
@@ -670,16 +669,26 @@ namespace Manina.Windows.Forms
                 bufferGraphics.Render(graphics);
             }
             /// <summary>
+            /// Clears the graphics buffer objects.
+            /// </summary>
+            internal void ClearBuffer()
+            {
+                if (bufferGraphics != null)
+                    bufferGraphics.Dispose();
+                bufferGraphics = null;
+            }
+            /// <summary>
             /// Destroys the current buffer and creates a new buffered graphics 
             /// sized to the client area of the owner control.
             /// </summary>
-            internal bool RecreateBuffer()
+            /// <param name="graphics">The Graphics to match the pixel format to.</param>
+            internal bool RecreateBuffer(Graphics graphics)
             {
                 if (creatingGraphics) return false;
 
                 creatingGraphics = true;
 
-                bufferContext = BufferedGraphicsManager.Current;
+                BufferedGraphicsContext bufferContext = BufferedGraphicsManager.Current;
 
                 if (disposed)
                     throw (new ObjectDisposedException("bufferContext"));
@@ -689,8 +698,9 @@ namespace Manina.Windows.Forms
 
                 bufferContext.MaximumBuffer = new Size(width, height);
 
-                if (bufferGraphics != null) bufferGraphics.Dispose();
-                bufferGraphics = bufferContext.Allocate(mImageListView.CreateGraphics(), new Rectangle(0, 0, width, height));
+                ClearBuffer();
+                
+                bufferGraphics = bufferContext.Allocate(graphics, new Rectangle(0, 0, width, height));
 
                 creatingGraphics = false;
 
@@ -706,8 +716,7 @@ namespace Manina.Windows.Forms
                 if (disposed) return;
                 disposed = true;
 
-                if (bufferGraphics != null)
-                    bufferGraphics.Dispose();
+                ClearBuffer();
 
                 Dispose();
             }

@@ -411,12 +411,25 @@ namespace Manina.Windows.Forms
             {
                 foreach (CacheItem item in thumbCache.Values)
                     item.Dispose();
-                toCache.Clear();
                 thumbCache.Clear();
-                removedItems.Clear();
+
+                foreach (CacheItem item in toCache)
+                    item.Dispose();
+                toCache.Clear();
+
+                foreach (Image img in editCache.Values)
+                    img.Dispose();
+                editCache.Clear();
+
+                foreach (CacheItem item in rendererToCache)
+                    item.Dispose();
+                rendererToCache.Clear();
+                if (rendererItem != null)
+                    rendererItem.Dispose();
 
                 memoryUsed = 0;
                 memoryUsedByRemoved = 0;
+                removedItems.Clear();
             }
         }
         /// <summary>
@@ -723,30 +736,7 @@ namespace Manina.Windows.Forms
         {
             if (!disposed)
             {
-                lock (lockObject)
-                {
-                    foreach (CacheItem item in thumbCache.Values)
-                        item.Dispose();
-                    thumbCache.Clear();
-
-                    foreach (CacheItem item in toCache)
-                        item.Dispose();
-                    toCache.Clear();
-
-                    foreach (Image img in editCache.Values)
-                        img.Dispose();
-                    editCache.Clear();
-
-                    foreach (CacheItem item in rendererToCache)
-                        item.Dispose();
-                    rendererToCache.Clear();
-                    if (rendererItem != null)
-                        rendererItem.Dispose();
-
-                    memoryUsed = 0;
-                    memoryUsedByRemoved = 0;
-                    removedItems.Clear();
-                }
+                Clear();
 
                 disposed = true;
             }
