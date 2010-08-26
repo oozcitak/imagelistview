@@ -1109,7 +1109,7 @@ namespace Manina.Windows.Forms
                     PointF ptf = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
                         (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
                     Point pt = Point.Round(ptf);
-                    g.DrawIcon(item.SmallIcon, pt.X, pt.Y);
+                    g.DrawImage(item.SmallIcon, pt.X, pt.Y);
                 }
             }
             /// <summary>

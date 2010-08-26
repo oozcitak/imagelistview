@@ -544,11 +544,11 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the small shell icon of the image file represented by this item.
         /// </summary>
-        public Icon SmallIcon { get; set; }
+        public Image SmallIcon { get; set; }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// </summary>
-        public Icon LargeIcon { get; set; }
+        public Image LargeIcon { get; set; }
         /// <summary>
         /// Gets or sets the last access date of the image file represented by this item.
         /// </summary>
