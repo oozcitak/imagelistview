@@ -114,7 +114,10 @@ namespace Manina.Windows.Forms
             }
 
             mImageListView.layoutManager.Update(true);
-
+            Rectangle itemArea = mImageListView.layoutManager.ItemAreaBounds;
+            itemArea.Offset(offset);
+            Rectangle clip = Rectangle.Intersect(Bounds, itemArea);
+            pe.Graphics.SetClip(clip);
             mImageListView.mRenderer.DrawItem(pe.Graphics, mItem, ItemState.None, Bounds);
 
             if (mImageListView.ShowCheckBoxes)
