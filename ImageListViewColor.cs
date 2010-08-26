@@ -29,9 +29,10 @@ namespace Manina.Windows.Forms
     public class ImageListViewColor
     {
         #region Member Variables
-
+        // control background color
         Color mControlBackColor;
 
+        // item colors
         Color mBackColor;
         Color mBorderColor;
         Color mUnFocusedColor1;
@@ -69,7 +70,6 @@ namespace Manina.Windows.Forms
         Color mSelectionRectangleColor1;
         Color mSelectionRectangleColor2;
         Color mSelectionRectangleBorderColor;
-
         #endregion
 
         #region Properties
