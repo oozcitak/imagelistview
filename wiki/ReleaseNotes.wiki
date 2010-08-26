@@ -4,7 +4,7 @@
 = 7.0 (26 August 2010) =
 
   * Added support for custom columns. (Issue 52, Issue 53, Issue 55, Issue 56)
-  * The !SortColumn property of the control is now an int value corresponding to column index. This change was necessary to support sorting of custom columns. *This is a breaking change.
+  * The !SortColumn property of the control is now an int value corresponding to column index. This change was necessary to support sorting of custom columns. *This is a breaking change.*
   * Added language resources for German. Thanks to Uwe.
   * Added a !TypeConverter to !ImageListViewColor to make it possible to modify the color palette from the object browser.
   * Added sub-items to items.
