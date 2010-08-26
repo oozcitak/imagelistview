@@ -251,8 +251,12 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void Clear()
             {
+                foreach (ImageListViewItem item in mItems)
+                    item.Dispose();
                 mItems.Clear();
+
                 mFocused = null;
+
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Clear();
@@ -313,6 +317,7 @@ namespace Manina.Windows.Forms
                     mItems[i].mIndex--;
                 if (item == mFocused) mFocused = null;
                 bool ret = mItems.Remove(item);
+                item.Dispose();
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Remove(item.Guid);
@@ -331,7 +336,9 @@ namespace Manina.Windows.Forms
             /// </exception>
             public void RemoveAt(int index)
             {
-                Remove(mItems[index]);
+                ImageListViewItem item = mItems[index];
+                Remove(item);
+                item.Dispose();
             }
             #endregion
 
@@ -451,6 +458,7 @@ namespace Manina.Windows.Forms
                 if (removeFromCache && mImageListView != null)
                     mImageListView.cacheManager.Remove(item.Guid);
                 mItems.Remove(item);
+                item.Dispose();
             }
             /// <summary>
             /// Returns the index of the specified item.
@@ -707,7 +715,9 @@ namespace Manina.Windows.Forms
             {
                 if (!(value is ImageListViewItem))
                     throw new ArgumentException("An object of type ImageListViewItem is required.", "value");
-                Remove((ImageListViewItem)value);
+                ImageListViewItem item = (ImageListViewItem)value;
+                Remove(item);
+                item.Dispose();
             }
             /// <summary>
             /// Gets or sets the <see cref="System.Object"/> at the specified index.

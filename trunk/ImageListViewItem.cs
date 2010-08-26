@@ -26,7 +26,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents an item in the image list view.
     /// </summary>
-    public class ImageListViewItem : ICloneable
+    public class ImageListViewItem : ICloneable, IDisposable
     {
         #region Member Variables
         // Property backing fields
@@ -396,6 +396,9 @@ namespace Manina.Windows.Forms
 
             mVirtualItemKey = null;
             isVirtualItem = false;
+
+            mSmallIcon = null;
+            mLargeIcon = null;
 
             subItems = new Dictionary<Guid, string>();
         }
@@ -819,6 +822,19 @@ namespace Manina.Windows.Forms
             item.mVirtualItemKey = mVirtualItemKey;
 
             return item;
+        }
+        #endregion
+
+        #region IDisposable Members
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (mSmallIcon != null)
+                mSmallIcon.Dispose();
+            if (mLargeIcon != null)
+                mLargeIcon.Dispose();
         }
         #endregion
     }
