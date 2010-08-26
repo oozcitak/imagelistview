@@ -35,7 +35,7 @@ namespace Manina.Windows.Forms
             private ColumnType mType;
             private bool mVisible;
             private int mWidth;
-
+            internal Guid columnID;
             internal ImageListViewColumnHeaderCollection owner;
             #endregion
 
@@ -48,13 +48,16 @@ namespace Manina.Windows.Forms
             {
                 get
                 {
-                    return owner.GetDefaultText(mType);
+                    if (owner == null)
+                        return "";
+                    else
+                        return owner.GetDefaultText(mType);
                 }
             }
             /// <summary>
             /// Gets or sets the display order of the column.
             /// </summary>
-            [Category("Appearance"), Browsable(true), Description("Gets the bounds of the item in client coordinates.")]
+            [Category("Appearance"), Browsable(true), Description("Gets or sets the display order of the column.")]
             public int DisplayIndex
             {
                 get
@@ -63,31 +66,15 @@ namespace Manina.Windows.Forms
                 }
                 set
                 {
-                    int oldIndex = mDisplayIndex;
-                    int newIndex = value;
-                    if (newIndex < 0 || newIndex > owner.Count - 1)
-                        throw new IndexOutOfRangeException();
-
-                    if (oldIndex == -1)
-                        mDisplayIndex = newIndex;
-                    else
+                    if (mDisplayIndex != value)
                     {
-                        ImageListViewColumnHeader targetColumn = null;
-                        foreach (ImageListViewColumnHeader column in owner)
-                        {
-                            if (column.DisplayIndex == newIndex)
-                            {
-                                targetColumn = column;
-                                break;
-                            }
-                        }
-                        if (targetColumn != null)
-                        {
-                            this.mDisplayIndex = newIndex;
-                            targetColumn.mDisplayIndex = oldIndex;
-                            if (mImageListView != null)
-                                mImageListView.Refresh();
-                        }
+                        mDisplayIndex = value;
+
+                        if (owner != null)
+                            owner.updateDisplayList = true;
+
+                        if (mImageListView != null)
+                            mImageListView.Refresh();
                     }
                 }
             }
@@ -117,10 +104,36 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Gets the type of information displayed by the column.
+            /// Gets or sets the type of information displayed by the column.
             /// </summary>
-            [Category("Appearance"), Browsable(false), Description("Gets or sets the type of information displayed by the column.")]
-            public ColumnType Type { get { return mType; } }
+            [Category("Appearance"), Browsable(true), Description("Gets or sets the type of information displayed by the column.")]
+            public ColumnType Type
+            {
+                get
+                {
+                    return mType;
+                }
+                set
+                {
+                    ColumnType oldType = mType;
+
+                    if (owner != null && oldType == ColumnType.Custom)
+                    {
+                        if (mImageListView == null)
+                            throw new InvalidOperationException("Owner control is null.");
+                        mImageListView.Items.RemoveCustomColumn(columnID);
+                    }
+
+                    mType = value;
+
+                    if (owner != null && mType == ColumnType.Custom)
+                    {
+                        if (mImageListView == null)
+                            throw new InvalidOperationException("Owner control is null.");
+                        mImageListView.Items.AddCustomColumn(columnID);
+                    }
+                }
+            }
             /// <summary>
             /// Gets or sets a value indicating whether the control is displayed.
             /// </summary>
@@ -134,6 +147,10 @@ namespace Manina.Windows.Forms
                 set
                 {
                     mVisible = value;
+
+                    if (owner != null)
+                        owner.updateDisplayList = true;
+
                     if (mImageListView != null)
                         mImageListView.Refresh();
                 }
@@ -173,6 +190,7 @@ namespace Manina.Windows.Forms
                 mWidth = width;
                 mVisible = true;
                 mDisplayIndex = -1;
+                columnID = Guid.NewGuid();
             }
             /// <summary>
             /// Initializes a new instance of the ImageListViewColumnHeader class.
@@ -228,6 +246,14 @@ namespace Manina.Windows.Forms
                     if (mImageListView.RatingImage != null)
                         width = mImageListView.RatingImage.Width * 5;
                 }
+                else if (mType == ColumnType.Custom)
+                {
+                    foreach (ImageListViewItem item in mImageListView.Items)
+                    {
+                        int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(columnID), mImageListView.Font).Width;
+                        width = System.Math.Max(width, itemwidth);
+                    }
+                }
                 else
                 {
                     foreach (ImageListViewItem item in mImageListView.Items)
@@ -250,6 +276,13 @@ namespace Manina.Windows.Forms
 
                 this.Width = width + 8;
                 mImageListView.Refresh();
+            }
+            /// <summary>
+            /// Returns a <see cref="System.String"/> that represents this instance.
+            /// </summary>
+            public override string ToString()
+            {
+                return mType.ToString();
             }
             #endregion
         }

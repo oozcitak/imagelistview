@@ -7,3 +7,5 @@ Contributors to ImageListView
    - Theming support with the ImageListViewColor class.
    - Checkboxes for imagelistview items.
    - File icons for imagelistview items.
+ * Uwe Keim (http://uwe.co/)
+   - German translations

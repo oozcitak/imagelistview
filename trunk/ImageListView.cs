@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
-using System.ComponentModel.Design.Serialization;
 using System.Resources;
 using System.Reflection;
 
@@ -34,7 +33,6 @@ namespace Manina.Windows.Forms
     [DefaultEvent("ItemClick")]
     [DefaultProperty("Items")]
     [Designer(typeof(ImageListViewDesigner))]
-    [DesignerSerializer(typeof(ImageListViewSerializer), typeof(CodeDomSerializer))]
     [Docking(DockingBehavior.Ask)]
     public partial class ImageListView : Control
     {
@@ -80,7 +78,7 @@ namespace Manina.Windows.Forms
         private bool mRetryOnError;
         internal ImageListViewSelectedItemCollection mSelectedItems;
         internal ImageListViewCheckedItemCollection mCheckedItems;
-        private ColumnType mSortColumn;
+        private int mSortColumn;
         private SortOrder mSortOrder;
         private bool mShowFileIcons;
         private bool mShowCheckBoxes;
@@ -400,10 +398,10 @@ namespace Manina.Windows.Forms
             set { mCheckBoxPadding = value; Refresh(); }
         }
         /// <summary>
-        /// Gets or sets the sort column.
+        /// Gets or sets the index of the sort column.
         /// </summary>
-        [Category("Appearance"), DefaultValue(typeof(ColumnType), "Name"), Description("Gets or sets the sort column.")]
-        public ColumnType SortColumn
+        [Category("Appearance"), DefaultValue(0), Description("Gets or sets the index of the sort column.")]
+        public int SortColumn
         {
             get
             {
@@ -565,7 +563,7 @@ namespace Manina.Windows.Forms
             mRetryOnError = true;
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mCheckedItems = new ImageListViewCheckedItemCollection(this);
-            mSortColumn = ColumnType.Name;
+            mSortColumn = 0;
             mSortOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
@@ -643,42 +641,6 @@ namespace Manina.Windows.Forms
             mRenderer.ResumePaint(true);
         }
         /// <summary>
-        /// Sets the properties of the specified column header.
-        /// </summary>
-        /// <param name="type">The column header to modify.</param>
-        /// <param name="text">Column header text.</param>
-        /// <param name="width">Width (in pixels) of the column header.</param>
-        /// <param name="displayIndex">Display index of the column header.</param>
-        /// <param name="visible">true if the column header will be shown; otherwise false.</param>
-        public void SetColumnHeader(ColumnType type, string text, int width, int displayIndex, bool visible)
-        {
-            mRenderer.SuspendPaint();
-            ImageListViewColumnHeader col = Columns[type];
-            col.Text = text;
-            col.Width = width;
-            col.DisplayIndex = displayIndex;
-            col.Visible = visible;
-            Refresh();
-            mRenderer.ResumePaint();
-        }
-        /// <summary>
-        /// Sets the properties of the specified column header.
-        /// </summary>
-        /// <param name="type">The column header to modify.</param>
-        /// <param name="width">Width (in pixels) of the column header.</param>
-        /// <param name="displayIndex">Display index of the column header.</param>
-        /// <param name="visible">true if the column header will be shown; otherwise false.</param>
-        public void SetColumnHeader(ColumnType type, int width, int displayIndex, bool visible)
-        {
-            mRenderer.SuspendPaint();
-            ImageListViewColumnHeader col = Columns[type];
-            col.Width = width;
-            col.DisplayIndex = displayIndex;
-            col.Visible = visible;
-            Refresh();
-            mRenderer.ResumePaint();
-        }
-        /// <summary>
         /// Sets the renderer for this instance.
         /// </summary>
         public void SetRenderer(ImageListViewRenderer renderer)
@@ -738,19 +700,19 @@ namespace Manina.Windows.Forms
             {
                 int i = 0;
                 int x = layoutManager.ColumnHeaderBounds.Left;
-                ColumnType colIndex = (ColumnType)(-1);
-                ColumnType sepIndex = (ColumnType)(-1);
+                ImageListViewColumnHeader colIndex = null;
+                ImageListViewColumnHeader sepIndex = null;
                 foreach (ImageListViewColumnHeader col in Columns.GetDisplayedColumns())
                 {
                     // Over a column?
                     if (pt.X >= x && pt.X < x + col.Width + SeparatorSize / 2)
-                        colIndex = col.Type;
+                        colIndex = col;
 
                     // Over a colummn separator?
                     if (pt.X > x + col.Width - SeparatorSize / 2 && pt.X < x + col.Width + SeparatorSize / 2)
-                        sepIndex = col.Type;
+                        sepIndex = col;
 
-                    if (colIndex != (ColumnType)(-1)) break;
+                    if (colIndex != null) break;
                     x += col.Width;
                     i++;
                 }
@@ -765,6 +727,7 @@ namespace Manina.Windows.Forms
             {
                 int itemIndex = -1;
                 bool checkBoxHit = false;
+                int subItemIndex = -1;
 
                 // Normalize to item area coordinates
                 pt.X -= layoutManager.ItemAreaBounds.Left;
@@ -792,9 +755,27 @@ namespace Manina.Windows.Forms
                             }
                         }
                     }
+
+                    // Calculate sub item index
+                    if (itemIndex != -1 && View == View.Details)
+                    {
+                        int xc1 = layoutManager.ColumnHeaderBounds.Left;
+                        int colIndex = 0;
+                        foreach (ImageListViewColumnHeader column in mColumns.GetDisplayedColumns())
+                        {
+                            int xc2 = xc1 + column.Width;
+                            if (pt.X >= xc1 && pt.X < xc2)
+                            {
+                                subItemIndex = colIndex;
+                                break;
+                            }
+                            colIndex++;
+                            xc1 = xc2;
+                        }
+                    }
                 }
 
-                hitInfo = new HitInfo(itemIndex, checkBoxHit);
+                hitInfo = new HitInfo(itemIndex, subItemIndex, checkBoxHit);
             }
         }
         /// <summary>

@@ -136,10 +136,12 @@ namespace Manina.Windows.Forms
 
                     // Shade sort column
                     List<ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
-                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    int x = bounds.Left - 1;
                     foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                     {
-                        if (mImageListView.SortColumn == column.Type && mImageListView.SortOrder != SortOrder.None &&
+                        if (mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                            mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID &&
+                            mImageListView.SortOrder != SortOrder.None &&
                             (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None)
                         {
                             Rectangle subItemBounds = bounds;
@@ -194,6 +196,8 @@ namespace Manina.Windows.Forms
                                     for (int i = rating + 1; i <= 5; i++)
                                         g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
+                                else if (column.Type == ColumnType.Custom)
+                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
                             }
@@ -342,7 +346,9 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None && mImageListView.SortColumn == column.Type)
+                if (mImageListView.SortOrder != SortOrder.None &&
+                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
                     if (mImageListView.SortOrder == SortOrder.Ascending)
@@ -444,7 +450,7 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font,
                             Brushes.White, Brushes.White);
@@ -453,7 +459,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // File type
-                    if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
+                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
                         using (Brush bCaption = new SolidBrush(Color.FromArgb(196, 196, 196)))
                         using (Brush bText = new SolidBrush(Color.White))
@@ -477,6 +483,7 @@ namespace Manina.Windows.Forms
                         if (bounds.Height <= 0) break;
 
                         if (column.Visible &&
+                            column.Type != ColumnType.Custom &&
                             column.Type != ColumnType.FileType &&
                             column.Type != ColumnType.DateAccessed &&
                             column.Type != ColumnType.FileName &&
@@ -1031,10 +1038,10 @@ namespace Manina.Windows.Forms
                                     for (int i = rating + 1; i <= 5; i++)
                                         g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
-                                else if ((state & ItemState.Selected) == ItemState.None)
-                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
+                                else if (column.Type == ColumnType.Custom)
+                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, SystemBrushes.HighlightText, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
 
                                 rt.X -= iconOffset;
                             }
@@ -1111,7 +1118,7 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         using (SolidBrush bLabel = new SolidBrush(SystemColors.GrayText))
                         using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
@@ -1123,7 +1130,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // File type
-                    if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
+                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
                         using (SolidBrush bLabel = new SolidBrush(SystemColors.GrayText))
                         using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
@@ -1147,6 +1154,7 @@ namespace Manina.Windows.Forms
                         if (bounds.Height <= 0) break;
 
                         if (column.Visible &&
+                            column.Type != ColumnType.Custom &&
                             column.Type != ColumnType.FileType &&
                             column.Type != ColumnType.DateAccessed &&
                             column.Type != ColumnType.FileName &&
@@ -1208,7 +1216,9 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None && mImageListView.SortColumn == column.Type)
+                if (mImageListView.SortOrder != SortOrder.None &&
+                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
                     if (mImageListView.SortOrder == SortOrder.Ascending)

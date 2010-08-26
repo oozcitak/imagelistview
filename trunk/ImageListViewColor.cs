@@ -25,6 +25,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the color palette of the image list view.
     /// </summary>
+    [TypeConverter(typeof(ImageListViewColorTypeConverter))]
     public class ImageListViewColor
     {
         #region Member Variables
@@ -76,6 +77,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color of the ImageListView control.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color of the ImageListView control.")]
+        [DefaultValue(typeof(Color), "Window")]
         public Color ControlBackColor
         {
             get { return mControlBackColor; }
@@ -85,6 +87,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color of the ImageListViewItem.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color of the ImageListViewItem.")]
+        [DefaultValue(typeof(Color), "Window")]
         public Color BackColor
         {
             get { return mBackColor; }
@@ -94,6 +97,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the border color of the ImageListViewItem.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem.")]
+        [DefaultValue(typeof(Color), "64, 128, 128, 128")]
         public Color BorderColor
         {
             get { return mBorderColor; }
@@ -103,6 +107,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the foreground color of the ImageListViewItem.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the foreground color of the ImageListViewItem.")]
+        [DefaultValue(typeof(Color), "ControlText")]
         public Color ForeColor
         {
             get { return mForeColor; }
@@ -112,6 +117,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color1 of the ImageListViewItem if the control is not focused.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color1 of the ImageListViewItem if the control is not focused.")]
+        [DefaultValue(typeof(Color), "16, 128, 128, 128")]
         public Color UnFocusedColor1
         {
             get { return mUnFocusedColor1; }
@@ -121,6 +127,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color2 of the ImageListViewItem if the control is not focused.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color2 of the ImageListViewItem if the control is not focused.")]
+        [DefaultValue(typeof(Color), "64, 128, 128, 128")]
         public Color UnFocusedColor2
         {
             get { return mUnFocusedColor2; }
@@ -130,6 +137,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the border color of the ImageListViewItem if the control is not focused.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the control is not focused.")]
+        [DefaultValue(typeof(Color), "128, 128, 128, 128")]
         public Color UnFocusedBorderColor
         {
             get { return mUnFocusedBorderColor; }
@@ -139,6 +147,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color1 if the ImageListViewItem is hovered.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color1 if the ImageListViewItem is hovered.")]
+        [DefaultValue(typeof(Color), "8, 10, 36, 106")]
         public Color HoverColor1
         {
             get { return mHoverColor1; }
@@ -148,6 +157,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color2 if the ImageListViewItem is hovered.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color2 if the ImageListViewItem is hovered.")]
+        [DefaultValue(typeof(Color), "64, 10, 36, 106")]
         public Color HoverColor2
         {
             get { return mHoverColor2; }
@@ -157,6 +167,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the border color of the ImageListViewItem if the item is hovered.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is hovered.")]
+        [DefaultValue(typeof(Color), "64, 10, 36, 106")]
         public Color HoverBorderColor
         {
             get { return mHoverBorderColor; }
@@ -166,6 +177,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the color of the insertion caret.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the color of the insertion caret.")]
+        [DefaultValue(typeof(Color), "Highlight")]
         public Color InsertionCaretColor
         {
             get { return mInsertionCaretColor; }
@@ -175,6 +187,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color1 if the ImageListViewItem is selected.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color1 if the ImageListViewItem is selected.")]
+        [DefaultValue(typeof(Color), "16, 10, 36, 106")]
         public Color SelectedColor1
         {
             get { return mSelectedColor1; }
@@ -184,6 +197,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color2 if the ImageListViewItem is selected.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color2 if the ImageListViewItem is selected.")]
+        [DefaultValue(typeof(Color), "128, 10, 36, 106")]
         public Color SelectedColor2
         {
             get { return mSelectedColor2; }
@@ -193,6 +207,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the border color of the ImageListViewItem if the item is selected.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is selected.")]
+        [DefaultValue(typeof(Color), "128, 10, 36, 106")]
         public Color SelectedBorderColor
         {
             get { return mSelectedBorderColor; }
@@ -202,6 +217,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color1 of the column header.
         /// </summary>
         [Category("Appearance Details View"), Description("Gets or sets the cells background color1 of the column header.")]
+        [DefaultValue(typeof(Color), "32, 212, 208, 200")]
         public Color ColumnHeaderBackColor1
         {
             get { return mColumnHeaderBackColor1; }
@@ -211,6 +227,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background gradient color2 of the column header.
         /// </summary>
         [Category("Appearance Details View"), Description("Gets or sets the cells background color2 of the column header.")]
+        [DefaultValue(typeof(Color), "196, 212, 208, 200")]
         public Color ColumnHeaderBackColor2
         {
             get { return mColumnHeaderBackColor2; }
@@ -220,6 +237,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background hover gradient color1 of the column header.
         /// </summary>
         [Category("Appearance Details View"), Description("Gets or sets the background hover color1 of the column header.")]
+        [DefaultValue(typeof(Color), "16, 10, 36, 106")]
         public Color ColumnHeaderHoverColor1
         {
             get { return mColumnHeaderHoverColor1; }
@@ -229,15 +247,17 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background hover gradient color2 of the column header.
         /// </summary>
         [Category("Appearance Details View"), Description("Gets or sets the background hover color2 of the column header.")]
+        [DefaultValue(typeof(Color), "64, 10, 36, 106")]
         public Color ColumnHeaderHoverColor2
         {
             get { return mColumnHeaderHoverColor2; }
             set { mColumnHeaderHoverColor2 = value; }
         }
         /// <summary>
-        /// Gets or sets the cells foreground color of the coumn header text.
+        /// Gets or sets the cells foreground color of the column header text.
         /// </summary>
-        [Category("Appearance Details View"), Description("Gets or sets the cells foreground color of the coumn header text.")]
+        [Category("Appearance Details View"), Description("Gets or sets the cells foreground color of the column header text.")]
+        [DefaultValue(typeof(Color), "WindowText")]
         public Color ColumnHeaderForeColor
         {
             get { return mColumnHeaderForeColor; }
@@ -247,33 +267,37 @@ namespace Manina.Windows.Forms
         /// Gets or sets the cells background color if column is selected in Details View.
         /// </summary>
         [Category("Appearance Details View"), Description("Gets or sets the cells background color if column is selected in Details View.")]
+        [DefaultValue(typeof(Color), "16, 128, 128, 128")]
         public Color ColumnSelectColor
         {
             get { return mColumnSelectColor; }
             set { mColumnSelectColor = value; }
         }
         /// <summary>
-        /// Gets or sets the foreground color of the cell text in Details View.
-        /// </summary>
-        [Category("Appearance Details View"), Description("Gets or sets the foreground color of the cell text in Details View.")]
-        public Color CellForeColor
-        {
-            get { return mCellForeColor; }
-            set { mCellForeColor = value; }
-        }
-        /// <summary>
         /// Gets or sets the color of the separator in Details View.
         /// </summary>
         [Category("Appearance Details View"), Description("Gets or sets the color of the separator in Details View.")]
+        [DefaultValue(typeof(Color), "32, 128, 128, 128")]
         public Color ColumnSeparatorColor
         {
             get { return mColumnSeparatorColor; }
             set { mColumnSeparatorColor = value; }
         }
         /// <summary>
+        /// Gets or sets the foreground color of the cell text in Details View.
+        /// </summary>
+        [Category("Appearance Details View"), Description("Gets or sets the foreground color of the cell text in Details View.")]
+        [DefaultValue(typeof(Color), "ControlText")]
+        public Color CellForeColor
+        {
+            get { return mCellForeColor; }
+            set { mCellForeColor = value; }
+        }
+        /// <summary>
         /// Gets or sets the background color of the image pane.
         /// </summary>
         [Category("Appearance Pane View"), Description("Gets or sets the background color of the image pane.")]
+        [DefaultValue(typeof(Color), "16, 128, 128, 128")]
         public Color PaneBackColor
         {
             get { return mPaneBackColor; }
@@ -283,6 +307,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the separator line color between image pane and thumbnail view.
         /// </summary>
         [Category("Appearance Pane View"), Description("Gets or sets the separator line color between image pane and thumbnail view.")]
+        [DefaultValue(typeof(Color), "128, 128, 128, 128")]
         public Color PaneSeparatorColor
         {
             get { return mPaneSeparatorColor; }
@@ -292,6 +317,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the color of labels in pane view.
         /// </summary>
         [Category("Appearance Pane View"), Description("Gets or sets the color of labels in pane view.")]
+        [DefaultValue(typeof(Color), "GrayText")]
         public Color PaneLabelColor
         {
             get { return mPaneLabelColor; }
@@ -301,6 +327,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the image inner border color for thumbnails and pane.
         /// </summary>
         [Category("Appearance Image"), Description("Gets or sets the image inner border color for thumbnails and pane.")]
+        [DefaultValue(typeof(Color), "128, 255, 255, 255")]
         public Color ImageInnerBorderColor
         {
             get { return mImageInnerBorderColor; }
@@ -310,6 +337,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the image outer border color for thumbnails and pane.
         /// </summary>
         [Category("Appearance Image"), Description("Gets or sets the image outer border color for thumbnails and pane.")]
+        [DefaultValue(typeof(Color), "128, 128, 128, 128")]
         public Color ImageOuterBorderColor
         {
             get { return mImageOuterBorderColor; }
@@ -319,6 +347,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color1 of the selection rectangle.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color1 of the selection rectangle.")]
+        [DefaultValue(typeof(Color), "128, 10, 36, 106")]
         public Color SelectionRectangleColor1
         {
             get { return mSelectionRectangleColor1; }
@@ -328,6 +357,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the background color2 of the selection rectangle.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background color2 of the selection rectangle.")]
+        [DefaultValue(typeof(Color), "128, 10, 36, 106")]
         public Color SelectionRectangleColor2
         {
             get { return mSelectionRectangleColor2; }
@@ -337,6 +367,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the color of the selection rectangle border.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the color of the selection rectangle border.")]
+        [DefaultValue(typeof(Color), "Highlight")]
         public Color SelectionRectangleBorderColor
         {
             get { return mSelectionRectangleBorderColor; }

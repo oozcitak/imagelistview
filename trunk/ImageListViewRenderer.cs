@@ -293,7 +293,7 @@ namespace Manina.Windows.Forms
 
                 if (img == null)
                 {
-                    if(item.isVirtualItem )
+                    if (item.isVirtualItem)
                         mImageListView.cacheManager.AddToRendererCache(item.Guid, item.VirtualItemKey, size, mImageListView.UseEmbeddedThumbnails);
                     else
                         mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
@@ -416,7 +416,7 @@ namespace Manina.Windows.Forms
                             state |= ColumnState.Hovered;
                         if (ReferenceEquals(mImageListView.navigationManager.HoveredSeparator, column))
                             state |= ColumnState.SeparatorHovered;
-                        if (ReferenceEquals(mImageListView.navigationManager.SelectedSeperator, column))
+                        if (ReferenceEquals(mImageListView.navigationManager.SelectedSeparator, column))
                             state |= ColumnState.SeparatorSelected;
 
                         Rectangle bounds = new Rectangle(x, y, column.Width, h);
@@ -511,6 +511,33 @@ namespace Manina.Windows.Forms
 
                         // Draw the item
                         DrawItem(g, param.Item, param.State, param.Bounds);
+
+                        // Draw sub item overlays
+                        if (mImageListView.View == View.Details)
+                        {
+                            int xc1 = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                            int colIndex = 0;
+                            foreach (ImageListViewColumnHeader column in mImageListView.Columns.GetDisplayedColumns())
+                            {
+                                Rectangle subBounds = new Rectangle(xc1, param.Bounds.Y, column.Width, param.Bounds.Height);
+                                if (mClip)
+                                {
+                                    Rectangle clip = Rectangle.Intersect(subBounds, mImageListView.layoutManager.ItemAreaBounds);
+                                    g.SetClip(clip);
+                                }
+
+                                // Check if the mouse is over the sub item
+                                bool subItemHovered = ((param.State & ItemState.Hovered) != ItemState.None) &&
+                                    (mImageListView.navigationManager.HoveredSubItem == colIndex);
+
+                                DrawSubItemItemOverlay(g, param.Item, param.State, colIndex, subItemHovered, subBounds);
+
+                                colIndex++;
+                                xc1 += column.Width;
+                            }
+                            g.SetClip(mImageListView.layoutManager.ClientArea);
+                        }
+
 
                         // Draw the checkbox and file icon
                         if (ImageListView.ShowCheckBoxes)
@@ -897,11 +924,13 @@ namespace Manina.Windows.Forms
                     List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
 
                     // Shade sort column
-                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    int x = bounds.Left - 1;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
-                        if (mImageListView.SortColumn == column.Type && mImageListView.SortOrder != SortOrder.None &&
-                            (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None)
+                        if (mImageListView.SortOrder != SortOrder.None &&
+                            mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                            (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None &&
+                            mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
                         {
                             Rectangle subItemBounds = bounds;
                             subItemBounds.X = x;
@@ -916,7 +945,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Separators 
-                    x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    x = bounds.Left - 1;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
                         x += column.Width;
@@ -964,10 +993,12 @@ namespace Manina.Windows.Forms
                                     if (rating < 0) rating = 0;
                                     if (rating > 5) rating = 5;
                                     for (int i = 1; i <= rating; i++)
-                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i-1) * w, y);
+                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
                                     for (int i = rating + 1; i <= 5; i++)
-                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i-1) * w, y);
+                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
+                                else if (column.Type == ColumnType.Custom)
+                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
 
@@ -1000,7 +1031,7 @@ namespace Manina.Windows.Forms
                         Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                else if (mImageListView.View == View.Thumbnails && (state & ItemState.Selected) == ItemState.None)
+                else if (mImageListView.View != View.Details && (state & ItemState.Selected) == ItemState.None)
                 {
                     using (Pen pGray64 = new Pen(ImageListView.Colors.BorderColor))
                     {
@@ -1021,6 +1052,21 @@ namespace Manina.Windows.Forms
                 {
                     ControlPaint.DrawFocusRectangle(g, bounds);
                 }
+            }
+            /// <summary>
+            /// Draws the overlay graphics for the specified sub item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="state">The current view state of item.</param>
+            /// <param name="subItemIndex">The index of the sub item. The index returned is the 0-based index of the 
+            /// column as displayed on the screen, considering column visibility and display indices.
+            /// Returns -1 if the hit point is not over a sub item.</param>
+            /// <param name="subItemHovered">true if the mouse cursor is over the sub item; otherwise false.</param>
+            /// <param name="bounds">The bounding rectangle of the sub item in client coordinates.</param>
+            public virtual void DrawSubItemItemOverlay(Graphics g, ImageListViewItem item, ItemState state, int subItemIndex, bool subItemHovered, Rectangle bounds)
+            {
+                ;
             }
             /// <summary>
             /// Draws the checkbox icon for the specified item on the given graphics.
@@ -1091,7 +1137,9 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None && mImageListView.SortColumn == column.Type)
+                if (mImageListView.SortOrder != SortOrder.None &&
+                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
                     if (mImageListView.SortOrder == SortOrder.Ascending)
@@ -1168,7 +1216,7 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
@@ -1180,7 +1228,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // File type
-                    if (mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
+                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
                     {
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
@@ -1204,6 +1252,7 @@ namespace Manina.Windows.Forms
                         if (bounds.Height <= 0) break;
 
                         if (column.Visible &&
+                            column.Type != ColumnType.Custom &&
                             column.Type != ColumnType.FileType &&
                             column.Type != ColumnType.DateAccessed &&
                             column.Type != ColumnType.FileName &&

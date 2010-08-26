@@ -21,19 +21,169 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.ComponentModel.Design;
 using System.Windows.Forms.Design;
+using System.Drawing;
+using System.Windows.Forms.Design.Behavior;
 
 namespace Manina.Windows.Forms
 {
+    /// <summary>
+    /// Represents an ImageListViewITem on the designer.
+    /// </summary>
+    internal class ItemGylph : Glyph
+    {
+        #region Member Variables
+        private BehaviorService mBehaviorService;
+        private ImageListView mImageListView;
+        private int mIndex;
+        private ImageListViewItem mItem;
+        private Point offset;
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Gets the bounds of the <see cref="T:System.Windows.Forms.Design.Behavior.Glyph"/>.
+        /// </summary>
+        public override Rectangle Bounds
+        {
+            get
+            {
+                // Glyph coordinates are in adorner window coordinates, so we must map
+                // using the behavior service.
+                Rectangle bounds = mImageListView.layoutManager.GetItemBounds(mIndex);
+                Point aPt = mBehaviorService.MapAdornerWindowPoint(mImageListView.Handle, bounds.Location);
+                offset = new Point(aPt.X - bounds.X, aPt.Y - bounds.Y);
+                bounds.Offset(offset);
+
+                return bounds;
+            }
+        }
+        #endregion
+
+        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ItemGylph class.
+        /// </summary>
+        /// <param name="behaviorService">The behavior service of the designer.</param>
+        /// <param name="owner">The owner control.</param>
+        /// <param name="text">The text of the item.</param>
+        /// <param name="index">Item index.</param>
+        public ItemGylph(BehaviorService behaviorService, ImageListView owner, string text, int index)
+            : base(null)
+        {
+            mBehaviorService = behaviorService;
+            mImageListView = owner;
+            mItem = new ImageListViewItem();
+            mItem.Text = text;
+            mItem.mImageListView = mImageListView;
+            mItem.Tag = null;
+            mIndex = index;
+        }
+        #endregion
+
+        #region Glyph Overrides
+        /// <summary>
+        /// Provides hit test logic.
+        /// </summary>
+        /// <param name="p">A point to hit-test.</param>
+        /// <returns>
+        /// A <see cref="T:System.Windows.Forms.Cursor"/> if the <see cref="T:System.Windows.Forms.Design.Behavior.Glyph"/> 
+        /// is associated with <paramref name="p"/>; otherwise, null.
+        /// </returns>
+        public override Cursor GetHitTest(Point p)
+        {
+            return null;
+        }
+        /// <summary>
+        /// Provides paint logic.
+        /// </summary>
+        /// <param name="pe">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> that contains the event data.</param>
+        public override void Paint(PaintEventArgs pe)
+        {
+            if (mItem.Tag == null)
+            {
+                int c = 0;
+                foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                {
+                    if (column.Type == ColumnType.Custom)
+                    {
+                        mItem.AddSubItemText(column.columnID);
+                        c++;
+                    }
+                }
+                mItem.Tag = c.ToString();
+            }
+
+            mImageListView.layoutManager.Update(true);
+
+            mImageListView.mRenderer.DrawItem(pe.Graphics, mItem, ItemState.None, Bounds);
+
+            if (mImageListView.ShowCheckBoxes)
+            {
+                Rectangle bounds = mImageListView.layoutManager.GetCheckBoxBounds(mIndex);
+                bounds.Offset(offset);
+                mImageListView.mRenderer.DrawCheckBox(pe.Graphics, mItem, bounds);
+            }
+            if (mImageListView.ShowFileIcons)
+            {
+                Rectangle bounds = mImageListView.layoutManager.GetIconBounds(mIndex);
+                bounds.Offset(offset);
+                mImageListView.mRenderer.DrawFileIcon(pe.Graphics, mItem, bounds);
+            }
+        }
+        #endregion
+    }
+
     /// <summary>
     /// Represents the designer of the image list view.
     /// </summary>
     internal class ImageListViewDesigner : ControlDesigner
     {
         #region Member Variables
-        DesignerActionListCollection actionLists;
+        private DesignerActionListCollection actionLists = null;
+        private Adorner adorner;
+        private ImageListView imageListView;
         #endregion
 
-        #region ControlDesigner Overrides
+        #region Add/Remove Glyphs on Initialize/Dispose
+        /// <summary>
+        /// Initializes the designer with the specified component.
+        /// </summary>
+        /// <param name="component">The <see cref="T:System.ComponentModel.IComponent"/> 
+        /// to associate the designer with. This component must always be an instance of, 
+        /// or derive from, <see cref="T:System.Windows.Forms.Control"/>.</param>
+        public override void Initialize(IComponent component)
+        {
+            base.Initialize(component);
+
+            imageListView = (ImageListView)this.Control;
+            // Add the custom glyphs
+            adorner = new Adorner();
+            BehaviorService.Adorners.Add(adorner);
+            adorner.Glyphs.Add(new ItemGylph(BehaviorService, imageListView, "Item 1", 0));
+            adorner.Glyphs.Add(new ItemGylph(BehaviorService, imageListView, "Item 2", 1));
+            adorner.Glyphs.Add(new ItemGylph(BehaviorService, imageListView, "Item 3", 2));
+        }
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Design.ControlDesigner"/> 
+        /// and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; 
+        /// false to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && adorner != null)
+            {
+                BehaviorService b = BehaviorService;
+                if (b != null)
+                {
+                    b.Adorners.Remove(adorner);
+                }
+            }
+            base.Dispose(disposing);
+        }
+        #endregion
+
+        #region Designer Action Lists
         /// <summary>
         /// Gets the design-time action lists supported by the component associated with the designer.
         /// </summary>
@@ -98,7 +248,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the sort column of the designed ImageListView.
         /// </summary>
-        public ColumnType SortColumn
+        public int SortColumn
         {
             get { return imageListView.SortColumn; }
             set { SetProperty("SortColumn", value); }

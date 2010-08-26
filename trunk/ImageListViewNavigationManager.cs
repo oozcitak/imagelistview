@@ -90,6 +90,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public ImageListViewItem HoveredItem { get; private set; }
             /// <summary>
+            /// Gets the sub item under the mouse.
+            /// </summary>
+            public int HoveredSubItem { get; private set; }
+            /// <summary>
             /// Gets the column under the mouse.
             /// </summary>
             public ImageListView.ImageListViewColumnHeader HoveredColumn { get; private set; }
@@ -100,7 +104,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the column whose separator is being dragged.
             /// </summary>
-            public ImageListView.ImageListViewColumnHeader SelectedSeperator { get; private set; }
+            public ImageListView.ImageListViewColumnHeader SelectedSeparator { get; private set; }
             /// <summary>
             /// Gets whether the mouse is over the pane border.
             /// </summary>
@@ -152,9 +156,10 @@ namespace Manina.Windows.Forms
                 ControlKey = false;
 
                 HoveredItem = null;
+                HoveredSubItem = -1;
                 HoveredColumn = null;
                 HoveredSeparator = null;
-                SelectedSeperator = null;
+                SelectedSeparator = null;
                 HoveredPaneBorder = false;
 
                 MouseSelecting = false;
@@ -230,6 +235,7 @@ namespace Manina.Windows.Forms
             public void MouseMove(MouseEventArgs e)
             {
                 ImageListViewItem oldHoveredItem = HoveredItem;
+                int oldHoveredSubItem = HoveredSubItem;
                 ImageListView.ImageListViewColumnHeader oldHoveredColumn = HoveredColumn;
                 ImageListView.ImageListViewColumnHeader oldHoveredSeparator = HoveredSeparator;
 
@@ -272,7 +278,7 @@ namespace Manina.Windows.Forms
                 if (DraggingSeperator)
                 {
                     int delta = e.Location.X - lastSeparatorDragLocation.X;
-                    int colwidth = SelectedSeperator.Width + delta;
+                    int colwidth = SelectedSeparator.Width + delta;
                     if (colwidth > 16)
                         lastSeparatorDragLocation = e.Location;
                     else
@@ -280,11 +286,11 @@ namespace Manina.Windows.Forms
                         lastSeparatorDragLocation = new Point(e.Location.X - colwidth + 16, e.Location.Y);
                         colwidth = 16;
                     }
-                    SelectedSeperator.Width = colwidth;
+                    SelectedSeparator.Width = colwidth;
 
                     HoveredItem = null;
-                    HoveredColumn = SelectedSeperator;
-                    HoveredSeparator = SelectedSeperator;
+                    HoveredColumn = SelectedSeparator;
+                    HoveredSeparator = SelectedSeparator;
                     mImageListView.Refresh();
                 }
                 else if (ResizingPane)
@@ -370,7 +376,7 @@ namespace Manina.Windows.Forms
 
                     HoveredColumn = null;
                     HoveredSeparator = null;
-                    SelectedSeperator = null;
+                    SelectedSeparator = null;
 
                     mImageListView.Refresh();
                 }
@@ -437,7 +443,7 @@ namespace Manina.Windows.Forms
                 {
                     // Start dragging a separator
                     DraggingSeperator = true;
-                    SelectedSeperator = HoveredSeparator;
+                    SelectedSeparator = HoveredSeparator;
                     lastSeparatorDragLocation = e.Location;
                 }
                 else if (!MouseSelecting && !DraggingSeperator && !ResizingPane &&
@@ -449,12 +455,13 @@ namespace Manina.Windows.Forms
                     lastPaneResizeLocation = e.Location;
                 }
                 else if (!ReferenceEquals(HoveredItem, oldHoveredItem) ||
+                    (HoveredSubItem != oldHoveredSubItem) ||
                     !ReferenceEquals(HoveredColumn, oldHoveredColumn) ||
                     !ReferenceEquals(HoveredSeparator, oldHoveredSeparator))
                 {
                     // Hovered item changed
-                    if (!ReferenceEquals(HoveredItem, oldHoveredItem))
-                        mImageListView.OnItemHover(new ItemHoverEventArgs(HoveredItem, oldHoveredItem));
+                    if (!ReferenceEquals(HoveredItem, oldHoveredItem) || (HoveredSubItem != oldHoveredSubItem))
+                        mImageListView.OnItemHover(new ItemHoverEventArgs(HoveredItem, HoveredSubItem, oldHoveredItem, oldHoveredSubItem));
 
                     if (!ReferenceEquals(HoveredColumn, oldHoveredColumn))
                         mImageListView.OnColumnHover(new ColumnHoverEventArgs(HoveredColumn, oldHoveredColumn));
@@ -495,8 +502,8 @@ namespace Manina.Windows.Forms
 
                 if (DraggingSeperator)
                 {
-                    mImageListView.OnColumnWidthChanged(new ColumnEventArgs(SelectedSeperator));
-                    SelectedSeperator = null;
+                    mImageListView.OnColumnWidthChanged(new ColumnEventArgs(SelectedSeparator));
+                    SelectedSeparator = null;
                     DraggingSeperator = false;
                 }
                 else if (ResizingPane)
@@ -601,7 +608,7 @@ namespace Manina.Windows.Forms
 
                     // Raise the selection change event
                     mImageListView.OnSelectionChangedInternal();
-                    mImageListView.OnItemClick(new ItemClickEventArgs(HoveredItem, e.Location, e.Button));
+                    mImageListView.OnItemClick(new ItemClickEventArgs(HoveredItem, HoveredSubItem, e.Location, e.Button));
 
                     // Set the item as the focused item
                     mImageListView.Items.FocusedItem = HoveredItem;
@@ -618,7 +625,7 @@ namespace Manina.Windows.Forms
                         mImageListView.OnSelectionChangedInternal();
                     }
 
-                    mImageListView.OnItemClick(new ItemClickEventArgs(HoveredItem, e.Location, e.Button));
+                    mImageListView.OnItemClick(new ItemClickEventArgs(HoveredItem, HoveredSubItem, e.Location, e.Button));
                     mImageListView.Items.FocusedItem = HoveredItem;
                 }
                 else if (lastMouseDownInItemArea && inItemArea && HoveredItem == null && (LeftButton || RightButton))
@@ -633,7 +640,7 @@ namespace Manina.Windows.Forms
                     if (!suppressClick)
                     {
                         // Change the sort column
-                        if (mImageListView.SortColumn == HoveredColumn.Type)
+                        if (mImageListView.Columns[mImageListView.SortColumn].columnID == HoveredColumn.columnID)
                         {
                             if (mImageListView.SortOrder == SortOrder.Descending)
                                 mImageListView.SortOrder = SortOrder.Ascending;
@@ -642,7 +649,7 @@ namespace Manina.Windows.Forms
                         }
                         else
                         {
-                            mImageListView.mSortColumn = HoveredColumn.Type;
+                            mImageListView.mSortColumn = mImageListView.Columns.IndexOf(HoveredColumn);
                             mImageListView.mSortOrder = SortOrder.Ascending;
                             mImageListView.Sort();
                         }
@@ -666,7 +673,7 @@ namespace Manina.Windows.Forms
             {
                 if (lastMouseDownInItemArea && lastMouseDownOverItem && HoveredItem != null)
                 {
-                    mImageListView.OnItemDoubleClick(new ItemClickEventArgs(HoveredItem, e.Location, e.Button));
+                    mImageListView.OnItemDoubleClick(new ItemClickEventArgs(HoveredItem, HoveredSubItem, e.Location, e.Button));
                 }
                 else if (lastMouseDownInColumnHeaderArea && lastMouseDownOverSeparator &&
                     mImageListView.AllowColumnClick && HoveredSeparator != null)
@@ -684,7 +691,7 @@ namespace Manina.Windows.Forms
                 if (HoveredItem != null || HoveredColumn != null || HoveredSeparator != null || HoveredPaneBorder != false)
                 {
                     if (HoveredItem != null)
-                        mImageListView.OnItemHover(new ItemHoverEventArgs(null, HoveredItem));
+                        mImageListView.OnItemHover(new ItemHoverEventArgs(null, -1, HoveredItem, HoveredSubItem));
                     if (HoveredColumn != null)
                         mImageListView.OnColumnHover(new ColumnHoverEventArgs(null, HoveredColumn));
 
@@ -964,17 +971,23 @@ namespace Manina.Windows.Forms
                 mImageListView.HitTest(pt, out h);
 
                 if (h.ItemHit)
+                {
                     HoveredItem = mImageListView.Items[h.ItemIndex];
+                    HoveredSubItem = h.SubItemIndex;
+                }
                 else
+                {
                     HoveredItem = null;
+                    HoveredSubItem = -1;
+                }
 
                 if (h.ColumnHit)
-                    HoveredColumn = mImageListView.Columns[h.ColumnIndex];
+                    HoveredColumn = h.Column;
                 else
                     HoveredColumn = null;
 
                 if (h.ColumnSeparatorHit)
-                    HoveredSeparator = mImageListView.Columns[h.ColumnSeparator];
+                    HoveredSeparator = h.ColumnSeparator;
                 else
                     HoveredSeparator = null;
 

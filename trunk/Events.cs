@@ -321,6 +321,7 @@ namespace Manina.Windows.Forms
     public class ItemClickEventArgs
     {
         private ImageListViewItem mItem;
+        private int mSubItemIndex;
         private Point mLocation;
         private MouseButtons mButtons;
 
@@ -328,6 +329,14 @@ namespace Manina.Windows.Forms
         /// Gets the ImageListViewItem that is the target of the event.
         /// </summary>
         public ImageListViewItem Item { get { return mItem; } }
+        /// <summary>
+        /// Gets the index of the sub item under the hit point.
+        /// The index returned is the 0-based index of the column
+        /// as displayed on the screen, considering column visibility
+        /// and display indices.
+        /// Returns -1 if the hit point is not over a sub item.
+        /// </summary>
+        public int SubItemIndex { get { return mSubItemIndex; } }
         /// <summary>
         /// Gets the coordinates of the cursor.
         /// </summary>
@@ -349,12 +358,14 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of the ItemClickEventArgs class.
         /// </summary>
         /// <param name="item">The item that is the target of this event.</param>
+        /// <param name="subItemIndex">Gets the index of the sub item under the hit point.</param>
         /// <param name="location">The location of the mouse.</param>
         /// <param name="buttons">One of the System.Windows.Forms.MouseButtons values 
         /// indicating which mouse button was pressed.</param>
-        public ItemClickEventArgs(ImageListViewItem item, Point location, MouseButtons buttons)
+        public ItemClickEventArgs(ImageListViewItem item, int subItemIndex, Point location, MouseButtons buttons)
         {
             mItem = item;
+            mSubItemIndex = subItemIndex;
             mLocation = location;
             mButtons = buttons;
         }
@@ -367,6 +378,8 @@ namespace Manina.Windows.Forms
     {
         private ImageListViewItem mPreviousItem;
         private ImageListViewItem mItem;
+        private int mPreviousSubItemIndex;
+        private int mSubItemIndex;
 
         /// <summary>
         /// Gets the ImageListViewItem that was previously hovered.
@@ -378,16 +391,37 @@ namespace Manina.Windows.Forms
         /// Returns null if there is no hovered item.
         /// </summary>
         public ImageListViewItem Item { get { return mItem; } }
+        /// <summary>
+        /// Gets the index of the sub item that was previously hovered.
+        /// The index returned is the 0-based index of the column
+        /// as displayed on the screen, considering column visibility
+        /// and display indices.
+        /// Returns -1 if the hit point is not over a sub item.
+        /// </summary>
+        public int PreviousSubItemIndex { get { return mPreviousSubItemIndex; } }
+        /// <summary>
+        /// Gets the index of the hovered sub item.
+        /// The index returned is the 0-based index of the column
+        /// as displayed on the screen, considering column visibility
+        /// and display indices.
+        /// Returns -1 if the hit point is not over a sub item.
+        /// </summary>
+        public int SubItemIndex { get { return mSubItemIndex; } }
 
         /// <summary>
         /// Initializes a new instance of the ItemEventArgs class.
         /// </summary>
         /// <param name="item">The currently hovered item.</param>
+        /// <param name="subItemIndex">The index of the hovered sub item.</param>
         /// <param name="previousItem">The previously hovered item.</param>
-        public ItemHoverEventArgs(ImageListViewItem item, ImageListViewItem previousItem)
+        /// <param name="previousSubItemIndex">The index of the sub item that was previously hovered.</param>
+        public ItemHoverEventArgs(ImageListViewItem item, int subItemIndex, ImageListViewItem previousItem, int previousSubItemIndex)
         {
             mItem = item;
+            mSubItemIndex = subItemIndex;
+
             mPreviousItem = previousItem;
+            mPreviousSubItemIndex = previousSubItemIndex;
         }
     }
     /// <summary>

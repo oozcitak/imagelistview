@@ -149,7 +149,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         private const int PropertyTagThumbnailImageHeight = 0x5021;
         /// <summary>
-        /// Represents the Exif tag for  inage description.
+        /// Represents the Exif tag for image description.
         /// </summary>
         private const int PropertyTagImageDescription = 0x010E;
         /// <summary>
@@ -201,6 +201,94 @@ namespace Manina.Windows.Forms
         /// Represents the Exif tag for rating between 1-99 (Windows specific).
         /// </summary>
         private const int PropertyTagRatingPercent = 0x4749;
+        #endregion
+
+        #region Exif Format Conversion
+        /// <summary>
+        /// Converts the given Exif data to a byte.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static byte ReadExifByte(byte[] value)
+        {
+            return value[0];
+        }
+        /// <summary>
+        /// Converts the given Exif data to an ASCII encoded string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static string ReadExifAscii(byte[] value)
+        {
+            int len = Array.IndexOf(value, (byte)0);
+            if (len == -1) len = value.Length;
+            return Encoding.ASCII.GetString(value, 0, len);
+        }
+        /// <summary>
+        /// Converts the given Exif data to DateTime.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static DateTime ReadExifDateTime(byte[] value)
+        {
+            return DateTime.ParseExact(ReadExifAscii(value),
+                "yyyy:MM:dd HH:mm:ss",
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an 16-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static ushort ReadExifUShort(byte[] value)
+        {
+            return BitConverter.ToUInt16(value, 0);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an 32-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static uint ReadExifUInt(byte[] value)
+        {
+            return BitConverter.ToUInt32(value, 0);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an 32-bit signed integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static int ReadExifInt(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an unsigned rational value
+        /// represented as a string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static string ReadExifURational(byte[] value)
+        {
+            return BitConverter.ToUInt32(value, 0).ToString() + "/" +
+                    BitConverter.ToUInt32(value, 4).ToString();
+        }
+        /// <summary>
+        /// Converts the given Exif data to a signed rational value
+        /// represented as a string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static string ReadExifRational(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0).ToString() + "/" +
+                    BitConverter.ToInt32(value, 4).ToString();
+        }
+        /// <summary>
+        /// Converts the given Exif data to a floating-point number.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private static float ReadExifFloat(byte[] value)
+        {
+            uint num = BitConverter.ToUInt32(value, 0);
+            uint den = BitConverter.ToUInt32(value, 4);
+            if (den == 0)
+                return 0.0f;
+            else
+                return (float)num / (float)den;
+        }
         #endregion
 
         #region Shell Utilities
@@ -289,7 +377,7 @@ namespace Manina.Windows.Forms
                     // Get the large icon
                     hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
                         structSize, SHGFI.Icon | SHGFI.LargeIcon);
-                    
+
                     if (hImg != IntPtr.Zero)
                     {
                         LargeIcon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
@@ -361,91 +449,6 @@ namespace Manina.Windows.Forms
                 }
             }
         }
-        /// <summary>
-        /// Converts the given Exif data to a byte.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static byte ReadExifByte(byte[] value)
-        {
-            return value[0];
-        }
-        /// <summary>
-        /// Converts the given Exif data to an ASCII encoded string.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static string ReadExifAscii(byte[] value)
-        {
-            int len = Array.IndexOf(value, (byte)0);
-            if (len == -1) len = value.Length;
-            return Encoding.ASCII.GetString(value, 0, len);
-        }
-        /// <summary>
-        /// Converts the given Exif data to DateTime.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static DateTime ReadExifDateTime(byte[] value)
-        {
-            return DateTime.ParseExact(ReadExifAscii(value),
-                "yyyy:MM:dd HH:mm:ss",
-                System.Globalization.CultureInfo.InvariantCulture);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an 16-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static ushort ReadExifUShort(byte[] value)
-        {
-            return BitConverter.ToUInt16(value, 0);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an 32-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static uint ReadExifUInt(byte[] value)
-        {
-            return BitConverter.ToUInt32(value, 0);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an 32-bit signed integer.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static int ReadExifInt(byte[] value)
-        {
-            return BitConverter.ToInt32(value, 0);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an unsigned rational value
-        /// represented as a string.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static string ReadExifURational(byte[] value)
-        {
-            return BitConverter.ToUInt32(value, 0).ToString() + "/" +
-                    BitConverter.ToUInt32(value, 4).ToString();
-        }
-        /// <summary>
-        /// Converts the given Exif data to a signed rational value
-        /// represented as a string.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static string ReadExifRational(byte[] value)
-        {
-            return BitConverter.ToInt32(value, 0).ToString() + "/" +
-                    BitConverter.ToInt32(value, 4).ToString();
-        }
-        /// <summary>
-        /// Converts the given Exif data to a floating-point number.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static float ReadExifFloat(byte[] value)
-        {
-            uint num = BitConverter.ToUInt32(value, 0);
-            uint den = BitConverter.ToUInt32(value, 4);
-            if (den == 0)
-                return 0.0f;
-            else
-                return (float)num / (float)den;
-        }
         #endregion
 
         #region Graphics Utilities
@@ -453,8 +456,9 @@ namespace Manina.Windows.Forms
         /// Checks the stream header if it matches with
         /// any of the supported image file types.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
+        /// <param name="stream">An open stream pointing to an image file.</param>
+        /// <returns>true if the stream is an image file (BMP, TIFF, PNG, GIF, JPEG, WMF, EMF, ICO, CUR);
+        /// false otherwise.</returns>
         private static bool IsImage(Stream stream)
         {
             // Sniff some bytes from the start of the stream
