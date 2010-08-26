@@ -1,6 +1,16 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.1 (26 August 2010) =
+
+  * Converted !SmallIcon and !LargeIcon properties of !ImageListViewItems to type Image instead of Icon. This was done to prevent converting the icons on the fly at each item render.
+  * !ImageListViewItem now implements IDisposable to release its icon resources.
+  * Buffered graphics is now properly disposed.
+  * Child scrollbars are now disposed with the control.
+  * Checkbox and file icons are now aligned properly in Details view.
+  * Added the !CanApplyColors property to renderers.
+  * Designer preview items are now clipped to client rectangle of the control.
+
 = 7.0 (26 August 2010) =
 
   * Added support for custom columns. (Issue 52, Issue 53, Issue 55, Issue 56)
