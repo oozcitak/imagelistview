@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.2 (27 August 2010) =
+
+  * Fixed a bug where !SmallChange property of scrollbars was calculated incorrectly if the control was sized smaller than the item height. (Issue 87)
+  * Reordering items by dragging now displays the move cursor instead of the copy cursor. (Issue 86)
+
 = 7.1 (26 August 2010) =
 
   * Converted !SmallIcon and !LargeIcon properties of !ImageListViewItems to type Image instead of Icon. This was done to prevent converting the icons on the fly at each item render.
