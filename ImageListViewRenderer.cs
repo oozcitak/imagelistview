@@ -67,6 +67,10 @@ namespace Manina.Windows.Forms
             /// Gets the rectangle bounding the column headers.
             /// </summary>
             public Rectangle ColumnHeaderBounds { get { return mImageListView.layoutManager.ColumnHeaderBounds; } }
+            /// <summary>
+            /// Gets a value indicating whether this renderer can apply custom colors.
+            /// </summary>
+            public virtual bool CanApplyColors { get { return true; } }
             #endregion
 
             #region Constructors
