@@ -8,14 +8,14 @@
 
 = 7.1 (26 August 2010) =
 
-  * Converted !SmallIcon and !LargeIcon properties of !ImageListViewItems to type Image instead of Icon. This was done to prevent converting the icons on the fly at each item render.
+  * Converted !SmallIcon and !LargeIcon properties of !ImageListViewItems to type Image instead of Icon. This was done to prevent converting the icons on the fly at each item render. *This is a breaking change.*
   * !ImageListViewItem now implements IDisposable to release its icon resources.
   * Buffered graphics is now properly disposed.
   * Child scrollbars are now disposed with the control.
   * Checkbox and file icons are now aligned properly in Details view.
   * Added the !CanApplyColors property to renderers.
-  * Designer preview items are now clipped to client rectangle of the control.
-  * Setting the !IntegralScroll now causes a layout update.
+  * Designer preview items are now clipped to the client rectangle of the control.
+  * Changing the !IntegralScroll property now causes a layout update.
 
 = 7.0 (26 August 2010) =
 
