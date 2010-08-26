@@ -1146,15 +1146,30 @@ namespace Manina.Windows.Forms
             {
                 if (disposing)
                 {
-                    if (mRenderer != null)
-                        mRenderer.Dispose();
-
+                    // resources
+                    if (mDefaultImage != null)
+                        mDefaultImage.Dispose();
+                    if (mErrorImage != null)
+                        mErrorImage.Dispose();
+                    if (mRatingImage != null)
+                        mRatingImage.Dispose();
+                    if (mEmptyRatingImage != null)
+                        mEmptyRatingImage.Dispose();
                     if (mHeaderFont != null)
                         mHeaderFont.Dispose();
 
+                    // Child controls
+                    if (hScrollBar != null)
+                        hScrollBar.Dispose();
+                    if (vScrollBar != null)
+                        vScrollBar.Dispose();
+
+                    // internal classes
                     cacheManager.Dispose();
                     itemCacheManager.Dispose();
                     navigationManager.Dispose();
+                    if (mRenderer != null)
+                        mRenderer.Dispose();
                 }
 
                 disposed = true;
