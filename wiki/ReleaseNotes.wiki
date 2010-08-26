@@ -10,6 +10,7 @@
   * Checkbox and file icons are now aligned properly in Details view.
   * Added the !CanApplyColors property to renderers.
   * Designer preview items are now clipped to client rectangle of the control.
+  * Setting the !IntegralScroll now causes a layout update.
 
 = 7.0 (26 August 2010) =
 
