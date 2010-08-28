@@ -638,10 +638,7 @@ namespace Manina.Windows.Forms
                 case ColumnType.UserComment:
                     return UserComment;
                 case ColumnType.Rating:
-                    if (Rating == 0)
-                        return "";
-                    else
-                        return Rating.ToString();
+                    return Rating.ToString();
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
