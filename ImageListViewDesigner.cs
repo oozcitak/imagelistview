@@ -29,7 +29,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents an ImageListViewITem on the designer.
     /// </summary>
-    internal class ItemGylph : Glyph
+    internal class ItemGlyph : Glyph, IDisposable
     {
         #region Member Variables
         private BehaviorService mBehaviorService;
@@ -37,6 +37,7 @@ namespace Manina.Windows.Forms
         private int mIndex;
         private ImageListViewItem mItem;
         private Point offset;
+        internal Rectangle clipBounds;
         #endregion
 
         #region Properties
@@ -67,7 +68,7 @@ namespace Manina.Windows.Forms
         /// <param name="owner">The owner control.</param>
         /// <param name="text">The text of the item.</param>
         /// <param name="index">Item index.</param>
-        public ItemGylph(BehaviorService behaviorService, ImageListView owner, string text, int index)
+        public ItemGlyph(BehaviorService behaviorService, ImageListView owner, string text, int index)
             : base(null)
         {
             mBehaviorService = behaviorService;
@@ -117,6 +118,9 @@ namespace Manina.Windows.Forms
             Rectangle itemArea = mImageListView.layoutManager.ItemAreaBounds;
             itemArea.Offset(offset);
             Rectangle clip = Rectangle.Intersect(Bounds, itemArea);
+            Rectangle overlay = clipBounds;
+            overlay.Offset(offset);
+            clip = Rectangle.Intersect(clip, overlay);
             pe.Graphics.SetClip(clip);
             mImageListView.mRenderer.DrawItem(pe.Graphics, mItem, ItemState.None, Bounds);
 
@@ -132,6 +136,18 @@ namespace Manina.Windows.Forms
                 bounds.Offset(offset);
                 mImageListView.mRenderer.DrawFileIcon(pe.Graphics, mItem, bounds);
             }
+        }
+        #endregion
+
+        #region IDisposable Members
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, 
+        /// releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (mItem != null)
+                mItem.Dispose();
         }
         #endregion
     }
@@ -162,9 +178,9 @@ namespace Manina.Windows.Forms
             // Add the custom glyphs
             adorner = new Adorner();
             BehaviorService.Adorners.Add(adorner);
-            adorner.Glyphs.Add(new ItemGylph(BehaviorService, imageListView, "Item 1", 0));
-            adorner.Glyphs.Add(new ItemGylph(BehaviorService, imageListView, "Item 2", 1));
-            adorner.Glyphs.Add(new ItemGylph(BehaviorService, imageListView, "Item 3", 2));
+            adorner.Glyphs.Add(new ItemGlyph(BehaviorService, imageListView, "Item 1", 0));
+            adorner.Glyphs.Add(new ItemGlyph(BehaviorService, imageListView, "Item 2", 1));
+            adorner.Glyphs.Add(new ItemGlyph(BehaviorService, imageListView, "Item 3", 2));
         }
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Design.ControlDesigner"/> 
@@ -176,6 +192,11 @@ namespace Manina.Windows.Forms
         {
             if (disposing && adorner != null)
             {
+                foreach (Glyph g in adorner.Glyphs)
+                {
+                    if (g is ItemGlyph)
+                        ((ItemGlyph)g).Dispose();
+                }
                 BehaviorService b = BehaviorService;
                 if (b != null)
                 {
@@ -200,6 +221,25 @@ namespace Manina.Windows.Forms
                     actionLists.Add(new ImageListViewActionLists(this.Component));
                 }
                 return actionLists;
+            }
+        }
+        #endregion
+
+        #region Paint Adornments
+        /// <summary>
+        /// Receives a call when the control that the designer is managing has painted 
+        /// its surface so the designer can paint any additional adornments on top of the control.
+        /// </summary>
+        /// <param name="pe">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> the designer 
+        /// can use to draw on the control.</param>
+        protected override void OnPaintAdornments(PaintEventArgs pe)
+        {
+            base.OnPaintAdornments(pe);
+
+            foreach (Glyph g in adorner.Glyphs)
+            {
+                if (g is ItemGlyph)
+                    ((ItemGlyph)g).clipBounds = pe.ClipRectangle;
             }
         }
         #endregion
