@@ -185,6 +185,35 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets the name of the image file represented by this item.
+        /// </summary>        
+        [Category("File Properties"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
+        public string FileName
+        {
+            get
+            {
+                return mFileName;
+            }
+            set
+            {
+                if (mFileName != value)
+                {
+                    mFileName = value;
+                    if (!isVirtualItem)
+                    {
+                        isDirty = true;
+                        if (mImageListView != null)
+                        {
+                            mImageListView.cacheManager.Remove(Guid);
+                            mImageListView.itemCacheManager.Add(this);
+                            if (mImageListView.IsItemVisible(mGuid))
+                                mImageListView.Refresh();
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
         /// Gets the thumbnail image. If the thumbnail image is not cached, it will be 
         /// added to the cache queue and DefaultImage of the owner image list view will
         /// be returned. If the thumbnail could not be cached ErrorImage of the owner
@@ -234,6 +263,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
         public int ZOrder { get { return mZOrder; } set { mZOrder = value; } }
+        #endregion
+
+        #region Shell Properties
         /// <summary>
         /// Gets the small shell icon of the image file represented by this item.
         /// </summary>
@@ -265,35 +297,6 @@ namespace Manina.Windows.Forms
         [Category("File Properties"), Browsable(true), Description("Gets the shell type of the image file represented by this item.")]
         public string FileType { get { UpdateFileInfo(); return mFileType; } }
         /// <summary>
-        /// Gets or sets the name of the image file represented by this item.
-        /// </summary>        
-        [Category("File Properties"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
-        public string FileName
-        {
-            get
-            {
-                return mFileName;
-            }
-            set
-            {
-                if (mFileName != value)
-                {
-                    mFileName = value;
-                    if (!isVirtualItem)
-                    {
-                        isDirty = true;
-                        if (mImageListView != null)
-                        {
-                            mImageListView.cacheManager.Remove(Guid);
-                            mImageListView.itemCacheManager.Add(this);
-                            if (mImageListView.IsItemVisible(mGuid))
-                                mImageListView.Refresh();
-                        }
-                    }
-                }
-            }
-        }
-        /// <summary>
         /// Gets the path of the image file represented by this item.
         /// </summary>        
         [Category("File Properties"), Browsable(true), Description("Gets the path of the image file represented by this item.")]
@@ -303,6 +306,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("File Properties"), Browsable(true), Description("Gets file size in bytes.")]
         public long FileSize { get { UpdateFileInfo(); return mFileSize; } }
+        #endregion
+
+        #region Exif Properties
         /// <summary>
         /// Gets image dimensions.
         /// </summary>
@@ -556,8 +562,15 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="type">The type of information to return.</param>
         /// <returns>Formatted text for the given column type.</returns>
-        public string GetSubItemText(ColumnType type)
+        internal string GetSubItemText(ColumnType type)
         {
+            if (type == ColumnType.Name)
+                return Text;
+            else if (type == ColumnType.FileName)
+                return FileName;
+            else if (isDirty)
+                return "";
+
             switch (type)
             {
                 case ColumnType.Custom:
@@ -577,10 +590,6 @@ namespace Manina.Windows.Forms
                         return "";
                     else
                         return DateModified.ToString("g");
-                case ColumnType.FileName:
-                    return FileName;
-                case ColumnType.Name:
-                    return Text;
                 case ColumnType.FilePath:
                     return FilePath;
                 case ColumnType.FileSize:
@@ -616,10 +625,7 @@ namespace Manina.Windows.Forms
                 case ColumnType.ExposureTime:
                     return ExposureTime;
                 case ColumnType.FNumber:
-                    if (FNumber == 0.0f)
-                        return "";
-                    else
-                        return FNumber.ToString("f2");
+                    return FNumber.ToString("f2");
                 case ColumnType.ISOSpeed:
                     if (ISOSpeed == 0)
                         return "";
@@ -688,6 +694,8 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Updates file info for the image file represented by this item.
+        /// Item details will be updated synchronously without waiting for the
+        /// cache thread.
         /// </summary>
         private void UpdateFileInfo()
         {
@@ -791,8 +799,8 @@ namespace Manina.Windows.Forms
             item.mText = mText;
 
             // File info
-            item.mSmallIcon = mSmallIcon;
-            item.mLargeIcon = mLargeIcon;
+            item.mSmallIcon = (Image)mSmallIcon.Clone();
+            item.mLargeIcon = (Image)mLargeIcon.Clone();
             item.mDateAccessed = mDateAccessed;
             item.mDateCreated = mDateCreated;
             item.mDateModified = mDateModified;
@@ -820,6 +828,10 @@ namespace Manina.Windows.Forms
             // Virtual item properties
             item.isVirtualItem = isVirtualItem;
             item.mVirtualItemKey = mVirtualItemKey;
+
+            // Sub items
+            foreach (KeyValuePair<Guid, string> kv in subItems)
+                item.subItems.Add(kv.Key, kv.Value);
 
             return item;
         }

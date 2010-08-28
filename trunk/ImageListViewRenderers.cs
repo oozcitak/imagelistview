@@ -192,15 +192,19 @@ namespace Manina.Windows.Forms
                             {
                                 if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
                                 {
-                                    int w = mImageListView.RatingImage.Width;
-                                    int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
-                                    int rating = (int)Math.Ceiling((float)item.Rating / 20.0f);
-                                    if (rating < 0) rating = 0;
-                                    if (rating > 5) rating = 5;
-                                    for (int i = 1; i <= rating; i++)
-                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
-                                    for (int i = rating + 1; i <= 5; i++)
-                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                    string srating = item.GetSubItemText(ColumnType.Rating);
+                                    if (!string.IsNullOrEmpty(srating))
+                                    {
+                                        int w = mImageListView.RatingImage.Width;
+                                        int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                        int rating = (int)Math.Ceiling((float)item.Rating / 20.0f);
+                                        if (rating < 0) rating = 0;
+                                        if (rating > 5) rating = 5;
+                                        for (int i = 1; i <= rating; i++)
+                                            g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                        for (int i = rating + 1; i <= 5; i++)
+                                            g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                    }
                                 }
                                 else if (column.Type == ColumnType.Custom)
                                     g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
