@@ -766,7 +766,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="image">The source image.</param>
         /// <param name="fit">The size to fit in to.</param>
-        /// <returns></returns>
+        /// <returns>New image size.</returns>
         internal static Size GetSizedImageBounds(Image image, Size fit)
         {
             float f = System.Math.Max((float)image.Width / (float)fit.Width, (float)image.Height / (float)fit.Height);
@@ -783,9 +783,13 @@ namespace Manina.Windows.Forms
         /// <param name="fit">The rectangle to fit in to.</param>
         /// <param name="hAlign">Horizontal image aligment in percent.</param>
         /// <param name="vAlign">Vertical image aligment in percent.</param>
-        /// <returns></returns>
-        internal static Rectangle GetSizedImageBounds(Image image, Rectangle fit, float hAlign, float vAlign)
+        /// <returns>New image size.</returns>
+        public static Rectangle GetSizedImageBounds(Image image, Rectangle fit, float hAlign, float vAlign)
         {
+            if (hAlign < 0 || hAlign > 100.0f)
+                throw new ArgumentException("hAlign must be between 0.0 and 100.0 (inclusive).", "hAlign");
+            if (vAlign < 0 || vAlign > 100.0f)
+                throw new ArgumentException("vAlign must be between 0.0 and 100.0 (inclusive).", "vAlign");
             Size scaled = GetSizedImageBounds(image, fit.Size);
             int x = fit.Left + (int)(hAlign / 100.0f * (float)(fit.Width - scaled.Width));
             int y = fit.Top + (int)(vAlign / 100.0f * (float)(fit.Height - scaled.Height));
@@ -799,8 +803,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="image">The source image.</param>
         /// <param name="fit">The rectangle to fit in to.</param>
-        /// <returns></returns>
-        internal static Rectangle GetSizedImageBounds(Image image, Rectangle fit)
+        /// <returns>New image size.</returns>
+        public static Rectangle GetSizedImageBounds(Image image, Rectangle fit)
         {
             return GetSizedImageBounds(image, fit, 50.0f, 50.0f);
         }

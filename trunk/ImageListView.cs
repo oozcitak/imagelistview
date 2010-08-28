@@ -1171,9 +1171,9 @@ namespace Manina.Windows.Forms
                         mHeaderFont.Dispose();
 
                     // Child controls
-                    if (hScrollBar != null)
+                    if (hScrollBar != null && !hScrollBar.IsDisposed)
                         hScrollBar.Dispose();
-                    if (vScrollBar != null)
+                    if (vScrollBar != null && !vScrollBar.IsDisposed)
                         vScrollBar.Dispose();
 
                     // internal classes
