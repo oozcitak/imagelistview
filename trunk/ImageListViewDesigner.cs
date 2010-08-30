@@ -27,140 +27,14 @@ using System.Windows.Forms.Design.Behavior;
 namespace Manina.Windows.Forms
 {
     /// <summary>
-    /// Represents an ImageListViewITem on the designer.
-    /// </summary>
-    internal class ItemGlyph : Glyph, IDisposable
-    {
-        #region Member Variables
-        private BehaviorService mBehaviorService;
-        private ImageListView mImageListView;
-        private int mIndex;
-        private ImageListViewItem mItem;
-        private Point offset;
-        internal Rectangle clipBounds;
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Gets the bounds of the <see cref="T:System.Windows.Forms.Design.Behavior.Glyph"/>.
-        /// </summary>
-        public override Rectangle Bounds
-        {
-            get
-            {
-                // Glyph coordinates are in adorner window coordinates, so we must map
-                // using the behavior service.
-                Rectangle bounds = mImageListView.layoutManager.GetItemBounds(mIndex);
-                Point aPt = mBehaviorService.MapAdornerWindowPoint(mImageListView.Handle, bounds.Location);
-                offset = new Point(aPt.X - bounds.X, aPt.Y - bounds.Y);
-                bounds.Offset(offset);
-
-                return bounds;
-            }
-        }
-        #endregion
-
-        #region Constructor
-        /// <summary>
-        /// Initializes a new instance of the ItemGylph class.
-        /// </summary>
-        /// <param name="behaviorService">The behavior service of the designer.</param>
-        /// <param name="owner">The owner control.</param>
-        /// <param name="text">The text of the item.</param>
-        /// <param name="index">Item index.</param>
-        public ItemGlyph(BehaviorService behaviorService, ImageListView owner, string text, int index)
-            : base(null)
-        {
-            mBehaviorService = behaviorService;
-            mImageListView = owner;
-            mItem = new ImageListViewItem();
-            mItem.Text = text;
-            mItem.mImageListView = mImageListView;
-            mItem.Tag = null;
-            mIndex = index;
-        }
-        #endregion
-
-        #region Glyph Overrides
-        /// <summary>
-        /// Provides hit test logic.
-        /// </summary>
-        /// <param name="p">A point to hit-test.</param>
-        /// <returns>
-        /// A <see cref="T:System.Windows.Forms.Cursor"/> if the <see cref="T:System.Windows.Forms.Design.Behavior.Glyph"/> 
-        /// is associated with <paramref name="p"/>; otherwise, null.
-        /// </returns>
-        public override Cursor GetHitTest(Point p)
-        {
-            return null;
-        }
-        /// <summary>
-        /// Provides paint logic.
-        /// </summary>
-        /// <param name="pe">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> that contains the event data.</param>
-        public override void Paint(PaintEventArgs pe)
-        {
-            if (mItem.Tag == null)
-            {
-                int c = 0;
-                foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
-                {
-                    if (column.Type == ColumnType.Custom)
-                    {
-                        mItem.AddSubItemText(column.columnID);
-                        c++;
-                    }
-                }
-                mItem.Tag = c.ToString();
-            }
-
-            mImageListView.layoutManager.Update(true);
-            Rectangle itemArea = mImageListView.layoutManager.ItemAreaBounds;
-            itemArea.Offset(offset);
-            Rectangle clip = Rectangle.Intersect(Bounds, itemArea);
-            Rectangle overlay = clipBounds;
-            overlay.Offset(offset);
-            clip = Rectangle.Intersect(clip, overlay);
-            pe.Graphics.SetClip(clip);
-            mImageListView.mRenderer.DrawItem(pe.Graphics, mItem, ItemState.None, Bounds);
-
-            if (mImageListView.ShowCheckBoxes)
-            {
-                Rectangle bounds = mImageListView.layoutManager.GetCheckBoxBounds(mIndex);
-                bounds.Offset(offset);
-                mImageListView.mRenderer.DrawCheckBox(pe.Graphics, mItem, bounds);
-            }
-            if (mImageListView.ShowFileIcons)
-            {
-                Rectangle bounds = mImageListView.layoutManager.GetIconBounds(mIndex);
-                bounds.Offset(offset);
-                mImageListView.mRenderer.DrawFileIcon(pe.Graphics, mItem, bounds);
-            }
-        }
-        #endregion
-
-        #region IDisposable Members
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, 
-        /// releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            if (mItem != null)
-                mItem.Dispose();
-        }
-        #endregion
-    }
-
-    /// <summary>
     /// Represents the designer of the image list view.
     /// </summary>
     internal class ImageListViewDesigner : ControlDesigner
     {
         #region Member Variables
         private DesignerActionListCollection actionLists = null;
-        private Adorner adorner;
         private ImageListView imageListView;
+        private ImageListViewItem[] items;
         #endregion
 
         #region Add/Remove Glyphs on Initialize/Dispose
@@ -175,12 +49,17 @@ namespace Manina.Windows.Forms
             base.Initialize(component);
 
             imageListView = (ImageListView)this.Control;
-            // Add the custom glyphs
-            adorner = new Adorner();
-            BehaviorService.Adorners.Add(adorner);
-            adorner.Glyphs.Add(new ItemGlyph(BehaviorService, imageListView, "Item 1", 0));
-            adorner.Glyphs.Add(new ItemGlyph(BehaviorService, imageListView, "Item 2", 1));
-            adorner.Glyphs.Add(new ItemGlyph(BehaviorService, imageListView, "Item 3", 2));
+
+            // Add preview items
+            items = new ImageListViewItem[3];
+            for (int i = 0; i < items.Length; i++)
+            {
+                ImageListViewItem item = new ImageListViewItem();
+                item.Text = "Item " + (i + 1).ToString();
+                item.mImageListView = imageListView;
+                item.Tag = null;
+                items[i] = item;
+            }
         }
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Design.ControlDesigner"/> 
@@ -190,18 +69,10 @@ namespace Manina.Windows.Forms
         /// false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && adorner != null)
+            if (disposing)
             {
-                foreach (Glyph g in adorner.Glyphs)
-                {
-                    if (g is ItemGlyph)
-                        ((ItemGlyph)g).Dispose();
-                }
-                BehaviorService b = BehaviorService;
-                if (b != null)
-                {
-                    b.Adorners.Remove(adorner);
-                }
+                for (int i = 0; i < items.Length; i++)
+                    items[i].Dispose();
             }
             base.Dispose(disposing);
         }
@@ -235,11 +106,43 @@ namespace Manina.Windows.Forms
         protected override void OnPaintAdornments(PaintEventArgs pe)
         {
             base.OnPaintAdornments(pe);
+            imageListView.layoutManager.Update(true);
 
-            foreach (Glyph g in adorner.Glyphs)
+            for (int i = 0; i < items.Length; i++)
             {
-                if (g is ItemGlyph)
-                    ((ItemGlyph)g).clipBounds = pe.ClipRectangle;
+                ImageListViewItem item = items[i];
+                Rectangle bounds = imageListView.layoutManager.GetItemBounds(i);
+
+                // Add custom columns
+                if (item.Tag == null)
+                {
+                    int c = 0;
+                    foreach (ImageListView.ImageListViewColumnHeader column in imageListView.Columns)
+                    {
+                        if (column.Type == ColumnType.Custom)
+                        {
+                            item.AddSubItemText(column.columnID);
+                            c++;
+                        }
+                    }
+                    item.Tag = c.ToString();
+                }
+
+                Rectangle itemArea = imageListView.layoutManager.ItemAreaBounds;
+                Rectangle clip = Rectangle.Intersect(Rectangle.Intersect(bounds, itemArea), pe.ClipRectangle);
+                //pe.Graphics.SetClip(clip);
+                imageListView.mRenderer.DrawItem(pe.Graphics, item, ItemState.None, bounds);
+
+                if (imageListView.ShowCheckBoxes)
+                {
+                    Rectangle wbounds = imageListView.layoutManager.GetCheckBoxBounds(i);
+                    imageListView.mRenderer.DrawCheckBox(pe.Graphics, item, wbounds);
+                }
+                if (imageListView.ShowFileIcons)
+                {
+                    Rectangle wbounds = imageListView.layoutManager.GetIconBounds(i);
+                    imageListView.mRenderer.DrawFileIcon(pe.Graphics, item, wbounds);
+                }
             }
         }
         #endregion
