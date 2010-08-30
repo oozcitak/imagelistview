@@ -21,7 +21,6 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
 using System.Resources;
-using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
