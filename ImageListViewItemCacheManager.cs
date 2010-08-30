@@ -164,6 +164,17 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Clears the thumbnail cache.
+        /// </summary>
+        public void Clear()
+        {
+            lock (lockObject)
+            {
+                toCache.Clear();
+                editCache.Clear();
+            }
+        }
+        /// <summary>
         /// Stops the cache manager.
         /// </summary>
         public void Stop()
@@ -215,6 +226,10 @@ namespace Manina.Windows.Forms
 
                         // Is it being edited?
                         if (editCache.ContainsKey(item.Item.Guid))
+                            item = null;
+
+                        // Is it still in the control?
+                        if (mImageListView.Items.Contains(item.Item))
                             item = null;
                     }
                 }

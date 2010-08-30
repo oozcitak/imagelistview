@@ -35,6 +35,7 @@ namespace Manina.Windows.Forms
             private List<ImageListViewItem> mItems;
             internal ImageListView mImageListView;
             private ImageListViewItem mFocused;
+            private Dictionary<Guid, ImageListViewItem> lookUp;
             #endregion
 
             #region Constructors
@@ -45,6 +46,7 @@ namespace Manina.Windows.Forms
             internal ImageListViewItemCollection(ImageListView owner)
             {
                 mItems = new List<ImageListViewItem>();
+                lookUp = new Dictionary<Guid, ImageListViewItem>();
                 mFocused = null;
                 mImageListView = owner;
             }
@@ -101,6 +103,7 @@ namespace Manina.Windows.Forms
                 set
                 {
                     ImageListViewItem item = value;
+                    ImageListViewItem oldItem = mItems[index];
 
                     if (mItems[index] == mFocused)
                         mFocused = item;
@@ -110,9 +113,12 @@ namespace Manina.Windows.Forms
                         item.mImageListView = mImageListView;
                     item.owner = this;
                     mItems[index] = item;
+                    lookUp.Remove(oldItem.Guid);
+                    lookUp.Add(item.Guid, item);
 
                     if (mImageListView != null)
                     {
+                        mImageListView.cacheManager.Remove(oldItem.Guid);
                         if (mImageListView.CacheMode == CacheMode.Continuous)
                         {
                             if (item.isVirtualItem)
@@ -136,9 +142,7 @@ namespace Manina.Windows.Forms
             {
                 get
                 {
-                    foreach (ImageListViewItem item in this)
-                        if (item.Guid == guid) return item;
-                    throw new ArgumentException("No item with this guid exists.", "guid");
+                    return lookUp[guid];
                 }
             }
             #endregion
@@ -259,6 +263,7 @@ namespace Manina.Windows.Forms
 
                 if (mImageListView != null)
                 {
+                    mImageListView.itemCacheManager.Clear();
                     mImageListView.cacheManager.Clear();
                     mImageListView.SelectedItems.Clear();
                     mImageListView.Refresh();
@@ -317,6 +322,7 @@ namespace Manina.Windows.Forms
                     mItems[i].mIndex--;
                 if (item == mFocused) mFocused = null;
                 bool ret = mItems.Remove(item);
+                lookUp.Remove(item.Guid);
                 item.Dispose();
                 if (mImageListView != null)
                 {
@@ -383,6 +389,7 @@ namespace Manina.Windows.Forms
                 item.owner = this;
                 item.mIndex = mItems.Count;
                 mItems.Add(item);
+                lookUp.Add(item.Guid, item);
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
@@ -420,6 +427,7 @@ namespace Manina.Windows.Forms
                 for (int i = index; i < mItems.Count; i++)
                     mItems[i].mIndex++;
                 mItems.Insert(index, item);
+                lookUp.Add(item.Guid, item);
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
@@ -458,6 +466,7 @@ namespace Manina.Windows.Forms
                 if (removeFromCache && mImageListView != null)
                     mImageListView.cacheManager.Remove(item.Guid);
                 mItems.Remove(item);
+                lookUp.Remove(item.Guid);
                 item.Dispose();
             }
             /// <summary>
@@ -472,8 +481,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal int IndexOf(Guid guid)
             {
-                for (int i = 0; i < mItems.Count; i++)
-                    if (mItems[i].Guid == guid) return i;
+                ImageListViewItem item = null;
+                if (lookUp.TryGetValue(guid, out item))
+                    return item.Index;
                 return -1;
             }
             /// <summary>
