@@ -229,7 +229,11 @@ namespace Manina.Windows.Forms
                             item = null;
 
                         // Is it still in the control?
-                        if (mImageListView.Items.Contains(item.Item))
+                        if (!mImageListView.Items.ContainsKey(item.Item.Guid))
+                            item = null;
+
+                        // Was it fetched by the UI thread in the meantime?
+                        if (!item.Item.isDirty)
                             item = null;
                     }
                 }

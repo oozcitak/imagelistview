@@ -359,6 +359,15 @@ namespace Manina.Windows.Forms
                     item.AddSubItemText(guid);
             }
             /// <summary>
+            /// Determines whether the collection contains the given key.
+            /// </summary>
+            /// <param name="guid">The key of the item.</param>
+            /// <returns>true if the collection contains the given key; otherwise false.</returns>
+            internal bool ContainsKey(Guid guid)
+            {
+                return lookUp.ContainsKey(guid);
+            }
+            /// <summary>
             /// Removes the subitem of each item for the given custom column.
             /// </summary>
             /// <param name="guid">Custom column ID.</param>
