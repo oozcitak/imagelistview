@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.3 (30 August 2010) =
+
+  * Fixed a bug where the !ItemCacheManager would continue working on old items even after they were removed from the control. (Follow up to Issue 88)
+  * Fixed a bug where the control wasn't redrawn after !ItemCacheManager cached new items. (Follow up to Issue 88)
+
 = 7.2 (27 August 2010) =
 
   * Fixed a bug where !SmallChange property of scrollbars was calculated incorrectly if the control was sized smaller than the item height. (Issue 87)
