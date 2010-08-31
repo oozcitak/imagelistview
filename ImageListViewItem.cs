@@ -204,7 +204,7 @@ namespace Manina.Windows.Forms
                         isDirty = true;
                         if (mImageListView != null)
                         {
-                            mImageListView.cacheManager.Remove(Guid);
+                            mImageListView.cacheManager.Remove(Guid, true);
                             mImageListView.itemCacheManager.Add(this);
                             if (mImageListView.IsItemVisible(mGuid))
                                 mImageListView.Refresh();
