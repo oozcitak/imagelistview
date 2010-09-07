@@ -27,6 +27,13 @@ namespace Manina.Windows.Forms
 {
     #region Event Delegates
     /// <summary>
+    /// Represents the method that will handle the CacheError event.
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A CacheErrorEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void CacheErrorEventHandler(object sender, CacheErrorEventArgs e);
+    /// <summary>
     /// Represents the method that will handle the DropFiles event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
@@ -121,6 +128,16 @@ namespace Manina.Windows.Forms
 
     #region Internal Delegates
     /// <summary>
+    /// Represents the method that will handle the CacheError event.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void CacheErrorEventHandlerInternal(Guid guid, Exception error, CacheThread cacheThread);
+    /// <summary>
+    /// Represents the method that will handle the CacheError event.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void CacheErrorWithItemEventHandlerInternal(ImageListViewItem item, Exception error, CacheThread cacheThread);
+    /// <summary>
     /// Updates item details.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -156,6 +173,43 @@ namespace Manina.Windows.Forms
     #endregion
 
     #region Event Arguments
+    /// <summary>
+    /// Represents the event arguments for errors during cache operations.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class CacheErrorEventArgs
+    {
+        private ImageListViewItem mItem;
+        private Exception mError;
+        private CacheThread mCacheThread;
+
+        /// <summary>
+        /// Gets the ImageListViewItem that is associated with this error.
+        /// This parameter can be null.
+        /// </summary>
+        public ImageListViewItem Item { get { return mItem; } }
+        /// <summary>
+        /// Gets a value indicating which error occurred during an asynchronous operation.
+        /// </summary>
+        public Exception Error { get { return mError; } }
+        /// <summary>
+        /// Gets the thread raising the error.
+        /// </summary>
+        public CacheThread CacheThread { get { return mCacheThread; } }
+
+        /// <summary>
+        /// Initializes a new instance of the CacheErrorEventArgs class.
+        /// </summary>
+        /// <param name="item">The ImageListViewItem that is associated with this error.</param>
+        /// <param name="error">The error that occurred during an asynchronous operation.</param>
+        /// <param name="cacheThread">The thread raising the error.</param>
+        public CacheErrorEventArgs(ImageListViewItem item, Exception error, CacheThread cacheThread)
+        {
+            mItem = item;
+            mError = error;
+            mCacheThread = cacheThread;
+        }
+    }
     /// <summary>
     /// Represents the event arguments for column related events.
     /// </summary>

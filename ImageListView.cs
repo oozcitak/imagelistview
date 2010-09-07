@@ -1194,6 +1194,15 @@ namespace Manina.Windows.Forms
 
         #region Virtual Functions
         /// <summary>
+        /// Raises the CacheError event.
+        /// </summary>
+        /// <param name="e">A CacheErrorEventArgs that contains event data.</param>
+        protected virtual void OnCacheError(CacheErrorEventArgs e)
+        {
+            if (CacheMode != null)
+                CacheError(this, e);
+        }
+        /// <summary>
         /// Raises the DropFiles event.
         /// </summary>
         /// <param name="e">A DropFileEventArgs that contains event data.</param>
@@ -1319,6 +1328,34 @@ namespace Manina.Windows.Forms
                 ThumbnailCached(this, e);
         }
         /// <summary>
+        /// Raises the CacheError event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="guid">The Guid of the ImageListViewItem that is associated with this error.
+        /// This parameter can be null.</param>
+        /// <param name="error">The error that occurred during an asynchronous operation.</param>
+        /// <param name="cacheThread">The thread raising the error.</param>
+        internal void OnCacheErrorInternal(Guid guid, Exception error, CacheThread cacheThread)
+        {
+            int itemIndex = Items.IndexOf(guid);
+            if (itemIndex != -1)
+                OnCacheError(new CacheErrorEventArgs(Items[itemIndex], error, cacheThread));
+            else
+                OnCacheError(new CacheErrorEventArgs(null, error, cacheThread));
+        }
+        /// <summary>
+        /// Raises the CacheError event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="item">The ImageListViewItem that is associated with this error.
+        /// This parameter can be null.</param>
+        /// <param name="error">The error that occurred during an asynchronous operation.</param>
+        /// <param name="cacheThread">The thread raising the error.</param>
+        internal void OnCacheErrorWithItemInternal(ImageListViewItem item, Exception error, CacheThread cacheThread)
+        {
+            OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
+        }
+        /// <summary>
         /// Raises the ThumbnailCached event.
         /// This method is invoked from the thumbnail thread.
         /// </summary>
@@ -1420,6 +1457,11 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Public Events
+        /// <summary>
+        /// Occurs when an error occurs during an asynchronous cache operation.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs when an error occurs during an asynchronous cache operation.")]
+        public event CacheErrorEventHandler CacheError;
         /// <summary>
         /// Occurs after the user drops files on to the control.
         /// </summary>

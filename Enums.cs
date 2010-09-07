@@ -54,6 +54,20 @@ namespace Manina.Windows.Forms
         Error,
     }
     /// <summary>
+    /// Represents the cache thread.
+    /// </summary>
+    public enum CacheThread
+    {
+        /// <summary>
+        /// The cache thread responsible for generating item image thumbnails.
+        /// </summary>
+        Thumbnail,
+        /// <summary>
+        /// The cache thread responsible for generating item details.
+        /// </summary>
+        Details,
+    }
+    /// <summary>
     /// Represents the visual state of an image list column.
     /// </summary>
     [Flags]
