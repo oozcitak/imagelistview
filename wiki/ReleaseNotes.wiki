@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.4 (07 September 2010) =
+
+  * Added the !CacheError event to the control. (Issue 91)
+  * !BeginEdit and !EndEdit methods work as intended. (Issue 90)
+  * Setting the !FileName property of an item updates the item thumbnail.
+
 = 7.3 (30 August 2010) =
 
   * Fixed a bug where the !ItemCacheManager would continue working on old items even after they were removed from the control. (Follow up to Issue 88)
