@@ -232,11 +232,11 @@ namespace Manina.Windows.Forms
                                 item = null;
 
                             // Is it still in the control?
-                            if (!mImageListView.Items.ContainsKey(item.Item.Guid))
+                            if (item != null && !mImageListView.Items.ContainsKey(item.Item.Guid))
                                 item = null;
 
                             // Was it fetched by the UI thread in the meantime?
-                            if (!item.Item.isDirty)
+                            if (item != null && !item.Item.isDirty)
                                 item = null;
                         }
                     }
@@ -321,10 +321,19 @@ namespace Manina.Windows.Forms
                 catch (Exception exception)
                 {
                     // Delegate the exception to the parent control
-                    if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                    try
                     {
-                        mImageListView.Invoke(new CacheErrorWithItemEventHandlerInternal(
-                            mImageListView.OnCacheErrorWithItemInternal), item, exception, CacheThread.Details);
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        {
+                            mImageListView.Invoke(new CacheErrorWithItemEventHandlerInternal(
+                                mImageListView.OnCacheErrorWithItemInternal), 
+                                (item == null ? null : item.Item), 
+                                exception, CacheThread.Details);
+                        }
+                    }
+                    finally
+                    {
+                        ;
                     }
                 }
                 finally

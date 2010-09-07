@@ -467,8 +467,7 @@ namespace Manina.Windows.Forms
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
 
-            UpdateFileInfo();
-            mImageListView.cacheManager.BeginItemEdit(mGuid, mFileName);
+            mImageListView.cacheManager.BeginItemEdit(mGuid);
             mImageListView.itemCacheManager.BeginItemEdit(mGuid);
 
             editing = true;

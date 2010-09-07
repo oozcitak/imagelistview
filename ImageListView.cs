@@ -1199,7 +1199,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A CacheErrorEventArgs that contains event data.</param>
         protected virtual void OnCacheError(CacheErrorEventArgs e)
         {
-            if (CacheMode != null)
+            if (CacheError != null)
                 CacheError(this, e);
         }
         /// <summary>

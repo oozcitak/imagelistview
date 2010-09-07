@@ -42,7 +42,7 @@ namespace Manina.Windows.Forms
 
         private Stack<CacheItem> toCache;
         private Dictionary<Guid, CacheItem> thumbCache;
-        private Dictionary<Guid, Image> editCache;
+        private Dictionary<Guid, bool> editCache;
 
         private Stack<CacheItem> rendererToCache;
         private Guid rendererGuid;
@@ -278,7 +278,7 @@ namespace Manina.Windows.Forms
 
             toCache = new Stack<CacheItem>();
             thumbCache = new Dictionary<Guid, CacheItem>();
-            editCache = new Dictionary<Guid, Image>();
+            editCache = new Dictionary<Guid, bool>();
 
             rendererToCache = new Stack<CacheItem>();
             rendererGuid = new Guid();
@@ -303,31 +303,7 @@ namespace Manina.Windows.Forms
         #region Instance Methods
         /// <summary>
         /// Starts editing an item. While items are edited,
-        /// their original images will be seperately cached
-        /// instead of fetching them from the file.
-        /// </summary>
-        /// <param name="guid">The guid representing the item</param>
-        /// <param name="filename">The image filename.</param>
-        public void BeginItemEdit(Guid guid, string filename)
-        {
-            lock (lockObject)
-            {
-                if (!editCache.ContainsKey(guid))
-                {
-                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                    {
-                        using (Image img = Image.FromStream(stream))
-                        {
-                            editCache.Add(guid, new Bitmap(img));
-                        }
-                    }
-                }
-            }
-        }
-        /// <summary>
-        /// Starts editing a virtual item. While items are edited,
-        /// their original images will be seperately cached
-        /// instead of fetching them from the file.
+        /// the cache thread will not work on them to prevent collisions.
         /// </summary>
         /// <param name="guid">The guid representing the item</param>
         public void BeginItemEdit(Guid guid)
@@ -336,25 +312,13 @@ namespace Manina.Windows.Forms
             {
                 if (!editCache.ContainsKey(guid))
                 {
-                    VirtualItemImageEventArgs e = new VirtualItemImageEventArgs(mImageListView.Items[guid].mVirtualItemKey);
-                    mImageListView.RetrieveVirtualItemImageInternal(e);
-                    if (!string.IsNullOrEmpty(e.FileName))
-                    {
-                        using (FileStream stream = new FileStream(e.FileName, FileMode.Open, FileAccess.Read))
-                        {
-                            using (Image img = Image.FromStream(stream))
-                            {
-                                editCache.Add(guid, new Bitmap(img));
-                            }
-                        }
-                    }
+                    editCache.Add(guid, false);
                 }
             }
         }
         /// <summary>
         /// Ends editing an item. After this call, item
-        /// image will be continued to be fetched from the
-        /// file.
+        /// image will be continued to be fetched by the thread.
         /// </summary>
         /// <param name="guid">The guid representing the item.</param>
         public void EndItemEdit(Guid guid)
@@ -363,14 +327,7 @@ namespace Manina.Windows.Forms
             {
                 if (editCache.ContainsKey(guid))
                 {
-                    editCache[guid].Dispose();
                     editCache.Remove(guid);
-                }
-                if (rendererGuid == guid)
-                {
-                    rendererGuid = Guid.Empty;
-                    if (rendererItem != null)
-                        rendererItem.Dispose();
                 }
             }
         }
@@ -416,10 +373,6 @@ namespace Manina.Windows.Forms
                 foreach (CacheItem item in toCache)
                     item.Dispose();
                 toCache.Clear();
-
-                foreach (Image img in editCache.Values)
-                    img.Dispose();
-                editCache.Clear();
 
                 foreach (CacheItem item in rendererToCache)
                     item.Dispose();
@@ -802,6 +755,10 @@ namespace Manina.Windows.Forms
                                 rendererToCache.Clear();
                                 rendererRequest = true;
                             }
+
+                            // Is it in the edit cache?
+                            if (editCache.ContainsKey(guid))
+                                request = null;
                         }
 
                         // Is it outside visible area?
@@ -837,16 +794,6 @@ namespace Manina.Windows.Forms
                         if (request != null)
                         {
                             Image thumb = null;
-
-                            // Is it in the edit cache?
-                            Image editSource = null;
-                            lock (lockObject)
-                            {
-                                if (!editCache.TryGetValue(guid, out editSource))
-                                    editSource = null;
-                            }
-                            if (editSource != null)
-                                thumb = Utility.ThumbnailFromImage(editSource, request.Size);
 
                             // Read thumbnail image
                             if (thumb == null)
