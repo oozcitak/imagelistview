@@ -250,7 +250,7 @@ namespace Manina.Windows.Forms
                             {
                                 VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(item.VirtualItemKey);
                                 mImageListView.RetrieveVirtualItemDetailsInternal(e);
-                                mImageListView.Invoke(new UpdateVirtualItemDetailsDelegateInternal(
+                                mImageListView.BeginInvoke(new UpdateVirtualItemDetailsDelegateInternal(
                                     mImageListView.UpdateItemDetailsInternal), item.Item, e);
                             }
                         }
@@ -264,7 +264,7 @@ namespace Manina.Windows.Forms
                                 {
                                     if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                                     {
-                                        mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
+                                        mImageListView.BeginInvoke(new UpdateItemDetailsDelegateInternal(
                                             mImageListView.UpdateItemDetailsInternal), item.Item, info);
                                     }
                                 }
@@ -296,7 +296,7 @@ namespace Manina.Windows.Forms
                         {
                             if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                             {
-                                mImageListView.Invoke(new RefreshDelegateInternal(
+                                mImageListView.BeginInvoke(new RefreshDelegateInternal(
                                     mImageListView.OnRefreshInternal));
                             }
                             sw.Reset();
@@ -325,7 +325,7 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                         {
-                            mImageListView.Invoke(new CacheErrorWithItemEventHandlerInternal(
+                            mImageListView.BeginInvoke(new CacheErrorWithItemEventHandlerInternal(
                                 mImageListView.OnCacheErrorWithItemInternal), 
                                 (item == null ? null : item.Item), 
                                 exception, CacheThread.Details);

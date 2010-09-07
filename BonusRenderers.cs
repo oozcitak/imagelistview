@@ -245,7 +245,7 @@ namespace Manina.Windows.Forms
                     try
                     {
                         if (ImageListView.InvokeRequired)
-                            ImageListView.Invoke((MethodInvoker)delegate { ImageListView.Refresh(); });
+                            ImageListView.BeginInvoke((MethodInvoker)delegate { ImageListView.Refresh(); });
                         else
                             ImageListView.Refresh();
                     }

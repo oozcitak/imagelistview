@@ -494,9 +494,9 @@ namespace Manina.Windows.Forms
             {
                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                 {
-                    mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                    mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
                         mImageListView.OnThumbnailCachedInternal), guid, false);
-                    mImageListView.Invoke(new RefreshDelegateInternal(
+                    mImageListView.BeginInvoke(new RefreshDelegateInternal(
                         mImageListView.OnRefreshInternal));
                 }
             }
@@ -564,9 +564,9 @@ namespace Manina.Windows.Forms
             {
                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                 {
-                    mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                    mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
                         mImageListView.OnThumbnailCachedInternal), guid, false);
-                    mImageListView.Invoke(new RefreshDelegateInternal(
+                    mImageListView.BeginInvoke(new RefreshDelegateInternal(
                         mImageListView.OnRefreshInternal));
                 }
             }
@@ -879,7 +879,7 @@ namespace Manina.Windows.Forms
                             {
                                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                                 {
-                                    mImageListView.Invoke(new ThumbnailCachedEventHandlerInternal(
+                                    mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
                                         mImageListView.OnThumbnailCachedInternal), guid, (result == null));
                                 }
                             }
@@ -908,7 +908,7 @@ namespace Manina.Windows.Forms
                             {
                                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                                 {
-                                    mImageListView.Invoke(new RefreshDelegateInternal(
+                                    mImageListView.BeginInvoke(new RefreshDelegateInternal(
                                         mImageListView.OnRefreshInternal));
                                 }
                                 sw.Reset();
@@ -985,7 +985,7 @@ namespace Manina.Windows.Forms
                         {
                             if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                             {
-                                mImageListView.Invoke(new RefreshDelegateInternal(
+                                mImageListView.BeginInvoke(new RefreshDelegateInternal(
                                     mImageListView.OnRefreshInternal));
                             }
                         }
@@ -1002,10 +1002,18 @@ namespace Manina.Windows.Forms
                 catch (Exception exception)
                 {
                     // Delegate the exception to the parent control
-                    if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                    try
                     {
-                        mImageListView.Invoke(new CacheErrorEventHandlerInternal(
-                            mImageListView.OnCacheErrorInternal), guid, exception, CacheThread.Thumbnail);
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        {
+                            mImageListView.BeginInvoke(new CacheErrorEventHandlerInternal(
+                                mImageListView.OnCacheErrorInternal),
+                                guid, exception, CacheThread.Details);
+                        }
+                    }
+                    finally
+                    {
+                        ;
                     }
                 }
                 finally
