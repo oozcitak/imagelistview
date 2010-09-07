@@ -212,107 +212,124 @@ namespace Manina.Windows.Forms
             while (!Stopping)
             {
                 CacheItem item = null;
-                lock (lockObject)
+
+                try
                 {
-                    // Wait until we have items waiting to be cached
-                    if (toCache.Count == 0)
-                        Monitor.Wait(lockObject);
-
-                    sw.Start();
-                    // Get an item from the queue
-                    if (toCache.Count != 0)
+                    lock (lockObject)
                     {
-                        item = toCache.Dequeue();
+                        // Wait until we have items waiting to be cached
+                        if (toCache.Count == 0)
+                            Monitor.Wait(lockObject);
 
-                        // Is it being edited?
-                        if (editCache.ContainsKey(item.Item.Guid))
-                            item = null;
-
-                        // Is it still in the control?
-                        if (!mImageListView.Items.ContainsKey(item.Item.Guid))
-                            item = null;
-
-                        // Was it fetched by the UI thread in the meantime?
-                        if (!item.Item.isDirty)
-                            item = null;
-                    }
-                }
-
-                // Read file info
-                if (item != null)
-                {
-                    if (item.IsVirtualItem)
-                    {
-                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        sw.Start();
+                        // Get an item from the queue
+                        if (toCache.Count != 0)
                         {
-                            VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(item.VirtualItemKey);
-                            mImageListView.RetrieveVirtualItemDetailsInternal(e);
-                            mImageListView.Invoke(new UpdateVirtualItemDetailsDelegateInternal(
-                                mImageListView.UpdateItemDetailsInternal), item.Item, e);
+                            item = toCache.Dequeue();
+
+                            // Is it being edited?
+                            if (editCache.ContainsKey(item.Item.Guid))
+                                item = null;
+
+                            // Is it still in the control?
+                            if (!mImageListView.Items.ContainsKey(item.Item.Guid))
+                                item = null;
+
+                            // Was it fetched by the UI thread in the meantime?
+                            if (!item.Item.isDirty)
+                                item = null;
                         }
                     }
-                    else
+
+                    // Read file info
+                    if (item != null)
                     {
-                        // Update file info
-                        if (!Stopping)
+                        if (item.IsVirtualItem)
                         {
-                            Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
-                            try
+                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                             {
-                                if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                                VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(item.VirtualItemKey);
+                                mImageListView.RetrieveVirtualItemDetailsInternal(e);
+                                mImageListView.Invoke(new UpdateVirtualItemDetailsDelegateInternal(
+                                    mImageListView.UpdateItemDetailsInternal), item.Item, e);
+                            }
+                        }
+                        else
+                        {
+                            // Update file info
+                            if (!Stopping)
+                            {
+                                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
+                                try
                                 {
-                                    mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
-                                        mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                                    if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                                    {
+                                        mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
+                                            mImageListView.UpdateItemDetailsInternal), item.Item, info);
+                                    }
+                                }
+                                catch (ObjectDisposedException)
+                                {
+                                    if (!Stopping) throw;
+                                }
+                                catch (InvalidOperationException)
+                                {
+                                    if (!Stopping) throw;
                                 }
                             }
-                            catch (ObjectDisposedException)
-                            {
-                                if (!Stopping) throw;
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                if (!Stopping) throw;
-                            }
                         }
                     }
-                }
 
-                // Check if the cache is exhausted
-                bool queueFull = true;
-                lock (lockObject)
-                {
-                    if (toCache.Count == 0)
-                        queueFull = false;
-                }
-
-                // Do we need a refresh?
-                sw.Stop();
-                if (!queueFull || sw.ElapsedMilliseconds > 100)
-                {
-                    try
+                    // Check if the cache is exhausted
+                    bool queueFull = true;
+                    lock (lockObject)
                     {
-                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        if (toCache.Count == 0)
+                            queueFull = false;
+                    }
+
+                    // Do we need a refresh?
+                    sw.Stop();
+                    if (!queueFull || sw.ElapsedMilliseconds > 100)
+                    {
+                        try
                         {
-                            mImageListView.Invoke(new RefreshDelegateInternal(
-                                mImageListView.OnRefreshInternal));
+                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                            {
+                                mImageListView.Invoke(new RefreshDelegateInternal(
+                                    mImageListView.OnRefreshInternal));
+                            }
+                            sw.Reset();
                         }
+                        catch (ObjectDisposedException)
+                        {
+                            if (!Stopping) throw;
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            if (!Stopping) throw;
+                        }
+                    }
+                    if (queueFull)
+                        sw.Start();
+                    else
+                    {
+                        sw.Stop();
                         sw.Reset();
                     }
-                    catch (ObjectDisposedException)
+                }
+                catch (Exception exception)
+                {
+                    // Delegate the exception to the parent control
+                    if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                     {
-                        if (!Stopping) throw;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        if (!Stopping) throw;
+                        mImageListView.Invoke(new CacheErrorWithItemEventHandlerInternal(
+                            mImageListView.OnCacheErrorWithItemInternal), item, exception, CacheThread.Details);
                     }
                 }
-                if (queueFull)
-                    sw.Start();
-                else
+                finally
                 {
-                    sw.Stop();
-                    sw.Reset();
+                    ;
                 }
             }
 
