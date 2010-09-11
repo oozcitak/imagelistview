@@ -363,9 +363,21 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="guid">The key of the item.</param>
             /// <returns>true if the collection contains the given key; otherwise false.</returns>
-            internal bool ContainsKey(Guid guid)
+            internal bool ContainsKey2(Guid guid)
             {
                 return lookUp.ContainsKey(guid);
+            }
+            /// <summary>
+            /// Gets the value associated with the specified key.
+            /// </summary>
+            /// <param name="guid">The key of the item.</param>
+            /// <param name="item">the value associated with the specified key, 
+            /// if the key is found; otherwise, the default value for the type 
+            /// of the value parameter. This parameter is passed uninitialized.</param>
+            /// <returns>true if the collection contains the given key; otherwise false.</returns>
+            internal bool TryGetValue(Guid guid, out ImageListViewItem item)
+            {
+                return lookUp.TryGetValue(guid, out item);
             }
             /// <summary>
             /// Removes the subitem of each item for the given custom column.

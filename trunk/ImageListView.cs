@@ -1363,9 +1363,9 @@ namespace Manina.Windows.Forms
         /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
         internal void OnThumbnailCachedInternal(Guid guid, bool error)
         {
-            int itemIndex = Items.IndexOf(guid);
-            if (itemIndex != -1)
-                OnThumbnailCached(new ThumbnailCachedEventArgs(Items[itemIndex], error));
+            ImageListViewItem item = null;
+            if (Items.TryGetValue(guid, out item))
+                OnThumbnailCached(new ThumbnailCachedEventArgs(item, error));
         }
         /// <summary>
         /// Raises the refresh event.
