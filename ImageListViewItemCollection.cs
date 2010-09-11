@@ -363,7 +363,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="guid">The key of the item.</param>
             /// <returns>true if the collection contains the given key; otherwise false.</returns>
-            internal bool ContainsKey2(Guid guid)
+            internal bool ContainsKey(Guid guid)
             {
                 return lookUp.ContainsKey(guid);
             }
