@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.5 (12 September 2010) =
+
+  * Fixed a bug where removing an item from the control while its thumbnail was being cached threw an exception. (Issue 92)
+  * Fixed a bug where adding items while the parent form was minimized did not refresh the control. (Issue 93)
+
 = 7.4 (07 September 2010) =
 
   * Added the !CacheError event to the control. (Issue 91)
