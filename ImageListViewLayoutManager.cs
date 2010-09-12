@@ -132,6 +132,8 @@ namespace Manina.Windows.Forms
                     return true;
                 else if (mImageListView.IntegralScroll != cachedIntegralScroll)
                     return true;
+                else if (mImageListView.Items.layoutChanged)
+                    return true;
                 else
                     return false;
             }
@@ -293,6 +295,7 @@ namespace Manina.Windows.Forms
             cachedPaneWidth = mImageListView.PaneWidth;
             cachedScrollBars = mImageListView.ScrollBars;
             cachedVisibleItems.Clear();
+            mImageListView.Items.layoutChanged = false;
 
             // Calculate drawing area
             mClientArea = mImageListView.ClientRectangle;
