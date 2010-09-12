@@ -1337,11 +1337,10 @@ namespace Manina.Windows.Forms
         /// <param name="cacheThread">The thread raising the error.</param>
         internal void OnCacheErrorInternal(Guid guid, Exception error, CacheThread cacheThread)
         {
-            int itemIndex = Items.IndexOf(guid);
-            if (itemIndex != -1)
-                OnCacheError(new CacheErrorEventArgs(Items[itemIndex], error, cacheThread));
-            else
-                OnCacheError(new CacheErrorEventArgs(null, error, cacheThread));
+            ImageListViewItem item = null;
+            if (guid != null)
+                Items.TryGetValue(guid, out item);
+            OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
         }
         /// <summary>
         /// Raises the CacheError event.
