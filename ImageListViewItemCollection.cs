@@ -36,7 +36,7 @@ namespace Manina.Windows.Forms
             internal ImageListView mImageListView;
             private ImageListViewItem mFocused;
             private Dictionary<Guid, ImageListViewItem> lookUp;
-            internal bool layoutChanged;
+            internal bool collectionModified;
             #endregion
 
             #region Constructors
@@ -50,7 +50,7 @@ namespace Manina.Windows.Forms
                 lookUp = new Dictionary<Guid, ImageListViewItem>();
                 mFocused = null;
                 mImageListView = owner;
-                layoutChanged = true;
+                collectionModified = true;
             }
             #endregion
 
@@ -117,7 +117,7 @@ namespace Manina.Windows.Forms
                     mItems[index] = item;
                     lookUp.Remove(oldItem.Guid);
                     lookUp.Add(item.Guid, item);
-                    layoutChanged = true;
+                    collectionModified = true;
 
                     if (mImageListView != null)
                     {
@@ -263,7 +263,7 @@ namespace Manina.Windows.Forms
                 mItems.Clear();
 
                 mFocused = null;
-                layoutChanged = true;
+                collectionModified = true;
 
                 if (mImageListView != null)
                 {
@@ -328,7 +328,7 @@ namespace Manina.Windows.Forms
                 bool ret = mItems.Remove(item);
                 lookUp.Remove(item.Guid);
                 item.Dispose();
-                layoutChanged = true;
+                collectionModified = true;
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Remove(item.Guid);
@@ -416,7 +416,7 @@ namespace Manina.Windows.Forms
                 item.mIndex = mItems.Count;
                 mItems.Add(item);
                 lookUp.Add(item.Guid, item);
-                layoutChanged = true;
+                collectionModified = true;
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
@@ -455,7 +455,7 @@ namespace Manina.Windows.Forms
                     mItems[i].mIndex++;
                 mItems.Insert(index, item);
                 lookUp.Add(item.Guid, item);
-                layoutChanged = true;
+                collectionModified = true;
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
@@ -496,7 +496,7 @@ namespace Manina.Windows.Forms
                 mItems.Remove(item);
                 lookUp.Remove(item.Guid);
                 item.Dispose();
-                layoutChanged = true;
+                collectionModified = true;
             }
             /// <summary>
             /// Returns the index of the specified item.
@@ -537,7 +537,7 @@ namespace Manina.Windows.Forms
 
                 // Restore previous cusrsor
                 mImageListView.Cursor = cursor;
-                layoutChanged = true;
+                collectionModified = true;
             }
             #endregion
 
