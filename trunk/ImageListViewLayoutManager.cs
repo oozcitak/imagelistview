@@ -132,7 +132,7 @@ namespace Manina.Windows.Forms
                     return true;
                 else if (mImageListView.IntegralScroll != cachedIntegralScroll)
                     return true;
-                else if (mImageListView.Items.layoutChanged)
+                else if (mImageListView.Items.collectionModified)
                     return true;
                 else
                     return false;
@@ -158,6 +158,15 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Instance Methods
+        /// <summary>
+        /// Determines whether the item with the given guid is
+        /// (partially) visible.
+        /// </summary>
+        /// <param name="guid">The guid of the item to check.</param>
+        public bool IsItemVisible(Guid guid)
+        {
+            return cachedVisibleItems.ContainsKey(guid);
+        }
         /// <summary>
         /// Returns the bounds of the item with the specified index.
         /// </summary>
@@ -278,32 +287,92 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Recalculates the control layout.
+        /// <param name="forceUpdate">true to force an update; otherwise false.</param>
         /// </summary>
         public void Update(bool forceUpdate)
         {
-            if (mImageListView.ClientRectangle.Width == 0 || mImageListView.ClientRectangle.Height == 0) return;
-            if (!forceUpdate && !UpdateRequired) return;
+            if (mImageListView.ClientRectangle.Width == 0 || mImageListView.ClientRectangle.Height == 0)
+                return;
+
+            // If only item order is changed, just update visible items.
+            if (!forceUpdate && !UpdateRequired && mImageListView.Items.collectionModified)
+            {
+                UpdateVisibleItems();
+                return;
+            }
+
+            if (!forceUpdate && !UpdateRequired) 
+                return;
+
+            // Get the item size from the renderer
+            mItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
+            cachedItemMargin = mImageListView.mRenderer.MeasureItemMargin(mImageListView.View);
+            mItemSizeWithMargin = mItemSize + cachedItemMargin;
+
             // Cache current properties to determine if we will need an update later
             cachedView = mImageListView.View;
             cachedViewOffset = mImageListView.ViewOffset;
             cachedSize = mImageListView.ClientSize;
             cachedItemCount = mImageListView.Items.Count;
             cachedIntegralScroll = mImageListView.IntegralScroll;
-            cachedItemSize = mImageListView.mRenderer.MeasureItem(mImageListView.View);
+            cachedItemSize = mItemSize;
             cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
-            cachedItemMargin = mImageListView.mRenderer.MeasureItemMargin(mImageListView.View);
             cachedPaneWidth = mImageListView.PaneWidth;
             cachedScrollBars = mImageListView.ScrollBars;
-            cachedVisibleItems.Clear();
-            mImageListView.Items.layoutChanged = false;
+            mImageListView.Items.collectionModified = false;
 
+            // Calculate item area bounds
+            if(!UpdateItemArea())
+                return;
+
+            // Let the calculated bounds modified by the renderer
+            LayoutEventArgs eLayout = new LayoutEventArgs(mItemAreaBounds);
+            mImageListView.mRenderer.OnLayout(eLayout);
+            mItemAreaBounds = eLayout.ItemAreaBounds;
+            if (mItemAreaBounds.Width <= 0 || mItemAreaBounds.Height <= 0)
+                return;
+
+            // Calculate the number of rows and columns
+            CalculateGrid();
+
+            // Check if we need the scroll bars.
+            // Recalculate the layout if scroll bar visibility changes.
+            if (CheckScrollBars())
+            {
+                Update(true);
+                return;
+            }
+
+            // Update scroll range
+            UpdateScrollBars();
+
+            // Cache visible items
+            UpdateVisibleItems();
+        }
+        /// <summary>
+        /// Calculates the maximum number of rows and columns 
+        /// that can be fully displayed.
+        /// </summary>
+        private void CalculateGrid()
+        {
+            mCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
+            mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
+            if (mImageListView.View == View.Details) mCols = 1;
+            if (mImageListView.View == View.Gallery) mRows = 1;
+            if (mCols < 1) mCols = 1;
+            if (mRows < 1) mRows = 1;
+        }
+        /// <summary>
+        /// Calculates the item area.
+        /// Returns true if the item area is not empty (both width and height
+        /// greater than zero); otherwise false.
+        /// </summary>
+        /// <returns></returns>
+        private bool UpdateItemArea()
+        {
             // Calculate drawing area
             mClientArea = mImageListView.ClientRectangle;
             mItemAreaBounds = mImageListView.ClientRectangle;
-
-            // Item size
-            mItemSize = cachedItemSize;
-            mItemSizeWithMargin = mItemSize + cachedItemMargin;
 
             // Allocate space for scrollbars
             if (mImageListView.hScrollBar.Visible)
@@ -348,23 +417,18 @@ namespace Manina.Windows.Forms
                 mItemAreaBounds.X += cachedPaneWidth;
             }
 
-            if (mItemAreaBounds.Width < 1 || mItemAreaBounds.Height < 1) return;
-
-            // Let the calculated bounds modified by the renderer
-            LayoutEventArgs eLayout = new LayoutEventArgs(mItemAreaBounds);
-            mImageListView.mRenderer.OnLayout(eLayout);
-            mItemAreaBounds = eLayout.ItemAreaBounds;
-
-            // Maximum number of rows and columns that can be fully displayed
-            mCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
-            mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
-            if (mImageListView.View == View.Details) mCols = 1;
-            if (mImageListView.View == View.Gallery) mRows = 1;
-            if (mCols < 1) mCols = 1;
-            if (mRows < 1) mRows = 1;
-
-            // Check if we need the horizontal scroll bar
+            return (mItemAreaBounds.Width > 0 && mItemAreaBounds.Height > 0); 
+        }
+        /// <summary>
+        /// Shows or hides the scroll bars.
+        /// Returns true if the layout needs to be recalculated; otherwise false.
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckScrollBars()
+        {
+            // Horizontal scroll bar
             bool hScrollRequired = false;
+            bool hScrollChanged = false;
             if (mImageListView.ScrollBars)
             {
                 if (mImageListView.View == View.Gallery)
@@ -372,16 +436,17 @@ namespace Manina.Windows.Forms
                 else
                     hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mCols * mItemSizeWithMargin.Width);
             }
+
             if (hScrollRequired != hScrollVisible)
             {
                 hScrollVisible = hScrollRequired;
                 mImageListView.hScrollBar.Visible = hScrollRequired;
-                Update(true);
-                return;
+                hScrollChanged = true;
             }
 
-            // Check if we need the vertical scroll bar
+            // Vertical scroll bar
             bool vScrollRequired = false;
+            bool vScrollChanged = false;
             if (mImageListView.ScrollBars)
             {
                 if (mImageListView.View == View.Gallery)
@@ -393,10 +458,17 @@ namespace Manina.Windows.Forms
             {
                 vScrollVisible = vScrollRequired;
                 mImageListView.vScrollBar.Visible = vScrollRequired;
-                Update(true);
-                return;
+                vScrollChanged = true;
             }
 
+            // Determine if the layout needs to be recalculated
+            return (hScrollChanged || vScrollChanged);
+        }
+        /// <summary>
+        /// Updates scroll bar parameters.
+        /// </summary>
+        private void UpdateScrollBars()
+        {
             // Set scroll range
             if (mImageListView.Items.Count != 0)
             {
@@ -468,7 +540,12 @@ namespace Manina.Windows.Forms
             mImageListView.vScrollBar.Left = mImageListView.ClientRectangle.Right - mImageListView.vScrollBar.Width;
             mImageListView.vScrollBar.Top = 0;
             mImageListView.vScrollBar.Height = mImageListView.ClientRectangle.Height - (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
-
+        }
+        /// <summary>
+        /// Updates the dictionary of visible items.
+        /// </summary>
+        private void UpdateVisibleItems()
+        {
             // Find the first and last partially visible items
             if (mImageListView.View == View.Gallery)
             {
@@ -502,6 +579,8 @@ namespace Manina.Windows.Forms
             if (mLastVisible > mImageListView.Items.Count - 1) mLastVisible = mImageListView.Items.Count - 1;
 
             // Cache visible items
+            cachedVisibleItems.Clear();
+
             if (mFirstPartiallyVisible >= 0 &&
                 mLastPartiallyVisible >= 0 &&
                 mFirstPartiallyVisible <= mImageListView.Items.Count - 1 &&
@@ -510,15 +589,9 @@ namespace Manina.Windows.Forms
                 for (int i = mFirstPartiallyVisible; i <= mLastPartiallyVisible; i++)
                     cachedVisibleItems.Add(mImageListView.Items[i].Guid, false);
             }
-        }
-        /// <summary>
-        /// Determines whether the item with the given guid is
-        /// (partially) visible.
-        /// </summary>
-        /// <param name="guid">The guid of the item to check.</param>
-        public bool IsItemVisible(Guid guid)
-        {
-            return cachedVisibleItems.ContainsKey(guid);
+
+            // Current item state processed
+            mImageListView.Items.collectionModified = false;
         }
         #endregion
     }
