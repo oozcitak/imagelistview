@@ -26,7 +26,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents an item in the image list view.
     /// </summary>
-    public class ImageListViewItem : ICloneable, IDisposable
+    public class ImageListViewItem : ICloneable
     {
         #region Member Variables
         // Property backing fields
@@ -38,8 +38,6 @@ namespace Manina.Windows.Forms
         private string mText;
         private int mZOrder;
         // File info
-        private Image mSmallIcon;
-        private Image mLargeIcon;
         private DateTime mDateAccessed;
         private DateTime mDateCreated;
         private DateTime mDateModified;
@@ -204,8 +202,9 @@ namespace Manina.Windows.Forms
                         isDirty = true;
                         if (mImageListView != null)
                         {
-                            mImageListView.cacheManager.Remove(Guid, true);
-                            mImageListView.itemCacheManager.Add(this);
+                            mImageListView.cacheManager.Remove(mGuid, true);
+                            mImageListView.itemCacheManager.Remove(mGuid);
+                            mImageListView.itemCacheManager.Add(mGuid, mFileName);
                             if (mImageListView.IsItemVisible(mGuid))
                                 mImageListView.Refresh();
                         }
@@ -227,18 +226,21 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Owner control is null.");
 
+                Image img = null;
                 CacheState state = ThumbnailCacheState;
+
                 if (state == CacheState.Error)
                 {
-                    if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32 && mLargeIcon != null)
-                        return mLargeIcon;
-                    else if (mImageListView.ShellIconFallback && mSmallIcon != null)
-                        return mSmallIcon;
-                    else
-                        return mImageListView.ErrorImage;
+                    if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32)
+                        img = LargeIcon;
+                    if (img == null && mImageListView.ShellIconFallback)
+                        img = SmallIcon;
+                    if (img == null)
+                        img = mImageListView.ErrorImage;
+                    return img;
                 }
 
-                Image img = mImageListView.cacheManager.GetImage(Guid);
+                img = mImageListView.cacheManager.GetImage(Guid);
 
                 if (state == CacheState.Cached)
                     return img;
@@ -248,14 +250,13 @@ namespace Manina.Windows.Forms
                 else
                     mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
 
-                if (img != null)
-                    return img;
-                else if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16 && mLargeIcon != null)
-                    return mLargeIcon;
-                else if (mImageListView.ShellIconFallback && mSmallIcon != null)
-                    return mSmallIcon;
-                else
-                    return mImageListView.DefaultImage;
+                if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
+                    img = LargeIcon;
+                if (img == null && mImageListView.ShellIconFallback)
+                    img = SmallIcon;
+                if (img == null)
+                    img = mImageListView.DefaultImage;
+                return img;
             }
         }
         /// <summary>
@@ -270,12 +271,12 @@ namespace Manina.Windows.Forms
         /// Gets the small shell icon of the image file represented by this item.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
-        public Image SmallIcon { get { UpdateFileInfo(); return mSmallIcon; } }
+        public Image SmallIcon { get { return mImageListView.itemCacheManager.GetSmallIcon(mGuid); } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
-        public Image LargeIcon { get { UpdateFileInfo(); return mLargeIcon; } }
+        public Image LargeIcon { get { return mImageListView.itemCacheManager.GetLargeIcon(mGuid); } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>
@@ -403,9 +404,6 @@ namespace Manina.Windows.Forms
             mVirtualItemKey = null;
             isVirtualItem = false;
 
-            mSmallIcon = null;
-            mLargeIcon = null;
-
             subItems = new Dictionary<Guid, string>();
         }
         /// <summary>
@@ -506,7 +504,11 @@ namespace Manina.Windows.Forms
             if (mImageListView != null)
             {
                 mImageListView.cacheManager.Remove(mGuid, true);
-                mImageListView.itemCacheManager.Add(this);
+                mImageListView.itemCacheManager.Remove(mGuid);
+                if (isVirtualItem)
+                    mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey);
+                else
+                    mImageListView.itemCacheManager.Add(mGuid, mFileName);
                 mImageListView.Refresh();
             }
         }
@@ -720,8 +722,6 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
-            mSmallIcon = info.SmallIcon;
-            mLargeIcon = info.LargeIcon;
             mDateAccessed = info.LastAccessTime;
             mDateCreated = info.CreationTime;
             mDateModified = info.LastWriteTime;
@@ -755,8 +755,6 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
-            mSmallIcon = info.SmallIcon;
-            mLargeIcon = info.LargeIcon;
             mDateAccessed = info.DateAccessed;
             mDateCreated = info.DateCreated;
             mDateModified = info.DateModified;
@@ -795,8 +793,6 @@ namespace Manina.Windows.Forms
             item.mText = mText;
 
             // File info
-            item.mSmallIcon = (Image)mSmallIcon.Clone();
-            item.mLargeIcon = (Image)mLargeIcon.Clone();
             item.mDateAccessed = mDateAccessed;
             item.mDateCreated = mDateCreated;
             item.mDateModified = mDateModified;
@@ -830,19 +826,6 @@ namespace Manina.Windows.Forms
                 item.subItems.Add(kv.Key, kv.Value);
 
             return item;
-        }
-        #endregion
-
-        #region IDisposable Members
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            if (mSmallIcon != null)
-                mSmallIcon.Dispose();
-            if (mLargeIcon != null)
-                mLargeIcon.Dispose();
         }
         #endregion
     }

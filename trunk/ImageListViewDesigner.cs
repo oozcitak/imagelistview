@@ -61,21 +61,6 @@ namespace Manina.Windows.Forms
                 items[i] = item;
             }
         }
-        /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Design.ControlDesigner"/> 
-        /// and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; 
-        /// false to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                for (int i = 0; i < items.Length; i++)
-                    items[i].Dispose();
-            }
-            base.Dispose(disposing);
-        }
         #endregion
 
         #region Designer Action Lists

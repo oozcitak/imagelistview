@@ -122,6 +122,7 @@ namespace Manina.Windows.Forms
                     if (mImageListView != null)
                     {
                         mImageListView.cacheManager.Remove(oldItem.Guid);
+                        mImageListView.itemCacheManager.Remove(oldItem.Guid);
                         if (mImageListView.CacheMode == CacheMode.Continuous)
                         {
                             if (item.isVirtualItem)
@@ -131,7 +132,10 @@ namespace Manina.Windows.Forms
                                 mImageListView.cacheManager.Add(item.Guid, item.FileName,
                                     mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                         }
-                        mImageListView.itemCacheManager.Add(item);
+                        if (item.isVirtualItem)
+                            mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
+                        else
+                            mImageListView.itemCacheManager.Add(item.Guid, item.FileName);
                         if (item.Selected != oldSelected)
                             mImageListView.OnSelectionChanged(new EventArgs());
                     }
@@ -258,8 +262,6 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void Clear()
             {
-                foreach (ImageListViewItem item in mItems)
-                    item.Dispose();
                 mItems.Clear();
 
                 mFocused = null;
@@ -327,11 +329,11 @@ namespace Manina.Windows.Forms
                 if (item == mFocused) mFocused = null;
                 bool ret = mItems.Remove(item);
                 lookUp.Remove(item.Guid);
-                item.Dispose();
                 collectionModified = true;
                 if (mImageListView != null)
                 {
                     mImageListView.cacheManager.Remove(item.Guid);
+                    mImageListView.itemCacheManager.Remove(item.Guid);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.Refresh();
@@ -349,7 +351,6 @@ namespace Manina.Windows.Forms
             {
                 ImageListViewItem item = mItems[index];
                 Remove(item);
-                item.Dispose();
             }
             #endregion
 
@@ -435,7 +436,10 @@ namespace Manina.Windows.Forms
                                 mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                     }
 
-                    mImageListView.itemCacheManager.Add(item);
+                    if (item.isVirtualItem)
+                        mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
+                    else
+                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName); ;
                 }
             }
             /// <summary>
@@ -470,7 +474,10 @@ namespace Manina.Windows.Forms
                                 mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                     }
 
-                    mImageListView.itemCacheManager.Add(item);
+                    if (item.isVirtualItem)
+                        mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
+                    else
+                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName); ;
                 }
             }
             /// <summary>
@@ -492,10 +499,12 @@ namespace Manina.Windows.Forms
                     mItems[i].mIndex--;
                 if (item == mFocused) mFocused = null;
                 if (removeFromCache && mImageListView != null)
+                {
                     mImageListView.cacheManager.Remove(item.Guid);
+                    mImageListView.itemCacheManager.Remove(item.Guid);
+                }
                 mItems.Remove(item);
                 lookUp.Remove(item.Guid);
-                item.Dispose();
                 collectionModified = true;
             }
             /// <summary>
@@ -757,7 +766,6 @@ namespace Manina.Windows.Forms
                     throw new ArgumentException("An object of type ImageListViewItem is required.", "value");
                 ImageListViewItem item = (ImageListViewItem)value;
                 Remove(item);
-                item.Dispose();
             }
             /// <summary>
             /// Gets or sets the <see cref="System.Object"/> at the specified index.

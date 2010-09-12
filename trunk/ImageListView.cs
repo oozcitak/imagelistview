@@ -888,6 +888,19 @@ namespace Manina.Windows.Forms
             return layoutManager.IsItemVisible(guid);
         }
         /// <summary>
+        /// Determines whether the specified item is modified.
+        /// </summary>
+        /// <param name="guid">The Guid of the item to test.</param>
+        /// <returns>true if the item is modified; otherwise false.</returns>
+        internal bool IsItemDirty(Guid guid)
+        {
+            ImageListViewItem item = null;
+            if (mItems.TryGetValue(guid, out item))
+                return item.isDirty;
+
+            return false;
+        }
+        /// <summary>
         /// Determines whether the specified item is visible on the screen.
         /// </summary>
         /// <param name="itemIndex">The index of the item to test.</param>
@@ -1330,20 +1343,8 @@ namespace Manina.Windows.Forms
         internal void OnCacheErrorInternal(Guid guid, Exception error, CacheThread cacheThread)
         {
             ImageListViewItem item = null;
-            if (guid != null)
+            if (guid != Guid.Empty)
                 Items.TryGetValue(guid, out item);
-            OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
-        }
-        /// <summary>
-        /// Raises the CacheError event.
-        /// This method is invoked from the thumbnail thread.
-        /// </summary>
-        /// <param name="item">The ImageListViewItem that is associated with this error.
-        /// This parameter can be null.</param>
-        /// <param name="error">The error that occurred during an asynchronous operation.</param>
-        /// <param name="cacheThread">The thread raising the error.</param>
-        internal void OnCacheErrorWithItemInternal(ImageListViewItem item, Exception error, CacheThread cacheThread)
-        {
             OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
         }
         /// <summary>
@@ -1370,17 +1371,21 @@ namespace Manina.Windows.Forms
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(ImageListViewItem item, Utility.ShellImageFileInfo info)
+        internal void UpdateItemDetailsInternal(Guid guid, Utility.ShellImageFileInfo info)
         {
-            item.UpdateDetailsInternal(info);
+            ImageListViewItem item = null;
+            if (mItems.TryGetValue(guid, out item))
+                item.UpdateDetailsInternal(info);
         }
         /// <summary>
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(ImageListViewItem item, VirtualItemDetailsEventArgs info)
+        internal void UpdateItemDetailsInternal(Guid guid, VirtualItemDetailsEventArgs info)
         {
-            item.UpdateDetailsInternal(info);
+            ImageListViewItem item = null;
+            if (mItems.TryGetValue(guid, out item))
+                item.UpdateDetailsInternal(info);
         }
         /// <summary>
         /// Raises the ThumbnailCaching event.
