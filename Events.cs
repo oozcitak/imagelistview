@@ -133,26 +133,27 @@ namespace Manina.Windows.Forms
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void CacheErrorEventHandlerInternal(Guid guid, Exception error, CacheThread cacheThread);
     /// <summary>
-    /// Represents the method that will handle the CacheError event.
+    /// Updates item details.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void CacheErrorWithItemEventHandlerInternal(ImageListViewItem item, Exception error, CacheThread cacheThread);
+    internal delegate void UpdateItemDetailsDelegateInternal(Guid guid, Utility.ShellImageFileInfo info);
     /// <summary>
     /// Updates item details.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void UpdateItemDetailsDelegateInternal(ImageListViewItem item, Utility.ShellImageFileInfo info);
-    /// <summary>
-    /// Updates item details.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void UpdateVirtualItemDetailsDelegateInternal(ImageListViewItem item, VirtualItemDetailsEventArgs e);
+    internal delegate void UpdateVirtualItemDetailsDelegateInternal(Guid guid, VirtualItemDetailsEventArgs e);
     /// <summary>
     /// Determines if the given item is visible.
     /// </summary>
     /// <param name="guid">The guid of the item to check visibility.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate bool CheckItemVisibleDelegateInternal(Guid guid);
+    /// <summary>
+    /// Determines if the given item is modified.
+    /// </summary>
+    /// <param name="guid">The guid of the item to check visibility.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate bool CheckItemDirtyDelegateInternal(Guid guid);
     /// <summary>
     /// Gets the guids of visible items.
     /// </summary>
