@@ -735,7 +735,14 @@ namespace Manina.Windows.Forms
                         {
                             sw.Start();
                             // Get an item from the queue
-                            if (toCache.Count != 0)
+                            if (rendererToCache.Count != 0)
+                            {
+                                request = rendererToCache.Pop();
+                                guid = request.Guid;
+                                rendererToCache.Clear();
+                                rendererRequest = true;
+                            }
+                            else if (toCache.Count != 0)
                             {
                                 request = toCache.Pop();
                                 guid = request.Guid;
@@ -747,13 +754,6 @@ namespace Manina.Windows.Forms
                                     if (existing.Size == mCurrentThumbnailSize)
                                         request = null;
                                 }
-                            }
-                            else if (rendererToCache.Count != 0)
-                            {
-                                request = rendererToCache.Pop();
-                                guid = request.Guid;
-                                rendererToCache.Clear();
-                                rendererRequest = true;
                             }
 
                             // Is it in the edit cache?
