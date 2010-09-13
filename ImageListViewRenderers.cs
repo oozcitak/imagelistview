@@ -231,67 +231,70 @@ namespace Manina.Windows.Forms
                         }
                     }
                 }
-                else
+                else // if (ImageListView.View != View.Details)
                 {
                     // Align images to bottom of bounds
                     Image img = item.ThumbnailImage;
-                    Rectangle pos = Utility.GetSizedImageBounds(img,
-                        new Rectangle(bounds.X + padding, bounds.Y + padding, bounds.Width - 2 * padding, bounds.Height - 2 * padding - mReflectionSize),
-                        50.0f, 100.0f);
-
-                    int x = pos.X;
-                    int y = pos.Y;
-
-                    // Item background
-                    if ((state & ItemState.Selected) == ItemState.Selected)
+                    if (img != null)
                     {
-                        using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
-                            Color.FromArgb(64, 96, 160), Color.FromArgb(16, 16, 16)))
+                        Rectangle pos = Utility.GetSizedImageBounds(img,
+                            new Rectangle(bounds.X + padding, bounds.Y + padding, bounds.Width - 2 * padding, bounds.Height - 2 * padding - mReflectionSize),
+                            50.0f, 100.0f);
+
+                        int x = pos.X;
+                        int y = pos.Y;
+
+                        // Item background
+                        if ((state & ItemState.Selected) == ItemState.Selected)
                         {
-                            g.FillRectangle(brush, x - padding, y - padding, pos.Width + 2 * padding, pos.Height + 2 * padding);
+                            using (Brush brush = new LinearGradientBrush(
+                                new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
+                                Color.FromArgb(64, 96, 160), Color.FromArgb(16, 16, 16)))
+                            {
+                                g.FillRectangle(brush, x - padding, y - padding, pos.Width + 2 * padding, pos.Height + 2 * padding);
+                            }
                         }
-                    }
-                    else if ((state & ItemState.Hovered) == ItemState.Hovered)
-                    {
-                        using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
-                            Color.FromArgb(64, Color.White), Color.FromArgb(16, 16, 16)))
+                        else if ((state & ItemState.Hovered) == ItemState.Hovered)
                         {
-                            g.FillRectangle(brush, x - padding, y - padding, pos.Width + 2 * padding, pos.Height + 2 * padding);
+                            using (Brush brush = new LinearGradientBrush(
+                                new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
+                                Color.FromArgb(64, Color.White), Color.FromArgb(16, 16, 16)))
+                            {
+                                g.FillRectangle(brush, x - padding, y - padding, pos.Width + 2 * padding, pos.Height + 2 * padding);
+                            }
                         }
-                    }
 
-                    // Border
-                    if ((state & ItemState.Hovered) == ItemState.Hovered)
-                    {
-                        using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
-                            Color.FromArgb(128, Color.White), Color.FromArgb(16, 16, 16)))
-                        using (Pen pen = new Pen(brush))
+                        // Border
+                        if ((state & ItemState.Hovered) == ItemState.Hovered)
                         {
-                            g.DrawRectangle(pen, x - padding, y - padding + 1, pos.Width + 2 * padding - 1, pos.Height + 2 * padding - 1);
+                            using (Brush brush = new LinearGradientBrush(
+                                new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
+                                Color.FromArgb(128, Color.White), Color.FromArgb(16, 16, 16)))
+                            using (Pen pen = new Pen(brush))
+                            {
+                                g.DrawRectangle(pen, x - padding, y - padding + 1, pos.Width + 2 * padding - 1, pos.Height + 2 * padding - 1);
+                            }
                         }
-                    }
-                    else if ((state & ItemState.Selected) == ItemState.Selected)
-                    {
-                        using (Brush brush = new LinearGradientBrush(
-                            new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
-                            Color.FromArgb(96, 144, 240), Color.FromArgb(16, 16, 16)))
-                        using (Pen pen = new Pen(brush))
+                        else if ((state & ItemState.Selected) == ItemState.Selected)
                         {
-                            g.DrawRectangle(pen, x - padding, y - padding + 1, pos.Width + 2 * padding - 1, pos.Height + 2 * padding - 1);
+                            using (Brush brush = new LinearGradientBrush(
+                                new Point(x - padding, y - padding), new Point(x - padding, y + pos.Height + 2 * padding),
+                                Color.FromArgb(96, 144, 240), Color.FromArgb(16, 16, 16)))
+                            using (Pen pen = new Pen(brush))
+                            {
+                                g.DrawRectangle(pen, x - padding, y - padding + 1, pos.Width + 2 * padding - 1, pos.Height + 2 * padding - 1);
+                            }
                         }
-                    }
 
-                    // Draw item image
-                    DrawImageWithReflection(g, img, pos, mReflectionSize);
+                        // Draw item image
+                        DrawImageWithReflection(g, img, pos, mReflectionSize);
 
-                    // Highlight
-                    using (Pen pen = new Pen(Color.FromArgb(160, Color.White)))
-                    {
-                        g.DrawLine(pen, pos.X, pos.Y + 1, pos.X + pos.Width - 1, pos.Y + 1);
-                        g.DrawLine(pen, pos.X, pos.Y + 1, pos.X, pos.Y + pos.Height);
+                        // Highlight
+                        using (Pen pen = new Pen(Color.FromArgb(160, Color.White)))
+                        {
+                            g.DrawLine(pen, pos.X, pos.Y + 1, pos.X + pos.Width - 1, pos.Y + 1);
+                            g.DrawLine(pen, pos.X, pos.Y + 1, pos.X, pos.Y + pos.Height);
+                        }
                     }
                 }
             }
@@ -1078,18 +1081,21 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the preview area.</param>
             public override void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
             {
-                // Calculate image bounds
-                Size itemMargin = MeasureItemMargin(mImageListView.View);
-                Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin));
-                // Draw image
-                g.DrawImage(image, pos);
-
-                // Draw image border
-                if (Math.Min(pos.Width, pos.Height) > 32)
+                if (item != null && image != null)
                 {
-                    using (Pen pBorder = new Pen(SystemColors.WindowText))
+                    // Calculate image bounds
+                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin));
+                    // Draw image
+                    g.DrawImage(image, pos);
+
+                    // Draw image border
+                    if (Math.Min(pos.Width, pos.Height) > 32)
                     {
-                        g.DrawRectangle(pBorder, pos);
+                        using (Pen pBorder = new Pen(SystemColors.WindowText))
+                        {
+                            g.DrawRectangle(pBorder, pos);
+                        }
                     }
                 }
             }
@@ -1417,65 +1423,70 @@ namespace Manina.Windows.Forms
                         img = GetImageAsync(item, new Size(bounds.Width - 8, bounds.Height - 8));
                     if (img == null) img = item.ThumbnailImage;
 
-                    // Calculate image bounds
-                    Rectangle pos = Utility.GetSizedImageBounds(img, Rectangle.Inflate(bounds, -4, -4));
-                    int imageWidth = pos.Width;
-                    int imageHeight = pos.Height;
-                    int imageX = pos.X;
-                    int imageY = pos.Y;
+                    int imageWidth = 0;
+                    int imageHeight = 0;
+                    if (img != null)
+                    {
+                        // Calculate image bounds
+                        Rectangle pos = Utility.GetSizedImageBounds(img, Rectangle.Inflate(bounds, -4, -4));
+                        imageWidth = pos.Width;
+                        imageHeight = pos.Height;
+                        int imageX = pos.X;
+                        int imageY = pos.Y;
 
-                    // Allocate space for item text
-                    if ((state & ItemState.Hovered) != ItemState.None &&
-                        (bounds.Height - imageHeight) / 2 < ImageListView.Font.Height + 8)
-                    {
-                        int delta = (ImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
-                        bounds.Height += 2 * delta;
-                        imageY += delta;
-                    }
+                        // Allocate space for item text
+                        if ((state & ItemState.Hovered) != ItemState.None &&
+                            (bounds.Height - imageHeight) / 2 < ImageListView.Font.Height + 8)
+                        {
+                            int delta = (ImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
+                            bounds.Height += 2 * delta;
+                            imageY += delta;
+                        }
 
-                    // Paint background
-                    using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
-                    {
-                        Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
-                    }
-                    if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
-                        (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
-                    {
-                        using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
+                        // Paint background
+                        using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
                         {
-                            Utility.FillRoundedRectangle(g, bSelected, bounds, 5);
+                            Utility.FillRoundedRectangle(g, bItemBack, bounds, 5);
                         }
-                    }
-                    else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
-                    {
-                        using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.UnFocusedColor1, ImageListView.Colors.UnFocusedColor2, LinearGradientMode.Vertical))
+                        if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                            (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                         {
-                            Utility.FillRoundedRectangle(g, bGray64, bounds, 5);
-                        }
-                    }
-                    if (((state & ItemState.Hovered) != ItemState.None))
-                    {
-                        using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.HoverColor1, ImageListView.Colors.HoverColor2, LinearGradientMode.Vertical))
-                        {
-                            Utility.FillRoundedRectangle(g, bHovered, bounds, 5);
-                        }
-                    }
-
-                    // Draw the image
-                    g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
-
-                    // Draw image border
-                    if (Math.Min(imageWidth, imageHeight) > 32)
-                    {
-                        using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
-                        {
-                            g.DrawRectangle(pOuterBorder, imageX, imageY, imageWidth, imageHeight);
-                        }
-                        if (System.Math.Min(imageWidth, imageHeight) > 32)
-                        {
-                            using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
+                            using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
                             {
-                                g.DrawRectangle(pInnerBorder, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                                Utility.FillRoundedRectangle(g, bSelected, bounds, 5);
+                            }
+                        }
+                        else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                        {
+                            using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.UnFocusedColor1, ImageListView.Colors.UnFocusedColor2, LinearGradientMode.Vertical))
+                            {
+                                Utility.FillRoundedRectangle(g, bGray64, bounds, 5);
+                            }
+                        }
+                        if (((state & ItemState.Hovered) != ItemState.None))
+                        {
+                            using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.HoverColor1, ImageListView.Colors.HoverColor2, LinearGradientMode.Vertical))
+                            {
+                                Utility.FillRoundedRectangle(g, bHovered, bounds, 5);
+                            }
+                        }
+
+                        // Draw the image
+                        g.DrawImage(img, imageX, imageY, imageWidth, imageHeight);
+
+                        // Draw image border
+                        if (Math.Min(imageWidth, imageHeight) > 32)
+                        {
+                            using (Pen pOuterBorder = new Pen(ImageListView.Colors.ImageOuterBorderColor))
+                            {
+                                g.DrawRectangle(pOuterBorder, imageX, imageY, imageWidth, imageHeight);
+                            }
+                            if (System.Math.Min(imageWidth, imageHeight) > 32)
+                            {
+                                using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
+                                {
+                                    g.DrawRectangle(pInnerBorder, imageX + 1, imageY + 1, imageWidth - 2, imageHeight - 2);
+                                }
                             }
                         }
                     }
