@@ -248,12 +248,12 @@ namespace Manina.Windows.Forms
                 {
                     if (e.Y > mImageListView.ClientRectangle.Bottom)
                     {
-                        scrollTimer.Tag = -120;
+                        scrollTimer.Tag = -SystemInformation.MouseWheelScrollDelta;
                         scrollTimer.Enabled = true;
                     }
                     else if (e.Y < mImageListView.ClientRectangle.Top)
                     {
-                        scrollTimer.Tag = 120;
+                        scrollTimer.Tag = SystemInformation.MouseWheelScrollDelta;
                         scrollTimer.Enabled = true;
                     }
                 }
@@ -261,12 +261,12 @@ namespace Manina.Windows.Forms
                 {
                     if (e.X > mImageListView.ClientRectangle.Right)
                     {
-                        scrollTimer.Tag = -120;
+                        scrollTimer.Tag = -SystemInformation.MouseWheelScrollDelta;
                         scrollTimer.Enabled = true;
                     }
                     else if (e.X < mImageListView.ClientRectangle.Left)
                     {
-                        scrollTimer.Tag = 120;
+                        scrollTimer.Tag = SystemInformation.MouseWheelScrollDelta;
                         scrollTimer.Enabled = true;
                     }
                 }
@@ -864,25 +864,25 @@ namespace Manina.Windows.Forms
                         if (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll &&
                             pt.Y > mImageListView.ClientRectangle.Bottom - 20)
                         {
-                            scrollTimer.Tag = -120;
+                            scrollTimer.Tag = -SystemInformation.MouseWheelScrollDelta;
                             scrollTimer.Enabled = true;
                         }
                         else if (mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll &&
                             pt.Y < mImageListView.ClientRectangle.Top + 20)
                         {
-                            scrollTimer.Tag = 120;
+                            scrollTimer.Tag = SystemInformation.MouseWheelScrollDelta;
                             scrollTimer.Enabled = true;
                         }
                         else if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
                             pt.X > mImageListView.ClientRectangle.Right - 20)
                         {
-                            scrollTimer.Tag = -120;
+                            scrollTimer.Tag = -SystemInformation.MouseWheelScrollDelta;
                             scrollTimer.Enabled = true;
                         }
                         else if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
                             pt.X < mImageListView.ClientRectangle.Left + 20)
                         {
-                            scrollTimer.Tag = 120;
+                            scrollTimer.Tag = SystemInformation.MouseWheelScrollDelta;
                             scrollTimer.Enabled = true;
                         }
                         else
