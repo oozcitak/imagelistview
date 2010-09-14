@@ -1,6 +1,14 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.6 (14 September 2010) =
+
+  * Custom renderers now check for null item images.
+  * Changed hard coded mouse scroll wheel parameters to system mouse settings.
+  * Mouse wheel now scrolls by the system line scroll setting.
+  * Shell icons are now managed by !ImageListViewItemCacheManager.
+  * Large preview images are now extracted before small thumbnails.
+
 = 7.5 (12 September 2010) =
 
   * Fixed a bug where removing an item from the control while its thumbnail was being cached threw an exception. (Issue 92)
