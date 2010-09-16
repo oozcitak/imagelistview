@@ -1053,7 +1053,7 @@ namespace Manina.Windows.Forms
             if (ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
                 int newYOffset = mViewOffset.Y - (e.Delta / SystemInformation.MouseWheelScrollDelta) 
-                    * vScrollBar.SmallChange * SystemInformation.MouseWheelScrollLines;
+                    * vScrollBar.SmallChange;
                 if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
                     newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
                 if (newYOffset < 0)
@@ -1066,7 +1066,7 @@ namespace Manina.Windows.Forms
             else
             {
                 int newXOffset = mViewOffset.X - (e.Delta / SystemInformation.MouseWheelScrollDelta) 
-                    * hScrollBar.SmallChange * SystemInformation.MouseWheelScrollLines;
+                    * hScrollBar.SmallChange;
                 if (newXOffset > hScrollBar.Maximum - hScrollBar.LargeChange + 1)
                     newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;
                 if (newXOffset < 0)
