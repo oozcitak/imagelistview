@@ -1373,7 +1373,7 @@ namespace Manina.Windows.Forms
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(Guid guid, Utility.ShellImageFileInfo info)
+        internal void UpdateItemDetailsInternal(Guid guid, ImageListViewItemCacheManager.ShellImageFileInfo info)
         {
             ImageListViewItem item = null;
             if (mItems.TryGetValue(guid, out item))
