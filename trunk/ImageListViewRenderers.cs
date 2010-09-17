@@ -561,38 +561,6 @@ namespace Manina.Windows.Forms
             /// <param name="img">The image to draw.</param>
             /// <param name="x">The x coordinate of the upper left corner of the image.</param>
             /// <param name="y">The y coordinate of the upper left corner of the image.</param>
-            /// <param name="reflection">Height of the reflection.</param>
-            private void DrawImageWithReflection(Graphics g, Image img, int x, int y, int reflection)
-            {
-                // Draw the image
-                g.DrawImageUnscaled(img, x, y + 1);
-
-                // Draw the reflection
-                if (img.Width > 32 && img.Height > 32)
-                {
-                    int reflectionHeight = img.Height / 2;
-                    if (reflectionHeight > reflection) reflectionHeight = reflection;
-
-                    Region prevClip = g.Clip;
-                    g.SetClip(new Rectangle(x, y + img.Height + 1, img.Width, reflectionHeight));
-                    g.DrawImage(img, x, y + img.Height + img.Height / 2 + 1, img.Width, -img.Height / 2);
-                    g.Clip = prevClip;
-
-                    using (Brush brush = new LinearGradientBrush(
-                        new Point(x, y + img.Height + 1), new Point(x, y + img.Height + reflectionHeight + 1),
-                        Color.FromArgb(128, 16, 16, 16), Color.FromArgb(16, 16, 16)))
-                    {
-                        g.FillRectangle(brush, x, y + img.Height + 1, img.Width, reflectionHeight);
-                    }
-                }
-            }
-            /// <summary>
-            /// Draws an image with a reflection effect at the bottom.
-            /// </summary>
-            /// <param name="g">The graphics to draw on.</param>
-            /// <param name="img">The image to draw.</param>
-            /// <param name="x">The x coordinate of the upper left corner of the image.</param>
-            /// <param name="y">The y coordinate of the upper left corner of the image.</param>
             /// <param name="width">Width of the drawn image.</param>
             /// <param name="height">Height of the drawn image.</param>
             /// <param name="reflection">Height of the reflection.</param>
@@ -614,7 +582,7 @@ namespace Manina.Windows.Forms
 
                     using (Brush brush = new LinearGradientBrush(
                         new Point(x, y + height + 1), new Point(x, y + height + reflectionHeight + 1),
-                        Color.FromArgb(128, 16, 16, 16), Color.FromArgb(16, 16, 16)))
+                        Color.FromArgb(128, 0, 0, 0), Color.Black))
                     {
                         g.FillRectangle(brush, x, y + height + 1, width, reflectionHeight);
                     }
