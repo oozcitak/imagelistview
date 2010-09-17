@@ -26,7 +26,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a column header displayed in details view mode.
         /// </summary>
-        public class ImageListViewColumnHeader
+        public class ImageListViewColumnHeader : ICloneable
         {
             #region Member Variables
             private int mDisplayIndex;
@@ -283,6 +283,24 @@ namespace Manina.Windows.Forms
             public override string ToString()
             {
                 return mType.ToString();
+            }
+            #endregion
+
+            #region ICloneable Members
+            /// <summary>
+            /// Creates a new object that is a copy of the current instance.
+            /// </summary>
+            public object Clone()
+            {
+                ImageListViewColumnHeader column = new ImageListViewColumnHeader();
+
+                column.mDisplayIndex = mDisplayIndex;
+                column.mText=mText;
+                column.mType=mType;
+                column.mVisible=mVisible;
+                column.mWidth=mWidth;
+
+                return column;
             }
             #endregion
         }
