@@ -710,15 +710,16 @@ namespace Manina.Windows.Forms
             }
             else
             {
-                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
-                UpdateDetailsInternal(info);
+                // FIXME:
+                //Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
+                //UpdateDetailsInternal(info);
             }
             isDirty = false;
         }
         /// <summary>
         /// Invoked by the worker thread to update item details.
         /// </summary>
-        internal void UpdateDetailsInternal(Utility.ShellImageFileInfo info)
+        internal void UpdateDetailsInternal(ImageListViewItemCacheManager.ShellImageFileInfo info)
         {
             if (!isDirty) return;
 

@@ -20,6 +20,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System.Drawing.Drawing2D;
+using System.Text;
 
 namespace Manina.Windows.Forms
 {
@@ -486,7 +488,7 @@ namespace Manina.Windows.Forms
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, filename, thumbSize,
-                    Utility.ThumbnailFromImage(thumb, thumbSize),
+                    ThumbnailFromImage(thumb, thumbSize),
                     CacheState.Cached));
             }
 
@@ -556,7 +558,7 @@ namespace Manina.Windows.Forms
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
-                    Utility.ThumbnailFromImage(thumb, thumbSize),
+                    ThumbnailFromImage(thumb, thumbSize),
                     CacheState.Cached, useEmbeddedThumbnails));
             }
 
@@ -809,7 +811,7 @@ namespace Manina.Windows.Forms
                                 }
                                 else
                                 {
-                                    thumb = Utility.ThumbnailFromFile(request.FileName,
+                                    thumb = ThumbnailFromFile(request.FileName,
                                         request.Size, request.UseEmbeddedThumbnails);
                                 }
                             }
@@ -1027,6 +1029,227 @@ namespace Manina.Windows.Forms
                 stopped = true;
             }
         }
+        #endregion
+
+        #region Thumbnail Functions
+        /// <summary>
+        /// Creates a thumbnail from the given image.
+        /// </summary>
+        /// <param name="image">The source image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        private static Image ThumbnailFromImage(Image image, Size size)
+        {
+            if (size.Width <= 0 || size.Height <= 0)
+                throw new ArgumentException();
+
+            Image thumb = null;
+            try
+            {
+                Size scaled = Utility.GetSizedImageBounds(image, size);
+                thumb = new Bitmap(scaled.Width, scaled.Height);
+                using (Graphics g = Graphics.FromImage(thumb))
+                {
+                    g.PixelOffsetMode = PixelOffsetMode.None;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.Clear(Color.Transparent);
+
+                    g.DrawImage(image, 0, 0, scaled.Width, scaled.Height);
+                }
+            }
+            catch
+            {
+                if (thumb != null)
+                    thumb.Dispose();
+                thumb = null;
+            }
+
+            return thumb;
+        }
+        /// <summary>
+        /// Creates a thumbnail from the given image file.
+        /// </summary>
+        /// <param name="filename">The filename pointing to an image.</param>
+        /// <param name="size">Requested image size.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
+        /// <returns>The image from the given file or null if an error occurs.</returns>
+        private static Image ThumbnailFromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            if (size.Width <= 0 || size.Height <= 0)
+                throw new ArgumentException();
+
+            // Check if this is an image file
+            try
+            {
+                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                {
+                    if (!Utility.IsImage(stream))
+                        return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            Image source = null;
+            Image thumb = null;
+
+            // Try to read the exif thumbnail
+            if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
+            {
+                try
+                {
+                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    {
+                        using (Image img = Image.FromStream(stream, false, false))
+                        {
+                            foreach (int index in img.PropertyIdList)
+                            {
+                                if (index == PropertyTagThumbnailData)
+                                {
+                                    // Fetch the embedded thumbnail
+                                    byte[] rawImage = img.GetPropertyItem(PropertyTagThumbnailData).Value;
+                                    using (MemoryStream memStream = new MemoryStream(rawImage))
+                                    {
+                                        source = Image.FromStream(memStream);
+                                    }
+                                    if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
+                                    {
+                                        // Check that the embedded thumbnail is large enough.
+                                        if (Math.Max((float)source.Width / (float)size.Width,
+                                            (float)source.Height / (float)size.Height) < 1.0f)
+                                        {
+                                            source.Dispose();
+                                            source = null;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    if (source != null)
+                        source.Dispose();
+                    source = null;
+                }
+            }
+
+            // Fix for the missing semicolon in GIF files
+            MemoryStream streamCopy = null;
+            try
+            {
+                if (source == null)
+                {
+                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] gifSignature = new byte[4];
+                        stream.Read(gifSignature, 0, 4);
+                        if (Encoding.ASCII.GetString(gifSignature) == "GIF8")
+                        {
+                            stream.Seek(0, SeekOrigin.Begin);
+                            streamCopy = new MemoryStream();
+                            byte[] buffer = new byte[32768];
+                            int read = 0;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                streamCopy.Write(buffer, 0, read);
+                            }
+                            // Append the missing semicolon
+                            streamCopy.Seek(-1, SeekOrigin.End);
+                            if (streamCopy.ReadByte() != 0x3b)
+                                streamCopy.WriteByte(0x3b);
+                            source = Image.FromStream(streamCopy);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                if (source != null)
+                    source.Dispose();
+                source = null;
+                if (streamCopy != null)
+                    streamCopy.Dispose();
+                streamCopy = null;
+            }
+
+            // Revert to source image if an embedded thumbnail of required size
+            // was not found.
+            FileStream sourceStream = null;
+            if (source == null)
+            {
+                try
+                {
+                    sourceStream = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                    source = Image.FromStream(sourceStream);
+                }
+                catch
+                {
+                    if (source != null)
+                        source.Dispose();
+                    if (sourceStream != null)
+                        sourceStream.Dispose();
+                    source = null;
+                    sourceStream = null;
+                }
+            }
+
+            // If all failed, return null.
+            if (source == null) return null;
+
+            // Create the thumbnail
+            try
+            {
+                Size scaled = Utility.GetSizedImageBounds(source, size);
+                thumb = new Bitmap(source, scaled.Width, scaled.Height);
+                using (Graphics g = Graphics.FromImage(thumb))
+                {
+                    g.PixelOffsetMode = PixelOffsetMode.None;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.Clear(Color.Transparent);
+                    g.DrawImage(source, 0, 0, scaled.Width, scaled.Height);
+                }
+            }
+            catch
+            {
+                if (thumb != null)
+                    thumb.Dispose();
+                thumb = null;
+            }
+            finally
+            {
+                if (source != null)
+                    source.Dispose();
+                source = null;
+                if (sourceStream != null)
+                    sourceStream.Dispose();
+                sourceStream = null;
+                if (streamCopy != null)
+                    streamCopy.Dispose();
+                streamCopy = null;
+            }
+
+            return thumb;
+        }
+        #endregion
+
+        #region Exif Tag IDs
+        /// <summary>
+        /// Represents the Exif tag for thumbnail data.
+        /// </summary>
+        private const int PropertyTagThumbnailData = 0x501B;
+        /// <summary>
+        /// Represents the Exif tag for thumbnail image width.
+        /// </summary>
+        private const int PropertyTagThumbnailImageWidth = 0x5020;
+        /// <summary>
+        /// Represents the Exif tag for thumbnail image height.
+        /// </summary>
+        private const int PropertyTagThumbnailImageHeight = 0x5021;
         #endregion
     }
 }

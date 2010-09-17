@@ -19,6 +19,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.IO;
+using System.Drawing.Imaging;
+using System.Text;
 
 namespace Manina.Windows.Forms
 {
@@ -47,6 +51,9 @@ namespace Manina.Windows.Forms
         private Dictionary<Guid, bool> editCache;
 
         private List<Guid> removedItems;
+
+        private Dictionary<string, string> cachedFileTypes;
+        private uint structSize;
 
         private volatile bool stopping;
         private bool stopped;
@@ -202,6 +209,9 @@ namespace Manina.Windows.Forms
             mThread.IsBackground = true;
 
             removedItems = new List<Guid>();
+
+            cachedFileTypes = new Dictionary<string, string>();
+            structSize = (uint)Marshal.SizeOf(typeof(SHFILEINFO));
 
             stopping = false;
             stopped = false;
@@ -498,7 +508,7 @@ namespace Manina.Windows.Forms
                             // Update file info
                             if (!Stopping)
                             {
-                                Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(item.FileName);
+                                ShellImageFileInfo info = this.GetImageFileInfo(item.FileName);
                                 // Add to cache
                                 lock (lockObject)
                                 {
@@ -591,6 +601,395 @@ namespace Manina.Windows.Forms
             {
                 stopped = true;
             }
+        }
+        #endregion
+
+        #region Shell Utility for Reading Image Details
+        /// <summary>
+        /// A utility class combining FileInfo with SHGetFileInfo for image files.
+        /// </summary>
+        internal struct ShellImageFileInfo
+        {
+            public FileAttributes FileAttributes;
+            public Image SmallIcon;
+            public Image LargeIcon;
+            public DateTime CreationTime;
+            public DateTime LastAccessTime;
+            public DateTime LastWriteTime;
+            public string Extension;
+            public string DirectoryName;
+            public string DisplayName;
+            public long Size;
+            public string TypeName;
+            public Size Dimensions;
+            public SizeF Resolution;
+            // Exif tags
+            public string ImageDescription;
+            public string EquipmentModel;
+            public DateTime DateTaken;
+            public string Artist;
+            public string Copyright;
+            public string ExposureTime;
+            public float FNumber;
+            public ushort ISOSpeed;
+            public string ShutterSpeed;
+            public string ApertureValue;
+            public string UserComment;
+            public ushort Rating;
+            public ushort RatingPercent;
+        }
+
+        /// <summary>
+        /// Gets image details for the given file.
+        /// </summary>
+        /// <param name="path">The path to an image file.</param>
+        private ShellImageFileInfo GetImageFileInfo(string path)
+        {
+            ShellImageFileInfo imageInfo = new ShellImageFileInfo();
+            FileInfo info = new FileInfo(path);
+            imageInfo.FileAttributes = info.Attributes;
+            imageInfo.CreationTime = info.CreationTime;
+            imageInfo.LastAccessTime = info.LastAccessTime;
+            imageInfo.LastWriteTime = info.LastWriteTime;
+            imageInfo.Size = info.Length;
+            imageInfo.DirectoryName = info.DirectoryName;
+            imageInfo.DisplayName = info.Name;
+            imageInfo.Extension = info.Extension;
+
+            SHFILEINFO shinfo = new SHFILEINFO();
+            SHGFI flags = SHGFI.Icon | SHGFI.SmallIcon;
+
+            string fileType = string.Empty;
+            bool fileTypeCached = false;
+            lock (lockObject)
+            {
+                if (!cachedFileTypes.TryGetValue(imageInfo.Extension, out fileType))
+                    flags |= SHGFI.TypeName;
+                else
+                    fileTypeCached = true;
+            }
+
+            // Get the small icon and shell file type
+            IntPtr hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                structSize, flags);
+
+            lock (lockObject)
+            {
+                if (!fileTypeCached)
+                {
+                    fileType = shinfo.szTypeName;
+                    if (!cachedFileTypes.ContainsKey(imageInfo.Extension))
+                        cachedFileTypes.Add(imageInfo.Extension, fileType);
+                }
+            }
+            imageInfo.TypeName = fileType;
+
+            if (hImg != IntPtr.Zero)
+            {
+                using (Icon newIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
+                {
+                    imageInfo.SmallIcon = newIcon.ToBitmap();
+                }
+                DestroyIcon(shinfo.hIcon);
+            }
+
+            // Get the large icon
+            hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
+                structSize, SHGFI.Icon | SHGFI.LargeIcon);
+
+            if (hImg != IntPtr.Zero)
+            {
+                using (Icon newIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
+                {
+                    imageInfo.LargeIcon = newIcon.ToBitmap();
+                }
+                DestroyIcon(shinfo.hIcon);
+            }
+
+            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                if (Utility.IsImage(stream))
+                {
+                    using (Image img = Image.FromStream(stream, false, false))
+                    {
+                        imageInfo.Dimensions = img.Size;
+                        imageInfo.Resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
+                        // Read exif properties
+                        foreach (PropertyItem prop in img.PropertyItems)
+                        {
+                            switch (prop.Id)
+                            {
+                                case PropertyTagImageDescription:
+                                    imageInfo.ImageDescription = ReadExifAscii(prop.Value);
+                                    break;
+                                case PropertyTagEquipmentModel:
+                                    imageInfo.EquipmentModel = ReadExifAscii(prop.Value);
+                                    break;
+                                case PropertyTagDateTimeOriginal:
+                                    imageInfo.DateTaken = ReadExifDateTime(prop.Value);
+                                    break;
+                                case PropertyTagArtist:
+                                    imageInfo.Artist = ReadExifAscii(prop.Value);
+                                    break;
+                                case PropertyTagCopyright:
+                                    imageInfo.Copyright = ReadExifAscii(prop.Value);
+                                    break;
+                                case PropertyTagExposureTime:
+                                    imageInfo.ExposureTime = ReadExifURational(prop.Value);
+                                    break;
+                                case PropertyTagFNumber:
+                                    imageInfo.FNumber = ReadExifFloat(prop.Value);
+                                    break;
+                                case PropertyTagISOSpeed:
+                                    imageInfo.ISOSpeed = ReadExifUShort(prop.Value);
+                                    break;
+                                case PropertyTagShutterSpeed:
+                                    imageInfo.ShutterSpeed = ReadExifRational(prop.Value);
+                                    break;
+                                case PropertyTagAperture:
+                                    imageInfo.ApertureValue = ReadExifURational(prop.Value);
+                                    break;
+                                case PropertyTagUserComment:
+                                    imageInfo.UserComment = ReadExifAscii(prop.Value);
+                                    break;
+                                case PropertyTagRating:
+                                    imageInfo.Rating = ReadExifUShort(prop.Value);
+                                    break;
+                                case PropertyTagRatingPercent:
+                                    imageInfo.RatingPercent = ReadExifUShort(prop.Value);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            return imageInfo;
+        }
+        #endregion
+
+        #region Platform Invoke
+        // GetFileAttributesEx
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetFileAttributesEx(string lpFileName,
+            GET_FILEEX_INFO_LEVELS fInfoLevelId,
+            out WIN32_FILE_ATTRIBUTE_DATA fileData);
+
+        private enum GET_FILEEX_INFO_LEVELS
+        {
+            GetFileExInfoStandard,
+            GetFileExMaxInfoLevel
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        private struct WIN32_FILE_ATTRIBUTE_DATA
+        {
+            public FileAttributes dwFileAttributes;
+            public FILETIME ftCreationTime;
+            public FILETIME ftLastAccessTime;
+            public FILETIME ftLastWriteTime;
+            public uint nFileSizeHigh;
+            public uint nFileSizeLow;
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FILETIME
+        {
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
+
+            public DateTime Value
+            {
+                get
+                {
+                    long longTime = (((long)dwHighDateTime) << 32) | ((uint)dwLowDateTime);
+                    return DateTime.FromFileTimeUtc(longTime);
+                }
+            }
+        }
+        // DestroyIcon
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DestroyIcon(IntPtr hIcon);
+        // SHGetFileInfo
+        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SHGetFileInfo(string pszPath, FileAttributes dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, SHGFI uFlags);
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct SHFILEINFO
+        {
+            public IntPtr hIcon;
+            public int iIcon;
+            public uint dwAttributes;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
+            public string szDisplayName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_TYPE)]
+            public string szTypeName;
+        };
+        private const int MAX_PATH = 260;
+        private const int MAX_TYPE = 80;
+        [Flags]
+        private enum SHGFI : uint
+        {
+            Icon = 0x000000100,
+            DisplayName = 0x000000200,
+            TypeName = 0x000000400,
+            Attributes = 0x000000800,
+            IconLocation = 0x000001000,
+            ExeType = 0x000002000,
+            SysIconIndex = 0x000004000,
+            LinkOverlay = 0x000008000,
+            Selected = 0x000010000,
+            Attr_Specified = 0x000020000,
+            LargeIcon = 0x000000000,
+            SmallIcon = 0x000000001,
+            OpenIcon = 0x000000002,
+            ShellIconSize = 0x000000004,
+            PIDL = 0x000000008,
+            UseFileAttributes = 0x000000010,
+            AddOverlays = 0x000000020,
+            OverlayIndex = 0x000000040,
+        }
+        #endregion
+
+        #region Exif Tag IDs
+        /// <summary>
+        /// Represents the Exif tag for image description.
+        /// </summary>
+        private const int PropertyTagImageDescription = 0x010E;
+        /// <summary>
+        /// Represents the Exif tag for the equipment model.
+        /// </summary>
+        private const int PropertyTagEquipmentModel = 0x0110;
+        /// <summary>
+        /// Represents the Exif tag for date and time the picture 
+        /// was taken.
+        /// </summary>        
+        private const int PropertyTagDateTimeOriginal = 0x9003;
+        /// <summary>
+        /// Represents the Exif tag for the artist.
+        /// </summary>
+        private const int PropertyTagArtist = 0x013B;
+        /// <summary>
+        /// Represents the Exif tag for copyright information.
+        /// </summary>
+        private const int PropertyTagCopyright = 0x8298;
+        /// <summary>
+        /// Represents the Exif tag for exposure time.
+        /// </summary>
+        private const int PropertyTagExposureTime = 0x829A;
+        /// <summary>
+        /// Represents the Exif tag for F-Number.
+        /// </summary>
+        private const int PropertyTagFNumber = 0x829D;
+        /// <summary>
+        /// Represents the Exif tag for ISO speed.
+        /// </summary>
+        private const int PropertyTagISOSpeed = 0x8827;
+        /// <summary>
+        /// Represents the Exif tag for shutter speed.
+        /// </summary>
+        private const int PropertyTagShutterSpeed = 0x9201;
+        /// <summary>
+        /// Represents the Exif tag for aperture value.
+        /// </summary>
+        private const int PropertyTagAperture = 0x9202;
+        /// <summary>
+        /// Represents the Exif tag for user comments.
+        /// </summary>
+        private const int PropertyTagUserComment = 0x9286;
+        /// <summary>
+        /// Represents the Exif tag for rating between 1-5 (Windows specific).
+        /// </summary>
+        private const int PropertyTagRating = 0x4746;
+        /// <summary>
+        /// Represents the Exif tag for rating between 1-99 (Windows specific).
+        /// </summary>
+        private const int PropertyTagRatingPercent = 0x4749;
+        #endregion
+
+        #region Exif Format Conversion
+        /// <summary>
+        /// Converts the given Exif data to a byte.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private byte ReadExifByte(byte[] value)
+        {
+            return value[0];
+        }
+        /// <summary>
+        /// Converts the given Exif data to an ASCII encoded string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private string ReadExifAscii(byte[] value)
+        {
+            int len = Array.IndexOf(value, (byte)0);
+            if (len == -1) len = value.Length;
+            return Encoding.ASCII.GetString(value, 0, len);
+        }
+        /// <summary>
+        /// Converts the given Exif data to DateTime.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private DateTime ReadExifDateTime(byte[] value)
+        {
+            return DateTime.ParseExact(ReadExifAscii(value),
+                "yyyy:MM:dd HH:mm:ss",
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an 16-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private ushort ReadExifUShort(byte[] value)
+        {
+            return BitConverter.ToUInt16(value, 0);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an 32-bit unsigned integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private uint ReadExifUInt(byte[] value)
+        {
+            return BitConverter.ToUInt32(value, 0);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an 32-bit signed integer.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private int ReadExifInt(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0);
+        }
+        /// <summary>
+        /// Converts the given Exif data to an unsigned rational value
+        /// represented as a string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private string ReadExifURational(byte[] value)
+        {
+            return BitConverter.ToUInt32(value, 0).ToString() + "/" +
+                    BitConverter.ToUInt32(value, 4).ToString();
+        }
+        /// <summary>
+        /// Converts the given Exif data to a signed rational value
+        /// represented as a string.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private string ReadExifRational(byte[] value)
+        {
+            return BitConverter.ToInt32(value, 0).ToString() + "/" +
+                    BitConverter.ToInt32(value, 4).ToString();
+        }
+        /// <summary>
+        /// Converts the given Exif data to a floating-point number.
+        /// </summary>
+        /// <param name="value">Exif data as a byte array.</param>
+        private float ReadExifFloat(byte[] value)
+        {
+            uint num = BitConverter.ToUInt32(value, 0);
+            uint den = BitConverter.ToUInt32(value, 4);
+            if (den == 0)
+                return 0.0f;
+            else
+                return (float)num / (float)den;
         }
         #endregion
     }
