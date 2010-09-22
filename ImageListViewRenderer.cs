@@ -1235,23 +1235,25 @@ namespace Manina.Windows.Forms
                     // Item text
                     if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
+                        string itemText = item.GetSubItemText(ColumnType.Name);
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
-                            int y = Utility.DrawStringPair(g, bounds, "", item.Text, mImageListView.Font, bLabel, bText);
+                            int y = Utility.DrawStringPair(g, bounds, "", itemText, mImageListView.Font, bLabel, bText);
                             bounds.Y += 2 * y;
                             bounds.Height -= 2 * y;
                         }
                     }
 
                     // File type
-                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(item.FileType))
+                    string fileType = item.GetSubItemText(ColumnType.FileType);
+                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
                     {
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
                             int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
-                                item.FileType, mImageListView.Font, bLabel, bText);
+                                fileType, mImageListView.Font, bLabel, bText);
                             bounds.Y += y;
                             bounds.Height -= y;
                         }

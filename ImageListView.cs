@@ -1445,7 +1445,8 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Raises the RetrieveVirtualItemDetails event.
-        /// This method is invoked from the thumbnail thread.
+        /// This method is called from the thumbnail thread; and runs on the thumbnail
+        /// thread.
         /// </summary>
         /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
         internal virtual void RetrieveVirtualItemDetailsInternal(VirtualItemDetailsEventArgs e)

@@ -737,53 +737,55 @@ namespace Manina.Windows.Forms
                                 }
                             }
                         }
+                    }
 
-                        // Draw item text
-                        int lineHeight = CaptionFont.Height;
-                        RectangleF rt;
-                        using (StringFormat sf = new StringFormat())
+                    // Draw item text
+                    int lineHeight = CaptionFont.Height;
+                    RectangleF rt;
+                    using (StringFormat sf = new StringFormat())
+                    {
+                        rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + ImageListView.ThumbnailSize.Width,
+                            bounds.Top + itemPadding.Height + (Math.Max(ImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
+                            mTileWidth, lineHeight);
+                        sf.Alignment = StringAlignment.Near;
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
-                            rt = new RectangleF(bounds.Left + 2 * itemPadding.Width + ImageListView.ThumbnailSize.Width,
-                                bounds.Top + itemPadding.Height + (Math.Max(ImageListView.ThumbnailSize.Height, mTextHeight) - mTextHeight) / 2,
-                                mTileWidth, lineHeight);
-                            sf.Alignment = StringAlignment.Near;
-                            sf.FormatFlags = StringFormatFlags.NoWrap;
-                            sf.LineAlignment = StringAlignment.Center;
-                            sf.Trimming = StringTrimming.EllipsisCharacter;
-                            using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
+                            g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
+                        }
+                        using (Brush bItemDetails = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                        {
+                            rt.Offset(0, 1.5f * lineHeight);
+                            string fileType = item.GetSubItemText(ColumnType.FileType);
+                            if (!string.IsNullOrEmpty(fileType))
                             {
-                                g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
+                                g.DrawString(fileType, ImageListView.Font, bItemDetails, rt, sf);
+                                rt.Offset(0, 1.1f * lineHeight);
                             }
-                            using (Brush bItemDetails = new SolidBrush(ImageListView.Colors.PaneLabelColor))
+                            string dimensions = item.GetSubItemText(ColumnType.Dimensions);
+                            string resolution = item.GetSubItemText(ColumnType.Resolution);
+                            if (!string.IsNullOrEmpty(dimensions) || !string.IsNullOrEmpty(resolution))
                             {
-                                rt.Offset(0, 1.5f * lineHeight);
-                                if (!string.IsNullOrEmpty(item.FileType))
-                                {
-                                    g.DrawString(item.GetSubItemText(ColumnType.FileType),
-                                        ImageListView.Font, bItemDetails, rt, sf);
-                                    rt.Offset(0, 1.1f * lineHeight);
-                                }
-                                if (item.Dimensions != Size.Empty || item.Resolution != SizeF.Empty)
-                                {
-                                    string text = "";
-                                    if (item.Dimensions != Size.Empty)
-                                        text += item.GetSubItemText(ColumnType.Dimensions) + " pixels ";
-                                    if (item.Resolution != SizeF.Empty)
-                                        text += item.Resolution.Width + " dpi";
-                                    g.DrawString(text, ImageListView.Font, bItemDetails, rt, sf);
-                                    rt.Offset(0, 1.1f * lineHeight);
-                                }
-                                if (item.FileSize != 0)
-                                {
-                                    g.DrawString(item.GetSubItemText(ColumnType.FileSize),
-                                        ImageListView.Font, bItemDetails, rt, sf);
-                                    rt.Offset(0, 1.1f * lineHeight);
-                                }
-                                if (item.DateModified != DateTime.MinValue)
-                                {
-                                    g.DrawString(item.GetSubItemText(ColumnType.DateModified),
-                                        ImageListView.Font, bItemDetails, rt, sf);
-                                }
+                                string text = "";
+                                if (!string.IsNullOrEmpty(dimensions))
+                                    text += dimensions + " pixels ";
+                                if (!string.IsNullOrEmpty(resolution))
+                                    text += resolution.Split(new char[] { ' ', 'x' }, StringSplitOptions.RemoveEmptyEntries)[0] + " dpi";
+                                g.DrawString(text, ImageListView.Font, bItemDetails, rt, sf);
+                                rt.Offset(0, 1.1f * lineHeight);
+                            }
+                            string fileSize = item.GetSubItemText(ColumnType.FileSize);
+                            if (!string.IsNullOrEmpty(fileSize))
+                            {
+                                g.DrawString(fileSize, ImageListView.Font, bItemDetails, rt, sf);
+                                rt.Offset(0, 1.1f * lineHeight);
+                            }
+                            string dateModified = item.GetSubItemText(ColumnType.DateModified);
+                            if (!string.IsNullOrEmpty(dateModified))
+                            {
+                                g.DrawString(dateModified, ImageListView.Font, bItemDetails, rt, sf);
                             }
                         }
                     }
@@ -1476,9 +1478,11 @@ namespace Manina.Windows.Forms
                             }
                             rt.Y = bounds.Bottom - (bounds.Height - imageHeight) / 2 + 4;
                             string details = "";
-                            if (item.Dimensions != Size.Empty)
-                                details += item.GetSubItemText(ColumnType.Dimensions) + " pixels ";
-                            if (item.FileSize != 0)
+                            string dimensions = item.GetSubItemText(ColumnType.Dimensions);
+                            if (!string.IsNullOrEmpty(dimensions))
+                                details += dimensions + " pixels ";
+                            string fileSize = item.GetSubItemText(ColumnType.FileSize);
+                            if (!string.IsNullOrEmpty(fileSize))
                                 details += item.GetSubItemText(ColumnType.FileSize);
                             using (Brush bGrayText = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                             {
