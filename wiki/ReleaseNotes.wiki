@@ -7,7 +7,7 @@
   * Fixed a bug where item details could be updated by the UI thread while the cache thread was still working on them. (Issue 94)
   * Fixed !NoirRenderer's reflections to match the background color.
   * Fixed an issue where item details could not be read by the renderers. (Issue 97)
-  * !ThumbnailImage, !SmallIcon and !LargeIcon properties of ImageListViewItem now return a clone of cached images from the cache manager. (Issue 96)
+  * !ThumbnailImage, !SmallIcon and !LargeIcon properties of !ImageListViewItem now return a clone of cached images from the cache manager. (Issue 96)
 
 = 7.6 (14 September 2010) =
 
