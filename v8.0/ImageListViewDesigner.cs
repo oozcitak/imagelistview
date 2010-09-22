@@ -113,9 +113,6 @@ namespace Manina.Windows.Forms
                     item.Tag = c.ToString();
                 }
 
-                Rectangle itemArea = imageListView.layoutManager.ItemAreaBounds;
-                Rectangle clip = Rectangle.Intersect(Rectangle.Intersect(bounds, itemArea), pe.ClipRectangle);
-                //pe.Graphics.SetClip(clip);
                 imageListView.mRenderer.DrawItem(pe.Graphics, item, ItemState.None, bounds);
 
                 if (imageListView.ShowCheckBoxes)

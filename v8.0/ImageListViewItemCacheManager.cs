@@ -813,43 +813,6 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Platform Invoke
-        // GetFileAttributesEx
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetFileAttributesEx(string lpFileName,
-            GET_FILEEX_INFO_LEVELS fInfoLevelId,
-            out WIN32_FILE_ATTRIBUTE_DATA fileData);
-
-        private enum GET_FILEEX_INFO_LEVELS
-        {
-            GetFileExInfoStandard,
-            GetFileExMaxInfoLevel
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        private struct WIN32_FILE_ATTRIBUTE_DATA
-        {
-            public FileAttributes dwFileAttributes;
-            public FILETIME ftCreationTime;
-            public FILETIME ftLastAccessTime;
-            public FILETIME ftLastWriteTime;
-            public uint nFileSizeHigh;
-            public uint nFileSizeLow;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        private struct FILETIME
-        {
-            public uint dwLowDateTime;
-            public uint dwHighDateTime;
-
-            public DateTime Value
-            {
-                get
-                {
-                    long longTime = (((long)dwHighDateTime) << 32) | ((uint)dwLowDateTime);
-                    return DateTime.FromFileTimeUtc(longTime);
-                }
-            }
-        }
         // DestroyIcon
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
