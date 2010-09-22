@@ -568,7 +568,7 @@ namespace Manina.Windows.Forms
                     if (item != null && bounds.Width > 4 && bounds.Height > 4)
                     {
                         image = GetImageAsync(item, bounds.Size);
-                        if (image == null) image = item.ThumbnailImage;
+                        if (image == null) image = item.GetCachedImage(CachedImageType.Thumbnail);
                     }
 
                     if (mClip)
@@ -597,7 +597,7 @@ namespace Manina.Windows.Forms
                     if (item != null && bounds.Width > 4 && bounds.Height > 4)
                     {
                         image = GetImageAsync(item, new Size(bounds.Width, 65535));
-                        if (image == null) image = item.ThumbnailImage;
+                        if (image == null) image = item.GetCachedImage(CachedImageType.Thumbnail);
                     }
 
                     if (mClip)
@@ -894,7 +894,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView.View != View.Details)
                 {
                     // Draw the image
-                    Image img = item.ThumbnailImage;
+                    Image img = item.GetCachedImage(CachedImageType.Thumbnail);
                     if (img != null)
                     {
                         Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, mImageListView.ThumbnailSize));
@@ -1107,13 +1107,14 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of the file icon in client coordinates.</param>
             public virtual void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
             {
-                if (item.SmallIcon != null)
+                Image icon = item.GetCachedImage(CachedImageType.SmallIcon);
+                if (icon != null)
                 {
-                    Size size = item.SmallIcon.Size;
+                    Size size = icon.Size;
                     PointF ptf = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
                         (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
                     Point pt = Point.Round(ptf);
-                    g.DrawImage(item.SmallIcon, pt.X, pt.Y);
+                    g.DrawImage(icon, pt.X, pt.Y);
                 }
             }
             /// <summary>
