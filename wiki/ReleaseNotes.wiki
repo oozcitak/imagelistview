@@ -1,6 +1,15 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 7.7 (22 September 2010) =
+
+  * Mouse wheel scrolls by scrollbar settings. (Issue 95)
+  * Fixed a bug where item details could be updated by the UI thread while the cache thread was still working on them. (Issue 94)
+  * Fixed NoirRenderer's reflections to match the background color.
+  * Fixed an issue where item details could not be read by the renderers. (Issue 97)
+  * ThumbnailImage, SmallIcon and LargeIcon properties of ImageListViewItem now
+return a clone of cached images from the cache manager. (Issue 96)
+
 = 7.6 (14 September 2010) =
 
   * Custom renderers now check for null item images.
