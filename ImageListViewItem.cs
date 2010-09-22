@@ -215,7 +215,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the thumbnail image. If the thumbnail image is not cached, it will be 
         /// added to the cache queue and null will be returned.
-        /// The returned image is a copy of the item image and should be disposed by the user.
+        /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the thumbnail image.")]
         public Image ThumbnailImage
@@ -247,12 +247,14 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the small shell icon of the image file represented by this item.
         /// Returns null if the image is not cached yet.
+        /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
         public Image SmallIcon { get { return mImageListView.itemCacheManager.GetSmallIcon(mGuid, true); } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// Returns null if the image is not cached yet.
+        /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
         public Image LargeIcon { get { return mImageListView.itemCacheManager.GetLargeIcon(mGuid, true); } }
