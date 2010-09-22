@@ -214,9 +214,8 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Gets the thumbnail image. If the thumbnail image is not cached, it will be 
-        /// added to the cache queue and DefaultImage of the owner image list view will
-        /// be returned. If the thumbnail could not be cached ErrorImage of the owner
-        /// image list view will be returned.
+        /// added to the cache queue and null will be returned.
+        /// The returned image is a copy of the item image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the thumbnail image.")]
         public Image ThumbnailImage
@@ -226,37 +225,15 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Owner control is null.");
 
-                Image img = null;
-                CacheState state = ThumbnailCacheState;
-
-                if (state == CacheState.Error)
+                if (ThumbnailCacheState != CacheState.Cached)
                 {
-                    if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32)
-                        img = LargeIcon;
-                    if (img == null && mImageListView.ShellIconFallback)
-                        img = SmallIcon;
-                    if (img == null)
-                        img = mImageListView.ErrorImage;
-                    return img;
+                    if (isVirtualItem)
+                        mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                    else
+                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
                 }
 
-                img = mImageListView.cacheManager.GetImage(Guid);
-
-                if (state == CacheState.Cached)
-                    return img;
-
-                if (isVirtualItem)
-                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
-                else
-                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
-
-                if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
-                    img = LargeIcon;
-                if (img == null && mImageListView.ShellIconFallback)
-                    img = SmallIcon;
-                if (img == null)
-                    img = mImageListView.DefaultImage;
-                return img;
+                return mImageListView.cacheManager.GetImage(Guid, true);
             }
         }
         /// <summary>
@@ -269,14 +246,16 @@ namespace Manina.Windows.Forms
         #region Shell Properties
         /// <summary>
         /// Gets the small shell icon of the image file represented by this item.
+        /// Returns null if the image is not cached yet.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
-        public Image SmallIcon { get { return mImageListView.itemCacheManager.GetSmallIcon(mGuid); } }
+        public Image SmallIcon { get { return mImageListView.itemCacheManager.GetSmallIcon(mGuid, true); } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
+        /// Returns null if the image is not cached yet.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
-        public Image LargeIcon { get { return mImageListView.itemCacheManager.GetLargeIcon(mGuid); } }
+        public Image LargeIcon { get { return mImageListView.itemCacheManager.GetLargeIcon(mGuid, true); } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>
@@ -649,6 +628,60 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Gets an image from the cache manager.
+        /// If the thumbnail image is not cached, it will be 
+        /// added to the cache queue and DefaultImage of the owner image list view will
+        /// be returned. If the thumbnail could not be cached ErrorImage of the owner
+        /// image list view will be returned.
+        /// </summary>
+        /// <param name="imageType">Type of cached image to return.</param>
+        /// <returns>Requested thumbnail or icon.</returns>
+        internal Image GetCachedImage(CachedImageType imageType)
+        {
+            if (mImageListView == null)
+                throw new InvalidOperationException("Owner control is null.");
+
+            if (imageType == CachedImageType.SmallIcon)
+                return mImageListView.itemCacheManager.GetSmallIcon(mGuid);
+            else if (imageType == CachedImageType.LargeIcon)
+                return mImageListView.itemCacheManager.GetLargeIcon(mGuid);
+            else
+            {
+                Image img = null;
+                CacheState state = ThumbnailCacheState;
+
+                if (state == CacheState.Error)
+                {
+                    if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32)
+                        img = mImageListView.itemCacheManager.GetLargeIcon(mGuid);
+                    if (img == null && mImageListView.ShellIconFallback)
+                        img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
+                    if (img == null)
+                        img = mImageListView.ErrorImage;
+                    return img;
+                }
+
+                img = mImageListView.cacheManager.GetImage(Guid);
+
+                if (state == CacheState.Cached)
+                    return img;
+
+                if (isVirtualItem)
+                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                else
+                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+
+                if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
+                    img = mImageListView.itemCacheManager.GetLargeIcon(mGuid);
+                if (img == null && mImageListView.ShellIconFallback)
+                    img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
+                if (img == null)
+                    img = mImageListView.DefaultImage;
+
+                return img;
+            }
+        }
         /// <summary>
         /// Adds a new subitem for the specified custom column.
         /// </summary>

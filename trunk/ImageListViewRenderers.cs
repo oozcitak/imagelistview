@@ -234,7 +234,7 @@ namespace Manina.Windows.Forms
                 else // if (ImageListView.View != View.Details)
                 {
                     // Align images to bottom of bounds
-                    Image img = item.ThumbnailImage;
+                    Image img = item.GetCachedImage(CachedImageType.Thumbnail);
                     if (img != null)
                     {
                         Rectangle pos = Utility.GetSizedImageBounds(img,
@@ -717,7 +717,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Draw the image
-                    Image img = item.ThumbnailImage;
+                    Image img = item.GetCachedImage(CachedImageType.Thumbnail);
                     if (img != null)
                     {
                         Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize), 0.0f, 50.0f);
@@ -901,7 +901,7 @@ namespace Manina.Windows.Forms
                     Size itemPadding = new Size(4, 4);
 
                     // Draw the image
-                    Image img = item.ThumbnailImage;
+                    Image img = item.GetCachedImage(CachedImageType.Thumbnail);
                     if (img != null)
                     {
                         Rectangle border = new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize);
@@ -1391,7 +1391,7 @@ namespace Manina.Windows.Forms
                     Image img = null;
                     if ((state & ItemState.Hovered) != ItemState.None)
                         img = GetImageAsync(item, new Size(bounds.Width - 8, bounds.Height - 8));
-                    if (img == null) img = item.ThumbnailImage;
+                    if (img == null) img = item.GetCachedImage(CachedImageType.Thumbnail);
 
                     int imageWidth = 0;
                     int imageHeight = 0;

@@ -360,14 +360,48 @@ namespace Manina.Windows.Forms
         /// null will be returned.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
-        public Image GetSmallIcon(Guid guid)
+        /// <param name="clone">true to return a cloned image; otherwise false.</param>
+        public Image GetSmallIcon(Guid guid, bool clone)
         {
             lock (lockObject)
             {
                 CacheItem item = null;
                 if (itemCache.TryGetValue(guid, out item))
                 {
-                    return item.SmallIcon;
+                    Image img = item.SmallIcon;
+                    if (clone && img != null)
+                        img = (Image)img.Clone();
+                    return img;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Gets the small shell icon from the cache. If the image is not cached,
+        /// null will be returned.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        public Image GetSmallIcon(Guid guid)
+        {
+            return GetSmallIcon(guid, false);
+        }
+        /// <summary>
+        /// Gets the large shell icon from the cache. If the image is not cached,
+        /// null will be returned.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="clone">true to return a cloned image; otherwise false.</param>
+        public Image GetLargeIcon(Guid guid, bool clone)
+        {
+            lock (lockObject)
+            {
+                CacheItem item = null;
+                if (itemCache.TryGetValue(guid, out item))
+                {
+                    Image img = item.LargeIcon;
+                    if (clone && img != null)
+                        img = (Image)img.Clone();
+                    return img;
                 }
             }
             return null;
@@ -379,15 +413,7 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The guid representing this item.</param>
         public Image GetLargeIcon(Guid guid)
         {
-            lock (lockObject)
-            {
-                CacheItem item = null;
-                if (itemCache.TryGetValue(guid, out item))
-                {
-                    return item.LargeIcon;
-                }
-            }
-            return null;
+            return GetLargeIcon(guid, false);
         }
         /// <summary>
         /// Stops the cache manager.

@@ -317,6 +317,24 @@ namespace Manina.Windows.Forms
 
     #region Internal Enums
     /// <summary>
+    /// Represents the type of image in the cache manager.
+    /// </summary>
+    internal enum CachedImageType
+    {
+        /// <summary>
+        /// Thumbnail image.
+        /// </summary>
+        Thumbnail,
+        /// <summary>
+        /// Small shell icon.
+        /// </summary>
+        SmallIcon,
+        /// <summary>
+        /// Large shell icon.
+        /// </summary>
+        LargeIcon,
+    }
+    /// <summary>
     /// Represents the item highlight state during mouse selection.
     /// </summary>
     internal enum ItemHighlightState
