@@ -44,6 +44,7 @@ namespace Manina.Windows.Forms
         private readonly object lockObject;
 
         private ImageListView mImageListView;
+        private bool mRetryOnError;
         private Thread mThread;
 
         private Queue<CacheItem> toCache;
@@ -181,6 +182,10 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
+        /// Determines whether the cache manager retries loading items on errors.
+        /// </summary>
+        public bool RetryOnError { get { return mRetryOnError; } set { mRetryOnError = value; } }
+        /// <summary>
         /// Determines whether the cache thread is being stopped.
         /// </summary>
         private bool Stopping { get { lock (lockObject) { return stopping; } } }
@@ -260,14 +265,6 @@ namespace Manina.Windows.Forms
         {
             lock (lockObject)
             {
-                // Already cached?
-                CacheItem cacheItem = null;
-                if (itemCache.TryGetValue(guid, out cacheItem))
-                {
-                    itemCache.Remove(guid);
-                    cacheItem.Dispose();
-                }
-
                 toCache.Enqueue(new CacheItem(guid, filename));
                 Monitor.Pulse(lockObject);
             }
@@ -279,14 +276,6 @@ namespace Manina.Windows.Forms
         {
             lock (lockObject)
             {
-                // Already cached?
-                CacheItem cacheItem = null;
-                if (itemCache.TryGetValue(guid, out cacheItem))
-                {
-                    itemCache.Remove(guid);
-                    cacheItem.Dispose();
-                }
-
                 toCache.Enqueue(new CacheItem(guid, key));
                 Monitor.Pulse(lockObject);
             }
@@ -509,6 +498,14 @@ namespace Manina.Windows.Forms
                             // Add to cache
                             lock (lockObject)
                             {
+                                // Is it already cached?
+                                CacheItem cacheItem = null;
+                                if (itemCache.TryGetValue(item.Guid, out cacheItem))
+                                {
+                                    itemCache.Remove(item.Guid);
+                                    cacheItem.Dispose();
+                                }
+
                                 itemCache.Add(item.Guid, new CacheItem(item.Guid, item.VirtualItemKey, e.SmallIcon, e.LargeIcon));
                             }
                             try
@@ -516,7 +513,7 @@ namespace Manina.Windows.Forms
                                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                                 {
                                     // Update item
-                                    mImageListView.BeginInvoke(new UpdateVirtualItemDetailsDelegateInternal(
+                                    mImageListView.Invoke(new UpdateVirtualItemDetailsDelegateInternal(
                                         mImageListView.UpdateItemDetailsInternal), item.Guid, e);
                                 }
                             }
@@ -535,17 +532,33 @@ namespace Manina.Windows.Forms
                             if (!Stopping)
                             {
                                 ShellImageFileInfo info = this.GetImageFileInfo(item.FileName);
-                                // Add to cache
-                                lock (lockObject)
+                                if (info.Error == null)
                                 {
-                                    itemCache.Add(item.Guid, new CacheItem(item.Guid, item.FileName, info.SmallIcon, info.LargeIcon));
+                                    // Add to cache
+                                    lock (lockObject)
+                                    {
+                                        // Is it already cached?
+                                        CacheItem cacheItem = null;
+                                        if (itemCache.TryGetValue(item.Guid, out cacheItem))
+                                        {
+                                            itemCache.Remove(item.Guid);
+                                            cacheItem.Dispose();
+                                        }
+
+                                        itemCache.Add(item.Guid, new CacheItem(item.Guid, item.FileName, info.SmallIcon, info.LargeIcon));
+                                    }
+                                }
+                                else if (mRetryOnError)
+                                {
+                                    // Retry
+                                    toCache.Enqueue(item);
                                 }
                                 try
                                 {
                                     if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                                     {
                                         // Update item
-                                        mImageListView.BeginInvoke(new UpdateItemDetailsDelegateInternal(
+                                        mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
                                             mImageListView.UpdateItemDetailsInternal), item.Guid, info);
 
                                         // Delegate errors to the parent control
@@ -680,7 +693,7 @@ namespace Manina.Windows.Forms
         /// Gets image details for the given file.
         /// </summary>
         /// <param name="path">The path to an image file.</param>
-        private ShellImageFileInfo GetImageFileInfo(string path)
+        internal ShellImageFileInfo GetImageFileInfo(string path)
         {
             ShellImageFileInfo imageInfo = new ShellImageFileInfo();
             try

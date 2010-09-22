@@ -334,6 +334,8 @@ namespace Manina.Windows.Forms
                 mRetryOnError = value;
                 if (cacheManager != null)
                     cacheManager.RetryOnError = mRetryOnError;
+                if (itemCacheManager != null)
+                    itemCacheManager.RetryOnError = mRetryOnError;
             }
         }
         /// <summary>

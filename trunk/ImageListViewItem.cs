@@ -747,9 +747,8 @@ namespace Manina.Windows.Forms
             }
             else
             {
-                // FIXME:
-                //Utility.ShellImageFileInfo info = new Utility.ShellImageFileInfo(mFileName);
-                //UpdateDetailsInternal(info);
+                ImageListViewItemCacheManager.ShellImageFileInfo info = mImageListView.itemCacheManager.GetImageFileInfo(mFileName);
+                UpdateDetailsInternal(info);
             }
             isDirty = false;
         }
