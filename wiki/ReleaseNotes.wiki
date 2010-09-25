@@ -1,6 +1,13 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 8.0 (25 September 2010) =
+
+  * Added the AutoRotate !AutoRotateThumbnails property to the control. Image rotation is determined by the Exif orientation metadata.
+  * Details cache manager now obeys the !RetryOnError property of the control.
+  * Thumbnails and metadata are now extracted using WIC (Windows Imaging Component). (Issue 85) Contributed by Jens.
+  * With this release target framework is increased to .Net 3.0 to take advantage of WIC. Previous v7 branch will be continued to be supported for bug fixes.
+
 = 7.7 (22 September 2010) =
 
   * Mouse wheel scrolls by scrollbar settings. (Issue 95)
