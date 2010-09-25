@@ -1007,7 +1007,7 @@ namespace Manina.Windows.Forms
                                     {
                                         int w = mImageListView.RatingImage.Width;
                                         int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
-                                        int rating = (int)Math.Ceiling((float)item.Rating / 20.0f);
+                                        int rating = item.StarRating;
                                         if (rating < 0) rating = 0;
                                         if (rating > 5) rating = 5;
                                         for (int i = 1; i <= rating; i++)

@@ -770,7 +770,7 @@ namespace Manina.Windows.Forms
                 imageInfo.ShutterSpeed = metadata.ShutterSpeedString ?? "";
                 imageInfo.ApertureValue = metadata.ApertureValueString ?? "";
                 imageInfo.UserComment = metadata.Comment ?? "";
-                imageInfo.Rating = (ushort)(metadata.Rating * 20);
+                imageInfo.Rating = (ushort)(metadata.Rating);
                 imageInfo.Error = metadata.Error;
             }
             catch (Exception e)

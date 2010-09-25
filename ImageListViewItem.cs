@@ -359,10 +359,33 @@ namespace Manina.Windows.Forms
         [Category("Image Properties"), Browsable(true), Description("Gets user comments.")]
         public string UserComment { get { UpdateFileInfo(); return mUserComment; } }
         /// <summary>
-        /// Gets rating in percent (Windows specific).
+        /// Gets rating in percent between 0-99 (Windows specific).
         /// </summary>
-        [Category("Image Properties"), Browsable(true), Description("Gets rating in percent.")]
+        [Category("Image Properties"), Browsable(true), Description("Gets rating in percent between 0-99.")]
         public ushort Rating { get { UpdateFileInfo(); return mRating; } }
+        /// <summary>
+        /// Gets the star rating between 0-5 (Windows specific).
+        /// </summary>
+        [Category("Image Properties"), Browsable(true), Description("Gets the star rating between 0-5.")]
+        public ushort StarRating
+        { 
+            get 
+            { 
+                UpdateFileInfo();
+                if (mRating >= 1 && mRating <= 12)
+                    return 1;
+                else if (mRating >= 13 && mRating <= 37)
+                    return 2;
+                else if (mRating >= 38 && mRating <= 62)
+                    return 3;
+                else if (mRating >= 63 && mRating <= 87)
+                    return 4;
+                else if (mRating >= 88 && mRating <= 99)
+                    return 5;
+
+                return 0;
+            } 
+        }
         #endregion
 
         #region Constructors
@@ -672,10 +695,10 @@ namespace Manina.Windows.Forms
                     return img;
 
                 if (isVirtualItem)
-                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, 
+                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
                         mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 else
-                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, 
+                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
                         mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
 
                 if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
@@ -783,9 +806,7 @@ namespace Manina.Windows.Forms
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.ApertureValue;
             mUserComment = info.UserComment;
-            mRating = 0;
-            if (mRating == 0 && info.Rating != 0)
-                mRating = (ushort)(info.Rating * 20);
+            mRating = info.Rating;
 
             isDirty = false;
         }
