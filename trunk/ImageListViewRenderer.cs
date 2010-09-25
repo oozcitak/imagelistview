@@ -297,9 +297,11 @@ namespace Manina.Windows.Forms
                 if (img == null)
                 {
                     if (item.isVirtualItem)
-                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.VirtualItemKey, size, mImageListView.UseEmbeddedThumbnails);
+                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.VirtualItemKey,
+                            size, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                     else
-                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size, mImageListView.UseEmbeddedThumbnails);
+                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size,
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
 
                 return img;
