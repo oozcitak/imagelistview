@@ -3,7 +3,7 @@
 
 = 8.0 (25 September 2010) =
 
-  * Added the AutoRotate !AutoRotateThumbnails property to the control. Image rotation is determined by the Exif orientation metadata.
+  * Added the !AutoRotateThumbnails property to the control. Image rotation is determined by the Exif orientation metadata.
   * Details cache manager now obeys the !RetryOnError property of the control.
   * File icons are no longer drawn over column headers in Details view.
   * Fixed an issue where item details were not being updated if the shell icon extraction failed for an item. (Issue 97)
