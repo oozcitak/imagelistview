@@ -251,7 +251,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public string Copyright = null;
         /// <summary>
-        /// Rating value between 0-5.
+        /// Rating value between 0-99.
         /// </summary>
         public int Rating = 0;
         /// <summary>
@@ -478,12 +478,24 @@ namespace Manina.Windows.Forms
                         }
                         break;
                     case TagRating:
-                        iVal = ExifUShort(prop.Value);
-                        Rating = iVal;
+                        if (Rating == 0)
+                        {
+                            iVal = ExifUShort(prop.Value);
+                            if (iVal == 1)
+                                Rating = 1;
+                            else if (iVal == 2)
+                                Rating = 25;
+                            else if (iVal == 3)
+                                Rating = 50;
+                            else if (iVal == 4)
+                                Rating = 75;
+                            else if (iVal == 5)
+                                Rating = 99;
+                        }
                         break;
                     case TagRatingPercent:
                         iVal = ExifUShort(prop.Value);
-                        Rating = iVal / 20;
+                        Rating = iVal;
                         break;
                     case TagShutterSpeed:
                         dVal = ExifDouble(prop.Value);
@@ -524,174 +536,208 @@ namespace Manina.Windows.Forms
         /// <param name="data">metadata</param>
         private void InitViaWpf(BitmapMetadata data)
         {
-            try
-            {
-                double dVal;
-                int iVal;
-                DateTime dateTime;
-                string str;
-                Object val;
-                Rating = data.Rating;
+            double dVal;
+            int iVal;
+            DateTime dateTime;
+            string str;
+            Object val;
 
-                val = data.GetQuery("System.Subject");
-                if (val != null)
+            val = GetMetadataObject(data, "System.Subject");
+            if (val != null)
+            {
+                str = ((string)val).Trim();
+                if (str != String.Empty)
                 {
-                    str = ((string)val).Trim();
-                    if (str != String.Empty)
-                    {
-                        ImageDescription = str;
-                    }
-                }
-                val = data.GetQuery("System.ApplicationName");
-                if (val != null)
-                {
-                    str = ((string)val).Trim();
-                    if (str != String.Empty)
-                    {
-                        Software = str;
-                    }
-                }
-                val = data.GetQuery("System.Photo.CameraManufacturer");
-                if (val != null)
-                {
-                    str = ((string)val).Trim();
-                    if (str != String.Empty)
-                    {
-                        EquipmentManufacturer = str;
-                    }
-                }
-                val = data.GetQuery("System.Photo.CameraModel");
-                if (val != null)
-                {
-                    str = ((string)val).Trim();
-                    if (str != String.Empty)
-                    {
-                        EquipmentModel = str;
-                    }
-                }
-                val = data.GetQuery("System.Author");
-                if (val != null)
-                {
-                    str = String.Concat((string[])val).Trim();
-                    if (str != String.Empty)
-                    {
-                        Artist = str;
-                    }
-                }
-                val = data.GetQuery("System.Photo.DateTaken");
-                if (val != null)
-                {
-                    dateTime = ConvertFileTime((System.Runtime.InteropServices.ComTypes.FILETIME)val);
-                    if (dateTime != DateTime.MinValue)
-                    {
-                        DateTaken = dateTime;
-                        DateTakenString = dateTime.ToString("g");
-                    }
-                }
-                val = data.GetQuery("System.Photo.ExposureTime");
-                if (val != null)
-                {
-                    dVal = (double)val;
-                    if (dVal != 0.0)
-                    {
-                        ExposureTime = dVal;
-                        if ((float)dVal >= 1.0f)
-                            ExposureTimeString = Math.Round(dVal, 1).ToString();
-                        else
-                            ExposureTimeString = "1/" + Math.Round(1.0 / dVal);
-                    }
-                }
-                val = data.GetQuery("System.Photo.FNumber");
-                if (val != null)
-                {
-                    dVal = (double)val;
-                    if (dVal != 0.0)
-                    {
-                        FNumber = dVal;
-                        FNumberString = Math.Round(dVal, 1).ToString();
-                    }
-                }
-                val = data.GetQuery("System.Photo.FocalLength");
-                if (val != null)
-                {
-                    dVal = (double)val;
-                    if (dVal != 0.0)
-                    {
-                        FocalLength = dVal;
-                        FocalLengthString = (Math.Round(dVal, 1)).ToString();
-                    }
-                }
-                val = data.GetQuery("System.Photo.ISOSpeed");
-                if (val != null)
-                {
-                    iVal = (ushort)val;
-                    if (iVal != 0)
-                    {
-                        ISOSpeed = iVal;
-                        ISOSpeedString = iVal.ToString();
-                    }
-                }
-                val = data.GetQuery("System.Photo.Orientation");
-                if (val != null)
-                {
-                    iVal = (ushort)val;
-                    if (iVal != 0)
-                    {
-                        Orientation = iVal;
-                        RotationAngle = GetRotationAngle(iVal);
-                    }
-                }
-                val = data.GetQuery("System.Copyright");
-                if (val != null)
-                {
-                    str = ((string)val).Trim();
-                    if (str != String.Empty)
-                    {
-                        Copyright = str;
-                    }
-                }
-                val = data.GetQuery("System.Photo.ShutterSpeed");
-                if (val != null)
-                {
-                    dVal = (double)val;
-                    if (dVal != 0.0)
-                    {
-                        ShutterSpeed = dVal;
-                        if ((float)dVal >= 1.0f)
-                            ShutterSpeedString = Math.Round(dVal, 1).ToString();
-                        else
-                            ShutterSpeedString = "1/" + Math.Round(1.0 / dVal);
-                    }
-                }
-                val = data.GetQuery("System.Photo.Aperture");
-                if (val != null)
-                {
-                    dVal = (double)val;
-                    if (dVal != 0.0)
-                    {
-                        ApertureValue = dVal;
-                        if ((float)dVal >= 1.0f)
-                            ApertureValueString = Math.Round(dVal, 1).ToString();
-                        else
-                            ApertureValueString = "1/" + Math.Round(1.0 / dVal);
-                    }
-                }
-                val = data.GetQuery("System.Comment");
-                if (val != null)
-                {
-                    str = ((string)val).Trim();
-                    if (str != String.Empty)
-                    {
-                        Comment = str;
-                    }
+                    ImageDescription = str;
                 }
             }
-            catch (NotSupportedException e)
+            val = GetMetadataObject(data, "System.ApplicationName");
+            if (val != null)
             {
-                ;
+                str = ((string)val).Trim();
+                if (str != String.Empty)
+                {
+                    Software = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.CameraManufacturer");
+            if (val != null)
+            {
+                str = ((string)val).Trim();
+                if (str != String.Empty)
+                {
+                    EquipmentManufacturer = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.CameraModel");
+            if (val != null)
+            {
+                str = ((string)val).Trim();
+                if (str != String.Empty)
+                {
+                    EquipmentModel = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Author");
+            if (val != null)
+            {
+                str = String.Concat((string[])val).Trim();
+                if (str != String.Empty)
+                {
+                    Artist = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.DateTaken");
+            if (val != null)
+            {
+                dateTime = ConvertFileTime((System.Runtime.InteropServices.ComTypes.FILETIME)val);
+                if (dateTime != DateTime.MinValue)
+                {
+                    DateTaken = dateTime;
+                    DateTakenString = dateTime.ToString("g");
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.ExposureTime");
+            if (val != null)
+            {
+                dVal = (double)val;
+                if (dVal != 0.0)
+                {
+                    ExposureTime = dVal;
+                    if ((float)dVal >= 1.0f)
+                        ExposureTimeString = Math.Round(dVal, 1).ToString();
+                    else
+                        ExposureTimeString = "1/" + Math.Round(1.0 / dVal);
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.FNumber");
+            if (val != null)
+            {
+                dVal = (double)val;
+                if (dVal != 0.0)
+                {
+                    FNumber = dVal;
+                    FNumberString = Math.Round(dVal, 1).ToString();
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.FocalLength");
+            if (val != null)
+            {
+                dVal = (double)val;
+                if (dVal != 0.0)
+                {
+                    FocalLength = dVal;
+                    FocalLengthString = (Math.Round(dVal, 1)).ToString();
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.ISOSpeed");
+            if (val != null)
+            {
+                iVal = (ushort)val;
+                if (iVal != 0)
+                {
+                    ISOSpeed = iVal;
+                    ISOSpeedString = iVal.ToString();
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.Orientation");
+            if (val != null)
+            {
+                iVal = (ushort)val;
+                if (iVal != 0)
+                {
+                    Orientation = iVal;
+                    RotationAngle = GetRotationAngle(iVal);
+                }
+            }
+            val = GetMetadataObject(data, "System.Copyright");
+            if (val != null)
+            {
+                str = ((string)val).Trim();
+                if (str != String.Empty)
+                {
+                    Copyright = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.ShutterSpeed");
+            if (val != null)
+            {
+                dVal = (double)val;
+                if (dVal != 0.0)
+                {
+                    ShutterSpeed = dVal;
+                    if ((float)dVal >= 1.0f)
+                        ShutterSpeedString = Math.Round(dVal, 1).ToString();
+                    else
+                        ShutterSpeedString = "1/" + Math.Round(1.0 / dVal);
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.Aperture");
+            if (val != null)
+            {
+                dVal = (double)val;
+                if (dVal != 0.0)
+                {
+                    ApertureValue = dVal;
+                    if ((float)dVal >= 1.0f)
+                        ApertureValueString = Math.Round(dVal, 1).ToString();
+                    else
+                        ApertureValueString = "1/" + Math.Round(1.0 / dVal);
+                }
+            }
+            val = GetMetadataObject(data, "System.Comment");
+            if (val != null)
+            {
+                str = ((string)val).Trim();
+                if (str != String.Empty)
+                {
+                    Comment = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Rating");
+            if (val != null)
+            {
+                iVal = (ushort)val;
+                Rating = iVal;
+            }
+            if (Rating == 0)
+            {
+                val = GetMetadataObject(data, "System.SimpleRating");
+                if (val != null)
+                {
+                    iVal = (ushort)val;
+                    if (iVal == 1)
+                        Rating = 1;
+                    else if (iVal == 2)
+                        Rating = 25;
+                    else if (iVal == 3)
+                        Rating = 50;
+                    else if (iVal == 4)
+                        Rating = 75;
+                    else if (iVal == 5)
+                        Rating = 99;
+                }
             }
         }
-
+        /// <summary>
+        /// Returns the metadata for the given query.
+        /// </summary>
+        /// <param name="metadata">The image metadata.</param>
+        /// <param name="query">Query string.</param>
+        /// <returns>Metadata object or null if the metadata as not found.</returns>
+        private object GetMetadataObject(BitmapMetadata metadata, string query)
+        {
+            object val = null;
+            try
+            {
+                val = metadata.GetQuery(query);
+            }
+            catch (NotSupportedException)
+            {
+                val = null;
+            }
+            return val;
+        }
         /// <summary>
         /// Get rotation angle from orientation flag.
         /// </summary>
