@@ -5,6 +5,8 @@
 
   * Added the AutoRotate !AutoRotateThumbnails property to the control. Image rotation is determined by the Exif orientation metadata.
   * Details cache manager now obeys the !RetryOnError property of the control.
+  * File icons are no longer drawn over column headers in Details view.
+  * Fixed an issue where item details were not being updated if the shell icon extraction failed for an item. (Issue 97)
   * Thumbnails and metadata are now extracted using WIC (Windows Imaging Component). (Issue 85) Contributed by Jens.
   * With this release target framework is increased to .Net 3.0 to take advantage of WIC. Previous v7 branch will be continued to be supported for bug fixes.
 
