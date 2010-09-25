@@ -540,15 +540,35 @@ namespace Manina.Windows.Forms
                                 colIndex++;
                                 xc1 += column.Width;
                             }
-                            g.SetClip(mImageListView.layoutManager.ClientArea);
                         }
-
 
                         // Draw the checkbox and file icon
                         if (ImageListView.ShowCheckBoxes)
-                            DrawCheckBox(g, param.Item, ImageListView.layoutManager.GetCheckBoxBounds(param.Item.Index));
+                        {
+                            Rectangle cBounds = ImageListView.layoutManager.GetCheckBoxBounds(param.Item.Index);
+                            if (mClip)
+                            {
+                                Rectangle clip = Rectangle.Intersect(cBounds, mImageListView.layoutManager.ItemAreaBounds);
+                                g.SetClip(clip);
+                            }
+                            else
+                                g.SetClip(mImageListView.layoutManager.ClientArea);
+
+                            DrawCheckBox(g, param.Item, cBounds);
+                        }
                         if (ImageListView.ShowFileIcons)
-                            DrawFileIcon(g, param.Item, ImageListView.layoutManager.GetIconBounds(param.Item.Index));
+                        {
+                            Rectangle cBounds = ImageListView.layoutManager.GetIconBounds(param.Item.Index);
+                            if (mClip)
+                            {
+                                Rectangle clip = Rectangle.Intersect(cBounds, mImageListView.layoutManager.ItemAreaBounds);
+                                g.SetClip(clip);
+                            }
+                            else
+                                g.SetClip(mImageListView.layoutManager.ClientArea);
+
+                            DrawFileIcon(g, param.Item, cBounds);
+                        }
                     }
                 }
 
