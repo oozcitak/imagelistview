@@ -583,71 +583,71 @@ namespace Manina.Windows.Forms
                 case ColumnType.Custom:
                     throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
                 case ColumnType.DateAccessed:
-                    if (DateAccessed == DateTime.MinValue)
+                    if (mDateAccessed == DateTime.MinValue)
                         return "";
                     else
-                        return DateAccessed.ToString("g");
+                        return mDateAccessed.ToString("g");
                 case ColumnType.DateCreated:
-                    if (DateCreated == DateTime.MinValue)
+                    if (mDateCreated == DateTime.MinValue)
                         return "";
                     else
-                        return DateCreated.ToString("g");
+                        return mDateCreated.ToString("g");
                 case ColumnType.DateModified:
-                    if (DateModified == DateTime.MinValue)
+                    if (mDateModified == DateTime.MinValue)
                         return "";
                     else
-                        return DateModified.ToString("g");
+                        return mDateModified.ToString("g");
                 case ColumnType.FilePath:
-                    return FilePath;
+                    return mFilePath;
                 case ColumnType.FileSize:
-                    if (FileSize == 0)
+                    if (mFileSize == 0)
                         return "";
                     else
-                        return Utility.FormatSize(FileSize);
+                        return Utility.FormatSize(mFileSize);
                 case ColumnType.FileType:
                     return FileType;
                 case ColumnType.Dimensions:
-                    if (Dimensions == Size.Empty)
+                    if (mDimensions == Size.Empty)
                         return "";
                     else
-                        return string.Format("{0} x {1}", Dimensions.Width, Dimensions.Height);
+                        return string.Format("{0} x {1}", mDimensions.Width, mDimensions.Height);
                 case ColumnType.Resolution:
-                    if (Resolution == SizeF.Empty)
+                    if (mResolution == SizeF.Empty)
                         return "";
                     else
-                        return string.Format("{0} x {1}", Resolution.Width, Resolution.Height);
+                        return string.Format("{0} x {1}", mResolution.Width, mResolution.Height);
                 case ColumnType.ImageDescription:
-                    return ImageDescription;
+                    return mImageDescription;
                 case ColumnType.EquipmentModel:
-                    return EquipmentModel;
+                    return mEquipmentModel;
                 case ColumnType.DateTaken:
-                    if (DateTaken == DateTime.MinValue)
+                    if (mDateTaken == DateTime.MinValue)
                         return "";
                     else
-                        return DateTaken.ToString("g");
+                        return mDateTaken.ToString("g");
                 case ColumnType.Artist:
-                    return Artist;
+                    return mArtist;
                 case ColumnType.Copyright:
-                    return Copyright;
+                    return mCopyright;
                 case ColumnType.ExposureTime:
-                    return ExposureTime;
+                    return mExposureTime;
                 case ColumnType.FNumber:
-                    return FNumber.ToString("f2");
+                    return mFNumber.ToString("f2");
                 case ColumnType.ISOSpeed:
-                    if (ISOSpeed == 0)
+                    if (mISOSpeed == 0)
                         return "";
                     else
-                        return ISOSpeed.ToString();
+                        return mISOSpeed.ToString();
                 case ColumnType.ShutterSpeed:
-                    return ShutterSpeed;
+                    return mShutterSpeed;
                 case ColumnType.Aperture:
-                    return Aperture;
+                    return mAperture;
                 case ColumnType.UserComment:
-                    return UserComment;
+                    return mUserComment;
                 case ColumnType.Rating:
-                    if (Rating == 0)
+                    if (mRating == 0)
                         return "";
-                    else return Rating.ToString();
+                    else return mRating.ToString();
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
