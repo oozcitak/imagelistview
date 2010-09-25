@@ -368,9 +368,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Image Properties"), Browsable(true), Description("Gets the star rating between 0-5.")]
         public ushort StarRating
-        { 
-            get 
-            { 
+        {
+            get
+            {
                 UpdateFileInfo();
                 if (mRating >= 1 && mRating <= 12)
                     return 1;
@@ -384,7 +384,7 @@ namespace Manina.Windows.Forms
                     return 5;
 
                 return 0;
-            } 
+            }
         }
         #endregion
 
@@ -763,21 +763,29 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
-            if (isVirtualItem)
+            if (mImageListView != null)
             {
-                if (mImageListView != null)
+                if (isVirtualItem)
                 {
                     VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(mVirtualItemKey);
                     mImageListView.RetrieveVirtualItemDetailsInternal(e);
                     UpdateDetailsInternal(e);
+
+                    isDirty = false;
+                }
+                else
+                {
+                    ImageListViewItemCacheManager.ShellImageFileInfo info = mImageListView.itemCacheManager.GetImageFileInfo(mFileName);
+                    mImageListView.itemCacheManager.ForceAddToCache(mGuid, mVirtualItemKey, info);
+
+                    UpdateDetailsInternal(info);
+
+                    if (info.Error == null)
+                        isDirty = false;
+                    else
+                        isDirty = true;
                 }
             }
-            else
-            {
-                ImageListViewItemCacheManager.ShellImageFileInfo info = mImageListView.itemCacheManager.GetImageFileInfo(mFileName);
-                UpdateDetailsInternal(info);
-            }
-            isDirty = false;
         }
         /// <summary>
         /// Invoked by the worker thread to update item details.

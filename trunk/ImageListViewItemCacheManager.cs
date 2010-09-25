@@ -51,8 +51,7 @@ namespace Manina.Windows.Forms
 
         private List<Guid> removedItems;
 
-        private Dictionary<string, string> cachedFileTypes;
-        private uint structSize;
+        private Dictionary<string, CachedShellInfo> cachedShellInfo;
 
         private volatile bool stopping;
         private bool stopped;
@@ -60,6 +59,62 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Private Classes
+        /// <summary>
+        /// Represents cached shell properties.
+        /// </summary>
+        private class CachedShellInfo : IDisposable
+        {
+            private string mFileType;
+            private Image mSmallIcon;
+            private Image mLargeIcon;
+            private bool disposed;
+
+            /// <summary>
+            /// Gets the mime type of the image file.
+            /// </summary>
+            public string FileType { get { return mFileType; } }
+            /// <summary>
+            /// Gets the small shell icon of the image file.
+            /// </summary>
+            public Image SmallIcon { get { return mSmallIcon; } }
+            /// <summary>
+            /// Gets the large shell icon of the image file.
+            /// </summary>
+            public Image LargeIcon { get { return mLargeIcon; } }
+
+            /// <summary>
+            /// Initializes a new instance of the CachedShellInfo class.
+            /// </summary>
+            /// <param name="fileType">Mime type of the file.</param>
+            /// <param name="smallIcon">The small icon.</param>
+            /// <param name="largeIcon">The large icon.</param>
+            public CachedShellInfo(string fileType, Image smallIcon, Image largeIcon)
+            {
+                disposed = false;
+                mFileType = fileType;
+                mSmallIcon = smallIcon;
+                mLargeIcon = largeIcon;
+            }
+
+            /// <summary>
+            /// Performs application-defined tasks associated with freeing, 
+            /// releasing, or resetting unmanaged resources.
+            /// </summary>
+            public void Dispose()
+            {
+                if (!disposed)
+                {
+                    if (mSmallIcon != null)
+                        mSmallIcon.Dispose();
+                    if (mLargeIcon != null)
+                        mLargeIcon.Dispose();
+
+                    mSmallIcon = null;
+                    mLargeIcon = null;
+                    disposed = true;
+                }
+            }
+        }
         /// <summary>
         /// Represents an item in the thumbnail cache.
         /// </summary>
@@ -119,6 +174,7 @@ namespace Manina.Windows.Forms
             /// <param name="largeIcon">The small shell icon.</param>
             public CacheItem(Guid guid, string filename, Image smallIcon, Image largeIcon)
             {
+                disposed = false;
                 mGuid = guid;
                 mFileName = filename;
                 mIsVirtualItem = false;
@@ -149,6 +205,7 @@ namespace Manina.Windows.Forms
             /// <param name="largeIcon">The small shell icon.</param>
             public CacheItem(Guid guid, object key, Image smallIcon, Image largeIcon)
             {
+                disposed = false;
                 mGuid = guid;
                 mFileName = string.Empty;
                 mIsVirtualItem = true;
@@ -213,8 +270,7 @@ namespace Manina.Windows.Forms
 
             removedItems = new List<Guid>();
 
-            cachedFileTypes = new Dictionary<string, string>();
-            structSize = (uint)Marshal.SizeOf(typeof(SHFILEINFO));
+            cachedShellInfo = new Dictionary<string, CachedShellInfo>();
 
             stopping = false;
             stopped = false;
@@ -288,6 +344,10 @@ namespace Manina.Windows.Forms
                 foreach (CacheItem item in itemCache.Values)
                     item.Dispose();
                 itemCache.Clear();
+
+                foreach (CachedShellInfo item in cachedShellInfo.Values)
+                    item.Dispose();
+                cachedShellInfo.Clear();
 
                 removedItems.Clear();
                 toCache.Clear();
@@ -401,6 +461,27 @@ namespace Manina.Windows.Forms
         public Image GetLargeIcon(Guid guid)
         {
             return GetLargeIcon(guid, false);
+        }
+        /// <summary>
+        /// Adds the given item to the cache bypassing the worker thread.
+        /// </summary>
+        /// <param name="guid">Item guid.</param>
+        /// <param name="key">Virtual item key.</param>
+        /// <param name="info">File info.</param>
+        public void ForceAddToCache(Guid guid, object key, ShellImageFileInfo info)
+        {
+            lock (lockObject)
+            {
+                // Is it already cached?
+                CacheItem cacheItem = null;
+                if (itemCache.TryGetValue(guid, out cacheItem))
+                {
+                    itemCache.Remove(guid);
+                    cacheItem.Dispose();
+                }
+
+                itemCache.Add(guid, new CacheItem(guid, key, info.SmallIcon, info.LargeIcon));
+            }
         }
         /// <summary>
         /// Stops the cache manager.
@@ -549,7 +630,19 @@ namespace Manina.Windows.Forms
                                 else if (mRetryOnError)
                                 {
                                     // Retry
-                                    toCache.Enqueue(item);
+                                    lock (lockObject)
+                                    {
+                                        toCache.Enqueue(item);
+                                        CachedShellInfo cachedInfo;
+                                        if (!string.IsNullOrEmpty(info.Extension))
+                                        {
+                                            if (cachedShellInfo.TryGetValue(info.Extension, out cachedInfo))
+                                            {
+                                                cachedShellInfo.Remove(info.Extension);
+                                                cachedInfo.Dispose();
+                                            }
+                                        }
+                                    }
                                 }
                                 try
                                 {
@@ -652,7 +745,7 @@ namespace Manina.Windows.Forms
 
         #region Utility for Reading Image Details
         /// <summary>
-        /// A utility class combining FileInfo with SHGetFileInfo for image files.
+        /// A utility class for reading image details.
         /// </summary>
         internal struct ShellImageFileInfo
         {
@@ -695,6 +788,7 @@ namespace Manina.Windows.Forms
             ShellImageFileInfo imageInfo = new ShellImageFileInfo();
             try
             {
+                // Read file properties
                 FileInfo info = new FileInfo(path);
                 imageInfo.FileAttributes = info.Attributes;
                 imageInfo.CreationTime = info.CreationTime;
@@ -705,55 +799,33 @@ namespace Manina.Windows.Forms
                 imageInfo.DisplayName = info.Name;
                 imageInfo.Extension = info.Extension;
 
-                SHFILEINFO shinfo = new SHFILEINFO();
-                SHGFI flags = SHGFI.Icon | SHGFI.SmallIcon;
-
-                string fileType = string.Empty;
+                // Read shell properties
+                CachedShellInfo shellInfo = null;
                 bool fileTypeCached = false;
                 lock (lockObject)
                 {
-                    if (!cachedFileTypes.TryGetValue(imageInfo.Extension, out fileType))
-                        flags |= SHGFI.TypeName;
-                    else
-                        fileTypeCached = true;
+                    fileTypeCached = cachedShellInfo.TryGetValue(imageInfo.Extension, out shellInfo);
                 }
-
-                // Get the small icon and shell file type
-                IntPtr hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
-                    structSize, flags);
-
-                lock (lockObject)
+                if (!fileTypeCached)
                 {
-                    if (!fileTypeCached)
+                    ShellInfoExtractor shellEx = ShellInfoExtractor.FromFile(info.Extension);
+                    shellInfo = new CachedShellInfo(shellEx.FileType, shellEx.SmallIcon, shellEx.LargeIcon);
+                    if (!string.IsNullOrEmpty(info.Extension))
                     {
-                        fileType = shinfo.szTypeName;
-                        if (!cachedFileTypes.ContainsKey(imageInfo.Extension))
-                            cachedFileTypes.Add(imageInfo.Extension, fileType);
+                        lock (lockObject)
+                        {
+                            if (!cachedShellInfo.ContainsKey(info.Extension))
+                                cachedShellInfo.Add(info.Extension, shellInfo);
+                        }
                     }
+                    if (shellEx.Error != null)
+                        imageInfo.Error = shellEx.Error;
                 }
-                imageInfo.TypeName = fileType;
-
-                if (hImg != IntPtr.Zero)
-                {
-                    using (Icon newIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
-                    {
-                        imageInfo.SmallIcon = newIcon.ToBitmap();
-                    }
-                    DestroyIcon(shinfo.hIcon);
-                }
-
-                // Get the large icon
-                hImg = SHGetFileInfo(path, (FileAttributes)0, out shinfo,
-                    structSize, SHGFI.Icon | SHGFI.LargeIcon);
-
-                if (hImg != IntPtr.Zero)
-                {
-                    using (Icon newIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon))
-                    {
-                        imageInfo.LargeIcon = newIcon.ToBitmap();
-                    }
-                    DestroyIcon(shinfo.hIcon);
-                }
+                imageInfo.TypeName = shellInfo.FileType;
+                if (shellInfo.SmallIcon != null)
+                    imageInfo.SmallIcon = (Image)shellInfo.SmallIcon.Clone();
+                if (shellInfo.LargeIcon != null)
+                    imageInfo.LargeIcon = (Image)shellInfo.LargeIcon.Clone();
 
                 // Get metadata
                 MetadataExtractor metadata = MetadataExtractor.FromFile(path);
@@ -771,95 +843,14 @@ namespace Manina.Windows.Forms
                 imageInfo.ApertureValue = metadata.ApertureValueString ?? "";
                 imageInfo.UserComment = metadata.Comment ?? "";
                 imageInfo.Rating = (ushort)(metadata.Rating);
-                imageInfo.Error = metadata.Error;
+                if (metadata.Error != null)
+                    imageInfo.Error = metadata.Error;
             }
             catch (Exception e)
             {
                 imageInfo.Error = e;
             }
             return imageInfo;
-        }
-        #endregion
-
-        #region Platform Invoke
-        // GetFileAttributesEx
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetFileAttributesEx(string lpFileName,
-            GET_FILEEX_INFO_LEVELS fInfoLevelId,
-            out WIN32_FILE_ATTRIBUTE_DATA fileData);
-
-        private enum GET_FILEEX_INFO_LEVELS
-        {
-            GetFileExInfoStandard,
-            GetFileExMaxInfoLevel
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        private struct WIN32_FILE_ATTRIBUTE_DATA
-        {
-            public FileAttributes dwFileAttributes;
-            public FILETIME ftCreationTime;
-            public FILETIME ftLastAccessTime;
-            public FILETIME ftLastWriteTime;
-            public uint nFileSizeHigh;
-            public uint nFileSizeLow;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        private struct FILETIME
-        {
-            public uint dwLowDateTime;
-            public uint dwHighDateTime;
-
-            public DateTime Value
-            {
-                get
-                {
-                    long longTime = (((long)dwHighDateTime) << 32) | ((uint)dwLowDateTime);
-                    return DateTime.FromFileTimeUtc(longTime);
-                }
-            }
-        }
-        // DestroyIcon
-        [DllImport("user32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool DestroyIcon(IntPtr hIcon);
-        // SHGetFileInfo
-        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SHGetFileInfo(string pszPath, FileAttributes dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, SHGFI uFlags);
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        private struct SHFILEINFO
-        {
-            public IntPtr hIcon;
-            public int iIcon;
-            public uint dwAttributes;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
-            public string szDisplayName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_TYPE)]
-            public string szTypeName;
-        };
-        private const int MAX_PATH = 260;
-        private const int MAX_TYPE = 80;
-        [Flags]
-        private enum SHGFI : uint
-        {
-            Icon = 0x000000100,
-            DisplayName = 0x000000200,
-            TypeName = 0x000000400,
-            Attributes = 0x000000800,
-            IconLocation = 0x000001000,
-            ExeType = 0x000002000,
-            SysIconIndex = 0x000004000,
-            LinkOverlay = 0x000008000,
-            Selected = 0x000010000,
-            Attr_Specified = 0x000020000,
-            LargeIcon = 0x000000000,
-            SmallIcon = 0x000000001,
-            OpenIcon = 0x000000002,
-            ShellIconSize = 0x000000004,
-            PIDL = 0x000000008,
-            UseFileAttributes = 0x000000010,
-            AddOverlays = 0x000000020,
-            OverlayIndex = 0x000000040,
         }
         #endregion
     }
