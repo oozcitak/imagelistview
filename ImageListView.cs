@@ -109,6 +109,11 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
+        /// Gets or sets whether thumbnail images are automatically rotated.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether thumbnail images are automatically rotated."), DefaultValue(true)]
+        public bool AutoRotateThumbnails { get; set; }
+        /// <summary>
         /// Gets or sets whether column headers respond to mouse clicks.
         /// </summary>
         [Category("Behavior"), Description("Gets or sets whether column headers respond to mouse clicks."), DefaultValue(true)]
@@ -556,6 +561,7 @@ namespace Manina.Windows.Forms
             SetRenderer(new ImageListViewRenderer());
 
             // Property defaults
+            AutoRotateThumbnails = true;
             AllowColumnClick = true;
             AllowColumnResize = true;
             AllowDrag = false;
@@ -1054,7 +1060,7 @@ namespace Manina.Windows.Forms
 
             if (ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
-                int newYOffset = mViewOffset.Y - (e.Delta / SystemInformation.MouseWheelScrollDelta) 
+                int newYOffset = mViewOffset.Y - (e.Delta / SystemInformation.MouseWheelScrollDelta)
                     * vScrollBar.SmallChange;
                 if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
                     newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
@@ -1067,7 +1073,7 @@ namespace Manina.Windows.Forms
             }
             else
             {
-                int newXOffset = mViewOffset.X - (e.Delta / SystemInformation.MouseWheelScrollDelta) 
+                int newXOffset = mViewOffset.X - (e.Delta / SystemInformation.MouseWheelScrollDelta)
                     * hScrollBar.SmallChange;
                 if (newXOffset > hScrollBar.Maximum - hScrollBar.LargeChange + 1)
                     newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;

@@ -127,10 +127,10 @@ namespace Manina.Windows.Forms
                         {
                             if (item.isVirtualItem)
                                 mImageListView.cacheManager.Add(item.Guid, item.VirtualItemKey,
-                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                             else
                                 mImageListView.cacheManager.Add(item.Guid, item.FileName,
-                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                         }
                         if (item.isVirtualItem)
                             mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
@@ -189,7 +189,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null && initialThumbnail != null)
                 {
                     mImageListView.cacheManager.Add(item.Guid, filename, mImageListView.ThumbnailSize,
-                        initialThumbnail, mImageListView.UseEmbeddedThumbnails);
+                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
                 Add(item);
             }
@@ -214,7 +214,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null && initialThumbnail != null)
                 {
                     mImageListView.cacheManager.Add(item.Guid, key, mImageListView.ThumbnailSize,
-                        initialThumbnail, mImageListView.UseEmbeddedThumbnails);
+                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
                 Add(item);
             }
@@ -430,10 +430,10 @@ namespace Manina.Windows.Forms
                     {
                         if (item.isVirtualItem)
                             mImageListView.cacheManager.Add(item.Guid, item.VirtualItemKey,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                         else
                             mImageListView.cacheManager.Add(item.Guid, item.FileName,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                     }
 
                     if (item.isVirtualItem)
@@ -468,10 +468,10 @@ namespace Manina.Windows.Forms
                     {
                         if (item.isVirtualItem)
                             mImageListView.cacheManager.Add(item.Guid, item.VirtualItemKey,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                         else
                             mImageListView.cacheManager.Add(item.Guid, item.FileName,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                     }
 
                     if (item.isVirtualItem)

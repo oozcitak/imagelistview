@@ -21,8 +21,6 @@ using System.Threading;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.IO;
-using System.Drawing.Imaging;
-using System.Text;
 
 namespace Manina.Windows.Forms
 {
@@ -652,7 +650,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Shell Utility for Reading Image Details
+        #region Utility for Reading Image Details
         /// <summary>
         /// A utility class combining FileInfo with SHGetFileInfo for image files.
         /// </summary>
@@ -684,7 +682,6 @@ namespace Manina.Windows.Forms
             public string ApertureValue;
             public string UserComment;
             public ushort Rating;
-            public ushort RatingPercent;
             // Error
             internal Exception Error;
         }
@@ -758,64 +755,23 @@ namespace Manina.Windows.Forms
                     DestroyIcon(shinfo.hIcon);
                 }
 
-                using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-                {
-                    if (Utility.IsImage(stream))
-                    {
-                        using (Image img = Image.FromStream(stream, false, false))
-                        {
-                            imageInfo.Dimensions = img.Size;
-                            imageInfo.Resolution = new SizeF(img.HorizontalResolution, img.VerticalResolution);
-                            // Read exif properties
-                            foreach (PropertyItem prop in img.PropertyItems)
-                            {
-                                switch (prop.Id)
-                                {
-                                    case PropertyTagImageDescription:
-                                        imageInfo.ImageDescription = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagEquipmentModel:
-                                        imageInfo.EquipmentModel = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagDateTimeOriginal:
-                                        imageInfo.DateTaken = ReadExifDateTime(prop.Value);
-                                        break;
-                                    case PropertyTagArtist:
-                                        imageInfo.Artist = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagCopyright:
-                                        imageInfo.Copyright = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagExposureTime:
-                                        imageInfo.ExposureTime = ReadExifURational(prop.Value);
-                                        break;
-                                    case PropertyTagFNumber:
-                                        imageInfo.FNumber = ReadExifFloat(prop.Value);
-                                        break;
-                                    case PropertyTagISOSpeed:
-                                        imageInfo.ISOSpeed = ReadExifUShort(prop.Value);
-                                        break;
-                                    case PropertyTagShutterSpeed:
-                                        imageInfo.ShutterSpeed = ReadExifRational(prop.Value);
-                                        break;
-                                    case PropertyTagAperture:
-                                        imageInfo.ApertureValue = ReadExifURational(prop.Value);
-                                        break;
-                                    case PropertyTagUserComment:
-                                        imageInfo.UserComment = ReadExifAscii(prop.Value);
-                                        break;
-                                    case PropertyTagRating:
-                                        imageInfo.Rating = ReadExifUShort(prop.Value);
-                                        break;
-                                    case PropertyTagRatingPercent:
-                                        imageInfo.RatingPercent = ReadExifUShort(prop.Value);
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                }
-                imageInfo.Error = null;
+                // Get metadata
+                MetadataExtractor metadata = MetadataExtractor.FromFile(path);
+                imageInfo.Dimensions = new Size(metadata.Width, metadata.Height);
+                imageInfo.Resolution = new SizeF((float)metadata.DPIX, (float)metadata.DPIY);
+                imageInfo.ImageDescription = metadata.ImageDescription ?? "";
+                imageInfo.EquipmentModel = metadata.EquipmentModel ?? "";
+                imageInfo.DateTaken = metadata.DateTaken;
+                imageInfo.Artist = metadata.Artist ?? "";
+                imageInfo.Copyright = metadata.Copyright ?? "";
+                imageInfo.ExposureTime = metadata.ExposureTimeString ?? "";
+                imageInfo.FNumber = (float)metadata.FNumber;
+                imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
+                imageInfo.ShutterSpeed = metadata.ShutterSpeedString ?? "";
+                imageInfo.ApertureValue = metadata.ApertureValueString ?? "";
+                imageInfo.UserComment = metadata.Comment ?? "";
+                imageInfo.Rating = (ushort)(metadata.Rating * 20);
+                imageInfo.Error = metadata.Error;
             }
             catch (Exception e)
             {
@@ -904,150 +860,6 @@ namespace Manina.Windows.Forms
             UseFileAttributes = 0x000000010,
             AddOverlays = 0x000000020,
             OverlayIndex = 0x000000040,
-        }
-        #endregion
-
-        #region Exif Tag IDs
-        /// <summary>
-        /// Represents the Exif tag for image description.
-        /// </summary>
-        private const int PropertyTagImageDescription = 0x010E;
-        /// <summary>
-        /// Represents the Exif tag for the equipment model.
-        /// </summary>
-        private const int PropertyTagEquipmentModel = 0x0110;
-        /// <summary>
-        /// Represents the Exif tag for date and time the picture 
-        /// was taken.
-        /// </summary>        
-        private const int PropertyTagDateTimeOriginal = 0x9003;
-        /// <summary>
-        /// Represents the Exif tag for the artist.
-        /// </summary>
-        private const int PropertyTagArtist = 0x013B;
-        /// <summary>
-        /// Represents the Exif tag for copyright information.
-        /// </summary>
-        private const int PropertyTagCopyright = 0x8298;
-        /// <summary>
-        /// Represents the Exif tag for exposure time.
-        /// </summary>
-        private const int PropertyTagExposureTime = 0x829A;
-        /// <summary>
-        /// Represents the Exif tag for F-Number.
-        /// </summary>
-        private const int PropertyTagFNumber = 0x829D;
-        /// <summary>
-        /// Represents the Exif tag for ISO speed.
-        /// </summary>
-        private const int PropertyTagISOSpeed = 0x8827;
-        /// <summary>
-        /// Represents the Exif tag for shutter speed.
-        /// </summary>
-        private const int PropertyTagShutterSpeed = 0x9201;
-        /// <summary>
-        /// Represents the Exif tag for aperture value.
-        /// </summary>
-        private const int PropertyTagAperture = 0x9202;
-        /// <summary>
-        /// Represents the Exif tag for user comments.
-        /// </summary>
-        private const int PropertyTagUserComment = 0x9286;
-        /// <summary>
-        /// Represents the Exif tag for rating between 1-5 (Windows specific).
-        /// </summary>
-        private const int PropertyTagRating = 0x4746;
-        /// <summary>
-        /// Represents the Exif tag for rating between 1-99 (Windows specific).
-        /// </summary>
-        private const int PropertyTagRatingPercent = 0x4749;
-        #endregion
-
-        #region Exif Format Conversion
-        /// <summary>
-        /// Converts the given Exif data to a byte.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private byte ReadExifByte(byte[] value)
-        {
-            return value[0];
-        }
-        /// <summary>
-        /// Converts the given Exif data to an ASCII encoded string.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private string ReadExifAscii(byte[] value)
-        {
-            int len = Array.IndexOf(value, (byte)0);
-            if (len == -1) len = value.Length;
-            return Encoding.ASCII.GetString(value, 0, len);
-        }
-        /// <summary>
-        /// Converts the given Exif data to DateTime.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private DateTime ReadExifDateTime(byte[] value)
-        {
-            return DateTime.ParseExact(ReadExifAscii(value),
-                "yyyy:MM:dd HH:mm:ss",
-                System.Globalization.CultureInfo.InvariantCulture);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an 16-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private ushort ReadExifUShort(byte[] value)
-        {
-            return BitConverter.ToUInt16(value, 0);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an 32-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private uint ReadExifUInt(byte[] value)
-        {
-            return BitConverter.ToUInt32(value, 0);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an 32-bit signed integer.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private int ReadExifInt(byte[] value)
-        {
-            return BitConverter.ToInt32(value, 0);
-        }
-        /// <summary>
-        /// Converts the given Exif data to an unsigned rational value
-        /// represented as a string.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private string ReadExifURational(byte[] value)
-        {
-            return BitConverter.ToUInt32(value, 0).ToString() + "/" +
-                    BitConverter.ToUInt32(value, 4).ToString();
-        }
-        /// <summary>
-        /// Converts the given Exif data to a signed rational value
-        /// represented as a string.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private string ReadExifRational(byte[] value)
-        {
-            return BitConverter.ToInt32(value, 0).ToString() + "/" +
-                    BitConverter.ToInt32(value, 4).ToString();
-        }
-        /// <summary>
-        /// Converts the given Exif data to a floating-point number.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private float ReadExifFloat(byte[] value)
-        {
-            uint num = BitConverter.ToUInt32(value, 0);
-            uint den = BitConverter.ToUInt32(value, 4);
-            if (den == 0)
-                return 0.0f;
-            else
-                return (float)num / (float)den;
         }
         #endregion
     }

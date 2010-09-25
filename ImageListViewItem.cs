@@ -228,9 +228,11 @@ namespace Manina.Windows.Forms
                 if (ThumbnailCacheState != CacheState.Cached)
                 {
                     if (isVirtualItem)
-                        mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                        mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                     else
-                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
 
                 return mImageListView.cacheManager.GetImage(Guid, true);
@@ -670,9 +672,11 @@ namespace Manina.Windows.Forms
                     return img;
 
                 if (isVirtualItem)
-                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize, 
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 else
-                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails);
+                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize, 
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
 
                 if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
                     img = mImageListView.itemCacheManager.GetLargeIcon(mGuid);
@@ -779,7 +783,7 @@ namespace Manina.Windows.Forms
             mShutterSpeed = info.ShutterSpeed;
             mAperture = info.ApertureValue;
             mUserComment = info.UserComment;
-            mRating = info.RatingPercent;
+            mRating = 0;
             if (mRating == 0 && info.Rating != 0)
                 mRating = (ushort)(info.Rating * 20);
 

@@ -9,3 +9,5 @@ Contributors to ImageListView
    - File icons for imagelistview items.
  * Uwe Keim (http://uwe.co/)
    - German translations
+ * Jens
+   - Thumbnail and metadata extraction via WIC.
