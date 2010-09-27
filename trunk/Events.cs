@@ -663,7 +663,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the exposure time in seconds.
         /// </summary>
-        public string ExposureTime { get; set; }
+        public float ExposureTime { get; set; }
         /// <summary>
         /// Gets or sets the F number.
         /// </summary>

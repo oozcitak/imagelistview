@@ -768,7 +768,7 @@ namespace Manina.Windows.Forms
             public DateTime DateTaken;
             public string Artist;
             public string Copyright;
-            public string ExposureTime;
+            public float ExposureTime;
             public float FNumber;
             public ushort ISOSpeed;
             public string UserComment;
@@ -834,7 +834,7 @@ namespace Manina.Windows.Forms
                 imageInfo.DateTaken = metadata.DateTaken;
                 imageInfo.Artist = metadata.Artist ?? "";
                 imageInfo.Copyright = metadata.Copyright ?? "";
-                imageInfo.ExposureTime = metadata.ExposureTimeString ?? "";
+                imageInfo.ExposureTime = (float)metadata.ExposureTime;
                 imageInfo.FNumber = (float)metadata.FNumber;
                 imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
                 imageInfo.UserComment = metadata.Comment ?? "";

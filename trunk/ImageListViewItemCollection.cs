@@ -624,7 +624,7 @@ namespace Manina.Windows.Forms
                             result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
                             break;
                         case ColumnType.ExposureTime:
-                            result = string.Compare(x.ExposureTime, y.ExposureTime, StringComparison.InvariantCultureIgnoreCase);
+                            result = (x.ExposureTime < y.ExposureTime ? -1 : (x.ExposureTime > y.ExposureTime ? 1 : 0));
                             break;
                         case ColumnType.FNumber:
                             result = (x.FNumber < y.FNumber ? -1 : (x.FNumber > y.FNumber ? 1 : 0));
