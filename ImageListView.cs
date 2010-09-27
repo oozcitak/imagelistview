@@ -231,7 +231,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
         [Category("Appearance"), Description("Gets the collection of columns of the image list view."), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ImageListViewColumnHeaderCollection Columns { get { return mColumns; } internal set { mColumns = value; Refresh(); } }
+        public ImageListViewColumnHeaderCollection Columns { get { return mColumns; } private set { mColumns = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the placeholder image.
         /// </summary>
@@ -1444,7 +1444,6 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Raises the RetrieveVirtualItemImage event.
-        /// This method is invoked from the thumbnail thread.
         /// </summary>
         /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
         internal virtual void RetrieveVirtualItemImageInternal(VirtualItemImageEventArgs e)

@@ -244,10 +244,13 @@ namespace Manina.Windows.Forms
                 {
                     try
                     {
-                        if (ImageListView.InvokeRequired)
-                            ImageListView.BeginInvoke((MethodInvoker)delegate { ImageListView.Refresh(); });
-                        else
-                            ImageListView.Refresh();
+                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        {
+                            if (ImageListView.InvokeRequired)
+                                ImageListView.BeginInvoke((MethodInvoker)delegate { ImageListView.Refresh(); });
+                            else
+                                ImageListView.Refresh();
+                        }
                     }
                     catch
                     {
