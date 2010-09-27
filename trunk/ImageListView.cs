@@ -725,19 +725,22 @@ namespace Manina.Windows.Forms
                 int x = layoutManager.ColumnHeaderBounds.Left;
                 ImageListViewColumnHeader colIndex = null;
                 ImageListViewColumnHeader sepIndex = null;
-                foreach (ImageListViewColumnHeader col in Columns.GetDisplayedColumns())
+                if (AllowColumnClick || AllowColumnResize)
                 {
-                    // Over a column?
-                    if (pt.X >= x && pt.X < x + col.Width + SeparatorSize / 2)
-                        colIndex = col;
+                    foreach (ImageListViewColumnHeader col in Columns.GetDisplayedColumns())
+                    {
+                        // Over a column?
+                        if (pt.X >= x && pt.X < x + col.Width + SeparatorSize / 2)
+                            colIndex = col;
 
-                    // Over a colummn separator?
-                    if (pt.X > x + col.Width - SeparatorSize / 2 && pt.X < x + col.Width + SeparatorSize / 2)
-                        sepIndex = col;
+                        // Over a colummn separator?
+                        if (pt.X > x + col.Width - SeparatorSize / 2 && pt.X < x + col.Width + SeparatorSize / 2)
+                            sepIndex = col;
 
-                    if (colIndex != null) break;
-                    x += col.Width;
-                    i++;
+                        if (colIndex != null) break;
+                        x += col.Width;
+                        i++;
+                    }
                 }
                 hitInfo = new HitInfo(colIndex, sepIndex);
             }
