@@ -632,12 +632,6 @@ namespace Manina.Windows.Forms
                         case ColumnType.ISOSpeed:
                             result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
                             break;
-                        case ColumnType.ShutterSpeed:
-                            result = string.Compare(x.ShutterSpeed, y.ShutterSpeed, StringComparison.InvariantCultureIgnoreCase);
-                            break;
-                        case ColumnType.Aperture:
-                            result = string.Compare(x.Aperture, y.Aperture, StringComparison.InvariantCultureIgnoreCase);
-                            break;
                         case ColumnType.UserComment:
                             result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
                             break;

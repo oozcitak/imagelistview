@@ -56,8 +56,6 @@ namespace Manina.Windows.Forms
         private string mExposureTime;
         private float mFNumber;
         private ushort mISOSpeed;
-        private string mShutterSpeed;
-        private string mAperture;
         private string mUserComment;
         private ushort mRating;
         // Used for virtual items
@@ -344,16 +342,6 @@ namespace Manina.Windows.Forms
         [Category("Camera Properties"), Browsable(true), Description("Gets the ISO speed.")]
         public ushort ISOSpeed { get { UpdateFileInfo(); return mISOSpeed; } }
         /// <summary>
-        /// Gets the shutter speed.
-        /// </summary>
-        [Category("Camera Properties"), Browsable(true), Description("Gets the shutter speed.")]
-        public string ShutterSpeed { get { UpdateFileInfo(); return mShutterSpeed; } }
-        /// <summary>
-        /// Gets the lens aperture value.
-        /// </summary>
-        [Category("Camera Properties"), Browsable(true), Description("Gets the lens aperture value.")]
-        public string Aperture { get { UpdateFileInfo(); return mAperture; } }
-        /// <summary>
         /// Gets user comments.
         /// </summary>
         [Category("Image Properties"), Browsable(true), Description("Gets user comments.")]
@@ -638,10 +626,6 @@ namespace Manina.Windows.Forms
                         return "";
                     else
                         return mISOSpeed.ToString();
-                case ColumnType.ShutterSpeed:
-                    return mShutterSpeed;
-                case ColumnType.Aperture:
-                    return mAperture;
                 case ColumnType.UserComment:
                     return mUserComment;
                 case ColumnType.Rating:
@@ -811,8 +795,6 @@ namespace Manina.Windows.Forms
             mExposureTime = info.ExposureTime;
             mFNumber = info.FNumber;
             mISOSpeed = info.ISOSpeed;
-            mShutterSpeed = info.ShutterSpeed;
-            mAperture = info.ApertureValue;
             mUserComment = info.UserComment;
             mRating = info.Rating;
 
@@ -843,8 +825,6 @@ namespace Manina.Windows.Forms
             mExposureTime = info.ExposureTime;
             mFNumber = info.FNumber;
             mISOSpeed = info.ISOSpeed;
-            mShutterSpeed = info.ShutterSpeed;
-            mAperture = info.Aperture;
             mUserComment = info.UserComment;
             mRating = info.Rating;
 
@@ -882,8 +862,6 @@ namespace Manina.Windows.Forms
             item.mExposureTime = mExposureTime;
             item.mFNumber = mFNumber;
             item.mISOSpeed = mISOSpeed;
-            item.mShutterSpeed = mShutterSpeed;
-            item.mAperture = mAperture;
             item.mUserComment = mUserComment;
             item.mRating = mRating;
 

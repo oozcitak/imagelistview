@@ -33,6 +33,10 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal class MetadataExtractor
     {
+        #region Member Variables
+        bool wicError = false;
+        #endregion
+
         #region Exif Tag IDs
         const int TagThumbnailData = 0x501B;
         const int TagThumbnailImageWidth = 0x5020;
@@ -45,8 +49,6 @@ namespace Manina.Windows.Forms
         const int TagExposureTime = 0x829A;
         const int TagFNumber = 0x829D;
         const int TagISOSpeed = 0x8827;
-        const int TagShutterSpeed = 0x9201;
-        const int TagAperture = 0x9202;
         const int TagUserComment = 0x9286;
         const int TagRating = 0x4746;
         const int TagRatingPercent = 0x4749;
@@ -223,14 +225,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public string ExposureTimeString = null;
         /// <summary>
-        /// Shutter speed.
-        /// </summary>
-        public double ShutterSpeed = 0.0;
-        /// <summary>
-        /// Sutter speed rounded and formatted string (null = not available).
-        /// </summary>
-        public string ShutterSpeedString = null;
-        /// <summary>
         /// F number.
         /// </summary>
         public double FNumber = 0.0;
@@ -255,14 +249,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public int Rating = 0;
         /// <summary>
-        /// Aperture value.
-        /// </summary>
-        public double ApertureValue = 0.0;
-        /// <summary>
-        /// Sutter speed rounded and formatted string (null = not available).
-        /// </summary>
-        public string ApertureValueString = null;
-        /// <summary>
         /// User comment (null = not available).
         /// </summary>
         public string Comment = null;
@@ -271,11 +257,12 @@ namespace Manina.Windows.Forms
         #region Helper Methods
         /// <summary>
         /// Inits metadata via WIC/WPF (.NET 3.0).
-        /// If WIC lacks a Metadata-Reader for this image type then fall back to .NET 2.0 method. 
+        /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
         /// </summary>
         /// <param name="path">Filepath of image</param>
         private void InitViaWpf(string path)
         {
+            wicError = false;
             try
             {
                 using (FileStream streamWpf = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -290,6 +277,11 @@ namespace Manina.Windows.Forms
             catch (Exception eWpf)
             {
                 Error = eWpf;
+                wicError = true;
+            }
+
+            if (wicError)
+            {
                 try
                 {
                     // Fall back to .NET 2.0 method.
@@ -303,7 +295,7 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Inits metadata via WIC/WPF (.NET 3.0).
-        /// If WIC lacks a Metadata-Reader for this image type then fall back to .NET 2.0 method. 
+        /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
         /// </summary>
         /// <param name="frameWpf">Opened WPF image</param>
         private void InitViaWpf(BitmapFrame frameWpf)
@@ -314,6 +306,7 @@ namespace Manina.Windows.Forms
             DPIY = frameWpf.DpiY;
             Dimension = Width * Height;
 
+            wicError = false;
             BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
             if (data != null)
             {
@@ -324,6 +317,11 @@ namespace Manina.Windows.Forms
                 catch (Exception eWpf)
                 {
                     Error = eWpf;
+                    wicError = true;
+                }
+
+                if (wicError)
+                {
                     try
                     {
                         Image img = null;
@@ -497,28 +495,6 @@ namespace Manina.Windows.Forms
                         iVal = ExifUShort(prop.Value);
                         Rating = iVal;
                         break;
-                    case TagShutterSpeed:
-                        dVal = ExifDouble(prop.Value);
-                        if (dVal != 0.0)
-                        {
-                            ShutterSpeed = dVal;
-                            if ((float)dVal >= 1.0f)
-                                ShutterSpeedString = Math.Round(dVal, 1).ToString();
-                            else
-                                ShutterSpeedString = "1/" + Math.Round(1.0 / dVal);
-                        }
-                        break;
-                    case TagAperture:
-                        dVal = ExifDouble(prop.Value);
-                        if (dVal != 0.0)
-                        {
-                            ApertureValue = dVal;
-                            if ((float)dVal >= 1.0f)
-                                ApertureValueString = Math.Round(dVal, 1).ToString();
-                            else
-                                ApertureValueString = "1/" + Math.Round(1.0 / dVal);
-                        }
-                        break;
                     case TagUserComment:
                         str = ExifAscii(prop.Value);
                         if (str != String.Empty)
@@ -659,32 +635,6 @@ namespace Manina.Windows.Forms
                     Copyright = str;
                 }
             }
-            val = GetMetadataObject(data, "System.Photo.ShutterSpeed");
-            if (val != null)
-            {
-                dVal = (double)val;
-                if (dVal != 0.0)
-                {
-                    ShutterSpeed = dVal;
-                    if ((float)dVal >= 1.0f)
-                        ShutterSpeedString = Math.Round(dVal, 1).ToString();
-                    else
-                        ShutterSpeedString = "1/" + Math.Round(1.0 / dVal);
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.Aperture");
-            if (val != null)
-            {
-                dVal = (double)val;
-                if (dVal != 0.0)
-                {
-                    ApertureValue = dVal;
-                    if ((float)dVal >= 1.0f)
-                        ApertureValueString = Math.Round(dVal, 1).ToString();
-                    else
-                        ApertureValueString = "1/" + Math.Round(1.0 / dVal);
-                }
-            }
             val = GetMetadataObject(data, "System.Comment");
             if (val != null)
             {
@@ -734,6 +684,7 @@ namespace Manina.Windows.Forms
             }
             catch (NotSupportedException)
             {
+                wicError = true;
                 val = null;
             }
             return val;
@@ -781,42 +732,26 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Creates an instance of the MetadataExtractor class.
         /// Reads metadata via WIC/WPF (.NET 3.0).
-        /// If WIC lacks a Metadata-Reader for this image type then fall back to .NET 2.0 method. 
+        /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
         /// </summary>
         /// <param name="path">Filepath of image</param>
         public static MetadataExtractor FromFile(string path)
         {
             MetadataExtractor metadata = new MetadataExtractor();
-            try
-            {
-                metadata.InitViaWpf(path);
-            }
-            catch (Exception e)
-            {
-                metadata.Error = e;
-            }
-
+            metadata.InitViaWpf(path);
             return metadata;
         }
 
         /// <summary>
         /// Creates an instance of the MetadataExtractor class.
         /// Reads metadata via WIC/WPF (.NET 3.0).
-        /// If WIC lacks a Metadata-Reader for this image type then fall back to .NET 2.0 method. 
+        /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
         /// </summary>
-        /// <param name="path">Filepath of image</param>
         /// <param name="frameWpf">Opened WPF image</param>
         public static MetadataExtractor FromBitmap(BitmapFrame frameWpf)
         {
             MetadataExtractor metadata = new MetadataExtractor();
-            try
-            {
-                metadata.InitViaWpf(frameWpf);
-            }
-            catch (Exception e)
-            {
-                metadata.Error = e;
-            }
+            metadata.InitViaWpf(frameWpf);
             return metadata;
         }
         #endregion

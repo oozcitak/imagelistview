@@ -173,14 +173,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         ISOSpeed,
         /// <summary>
-        /// Shutter speed (Exif tag).
-        /// </summary>
-        ShutterSpeed,
-        /// <summary>
-        /// The lens aperture (Exif tag).
-        /// </summary>
-        Aperture,
-        /// <summary>
         /// User comment (Exif tag).
         /// </summary>
         UserComment,

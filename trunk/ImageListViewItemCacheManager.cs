@@ -771,8 +771,6 @@ namespace Manina.Windows.Forms
             public string ExposureTime;
             public float FNumber;
             public ushort ISOSpeed;
-            public string ShutterSpeed;
-            public string ApertureValue;
             public string UserComment;
             public ushort Rating;
             // Error
@@ -839,8 +837,6 @@ namespace Manina.Windows.Forms
                 imageInfo.ExposureTime = metadata.ExposureTimeString ?? "";
                 imageInfo.FNumber = (float)metadata.FNumber;
                 imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
-                imageInfo.ShutterSpeed = metadata.ShutterSpeedString ?? "";
-                imageInfo.ApertureValue = metadata.ApertureValueString ?? "";
                 imageInfo.UserComment = metadata.Comment ?? "";
                 imageInfo.Rating = (ushort)(metadata.Rating);
                 if (metadata.Error != null)

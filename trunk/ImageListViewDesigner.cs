@@ -154,24 +154,24 @@ namespace Manina.Windows.Forms
             : base(component)
         {
             imageListView = (ImageListView)component;
+
             designerService = (DesignerActionUIService)GetService(typeof(DesignerActionUIService));
         }
         #endregion
 
         #region Helper Methods
         /// <summary>
-        /// Sets the specified ImageListView property.
+        /// Helper method to retrieve control properties for undo support.
         /// </summary>
-        /// <param name="propName">Name of the member property.</param>
-        /// <param name="value">New value of the property.</param>
-        private void SetProperty(String propName, object value)
+        /// <param name="propName">Property name.</param>
+        private PropertyDescriptor GetPropertyByName(String propName)
         {
             PropertyDescriptor prop;
             prop = TypeDescriptor.GetProperties(imageListView)[propName];
             if (prop == null)
                 throw new ArgumentException("Unknown property.", propName);
             else
-                prop.SetValue(imageListView, value);
+                return prop;
         }
         #endregion
 
@@ -182,7 +182,7 @@ namespace Manina.Windows.Forms
         public int SortColumn
         {
             get { return imageListView.SortColumn; }
-            set { SetProperty("SortColumn", value); }
+            set { GetPropertyByName("SortColumn").SetValue(imageListView, value); }
         }
         /// <summary>
         /// Gets or sets the sort oerder of the designed ImageListView.
@@ -190,7 +190,7 @@ namespace Manina.Windows.Forms
         public SortOrder SortOrder
         {
             get { return imageListView.SortOrder; }
-            set { SetProperty("SortOrder", value); }
+            set { GetPropertyByName("SortOrder").SetValue(imageListView, value); }
         }
         /// <summary>
         /// Gets or sets the view mode of the designed ImageListView.
@@ -198,7 +198,15 @@ namespace Manina.Windows.Forms
         public View View
         {
             get { return imageListView.View; }
-            set { SetProperty("View", value); }
+            set { GetPropertyByName("View").SetValue(imageListView, value); }
+        }
+        /// <summary>
+        /// Gets or sets the view mode of the designed ImageListView.
+        /// </summary>
+        public ImageListView.ImageListViewColumnHeaderCollection Columns
+        {
+            get { return imageListView.Columns; }
+            set { GetPropertyByName("Columns").SetValue(imageListView, value); }
         }
         #endregion
 
@@ -211,9 +219,9 @@ namespace Manina.Windows.Forms
             // TODO: Column editing cannot be undone in the designer.
             property = TypeDescriptor.GetProperties(imageListView)["Columns"];
             UITypeEditor editor = (UITypeEditor)property.GetEditor(typeof(UITypeEditor));
-            object value = imageListView.Columns;// property.GetValue(imageListView);
+            object value = property.GetValue(imageListView);
             value = editor.EditValue(this, this, value);
-            SetProperty("Columns", value);
+            property.SetValue(imageListView, value);
             designerService.Refresh(Component);
         }
         #endregion
