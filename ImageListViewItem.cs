@@ -53,7 +53,7 @@ namespace Manina.Windows.Forms
         private DateTime mDateTaken;
         private string mArtist;
         private string mCopyright;
-        private string mExposureTime;
+        private float mExposureTime;
         private float mFNumber;
         private ushort mISOSpeed;
         private string mUserComment;
@@ -330,7 +330,7 @@ namespace Manina.Windows.Forms
         /// Gets the exposure time in seconds.
         /// </summary>
         [Category("Camera Properties"), Browsable(true), Description("Gets the exposure time in seconds.")]
-        public string ExposureTime { get { UpdateFileInfo(); return mExposureTime; } }
+        public float ExposureTime { get { UpdateFileInfo(); return mExposureTime; } }
         /// <summary>
         /// Gets the F number.
         /// </summary>
@@ -618,7 +618,12 @@ namespace Manina.Windows.Forms
                 case ColumnType.Copyright:
                     return mCopyright;
                 case ColumnType.ExposureTime:
-                    return mExposureTime;
+                    if (mExposureTime < double.Epsilon)
+                        return "";
+                    else if (mExposureTime >= 1.0f)
+                        return Math.Round(mExposureTime, 1).ToString();
+                    else
+                        return "1/" + Math.Round(1.0f / mExposureTime);
                 case ColumnType.FNumber:
                     return mFNumber.ToString("f2");
                 case ColumnType.ISOSpeed:
