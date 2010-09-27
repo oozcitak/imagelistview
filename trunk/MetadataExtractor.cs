@@ -185,10 +185,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public DateTime DateTaken = DateTime.MinValue;
         /// <summary>
-        /// Date taken as formatted string (null = not available).
-        /// </summary>
-        public string DateTakenString = null;
-        /// <summary>
         /// Image description (null = not available).
         /// </summary>
         public string ImageDescription = null;
@@ -213,33 +209,17 @@ namespace Manina.Windows.Forms
         /// </summary>
         public int ISOSpeed = 0;
         /// <summary>
-        /// Iso speed rating as string (null = not available).
-        /// </summary>
-        public string ISOSpeedString = null;
-        /// <summary>
         /// Exposure time.
         /// </summary>
         public double ExposureTime = 0.0;
-        /// <summary>
-        /// Exposure time as rounded and formatted string (null = not available).
-        /// </summary>
-        public string ExposureTimeString = null;
         /// <summary>
         /// F number.
         /// </summary>
         public double FNumber = 0.0;
         /// <summary>
-        /// F number as rounded string (null = not available).
-        /// </summary>
-        public string FNumberString = null;
-        /// <summary>
         /// Focal length.
         /// </summary>
         public double FocalLength = 0.0;
-        /// <summary>
-        /// Focal length as rounded string (null = not available).
-        /// </summary>
-        public string FocalLengthString = null;
         /// <summary>
         /// Copyright information (null = not available).
         /// </summary>
@@ -422,7 +402,6 @@ namespace Manina.Windows.Forms
                         if (dateTime != DateTime.MinValue)
                         {
                             DateTaken = dateTime;
-                            DateTakenString = dateTime.ToString("g");
                         }
                         break;
                     case TagExposureTime:
@@ -430,10 +409,6 @@ namespace Manina.Windows.Forms
                         if (dVal != 0.0)
                         {
                             ExposureTime = dVal;
-                            if ((float)dVal >= 1.0f)
-                                ExposureTimeString = Math.Round(dVal, 1).ToString();
-                            else
-                                ExposureTimeString = "1/" + Math.Round(1.0 / dVal);
                         }
                         break;
                     case TagFNumber:
@@ -441,7 +416,6 @@ namespace Manina.Windows.Forms
                         if (dVal != 0.0)
                         {
                             FNumber = dVal;
-                            FNumberString = Math.Round(dVal, 1).ToString();
                         }
                         break;
                     case TagFocalLength:
@@ -449,7 +423,6 @@ namespace Manina.Windows.Forms
                         if (dVal != 0.0)
                         {
                             FocalLength = dVal;
-                            FocalLengthString = (Math.Round(dVal, 1)).ToString();
                         }
                         break;
                     case TagISOSpeed:
@@ -457,7 +430,6 @@ namespace Manina.Windows.Forms
                         if (iVal != 0)
                         {
                             ISOSpeed = iVal;
-                            ISOSpeedString = iVal.ToString();
                         }
                         break;
                     case TagOrientation:
@@ -570,7 +542,6 @@ namespace Manina.Windows.Forms
                 if (dateTime != DateTime.MinValue)
                 {
                     DateTaken = dateTime;
-                    DateTakenString = dateTime.ToString("g");
                 }
             }
             val = GetMetadataObject(data, "System.Photo.ExposureTime");
@@ -580,10 +551,6 @@ namespace Manina.Windows.Forms
                 if (dVal != 0.0)
                 {
                     ExposureTime = dVal;
-                    if ((float)dVal >= 1.0f)
-                        ExposureTimeString = Math.Round(dVal, 1).ToString();
-                    else
-                        ExposureTimeString = "1/" + Math.Round(1.0 / dVal);
                 }
             }
             val = GetMetadataObject(data, "System.Photo.FNumber");
@@ -593,7 +560,6 @@ namespace Manina.Windows.Forms
                 if (dVal != 0.0)
                 {
                     FNumber = dVal;
-                    FNumberString = Math.Round(dVal, 1).ToString();
                 }
             }
             val = GetMetadataObject(data, "System.Photo.FocalLength");
@@ -603,7 +569,6 @@ namespace Manina.Windows.Forms
                 if (dVal != 0.0)
                 {
                     FocalLength = dVal;
-                    FocalLengthString = (Math.Round(dVal, 1)).ToString();
                 }
             }
             val = GetMetadataObject(data, "System.Photo.ISOSpeed");
@@ -613,7 +578,6 @@ namespace Manina.Windows.Forms
                 if (iVal != 0)
                 {
                     ISOSpeed = iVal;
-                    ISOSpeedString = iVal.ToString();
                 }
             }
             val = GetMetadataObject(data, "System.Photo.Orientation");
