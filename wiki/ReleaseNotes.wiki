@@ -1,6 +1,16 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 8.1 (28 September 2010) =
+
+  * Added the conditional compilation symbol USEWIC to enable/disable Windows Imaging Component support. See the [WICSupport] wiki page for more information.
+  * Thumbnail size is now adjusted for the Exif orientation tag. (Issue 100)
+  * Column headers are no longer displayed in hovered state if both !AllowColumnClick and !AllowColumnResize properties of the control are set to false.
+  * !ExposureTime property of !ImageListViewItem is now a real value. *This is a breaking change.*
+  * Removed !ShutterSpeed and !ApertureValue columns. They were duplicates of !ExposureTime and FNumber. *This is a breaking change.*
+  * Added .Net 2.0 fall-back to !ThumbnailExtractor.
+  * .Net 2.0 fall-back of !MetadataExtractor should now work. (Issue 99)
+
 = 8.0 for .Net 3.0 (25 September 2010) =
 
   * Added the !AutoRotateThumbnails property to the control. Image rotation is determined by the Exif orientation metadata.
