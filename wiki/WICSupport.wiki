@@ -1,0 +1,9 @@
+#summary Compiling ImageListView without Windows Imaging Component
+#labels Phase-Implementation
+
+Although ImageListView requires the .NET framework 3.0; it is possible to recompile it for .NET 2.0 without Windows Imaging Component.
+
+  # [http://code.google.com/p/imagelistview/downloads/list Download] or [http://code.google.com/p/imagelistview/source/checkout checkout] the latest source code.
+  # Open project properties and change the target framework to .NET 2.0 in the Application tab.
+  # Also delete the USEWIC conditional compilation symbol from the Build tab.
+  # Recompile the project.
