@@ -743,7 +743,7 @@ namespace Manina.Windows.Forms
                     GC.SuppressFinalize(this);
                 }
             }
-
+#if DEBUG
             /// <summary>
             /// Releases unmanaged resources and performs other cleanup operations before the
             /// ImageListViewRenderer is reclaimed by garbage collection.
@@ -753,6 +753,7 @@ namespace Manina.Windows.Forms
                 System.Diagnostics.Debug.Print("Finalizer of {0} called.", GetType());
                 Dispose();
             }
+#endif
             #endregion
 
             #region Virtual Methods
