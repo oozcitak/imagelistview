@@ -233,7 +233,7 @@ namespace Manina.Windows.Forms
                             mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
 
-                return mImageListView.cacheManager.GetImage(Guid, true);
+                return mImageListView.cacheManager.GetImage(Guid);
             }
         }
         /// <summary>
@@ -250,14 +250,14 @@ namespace Manina.Windows.Forms
         /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the small shell icon of the image file represented by this item.")]
-        public Image SmallIcon { get { return mImageListView.itemCacheManager.GetSmallIcon(mGuid, true); } }
+        public Image SmallIcon { get { return mImageListView.itemCacheManager.GetSmallIcon(mGuid); } }
         /// <summary>
         /// Gets the large shell icon of the image file represented by this item.
         /// Returns null if the image is not cached yet.
         /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the large shell icon of the image file represented by this item.")]
-        public Image LargeIcon { get { return mImageListView.itemCacheManager.GetLargeIcon(mGuid, true); } }
+        public Image LargeIcon { get { return mImageListView.itemCacheManager.GetLargeIcon(mGuid); } }
         /// <summary>
         /// Gets the last access date of the image file represented by this item.
         /// </summary>

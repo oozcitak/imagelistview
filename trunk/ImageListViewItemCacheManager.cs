@@ -421,8 +421,7 @@ namespace Manina.Windows.Forms
         /// null will be returned.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
-        /// <param name="clone">true to return a cloned image; otherwise false.</param>
-        public Image GetSmallIcon(Guid guid, bool clone)
+        public Image GetSmallIcon(Guid guid)
         {
             lock (lockObject)
             {
@@ -430,37 +429,7 @@ namespace Manina.Windows.Forms
                 if (itemCache.TryGetValue(guid, out item))
                 {
                     Image img = item.SmallIcon;
-                    if (clone && img != null)
-                        img = (Image)img.Clone();
-                    return img;
-                }
-            }
-            return null;
-        }
-        /// <summary>
-        /// Gets the small shell icon from the cache. If the image is not cached,
-        /// null will be returned.
-        /// </summary>
-        /// <param name="guid">The guid representing this item.</param>
-        public Image GetSmallIcon(Guid guid)
-        {
-            return GetSmallIcon(guid, false);
-        }
-        /// <summary>
-        /// Gets the large shell icon from the cache. If the image is not cached,
-        /// null will be returned.
-        /// </summary>
-        /// <param name="guid">The guid representing this item.</param>
-        /// <param name="clone">true to return a cloned image; otherwise false.</param>
-        public Image GetLargeIcon(Guid guid, bool clone)
-        {
-            lock (lockObject)
-            {
-                CacheItem item = null;
-                if (itemCache.TryGetValue(guid, out item))
-                {
-                    Image img = item.LargeIcon;
-                    if (clone && img != null)
+                    if (img != null)
                         img = (Image)img.Clone();
                     return img;
                 }
@@ -474,7 +443,18 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The guid representing this item.</param>
         public Image GetLargeIcon(Guid guid)
         {
-            return GetLargeIcon(guid, false);
+            lock (lockObject)
+            {
+                CacheItem item = null;
+                if (itemCache.TryGetValue(guid, out item))
+                {
+                    Image img = item.LargeIcon;
+                    if (img != null)
+                        img = (Image)img.Clone();
+                    return img;
+                }
+            }
+            return null;
         }
         /// <summary>
         /// Adds the given item to the cache bypassing the worker thread.
