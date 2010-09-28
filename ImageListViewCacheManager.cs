@@ -688,8 +688,7 @@ namespace Manina.Windows.Forms
         /// null will be returned.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
-        /// <param name="clone">true to return a cloned image; otherwise false.</param>
-        public Image GetImage(Guid guid, bool clone)
+        public Image GetImage(Guid guid)
         {
             lock (lockObject)
             {
@@ -697,21 +696,12 @@ namespace Manina.Windows.Forms
                 if (thumbCache.TryGetValue(guid, out item))
                 {
                     Image img = item.Image;
-                    if (clone && img != null)
+                    if (img != null)
                         img = (Image)img.Clone();
                     return img;
                 }
             }
             return null;
-        }
-        /// <summary>
-        /// Gets the image from the thumbnail cache. If the image is not cached,
-        /// null will be returned.
-        /// </summary>
-        /// <param name="guid">The guid representing this item.</param>
-        public Image GetImage(Guid guid)
-        {
-            return GetImage(guid, false);
         }
         /// <summary>
         /// Stops the cache manager.
