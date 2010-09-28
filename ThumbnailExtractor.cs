@@ -48,13 +48,13 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="image">The source image.</param>
         /// <param name="size">Requested image size.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
         /// <returns>The thumbnail image from the given image or null if an error occurs.</returns>
-        public static Image FromImage(Image image, Size size, bool useExifOrientation)
+        public static Image FromImage(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
-
 #if USEWIC
             MemoryStream stream = null;
             BitmapFrame frameWpf = null;
@@ -99,7 +99,7 @@ namespace Manina.Windows.Forms
                 rotate = GetRotation(frameWpf);
             }
 
-            Image thumb = GetThumbnail(frameWpf, size, UseEmbeddedThumbnails.Auto, rotate);
+            Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
             stream.Dispose();
             return thumb;
 #else
@@ -186,7 +186,8 @@ namespace Manina.Windows.Forms
         #region Helper Methods
         /// <summary>
         /// Returns Exif rotation in degrees. Returns 0 if the metadata 
-        /// does not exist or could not be read.
+        /// does not exist or could not be read. A negative value means
+        /// the image needs to be mirrored about the vertical axis.
         /// </summary>
         /// <param name="frameWpf">Image source.</param>
         private static int GetRotation(BitmapFrame frameWpf)
@@ -197,14 +198,22 @@ namespace Manina.Windows.Forms
                 try
                 {
                     ushort orientationFlag = (ushort)data.GetQuery("System.Photo.Orientation");
-                    if (orientationFlag == 6)
-                        return 90;
+                    if (orientationFlag == 1)
+                        return 0;
+                    else if (orientationFlag == 2)
+                        return -360;
                     else if (orientationFlag == 3)
                         return 180;
+                    else if (orientationFlag == 4)
+                        return -180;
+                    else if (orientationFlag == 5)
+                        return -90;
+                    else if (orientationFlag == 6)
+                        return 90;
+                    else if (orientationFlag == 7)
+                        return -270;
                     else if (orientationFlag == 8)
                         return 270;
-                    else
-                        return 0;
                 }
                 catch
                 {
@@ -569,30 +578,36 @@ namespace Manina.Windows.Forms
                 return sourceWpf;
             }
 
-            BitmapSource scaledWpf;
+            // Set up the transformed thumbnail
+            TransformedBitmap thumbWpf = new TransformedBitmap();
+            thumbWpf.BeginInit();
+            thumbWpf.Source = sourceWpf;
+            TransformGroup transform = new TransformGroup();
+
+            // Scale
             if ((float)scale < 1.0f) // Only downscale
             {
                 double xScale = Math.Max(1.0 / (double)sourceWpf.PixelWidth, scale);
                 double yScale = Math.Max(1.0 / (double)sourceWpf.PixelHeight, scale);
-                ScaleTransform scaleTransform = new ScaleTransform(xScale, yScale);
-                scaledWpf = new TransformedBitmap(sourceWpf, scaleTransform);
+                if (angle < 0)
+                {
+                    xScale = -xScale;
+                    angle = (-angle) % 360;
+                }
+                transform.Children.Add(new ScaleTransform(xScale, yScale));
             }
-            else
-            {
-                scaledWpf = sourceWpf;
-            }
+
+            // Rotation
             if (angle != 0)
             {
-                // RotateTransform
-                RotateTransform rotateTransform = new RotateTransform(angle);
-                TransformedBitmap rotatedWpf = new TransformedBitmap(scaledWpf, rotateTransform);
+                transform.Children.Add(new RotateTransform(angle));
+            }
 
-                return BitmapFrame.Create(rotatedWpf);
-            }
-            else
-            {
-                return BitmapFrame.Create(scaledWpf);
-            }
+            // Apply the tranformation
+            thumbWpf.Transform = transform;
+            thumbWpf.EndInit();
+
+            return thumbWpf;
         }
 
         /// <summary>

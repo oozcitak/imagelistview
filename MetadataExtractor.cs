@@ -175,10 +175,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public int Orientation = 0;
         /// <summary>
-        /// Rotation angle (derived from orientation flag).
-        /// </summary>
-        public int RotationAngle = 0;
-        /// <summary>
         /// Date taken.
         /// </summary>
         public DateTime DateTaken = DateTime.MinValue;
@@ -435,14 +431,6 @@ namespace Manina.Windows.Forms
                             ISOSpeed = iVal;
                         }
                         break;
-                    case TagOrientation:
-                        iVal = ExifUShort(prop.Value);
-                        if (iVal != 0)
-                        {
-                            Orientation = iVal;
-                            RotationAngle = GetRotationAngle(iVal);
-                        }
-                        break;
                     case TagCopyright:
                         str = ExifAscii(prop.Value);
                         if (str != String.Empty)
@@ -582,16 +570,6 @@ namespace Manina.Windows.Forms
                 if (iVal != 0)
                 {
                     ISOSpeed = iVal;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.Orientation");
-            if (val != null)
-            {
-                iVal = (ushort)val;
-                if (iVal != 0)
-                {
-                    Orientation = iVal;
-                    RotationAngle = GetRotationAngle(iVal);
                 }
             }
             val = GetMetadataObject(data, "System.Copyright");

@@ -511,7 +511,7 @@ namespace Manina.Windows.Forms
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, filename, thumbSize,
-                    ThumbnailExtractor.FromImage(thumb, thumbSize, autoRotate),
+                    ThumbnailExtractor.FromImage(thumb, thumbSize, useEmbeddedThumbnails, autoRotate),
                     CacheState.Cached));
             }
 
@@ -583,7 +583,7 @@ namespace Manina.Windows.Forms
                 }
                 // Add to cache
                 thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
-                    ThumbnailExtractor.FromImage(thumb, thumbSize, autoRotate),
+                    ThumbnailExtractor.FromImage(thumb, thumbSize, useEmbeddedThumbnails, autoRotate),
                     CacheState.Cached, useEmbeddedThumbnails, autoRotate));
             }
 
