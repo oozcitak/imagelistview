@@ -391,8 +391,17 @@ namespace Manina.Windows.Forms
                 try
                 {
                     BitmapSource sourceWpf = bmp.Thumbnail;
-                    double scale = Math.Min(size.Width / (double)sourceWpf.PixelWidth,
-                                            size.Height / (double)sourceWpf.PixelHeight);
+                    double scale;
+                    if (rotate % 180 != 0)
+                    {
+                        scale = Math.Min(size.Height / (double)sourceWpf.PixelWidth,
+                            size.Width / (double)sourceWpf.PixelHeight);
+                    }
+                    else
+                    {
+                        scale = Math.Min(size.Width / (double)sourceWpf.PixelWidth,
+                            size.Height / (double)sourceWpf.PixelHeight);
+                    }
                     if (bmp.Decoder == null ||
                         (bmp.Decoder.Preview == null && bmp.Decoder.Frames == null) ||
                         useEmbeddedThumbnails == UseEmbeddedThumbnails.Always)
@@ -427,8 +436,17 @@ namespace Manina.Windows.Forms
                 try
                 {
                     BitmapSource sourceWpf = bmp.Decoder.Preview;
-                    double scale = Math.Min(size.Width / (double)sourceWpf.PixelWidth,
-                                            size.Height / (double)sourceWpf.PixelHeight);
+                    double scale;
+                    if (rotate % 180 != 0)
+                    {
+                        scale = Math.Min(size.Height / (double)sourceWpf.PixelWidth,
+                            size.Width / (double)sourceWpf.PixelHeight);
+                    }
+                    else
+                    {
+                        scale = Math.Min(size.Width / (double)sourceWpf.PixelWidth,
+                            size.Height / (double)sourceWpf.PixelHeight);
+                    }
                     if (bmp.Decoder.Frames == null ||
                         useEmbeddedThumbnails == UseEmbeddedThumbnails.Always)
                     {
@@ -462,8 +480,17 @@ namespace Manina.Windows.Forms
                 try
                 {
                     BitmapSource sourceWpf = bmp.Decoder.Frames[0];
-                    double scale = Math.Min(size.Width / (double)sourceWpf.PixelWidth,
-                                            size.Height / (double)sourceWpf.PixelHeight);
+                    double scale;
+                    if (rotate % 180 != 0)
+                    {
+                        scale = Math.Min(size.Height / (double)sourceWpf.PixelWidth,
+                            size.Width / (double)sourceWpf.PixelHeight);
+                    }
+                    else
+                    {
+                        scale = Math.Min(size.Width / (double)sourceWpf.PixelWidth,
+                            size.Height / (double)sourceWpf.PixelHeight);
+                    }
                     thumb = ConvertToBitmap(ScaleDownRotateBitmap(sourceWpf, scale, rotate));
                 }
                 catch
