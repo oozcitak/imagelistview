@@ -3,6 +3,8 @@
 
 = Mono Support =
 
+To run ImageListView on Mono, Windows Imaging Component support needs to be disabled. See [WICSupport this wiki page] for more information.
+
 ImageListView was tested on Mono 2.6.1. The control is almost feature complete on Mono with two exceptions:
 
   * The Type column is not populated. This is a known issue and will be addressed in a future release.
