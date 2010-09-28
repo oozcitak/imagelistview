@@ -96,8 +96,7 @@ namespace Manina.Windows.Forms
             int rotate = 0;
             if (useExifOrientation)
             {
-                MetadataExtractor metaInfo = MetadataExtractor.FromBitmap(frameWpf);
-                rotate = metaInfo.RotationAngle;
+                rotate = GetRotation(frameWpf);
             }
 
             Image thumb = GetThumbnail(frameWpf, size, UseEmbeddedThumbnails.Auto, rotate);
@@ -170,8 +169,7 @@ namespace Manina.Windows.Forms
             int rotate = 0;
             if (useExifOrientation)
             {
-                MetadataExtractor metaInfo = MetadataExtractor.FromBitmap(frameWpf);
-                rotate = metaInfo.RotationAngle;
+                rotate = GetRotation(frameWpf);
             }
 
             Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
@@ -186,6 +184,36 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Returns Exif rotation in degrees. Returns 0 if the metadata 
+        /// does not exist or could not be read.
+        /// </summary>
+        /// <param name="frameWpf">Image source.</param>
+        private static int GetRotation(BitmapFrame frameWpf)
+        {
+            BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
+            if (data != null)
+            {
+                try
+                {
+                    ushort orientationFlag = (ushort)data.GetQuery("System.Photo.Orientation");
+                    if (orientationFlag == 6)
+                        return 90;
+                    else if (orientationFlag == 3)
+                        return 180;
+                    else if (orientationFlag == 8)
+                        return 270;
+                    else
+                        return 0;
+                }
+                catch
+                {
+                    ;
+                }
+            }
+
+            return 0;
+        }
         /// <summary>
         /// Creates a thumbnail from the given image.
         /// </summary>
