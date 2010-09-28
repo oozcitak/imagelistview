@@ -241,7 +241,16 @@ namespace Manina.Windows.Forms
         /// Gets the rectangle that represents the display area of the control.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the rectangle that represents the display area of the control.")]
-        public override Rectangle DisplayRectangle { get { return layoutManager.ClientArea; } }
+        public override Rectangle DisplayRectangle 
+        {
+            get 
+            {
+                if (layoutManager == null)
+                    return base.DisplayRectangle;
+                else
+                    return layoutManager.ClientArea; 
+            } 
+        }
         /// <summary>
         /// Gets or sets the error image.
         /// </summary>
