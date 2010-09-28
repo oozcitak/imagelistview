@@ -735,11 +735,22 @@ namespace Manina.Windows.Forms
             /// </summary>
             void IDisposable.Dispose()
             {
-                if (disposed) return;
-                disposed = true;
+                if (!disposed)
+                {
+                    ClearBuffer();
 
-                ClearBuffer();
+                    disposed = true;
+                    GC.SuppressFinalize(this);
+                }
+            }
 
+            /// <summary>
+            /// Releases unmanaged resources and performs other cleanup operations before the
+            /// ImageListViewRenderer is reclaimed by garbage collection.
+            /// </summary>
+            ~ImageListViewRenderer()
+            {
+                System.Diagnostics.Debug.Print("Finalizer of {0} called.", GetType());
                 Dispose();
             }
             #endregion
@@ -1395,7 +1406,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public virtual void Dispose()
             {
-                ;
+                ((IDisposable)this).Dispose();
             }
             /// <summary>
             /// Sets the layout of the control.
