@@ -682,10 +682,12 @@ namespace Manina.Windows.Forms
 
             if (mRenderer != null)
                 mRenderer.Dispose();
+
             mRenderer = renderer;
             mRenderer.mImageListView = this;
             if (layoutManager != null)
                 layoutManager.Update(true);
+
             Refresh();
         }
         /// <summary>

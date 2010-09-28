@@ -197,8 +197,21 @@ namespace Manina.Windows.Forms
                         mImage.Dispose();
                         mImage = null;
                     }
+
                     disposed = true;
+                    GC.SuppressFinalize(this);
                 }
+            }
+
+            /// <summary>
+            /// Releases unmanaged resources and performs other cleanup operations before the
+            /// CacheItem is reclaimed by garbage collection.
+            /// </summary>
+            ~CacheItem()
+            {
+                if (mImage != null)
+                    System.Diagnostics.Debug.Print("Finalizer of {0} called for non-empty cache item.", GetType());
+                Dispose();
             }
         }
         #endregion
@@ -612,6 +625,8 @@ namespace Manina.Windows.Forms
                     return;
 
                 // Renderer cache holds one item only.
+                foreach (CacheItem item in rendererToCache)
+                    item.Dispose();
                 rendererToCache.Clear();
 
                 rendererToCache.Push(new CacheItem(guid, filename,
@@ -639,6 +654,8 @@ namespace Manina.Windows.Forms
                     return;
 
                 // Renderer cache holds one item only.
+                foreach (CacheItem item in rendererToCache)
+                    item.Dispose();
                 rendererToCache.Clear();
 
                 rendererToCache.Push(new CacheItem(guid, key, thumbSize,
@@ -720,9 +737,19 @@ namespace Manina.Windows.Forms
                 Clear();
 
                 disposed = true;
+
+                GC.SuppressFinalize(this);
             }
         }
-
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// ImageListViewCacheManager is reclaimed by garbage collection.
+        /// </summary>
+        ~ImageListViewCacheManager()
+        {
+            System.Diagnostics.Debug.Print("Finalizer of {0} called.", GetType());
+            Dispose();
+        }
         #endregion
 
         #region Worker Method
@@ -767,6 +794,8 @@ namespace Manina.Windows.Forms
                             {
                                 request = rendererToCache.Pop();
                                 guid = request.Guid;
+                                foreach (CacheItem item in rendererToCache)
+                                    item.Dispose();
                                 rendererToCache.Clear();
                                 rendererRequest = true;
                             }

@@ -229,8 +229,21 @@ namespace Manina.Windows.Forms
 
                     mSmallIcon = null;
                     mLargeIcon = null;
+
                     disposed = true;
+                    GC.SuppressFinalize(this);
                 }
+            }
+
+            /// <summary>
+            /// Releases unmanaged resources and performs other cleanup operations before the
+            /// CacheItem is reclaimed by garbage collection.
+            /// </summary>
+            ~CacheItem()
+            {
+                if (mSmallIcon != null || mLargeIcon!=null)
+                    System.Diagnostics.Debug.Print("Finalizer of {0} called for non-empty cache item.", GetType());
+                Dispose();
             }
         }
         #endregion
@@ -507,8 +520,20 @@ namespace Manina.Windows.Forms
                 Clear();
 
                 disposed = true;
+
+                GC.SuppressFinalize(this);
             }
         }
+
+        /// <summary>
+        /// Releases unmanaged resources and performs other cleanup operations before the
+        /// ImageListViewItemCacheManager is reclaimed by garbage collection.
+        /// </summary>
+        ~ImageListViewItemCacheManager()
+        {
+            System.Diagnostics.Debug.Print("Finalizer of {0} called.", GetType());
+            Dispose();
+        }        
         #endregion
 
         #region Worker Method
