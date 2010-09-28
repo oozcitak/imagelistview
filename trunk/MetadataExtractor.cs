@@ -22,7 +22,9 @@ using System.Text;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+#if USEWIC
 using System.Windows.Media.Imaging;
+#endif
 
 namespace Manina.Windows.Forms
 {
@@ -169,10 +171,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public double DPIY = 0.0;
         /// <summary>
-        /// Image dimension (width x height).
-        /// </summary>
-        public int Dimension = 0;
-        /// <summary>
         /// Orientation flag.
         /// </summary>
         public int Orientation = 0;
@@ -242,6 +240,7 @@ namespace Manina.Windows.Forms
         /// <param name="path">Filepath of image</param>
         private void InitViaWpf(string path)
         {
+#if USEWIC
             wicError = false;
             try
             {
@@ -259,7 +258,9 @@ namespace Manina.Windows.Forms
                 Error = eWpf;
                 wicError = true;
             }
-
+#else
+            wicError = true;
+#endif
             if (wicError)
             {
                 try
@@ -273,6 +274,7 @@ namespace Manina.Windows.Forms
                 }
             }
         }
+#if USEWIC
         /// <summary>
         /// Inits metadata via WIC/WPF (.NET 3.0).
         /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
@@ -284,7 +286,6 @@ namespace Manina.Windows.Forms
             Height = frameWpf.PixelHeight;
             DPIX = frameWpf.DpiX;
             DPIY = frameWpf.DpiY;
-            Dimension = Width * Height;
 
             wicError = false;
             BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
@@ -324,6 +325,7 @@ namespace Manina.Windows.Forms
                 }
             }
         }
+#endif
         /// <summary>
         /// Open image and read metadata (.NET 2.0).
         /// </summary>
@@ -352,7 +354,8 @@ namespace Manina.Windows.Forms
         {
             Width = img.Width;
             Height = img.Height;
-            Dimension = Width * Height;
+            DPIX = img.HorizontalResolution;
+            DPIY = img.VerticalResolution;
 
             double dVal;
             int iVal;
@@ -478,6 +481,7 @@ namespace Manina.Windows.Forms
             }
         }
 
+#if USEWIC
         /// <summary>
         /// Read metadata via WIC/WPF.
         /// </summary>
@@ -653,6 +657,7 @@ namespace Manina.Windows.Forms
             }
             return val;
         }
+#endif
         /// <summary>
         /// Get rotation angle from orientation flag.
         /// </summary>
@@ -706,6 +711,7 @@ namespace Manina.Windows.Forms
             return metadata;
         }
 
+#if USEWIC
         /// <summary>
         /// Creates an instance of the MetadataExtractor class.
         /// Reads metadata via WIC/WPF (.NET 3.0).
@@ -718,6 +724,7 @@ namespace Manina.Windows.Forms
             metadata.InitViaWpf(frameWpf);
             return metadata;
         }
+#endif
         #endregion
     }
 }

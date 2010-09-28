@@ -19,12 +19,14 @@
 
 using System;
 using System.IO;
-using System.Windows.Media.Imaging;
 using System.Drawing.Imaging;
 using System.Drawing;
-using System.Windows.Media;
 using System.Drawing.Drawing2D;
 using System.Text;
+#if USEWIC
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+#endif
 
 namespace Manina.Windows.Forms
 {
@@ -53,6 +55,7 @@ namespace Manina.Windows.Forms
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
 
+#if USEWIC
             MemoryStream stream = null;
             BitmapFrame frameWpf = null;
             try
@@ -100,6 +103,11 @@ namespace Manina.Windows.Forms
             Image thumb = GetThumbnail(frameWpf, size, UseEmbeddedThumbnails.Auto, rotate);
             stream.Dispose();
             return thumb;
+#else
+            // .Net 2.0 fallback
+            Image img = GetThumbnailBmp(image, size);
+            return img;
+#endif
         }
         /// <summary>
         /// Creates a thumbnail from the given image file.
@@ -118,6 +126,7 @@ namespace Manina.Windows.Forms
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
 
+#if USEWIC
             // File can be read and an image is recognized.
             FileStream stream = null;
             BitmapFrame frameWpf = null;
@@ -168,6 +177,11 @@ namespace Manina.Windows.Forms
             Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
             stream.Dispose();
             return thumb;
+#else
+            // .Net 2.0 fallback
+            Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
+            return img;
+#endif
         }
         #endregion
 
@@ -375,6 +389,7 @@ namespace Manina.Windows.Forms
 
             return thumb;
         }
+#if USEWIC
         /// <summary>
         /// Creates a  thumbnail from the given bitmap.
         /// </summary>
@@ -591,6 +606,7 @@ namespace Manina.Windows.Forms
             bmp.UnlockBits(data);
             return bmp;
         }
+#endif
         #endregion
     }
 }
