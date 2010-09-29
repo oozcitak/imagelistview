@@ -39,7 +39,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents the Exif tag for thumbnail data.
         /// </summary>
-        private const int PropertyTagThumbnailData = 0x501B;
+        private const int TagThumbnailData = 0x501B;
+        private const int TagOrientation = 0x0112;
         #endregion
 
         #region Public Methods
@@ -258,10 +259,10 @@ namespace Manina.Windows.Forms
                         {
                             foreach (int index in img.PropertyIdList)
                             {
-                                if (index == PropertyTagThumbnailData)
+                                if (index == TagThumbnailData)
                                 {
                                     // Fetch the embedded thumbnail
-                                    byte[] rawImage = img.GetPropertyItem(PropertyTagThumbnailData).Value;
+                                    byte[] rawImage = img.GetPropertyItem(TagThumbnailData).Value;
                                     using (MemoryStream memStream = new MemoryStream(rawImage))
                                     {
                                         source = Image.FromStream(memStream);
@@ -401,7 +402,7 @@ namespace Manina.Windows.Forms
             {
                 try
                 {
-                    object obj = data.GetQuery("System.Photo.Orientation");
+                    object obj = data.GetQuery("/app1/ifd/exif/subifd:{uint=" + TagOrientation.ToString() + "}");
                     if (obj == null)
                         return 0;
                     ushort orientationFlag = (ushort)obj;

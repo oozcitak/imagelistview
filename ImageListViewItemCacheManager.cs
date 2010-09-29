@@ -280,6 +280,9 @@ namespace Manina.Windows.Forms
             editCache = new Dictionary<Guid, bool>();
 
             mThread = new Thread(new ThreadStart(DoWork));
+            // Metadata extractor is a COM wrapper hence requires a STA thread.
+            if (!mThread.TrySetApartmentState(ApartmentState.STA))
+                throw new Exception("Could not set worker thread's apartment state.");
             mThread.IsBackground = true;
 
             removedItems = new List<Guid>();

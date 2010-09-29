@@ -40,9 +40,6 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Exif Tag IDs
-        const int TagThumbnailData = 0x501B;
-        const int TagThumbnailImageWidth = 0x5020;
-        const int TagThumbnailImageHeight = 0x5021;
         const int TagImageDescription = 0x010E;
         const int TagEquipmentModel = 0x0110;
         const int TagDateTimeOriginal = 0x9003;
@@ -55,9 +52,6 @@ namespace Manina.Windows.Forms
         const int TagRating = 0x4746;
         const int TagRatingPercent = 0x4749;
         const int TagEquipmentManufacturer = 0x010F;
-        const int TagFocalLength = 0x920A;
-        const int TagSoftware = 0x0131;
-        const int TagOrientation = 0x0112;
         #endregion
 
         #region Exif Format Conversion
@@ -171,10 +165,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public double DPIY = 0.0;
         /// <summary>
-        /// Orientation flag.
-        /// </summary>
-        public int Orientation = 0;
-        /// <summary>
         /// Date taken.
         /// </summary>
         public DateTime DateTaken = DateTime.MinValue;
@@ -182,10 +172,6 @@ namespace Manina.Windows.Forms
         /// Image description (null = not available).
         /// </summary>
         public string ImageDescription = null;
-        /// <summary>
-        /// Software used (null = not available).
-        /// </summary>
-        public string Software = null;
         /// <summary>
         /// Camera manufacturer (null = not available).
         /// </summary>
@@ -210,10 +196,6 @@ namespace Manina.Windows.Forms
         /// F number.
         /// </summary>
         public double FNumber = 0.0;
-        /// <summary>
-        /// Focal length.
-        /// </summary>
-        public double FocalLength = 0.0;
         /// <summary>
         /// Copyright information (null = not available).
         /// </summary>
@@ -368,13 +350,6 @@ namespace Manina.Windows.Forms
                             ImageDescription = str;
                         }
                         break;
-                    case TagSoftware:
-                        str = ExifAscii(prop.Value).Trim();
-                        if (str != String.Empty)
-                        {
-                            Software = str;
-                        }
-                        break;
                     case TagArtist:
                         str = ExifAscii(prop.Value).Trim();
                         if (str != String.Empty)
@@ -415,13 +390,6 @@ namespace Manina.Windows.Forms
                         if (dVal != 0.0)
                         {
                             FNumber = dVal;
-                        }
-                        break;
-                    case TagFocalLength:
-                        dVal = ExifDouble(prop.Value);
-                        if (dVal != 0.0)
-                        {
-                            FocalLength = dVal;
                         }
                         break;
                     case TagISOSpeed:
@@ -491,15 +459,6 @@ namespace Manina.Windows.Forms
                     ImageDescription = str;
                 }
             }
-            val = GetMetadataObject(data, "System.ApplicationName");
-            if (val != null)
-            {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    Software = str;
-                }
-            }
             val = GetMetadataObject(data, "System.Photo.CameraManufacturer");
             if (val != null)
             {
@@ -552,15 +511,6 @@ namespace Manina.Windows.Forms
                 if (dVal != 0.0)
                 {
                     FNumber = dVal;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.FocalLength");
-            if (val != null)
-            {
-                dVal = (double)val;
-                if (dVal != 0.0)
-                {
-                    FocalLength = dVal;
                 }
             }
             val = GetMetadataObject(data, "System.Photo.ISOSpeed");
@@ -636,23 +586,6 @@ namespace Manina.Windows.Forms
             return val;
         }
 #endif
-        /// <summary>
-        /// Get rotation angle from orientation flag.
-        /// </summary>
-        /// <param name="orientationFlag">Orientation flag</param>
-        /// <returns>Rotation angle</returns>
-        private int GetRotationAngle(int orientationFlag)
-        {
-            if (orientationFlag == 6)
-                return 90;
-            else if (orientationFlag == 3)
-                return 180;
-            else if (orientationFlag == 8)
-                return 270;
-            else
-                return 0;
-        }
-
         /// <summary>
         /// Convert FileTime to DateTime.
         /// </summary>

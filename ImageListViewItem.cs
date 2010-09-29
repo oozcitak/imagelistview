@@ -621,11 +621,14 @@ namespace Manina.Windows.Forms
                     if (mExposureTime < double.Epsilon)
                         return "";
                     else if (mExposureTime >= 1.0f)
-                        return Math.Round(mExposureTime, 1).ToString();
+                        return mExposureTime.ToString("f1");
                     else
-                        return "1/" + Math.Round(1.0f / mExposureTime);
+                        return string.Format("1/{0:f0}", (1.0f / mExposureTime));
                 case ColumnType.FNumber:
-                    return mFNumber.ToString("f2");
+                    if (mFNumber < double.Epsilon)
+                        return "";
+                    else
+                        return mFNumber.ToString("f1");
                 case ColumnType.ISOSpeed:
                     if (mISOSpeed == 0)
                         return "";
