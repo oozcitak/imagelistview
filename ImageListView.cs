@@ -331,7 +331,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets whether scrollbars scroll by an amount which is a multiple of item height.
         /// </summary>
-        [Browsable(true), Category("Behavior"), Description("Gets or sets whether scrollbars scroll by an amount which is a multiple of item height."), DefaultValue(true)]
+        [Browsable(true), Category("Behavior"), Description("Gets or sets whether scrollbars scroll by an amount which is a multiple of item height."), DefaultValue(false)]
         public bool IntegralScroll
         {
             get
@@ -805,7 +805,7 @@ namespace Manina.Windows.Forms
             mRatingImage = manager.GetObject("RatingImage") as Image;
             mEmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
             HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
-            mIntegralScroll = true;
+            mIntegralScroll = false;
             mItems = new ImageListViewItemCollection(this);
             MultiSelect = true;
             mPaneWidth = 240;
