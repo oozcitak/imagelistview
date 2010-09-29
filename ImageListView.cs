@@ -472,7 +472,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// This property is not relevant for this class.
         /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never), Browsable(false), Bindable(false), DefaultValue(null)]
+        [EditorBrowsable(EditorBrowsableState.Never), Browsable(false), Bindable(false), DefaultValue(null), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override string Text { get; set; }
         /// <summary>
         /// Gets or sets the size of image thumbnails.
@@ -583,6 +583,23 @@ namespace Manina.Windows.Forms
         {
             HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
         }
+
+        /// <summary>
+        /// Determines if the header font should be serialized.
+        /// </summary>
+        /// <returns>true if the designer should serialize 
+        /// the header font; otherwise false.</returns>
+        public bool ShouldSerializeColors()
+        {
+            return !mColors.Equals(ImageListViewColor.Default);
+        }
+        /// <summary>
+        /// Resets the header font to its default value.
+        /// </summary>
+        public void ResetColors()
+        {
+            Colors = ImageListViewColor.Default;
+        }
         #endregion
 
         #region Constructor
@@ -591,7 +608,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ImageListView()
         {
-            mColors = new ImageListViewColor();
+            mColors = ImageListViewColor.Default;
             SetRenderer(new ImageListViewRenderer());
 
             // Property defaults
