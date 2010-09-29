@@ -185,45 +185,6 @@ namespace Manina.Windows.Forms
 
         #region Helper Methods
         /// <summary>
-        /// Returns Exif rotation in degrees. Returns 0 if the metadata 
-        /// does not exist or could not be read. A negative value means
-        /// the image needs to be mirrored about the vertical axis.
-        /// </summary>
-        /// <param name="frameWpf">Image source.</param>
-        private static int GetRotation(BitmapFrame frameWpf)
-        {
-            BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
-            if (data != null)
-            {
-                try
-                {
-                    ushort orientationFlag = (ushort)data.GetQuery("System.Photo.Orientation");
-                    if (orientationFlag == 1)
-                        return 0;
-                    else if (orientationFlag == 2)
-                        return -360;
-                    else if (orientationFlag == 3)
-                        return 180;
-                    else if (orientationFlag == 4)
-                        return -180;
-                    else if (orientationFlag == 5)
-                        return -90;
-                    else if (orientationFlag == 6)
-                        return 90;
-                    else if (orientationFlag == 7)
-                        return -270;
-                    else if (orientationFlag == 8)
-                        return 270;
-                }
-                catch
-                {
-                    ;
-                }
-            }
-
-            return 0;
-        }
-        /// <summary>
         /// Creates a thumbnail from the given image.
         /// </summary>
         /// <param name="image">The source image.</param>
@@ -427,6 +388,48 @@ namespace Manina.Windows.Forms
             return thumb;
         }
 #if USEWIC
+        /// <summary>
+        /// Returns Exif rotation in degrees. Returns 0 if the metadata 
+        /// does not exist or could not be read. A negative value means
+        /// the image needs to be mirrored about the vertical axis.
+        /// </summary>
+        /// <param name="frameWpf">Image source.</param>
+        private static int GetRotation(BitmapFrame frameWpf)
+        {
+            BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
+            if (data != null)
+            {
+                try
+                {
+                    object obj = data.GetQuery("System.Photo.Orientation");
+                    if (obj == null)
+                        return 0;
+                    ushort orientationFlag = (ushort)obj;
+                    if (orientationFlag == 1)
+                        return 0;
+                    else if (orientationFlag == 2)
+                        return -360;
+                    else if (orientationFlag == 3)
+                        return 180;
+                    else if (orientationFlag == 4)
+                        return -180;
+                    else if (orientationFlag == 5)
+                        return -90;
+                    else if (orientationFlag == 6)
+                        return 90;
+                    else if (orientationFlag == 7)
+                        return -270;
+                    else if (orientationFlag == 8)
+                        return 270;
+                }
+                catch
+                {
+                    ;
+                }
+            }
+
+            return 0;
+        }
         /// <summary>
         /// Creates a  thumbnail from the given bitmap.
         /// </summary>
@@ -647,6 +650,9 @@ namespace Manina.Windows.Forms
             BitmapData data = bmp.LockBits(rect, ImageLockMode.WriteOnly, formatBmp);
             bmpWpf.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
             bmp.UnlockBits(data);
+#if DEBUG
+            bmp.Tag = "WIC";
+#endif
             return bmp;
         }
 #endif
