@@ -60,6 +60,11 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Member Variables
+        // Set when properties change
+        private bool mDefaultImageChanged = false;
+        private bool mErrorImageChanged = false;
+        private bool mRatingImageChanged = false;
+        private bool mEmptyRatingImageChanged = false;
         // Properties
         private BorderStyle mBorderStyle;
         private CacheMode mCacheMode;
@@ -219,7 +224,13 @@ namespace Manina.Windows.Forms
         [Category("Appearance"), Description("Gets or sets the color palette of the ImageListView.")]
         public ImageListViewColor Colors
         {
-            get { return mColors; }
+            get
+            {
+                if (mColors == null)
+                    return ImageListViewColor.Default;
+                else
+                    return mColors;
+            }
             set
             {
                 mColors = value;
@@ -236,7 +247,27 @@ namespace Manina.Windows.Forms
         /// Gets or sets the placeholder image.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the placeholder image.")]
-        public Image DefaultImage { get { return mDefaultImage; } set { mDefaultImage = value; Refresh(); } }
+        public Image DefaultImage
+        {
+            get
+            {
+                if (mDefaultImage == null)
+                {
+                    ResourceManager manager = new ResourceManager(
+                        "Manina.Windows.Forms.ImageListViewResources",
+                        Assembly.GetExecutingAssembly());
+                    return manager.GetObject("DefaultImage") as Image;
+                }
+                else
+                    return mDefaultImage;
+            }
+            set
+            {
+                mDefaultImageChanged = true;
+                mDefaultImage = value;
+                Refresh();
+            }
+        }
         /// <summary>
         /// Gets the rectangle that represents the display area of the control.
         /// </summary>
@@ -255,7 +286,27 @@ namespace Manina.Windows.Forms
         /// Gets or sets the error image.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the error image.")]
-        public Image ErrorImage { get { return mErrorImage; } set { mErrorImage = value; Refresh(); } }
+        public Image ErrorImage
+        {
+            get
+            {
+                if (mErrorImage == null)
+                {
+                    ResourceManager manager = new ResourceManager(
+                        "Manina.Windows.Forms.ImageListViewResources",
+                        Assembly.GetExecutingAssembly());
+                    return manager.GetObject("ErrorImage") as Image;
+                }
+                else
+                    return mErrorImage;
+            }
+            set
+            {
+                mErrorImageChanged = true;
+                mErrorImage = value;
+                Refresh();
+            }
+        }
         /// <summary>
         /// Gets or sets the font of the column headers.
         /// </summary>
@@ -330,12 +381,52 @@ namespace Manina.Windows.Forms
         /// Gets or sets the rating image.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the rating image.")]
-        public Image RatingImage { get { return mRatingImage; } set { mRatingImage = value; Refresh(); } }
+        public Image RatingImage
+        {
+            get
+            {
+                if (mRatingImage == null)
+                {
+                    ResourceManager manager = new ResourceManager(
+                        "Manina.Windows.Forms.ImageListViewResources",
+                        Assembly.GetExecutingAssembly());
+                    return manager.GetObject("RatingImage") as Image;
+                }
+                else
+                    return mRatingImage;
+            }
+            set
+            {
+                mRatingImageChanged = true;
+                mRatingImage = value;
+                Refresh();
+            }
+        }
         /// <summary>
         /// Gets or sets the empty rating image.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the empty rating image.")]
-        public Image EmptyRatingImage { get { return mEmptyRatingImage; } set { mEmptyRatingImage = value; Refresh(); } }
+        public Image EmptyRatingImage
+        {
+            get
+            {
+                if (mEmptyRatingImage == null)
+                {
+                    ResourceManager manager = new ResourceManager(
+                        "Manina.Windows.Forms.ImageListViewResources",
+                        Assembly.GetExecutingAssembly());
+                    return manager.GetObject("EmptyRatingImage") as Image;
+                }
+                else
+                    return mRatingImage;
+            }
+            set
+            {
+                mEmptyRatingImageChanged = true;
+                mEmptyRatingImage = value;
+                Refresh();
+            }
+        }
         /// <summary>
         /// Gets or sets whether the control will retry loading thumbnails on an error.
         /// </summary>
@@ -568,7 +659,7 @@ namespace Manina.Windows.Forms
         /// Determines if the header font should be serialized.
         /// </summary>
         /// <returns>true if the designer should serialize 
-        /// the header font; otherwise false.</returns>
+        /// the property; otherwise false.</returns>
         public bool ShouldSerializeHeaderFont()
         {
             using (Font font = new Font("Microsoft Sans Serif", 8.25f))
@@ -585,20 +676,104 @@ namespace Manina.Windows.Forms
         }
 
         /// <summary>
-        /// Determines if the header font should be serialized.
+        /// Determines if the colors should be serialized.
         /// </summary>
         /// <returns>true if the designer should serialize 
-        /// the header font; otherwise false.</returns>
+        /// the property; otherwise false.</returns>
         public bool ShouldSerializeColors()
         {
             return !mColors.Equals(ImageListViewColor.Default);
         }
         /// <summary>
-        /// Resets the header font to its default value.
+        /// Resets the colors to their default value.
         /// </summary>
         public void ResetColors()
         {
             Colors = ImageListViewColor.Default;
+        }
+
+        /// <summary>
+        /// Determines if the default image should be serialized.
+        /// </summary>
+        /// <returns>true if the designer should serialize 
+        /// the property; otherwise false.</returns>
+        public bool ShouldSerializeDefaultImage()
+        {
+            return mDefaultImageChanged;
+        }
+        /// <summary>
+        /// Resets the default image to its default value.
+        /// </summary>
+        public void ResetDefaultImage()
+        {
+            ResourceManager manager = new ResourceManager(
+                "Manina.Windows.Forms.ImageListViewResources",
+                Assembly.GetExecutingAssembly());
+            DefaultImage = manager.GetObject("DefaultImage") as Image;
+            mDefaultImageChanged = false;
+        }
+
+        /// <summary>
+        /// Determines if the error image should be serialized.
+        /// </summary>
+        /// <returns>true if the designer should serialize 
+        /// the property; otherwise false.</returns>
+        public bool ShouldSerializeErrorImage()
+        {
+            return mErrorImageChanged;
+        }
+        /// <summary>
+        /// Resets the error image to its default value.
+        /// </summary>
+        public void ResetErrorImage()
+        {
+            ResourceManager manager = new ResourceManager(
+                "Manina.Windows.Forms.ImageListViewResources",
+                Assembly.GetExecutingAssembly());
+            ErrorImage = manager.GetObject("ErrorImage") as Image;
+            mErrorImageChanged = false;
+        }
+
+        /// <summary>
+        /// Determines if the rating image should be serialized.
+        /// </summary>
+        /// <returns>true if the designer should serialize 
+        /// the property; otherwise false.</returns>
+        public bool ShouldSerializeRatingImage()
+        {
+            return mRatingImageChanged;
+        }
+        /// <summary>
+        /// Resets the rating image to its default value.
+        /// </summary>
+        public void ResetRatingImage()
+        {
+            ResourceManager manager = new ResourceManager(
+                "Manina.Windows.Forms.ImageListViewResources",
+                Assembly.GetExecutingAssembly());
+            RatingImage = manager.GetObject("RatingImage") as Image;
+            mRatingImageChanged = false;
+        }
+
+        /// <summary>
+        /// Determines if the empty rating image should be serialized.
+        /// </summary>
+        /// <returns>true if the designer should serialize 
+        /// the property; otherwise false.</returns>
+        public bool ShouldSerializeEmptyRatingImage()
+        {
+            return mEmptyRatingImageChanged;
+        }
+        /// <summary>
+        /// Resets the empty rating image to its default value.
+        /// </summary>
+        public void ResetEmptyRatingImage()
+        {
+            ResourceManager manager = new ResourceManager(
+                "Manina.Windows.Forms.ImageListViewResources",
+                Assembly.GetExecutingAssembly());
+            EmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
+            mEmptyRatingImageChanged = false;
         }
         #endregion
 
