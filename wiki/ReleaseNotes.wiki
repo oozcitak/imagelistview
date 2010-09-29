@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 8.2 (29 September 2010) =
+
+  * Thumbnail images are now automatically mirrored depending on Exif orientation tag.
+  * Thumbnail extraction should now work faster since the control longer extracts all metadata to get the Exif rotation tag.
+  * Fixed a bug where the thumbnail image was disposed by the cache manager while the image was being drawn by the control. (Issue 101)
+
 = 8.1 (28 September 2010) =
 
   * Added the conditional compilation symbol USEWIC to enable/disable Windows Imaging Component support. See the [WICSupport] wiki page for more information.
