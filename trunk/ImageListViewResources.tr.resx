@@ -186,4 +186,10 @@
   <data name="Custom" xml:space="preserve">
     <value>Özel</value>
   </data>
+  <data name="FocalLength" xml:space="preserve">
+    <value>Odak Uzunluğu</value>
+  </data>
+  <data name="Software" xml:space="preserve">
+    <value>Yazılım</value>
+  </data>
 </root>

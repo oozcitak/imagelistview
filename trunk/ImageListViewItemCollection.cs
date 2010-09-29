@@ -638,6 +638,12 @@ namespace Manina.Windows.Forms
                         case ColumnType.Rating:
                             result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
                             break;
+                        case ColumnType.Software:
+                            result = string.Compare(x.Software, y.Software, StringComparison.InvariantCultureIgnoreCase);
+                            break;
+                        case ColumnType.FocalLength:
+                            result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
+                            break;
                         case ColumnType.Custom:
                             result = string.Compare(x.GetSubItemText(mSortColumn.columnID), y.GetSubItemText(mSortColumn.columnID), StringComparison.InvariantCultureIgnoreCase);
                             break;

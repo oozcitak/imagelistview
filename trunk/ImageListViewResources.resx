@@ -205,4 +205,10 @@
   <data name="Custom" xml:space="preserve">
     <value>Custom</value>
   </data>
+  <data name="FocalLength" xml:space="preserve">
+    <value>Focal Length</value>
+  </data>
+  <data name="Software" xml:space="preserve">
+    <value>Software</value>
+  </data>
 </root>

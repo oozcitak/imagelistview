@@ -688,6 +688,14 @@ namespace Manina.Windows.Forms
         /// Gets or sets rating between 0-100.
         /// </summary>
         public ushort Rating { get; set; }
+        /// <summary>
+        /// Gets the name of the application that created this file.
+        /// </summary>
+        public string Software { get; set; }
+        /// <summary>
+        /// Gets focal length of the lens in millimeters.
+        /// </summary>
+        public float FocalLength { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the LayoutEventArgs class.

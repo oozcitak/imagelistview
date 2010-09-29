@@ -58,6 +58,8 @@ namespace Manina.Windows.Forms
         private ushort mISOSpeed;
         private string mUserComment;
         private ushort mRating;
+        private string mSoftware;
+        private float mFocalLength;
         // Used for virtual items
         internal bool isVirtualItem;
         internal object mVirtualItemKey;
@@ -374,6 +376,16 @@ namespace Manina.Windows.Forms
                 return 0;
             }
         }
+        /// <summary>
+        /// Gets the name of the application that created this file.
+        /// </summary>
+        [Category("Image Properties"), Browsable(true), Description("Gets the name of the application that created this file.")]
+        public string Software { get { UpdateFileInfo(); return mSoftware; } }
+        /// <summary>
+        /// Gets focal length of the lens in millimeters.
+        /// </summary>
+        [Category("Image Properties"), Browsable(true), Description("Gets focal length of the lens in millimeters.")]
+        public float FocalLength { get { UpdateFileInfo(); return mFocalLength; } }
         #endregion
 
         #region Constructors
@@ -640,6 +652,13 @@ namespace Manina.Windows.Forms
                     if (mRating == 0)
                         return "";
                     else return mRating.ToString();
+                case ColumnType.Software:
+                    return mSoftware;
+                case ColumnType.FocalLength:
+                    if (mFocalLength < double.Epsilon)
+                        return "";
+                    else
+                        return mFocalLength.ToString("f1");
                 default:
                     throw new ArgumentException("Unknown column type", "type");
             }
@@ -677,7 +696,7 @@ namespace Manina.Windows.Forms
                     if (img == null && mImageListView.ShellIconFallback)
                         img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
                     if (img == null)
-                        img = mImageListView.ErrorImage;
+                        img = (Image)mImageListView.ErrorImage.Clone();
                     return img;
                 }
 
@@ -698,7 +717,7 @@ namespace Manina.Windows.Forms
                 if (img == null && mImageListView.ShellIconFallback)
                     img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
                 if (img == null)
-                    img = mImageListView.DefaultImage;
+                    img = (Image)mImageListView.DefaultImage.Clone();
 
                 return img;
             }
@@ -805,6 +824,8 @@ namespace Manina.Windows.Forms
             mISOSpeed = info.ISOSpeed;
             mUserComment = info.UserComment;
             mRating = info.Rating;
+            mSoftware = info.Software;
+            mFocalLength = info.FocalLength;
 
             isDirty = false;
         }
@@ -835,6 +856,8 @@ namespace Manina.Windows.Forms
             mISOSpeed = info.ISOSpeed;
             mUserComment = info.UserComment;
             mRating = info.Rating;
+            mSoftware = info.Software;
+            mFocalLength = info.FocalLength;
 
             isDirty = false;
         }
@@ -872,6 +895,8 @@ namespace Manina.Windows.Forms
             item.mISOSpeed = mISOSpeed;
             item.mUserComment = mUserComment;
             item.mRating = mRating;
+            item.mSoftware = mSoftware;
+            item.mFocalLength = mFocalLength;
 
             // Virtual item properties
             item.isVirtualItem = isVirtualItem;

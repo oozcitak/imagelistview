@@ -186,4 +186,10 @@
   <data name="UserComment" xml:space="preserve">
     <value>Kommentare</value>
   </data>
+  <data name="FocalLength" xml:space="preserve">
+    <value>Brennweite</value>
+  </data>
+  <data name="Software" xml:space="preserve">
+    <value>Software</value>
+  </data>
 </root>
