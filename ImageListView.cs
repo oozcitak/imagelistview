@@ -241,15 +241,15 @@ namespace Manina.Windows.Forms
         /// Gets the rectangle that represents the display area of the control.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the rectangle that represents the display area of the control.")]
-        public override Rectangle DisplayRectangle 
+        public override Rectangle DisplayRectangle
         {
-            get 
+            get
             {
                 if (layoutManager == null)
                     return base.DisplayRectangle;
                 else
-                    return layoutManager.ClientArea; 
-            } 
+                    return layoutManager.ClientArea;
+            }
         }
         /// <summary>
         /// Gets or sets the error image.
@@ -259,18 +259,21 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the font of the column headers.
         /// </summary>
-        [Category("Appearance"), Description("Gets or sets the font of the column headers."), DefaultValue(typeof(Font), "Microsoft Sans Serif; 8.25pt")]
+        [Category("Appearance"), Description("Gets or sets the font of the column headers.")]
         public Font HeaderFont
         {
             get
             {
-                return mHeaderFont;
+                if (mHeaderFont != null)
+                    return mHeaderFont;
+                else if (Font != null)
+                    return Font;
+                else
+                    return Control.DefaultFont;
             }
             set
             {
-                if (mHeaderFont != null)
-                    mHeaderFont.Dispose();
-                mHeaderFont = (Font)value.Clone();
+                mHeaderFont = value;
                 Refresh();
             }
         }
@@ -560,6 +563,28 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region Custom Property Serializers
+        /// <summary>
+        /// Determines if the header font should be serialized.
+        /// </summary>
+        /// <returns>true if the designer should serialize 
+        /// the header font; otherwise false.</returns>
+        public bool ShouldSerializeHeaderFont()
+        {
+            using (Font font = new Font("Microsoft Sans Serif", 8.25f))
+            {
+                return !mHeaderFont.Equals(font);
+            }
+        }
+        /// <summary>
+        /// Resets the header font to its default value.
+        /// </summary>
+        public void ResetHeaderFont()
+        {
+            HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
+        }
+        #endregion
+
         #region Constructor
         /// <summary>
         /// Initializes a new instance of the ImageListView class.
@@ -587,7 +612,7 @@ namespace Manina.Windows.Forms
             mErrorImage = manager.GetObject("ErrorImage") as Image;
             mRatingImage = manager.GetObject("RatingImage") as Image;
             mEmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
-            HeaderFont = this.Font;
+            HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
             mIntegralScroll = true;
             mItems = new ImageListViewItemCollection(this);
             MultiSelect = true;
@@ -1196,8 +1221,6 @@ namespace Manina.Windows.Forms
                         mRatingImage.Dispose();
                     if (mEmptyRatingImage != null)
                         mEmptyRatingImage.Dispose();
-                    if (mHeaderFont != null)
-                        mHeaderFont.Dispose();
 
                     // Child controls
                     if (hScrollBar != null && hScrollBar.IsHandleCreated && !hScrollBar.IsDisposed)
