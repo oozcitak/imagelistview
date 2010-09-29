@@ -52,6 +52,8 @@ namespace Manina.Windows.Forms
         const int TagRating = 0x4746;
         const int TagRatingPercent = 0x4749;
         const int TagEquipmentManufacturer = 0x010F;
+        const int TagFocalLength = 0x920A;
+        const int TagSoftware = 0x0131;
         #endregion
 
         #region Exif Format Conversion
@@ -208,6 +210,14 @@ namespace Manina.Windows.Forms
         /// User comment (null = not available).
         /// </summary>
         public string Comment = null;
+        /// <summary>
+        /// Software used (null = not available).
+        /// </summary>
+        public string Software = null;
+        /// <summary>
+        /// Focal length.
+        /// </summary>
+        public double FocalLength = 0.0;
         #endregion
 
         #region Helper Methods
@@ -433,6 +443,20 @@ namespace Manina.Windows.Forms
                             Comment = str;
                         }
                         break;
+                    case TagSoftware:
+                        str = ExifAscii(prop.Value).Trim();
+                        if (str != String.Empty)
+                        {
+                            Software = str;
+                        }
+                        break;
+                    case TagFocalLength:
+                        dVal = ExifDouble(prop.Value);
+                        if (dVal != 0.0)
+                        {
+                            FocalLength = dVal;
+                        }
+                        break;
                 }
             }
         }
@@ -562,6 +586,24 @@ namespace Manina.Windows.Forms
                         Rating = 75;
                     else if (iVal == 5)
                         Rating = 99;
+                }
+            }
+            val = GetMetadataObject(data, "System.ApplicationName");
+            if (val != null)
+            {
+                str = ((string)val).Trim();
+                if (str != String.Empty)
+                {
+                    Software = str;
+                }
+            }
+            val = GetMetadataObject(data, "System.Photo.FocalLength");
+            if (val != null)
+            {
+                dVal = (double)val;
+                if (dVal != 0.0)
+                {
+                    FocalLength = dVal;
                 }
             }
         }

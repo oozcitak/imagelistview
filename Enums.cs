@@ -180,6 +180,14 @@ namespace Manina.Windows.Forms
         /// Rating (Windows Exif tag).
         /// </summary>
         Rating,
+        /// <summary>
+        /// Software (Exif tag).
+        /// </summary>
+        Software,
+        /// <summary>
+        /// Focal length (Exif tag).
+        /// </summary>
+        FocalLength,
     }
     /// <summary>
     /// Represents the order by which items are drawn.

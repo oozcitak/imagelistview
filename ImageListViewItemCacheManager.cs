@@ -783,6 +783,8 @@ namespace Manina.Windows.Forms
             public ushort ISOSpeed;
             public string UserComment;
             public ushort Rating;
+            public string Software;
+            public float FocalLength;
             // Error
             internal Exception Error;
         }
@@ -849,6 +851,8 @@ namespace Manina.Windows.Forms
                 imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
                 imageInfo.UserComment = metadata.Comment ?? "";
                 imageInfo.Rating = (ushort)(metadata.Rating);
+                imageInfo.Software = metadata.Software ?? "";
+                imageInfo.FocalLength = (float)metadata.FocalLength;
                 if (metadata.Error != null)
                     imageInfo.Error = metadata.Error;
             }
