@@ -174,6 +174,25 @@ namespace Manina.Windows.Forms
             }
             #endregion
 
+            #region Custom Property Serializers
+            /// <summary>
+            /// Determines if the column text should be serialized.
+            /// </summary>
+            /// <returns>true if the designer should serialize 
+            /// the property; otherwise false.</returns>
+            public bool ShouldSerializeText()
+            {
+                return Text != DefaultText;
+            }
+            /// <summary>
+            /// Resets the column text to its default value.
+            /// </summary>
+            public void ResetText()
+            {
+                Text = DefaultText;
+            }
+            #endregion
+
             #region Constructors
             /// <summary>
             /// Initializes a new instance of the ImageListViewColumnHeader class.
@@ -295,10 +314,10 @@ namespace Manina.Windows.Forms
                 ImageListViewColumnHeader column = new ImageListViewColumnHeader();
 
                 column.mDisplayIndex = mDisplayIndex;
-                column.mText=mText;
-                column.mType=mType;
-                column.mVisible=mVisible;
-                column.mWidth=mWidth;
+                column.mText = mText;
+                column.mType = mType;
+                column.mVisible = mVisible;
+                column.mWidth = mWidth;
 
                 return column;
             }

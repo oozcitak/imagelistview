@@ -15,8 +15,14 @@
 //
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
+using System;
+using System.Globalization;
 using System.ComponentModel;
 using System.Drawing;
+using System.Text;
+using System.Reflection;
+using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 
 namespace Manina.Windows.Forms
 {
@@ -27,36 +33,80 @@ namespace Manina.Windows.Forms
     {
         #region Instance Methods
         /// <summary>
-        /// Returns whether this converter can convert the object to the specified type, using the specified context.
+        /// Returns whether this converter can convert the 
+        /// object to the specified type, using the specified context.
         /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="destinationType">A <see cref="T:System.Type"/> that represents the type you want to convert to.</param>
-        /// <returns>
-        /// true if this converter can perform the conversion; otherwise, false.
-        /// </returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, System.Type destinationType)
+        /// <param name="context">Format context.</param>
+        /// <param name="destinationType">The type you want to convert to.</param>
+        /// <returns>true if this converter can perform the conversion; otherwise, false.</returns>
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(ImageListViewColor))
+            if (destinationType == typeof(string))
+                return true;
+            else if (destinationType == typeof(InstanceDescriptor))
                 return true;
 
             return base.CanConvertTo(context, destinationType);
         }
         /// <summary>
-        /// Converts the given value object to the specified type, using the specified context and culture information.
+        /// Returns whether this converter can convert an object of the given type 
+        /// to the type of this converter, using the specified context.
         /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="culture">A <see cref="T:System.Globalization.CultureInfo"/>. If null is passed, the current culture is assumed.</param>
-        /// <param name="value">The <see cref="T:System.Object"/> to convert.</param>
-        /// <param name="destinationType">The <see cref="T:System.Type"/> to convert the <paramref name="value"/> parameter to.</param>
-        /// <returns>
-        /// An <see cref="T:System.Object"/> that represents the converted value.
-        /// </returns>
-        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, System.Type destinationType)
+        /// <param name="context">Format context.</param>
+        /// <param name="sourceType">The type you want to convert from.</param>
+        /// <returns>true if this converter can perform the conversion; otherwise, false.</returns>
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (destinationType == typeof(string) && value is ImageListViewColor)
-                return "(Color Settings)";
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+        /// <summary>
+        /// Converts the given value object to the specified type, 
+        /// using the specified context and culture information.
+        /// </summary>
+        /// <param name="context">Format context.</param>
+        /// <param name="culture">The culture info. If null is passed, the current culture is assumed.</param>
+        /// <param name="value">The objct to convert.</param>
+        /// <param name="destinationType">The type to convert to.</param>
+        /// <returns>An object that represents the converted value.</returns>
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            if (value != null && value is ImageListViewColor)
+            {
+                ImageListViewColor colors = (ImageListViewColor)value;
+
+                if (destinationType == typeof(string))
+                {
+                    return colors.ToString();
+                }
+                else if (destinationType == typeof(InstanceDescriptor))
+                {
+                    // Used by the designer serializer
+                    ConstructorInfo consInfo = typeof(ImageListViewColor).GetConstructor(new Type[] { typeof(string) });
+                    return new InstanceDescriptor(consInfo, new object[] { colors.ToString() });
+                }
+            }
 
             return base.ConvertTo(context, culture, value, destinationType);
+        }
+        /// <summary>
+        /// Converts the given object to the type of this converter, 
+        /// using the specified context and culture information.
+        /// </summary>
+        /// <param name="context">Format context.</param>
+        /// <param name="culture">The culture info to use as the current culture.</param>
+        /// <param name="value">The object to convert.</param>
+        /// <returns>An object that represents the converted value.</returns>
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value != null && value is string)
+            {
+                return new ImageListViewColor((string)value);
+            }
+
+            return base.ConvertFrom(context, culture, value);
         }
         #endregion
     }

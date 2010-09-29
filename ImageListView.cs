@@ -227,9 +227,9 @@ namespace Manina.Windows.Forms
             get
             {
                 if (mColors == null)
-                    return ImageListViewColor.Default;
-                else
-                    return mColors;
+                    mColors = ImageListViewColor.Default;
+
+                return mColors;
             }
             set
             {
@@ -674,7 +674,7 @@ namespace Manina.Windows.Forms
         {
             HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
         }
-
+        
         /// <summary>
         /// Determines if the colors should be serialized.
         /// </summary>
@@ -682,7 +682,8 @@ namespace Manina.Windows.Forms
         /// the property; otherwise false.</returns>
         public bool ShouldSerializeColors()
         {
-            return !mColors.Equals(ImageListViewColor.Default);
+            ImageListViewColor defaultColors = ImageListViewColor.Default;
+            return !mColors.Equals(defaultColors);
         }
         /// <summary>
         /// Resets the colors to their default value.
@@ -691,7 +692,7 @@ namespace Manina.Windows.Forms
         {
             Colors = ImageListViewColor.Default;
         }
-
+        
         /// <summary>
         /// Determines if the default image should be serialized.
         /// </summary>
