@@ -20,6 +20,8 @@
 using System.ComponentModel;
 using System.Drawing;
 using System;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace Manina.Windows.Forms
 {
@@ -376,7 +378,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Constructor
+        #region Constructors
         /// <summary>
         /// Initializes a new instance of the ImageListViewColor class.
         /// </summary>
@@ -429,18 +431,93 @@ namespace Manina.Windows.Forms
             mSelectionRectangleColor2 = Color.FromArgb(128, SystemColors.Highlight);
             mSelectionRectangleBorderColor = SystemColors.Highlight;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewColor class
+        /// from its string representation.
+        /// </summary>
+        /// <param name="definition">String representation of the object.</param>
+        public ImageListViewColor(string definition)
+            : this()
+        {
+            try
+            {
+                // First check if the color matches a predefined color setting
+                foreach (MemberInfo info in typeof(ImageListViewColor).GetMembers(BindingFlags.Static | BindingFlags.Public))
+                {
+                    if (info.MemberType == MemberTypes.Property)
+                    {
+                        PropertyInfo propertyInfo = (PropertyInfo)info;
+                        if (propertyInfo.PropertyType == typeof(ImageListViewColor))
+                        {
+                            // If the color setting is equal to a preset value
+                            // return the preset
+                            if (definition == string.Format("({0})", propertyInfo.Name) ||
+                                definition == propertyInfo.Name)
+                            {
+                                ImageListViewColor presetValue = (ImageListViewColor)propertyInfo.GetValue(null, null);
+                                CopyFrom(presetValue);
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                // Convert color values
+                foreach (string line in definition.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    // Read the color setting
+                    string[] pair = line.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
+                    string name = pair[0].Trim();
+                    Color color = Color.FromName(pair[1].Trim());
+                    // Set the property value
+                    PropertyInfo property = typeof(ImageListViewColor).GetProperty(name);
+                    property.SetValue(this, color, null);
+                }
+            }
+            catch
+            {
+                throw new ArgumentException("Invalid string format", "definition");
+            }
+        }
+        #endregion
+
+        #region InstanceMethods
+        /// <summary>
+        /// Copies color values from the given object.
+        /// </summary>
+        /// <param name="source">The source object.</param>
+        public void CopyFrom(ImageListViewColor source)
+        {
+            foreach (PropertyInfo info in typeof(ImageListViewColor).GetProperties())
+            {
+                // Walk through color properties
+                if (info.PropertyType == typeof(Color))
+                {
+                    Color color = (Color)info.GetValue(source, null);
+                    info.SetValue(this, color, null);
+                }
+            }
+        }
         #endregion
 
         #region Static Members
         /// <summary>
         /// Represents the default color theme.
         /// </summary>
-        public static ImageListViewColor Default = new ImageListViewColor();
+        public static ImageListViewColor Default { get { return ImageListViewColor.GetDefaultTheme(); } }
         /// <summary>
         /// Represents the noir color theme.
         /// </summary>
-        public static ImageListViewColor Noir = ImageListViewColor.GetNoirTheme();
+        public static ImageListViewColor Noir { get { return ImageListViewColor.GetNoirTheme(); } }
 
+        /// <summary>
+        /// Sets the controls color palette to default colors.
+        /// </summary>
+        private static ImageListViewColor GetDefaultTheme()
+        {
+            return new ImageListViewColor();
+        }
         /// <summary>
         /// Sets the controls color palette to noir colors.
         /// </summary>
@@ -499,7 +576,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Equals Overrides
+        #region System.Object Overrides
         /// <summary>
         /// Determines whether all color values of the specified 
         /// ImageListViewColor are equal to this instance.
@@ -515,41 +592,18 @@ namespace Manina.Windows.Forms
             ImageListViewColor other = obj as ImageListViewColor;
             if (other == null) return false;
 
-            if (mControlBackColor != other.mControlBackColor) return false;
+            foreach (PropertyInfo info in typeof(ImageListViewColor).GetProperties())
+            {
+                // Walk through color properties
+                if (info.PropertyType == typeof(Color))
+                {
+                    // Compare colors
+                    Color color1 = (Color)info.GetValue(this, null);
+                    Color color2 = (Color)info.GetValue(other, null);
 
-            if (mBackColor != other.mBackColor) return false;
-            if (mBorderColor != other.mBorderColor) return false;
-            if (mUnFocusedColor1 != other.mUnFocusedColor1) return false;
-            if (mUnFocusedColor2 != other.mUnFocusedColor2) return false;
-            if (mUnFocusedBorderColor != other.mUnFocusedBorderColor) return false;
-            if (mForeColor != other.mForeColor) return false;
-            if (mHoverColor1 != other.mHoverColor1) return false;
-            if (mHoverColor2 != other.mHoverColor2) return false;
-            if (mHoverBorderColor != other.mHoverBorderColor) return false;
-            if (mInsertionCaretColor != other.mInsertionCaretColor) return false;
-            if (mSelectedColor1 != other.mSelectedColor1) return false;
-            if (mSelectedColor2 != other.mSelectedColor2) return false;
-            if (mSelectedBorderColor != other.mSelectedBorderColor) return false;
-
-            if (mImageInnerBorderColor != other.mImageInnerBorderColor) return false;
-            if (mImageOuterBorderColor != other.mImageOuterBorderColor) return false;
-
-            if (mCellForeColor != other.mCellForeColor) return false;
-            if (mColumnHeaderBackColor1 != other.mColumnHeaderBackColor1) return false;
-            if (mColumnHeaderBackColor2 != other.mColumnHeaderBackColor2) return false;
-            if (mColumnHeaderForeColor != other.mColumnHeaderForeColor) return false;
-            if (mColumnHeaderHoverColor1 != other.mColumnHeaderHoverColor1) return false;
-            if (mColumnHeaderHoverColor2 != other.mColumnHeaderHoverColor2) return false;
-            if (mColumnSelectColor != other.mColumnSelectColor) return false;
-            if (mColumnSeparatorColor != other.mColumnSeparatorColor) return false;
-
-            if (mPaneBackColor != other.mPaneBackColor) return false;
-            if (mPaneSeparatorColor != other.mPaneSeparatorColor) return false;
-            if (mPaneLabelColor != other.mPaneLabelColor) return false;
-
-            if (mSelectionRectangleColor1 != other.mSelectionRectangleColor1) return false;
-            if (mSelectionRectangleColor2 != other.mSelectionRectangleColor2) return false;
-            if (mSelectionRectangleBorderColor != other.mSelectionRectangleBorderColor) return false;
+                    if (color1 != color2) return false;
+                }
+            }
 
             return true;
         }
@@ -563,6 +617,63 @@ namespace Manina.Windows.Forms
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a string that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A string that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            ImageListViewColor colors = this;
+
+            // First check if the color matches a predefined color setting
+            foreach (MemberInfo info in typeof(ImageListViewColor).GetMembers(BindingFlags.Static | BindingFlags.Public))
+            {
+                if (info.MemberType == MemberTypes.Property)
+                {
+                    PropertyInfo propertyInfo = (PropertyInfo)info;
+                    if (propertyInfo.PropertyType == typeof(ImageListViewColor))
+                    {
+                        ImageListViewColor presetValue = (ImageListViewColor)propertyInfo.GetValue(null, null);
+                        // If the color setting is equal to a preset value
+                        // return the name of the preset
+                        if (colors.Equals(presetValue))
+                            return string.Format("({0})", propertyInfo.Name);
+                    }
+                }
+            }
+
+            // Serialize all colors which are different from the default setting
+            List<string> lines = new List<string>();
+            foreach (PropertyInfo info in typeof(ImageListViewColor).GetProperties())
+            {
+                // Walk through color properties
+                if (info.PropertyType == typeof(Color))
+                {
+                    // Get property name
+                    string name = info.Name;
+                    // Get the current value
+                    Color color = (Color)info.GetValue(colors, null);
+                    // Find the default value atribute
+                    Attribute[] attributes = (Attribute[])info.GetCustomAttributes(typeof(DefaultValueAttribute), false);
+                    if (attributes.Length != 0)
+                    {
+                        // Get the default value
+                        DefaultValueAttribute attribute = (DefaultValueAttribute)attributes[0];
+                        Color defaultColor = (Color)attribute.Value;
+                        // Serialize only if colors are different
+                        if (color != defaultColor)
+                        {
+                            lines.Add(string.Format("{0} = {1}", name, color.Name));
+                        }
+                    }
+                }
+            }
+
+            return string.Join("; ", lines.ToArray());
         }
         #endregion
     }
