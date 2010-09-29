@@ -18,6 +18,8 @@
 using System;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Resources;
+using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
@@ -26,6 +28,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a column header displayed in details view mode.
         /// </summary>
+        [TypeConverter(typeof(ImageListViewColumnHeaderTypeConverter))]
         public class ImageListViewColumnHeader : ICloneable
         {
             #region Member Variables
@@ -48,10 +51,7 @@ namespace Manina.Windows.Forms
             {
                 get
                 {
-                    if (owner == null)
-                        return "";
-                    else
-                        return owner.GetDefaultText(mType);
+                    return GetDefaultText(mType);
                 }
             }
             /// <summary>
@@ -200,16 +200,52 @@ namespace Manina.Windows.Forms
             /// <param name="type">The type of data to display in this column.</param>
             /// <param name="text">Text of the column header.</param>
             /// <param name="width">Width in pixels of the column header.</param>
-            public ImageListViewColumnHeader(ColumnType type, string text, int width)
+            /// <param name="displayIndex">Display order of the column.</param>
+            /// <param name="visible"></param>
+            public ImageListViewColumnHeader(ColumnType type, string text, int width, int displayIndex, bool visible)
             {
                 mImageListView = null;
                 owner = null;
+                columnID = Guid.NewGuid();
                 mText = text;
                 mType = type;
                 mWidth = width;
-                mVisible = true;
-                mDisplayIndex = -1;
-                columnID = Guid.NewGuid();
+                mVisible = visible;
+                mDisplayIndex = displayIndex;
+            }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
+            /// <param name="displayIndex">Display order of the column.</param>
+            public ImageListViewColumnHeader(ColumnType type, string text, int width, int displayIndex)
+                : this(type, text, width, displayIndex, true)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
+            /// <param name="displayIndex">Display order of the column.</param>
+            public ImageListViewColumnHeader(ColumnType type, int width, int displayIndex)
+                : this(type, "", width, displayIndex)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the ImageListViewColumnHeader class.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
+            /// <param name="width">Width in pixels of the column header.</param>
+            public ImageListViewColumnHeader(ColumnType type, string text, int width)
+                : this(type, text, width, -1)
+            {
+                ;
             }
             /// <summary>
             /// Initializes a new instance of the ImageListViewColumnHeader class.
@@ -302,6 +338,19 @@ namespace Manina.Windows.Forms
             public override string ToString()
             {
                 return mType.ToString();
+            }
+            #endregion
+
+            #region Helper Methods
+            /// <summary>
+            /// Gets the default column header text for the given column type.
+            /// </summary>
+            [Localizable(true)]
+            private string GetDefaultText(ColumnType type)
+            {
+                ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources",
+                    Assembly.GetExecutingAssembly());
+                return manager.GetString(type.ToString());
             }
             #endregion
 

@@ -203,16 +203,6 @@ namespace Manina.Windows.Forms
                 return mItems.Contains(item);
             }
             /// <summary>
-            /// Gets the default column header text for the given column type.
-            /// </summary>
-            [Localizable(true)]
-            public string GetDefaultText(ColumnType type)
-            {
-                ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources",
-                    Assembly.GetExecutingAssembly());
-                return manager.GetString(type.ToString());
-            }
-            /// <summary>
             /// Returns an enumerator to use to iterate through columns.
             /// </summary>
             /// <returns>An IEnumerator&lt;ImageListViewColumn&gt; that represents the item collection.</returns>
