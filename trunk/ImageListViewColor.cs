@@ -19,6 +19,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System;
 
 namespace Manina.Windows.Forms
 {
@@ -495,6 +496,73 @@ namespace Manina.Windows.Forms
             c.SelectionRectangleBorderColor = Color.FromArgb(64, 96, 144, 240);
 
             return c;
+        }
+        #endregion
+
+        #region Equals Overrides
+        /// <summary>
+        /// Determines whether all color values of the specified 
+        /// ImageListViewColor are equal to this instance.
+        /// </summary>
+        /// <param name="obj">The object to compare with this instance.</param>
+        /// <returns>true if the two instances have the same color values; 
+        /// otherwise false.</returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                throw new NullReferenceException();
+
+            ImageListViewColor other = obj as ImageListViewColor;
+            if (other == null) return false;
+
+            if (mControlBackColor != other.mControlBackColor) return false;
+
+            if (mBackColor != other.mBackColor) return false;
+            if (mBorderColor != other.mBorderColor) return false;
+            if (mUnFocusedColor1 != other.mUnFocusedColor1) return false;
+            if (mUnFocusedColor2 != other.mUnFocusedColor2) return false;
+            if (mUnFocusedBorderColor != other.mUnFocusedBorderColor) return false;
+            if (mForeColor != other.mForeColor) return false;
+            if (mHoverColor1 != other.mHoverColor1) return false;
+            if (mHoverColor2 != other.mHoverColor2) return false;
+            if (mHoverBorderColor != other.mHoverBorderColor) return false;
+            if (mInsertionCaretColor != other.mInsertionCaretColor) return false;
+            if (mSelectedColor1 != other.mSelectedColor1) return false;
+            if (mSelectedColor2 != other.mSelectedColor2) return false;
+            if (mSelectedBorderColor != other.mSelectedBorderColor) return false;
+
+            if (mImageInnerBorderColor != other.mImageInnerBorderColor) return false;
+            if (mImageOuterBorderColor != other.mImageOuterBorderColor) return false;
+
+            if (mCellForeColor != other.mCellForeColor) return false;
+            if (mColumnHeaderBackColor1 != other.mColumnHeaderBackColor1) return false;
+            if (mColumnHeaderBackColor2 != other.mColumnHeaderBackColor2) return false;
+            if (mColumnHeaderForeColor != other.mColumnHeaderForeColor) return false;
+            if (mColumnHeaderHoverColor1 != other.mColumnHeaderHoverColor1) return false;
+            if (mColumnHeaderHoverColor2 != other.mColumnHeaderHoverColor2) return false;
+            if (mColumnSelectColor != other.mColumnSelectColor) return false;
+            if (mColumnSeparatorColor != other.mColumnSeparatorColor) return false;
+
+            if (mPaneBackColor != other.mPaneBackColor) return false;
+            if (mPaneSeparatorColor != other.mPaneSeparatorColor) return false;
+            if (mPaneLabelColor != other.mPaneLabelColor) return false;
+
+            if (mSelectionRectangleColor1 != other.mSelectionRectangleColor1) return false;
+            if (mSelectionRectangleColor2 != other.mSelectionRectangleColor2) return false;
+            if (mSelectionRectangleBorderColor != other.mSelectionRectangleBorderColor) return false;
+
+            return true;
+        }
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in 
+        /// hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
         #endregion
     }
