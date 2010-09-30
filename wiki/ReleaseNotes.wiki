@@ -5,7 +5,7 @@
 
 This release aims better integration with the control designer. Some of the changes are  invisible to the user (ie. new !InstanceDescriptors and default property values emit cleaner code in !InitializeComponent), some are visible on the designer surface (ie. items can now be added to the control from the designer. Both thumbnail and item details will be fetched and shown on the designer), some changes fix long standing glitches (ie. editing child item collections from the designer could not be undone). There is also a minor bug fix and new properties for items.
 
-  * Added Software and !FocalLength properties to items.
+  * Reintroduced Software and !FocalLength properties to items (Issue 102).
   * !IntegralScroll property now defaults to false.
   * Added default values for !DefaultImage, !ErrorImage, !RatingImage, !EmptyRatingImage, Colors and !HeaderFont properties for better designer integration.
   * Added type converters to !ImageListViewColors, !ImageListItem and !ImageListViewColumnHeader for designer serialization.
