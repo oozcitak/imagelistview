@@ -197,6 +197,10 @@ namespace Manina.Windows.Forms
                 if (mFileName != value)
                 {
                     mFileName = value;
+
+                    if(string.IsNullOrEmpty(mText))
+                        mText = Path.GetFileName(mFileName);
+
                     if (!isVirtualItem)
                     {
                         isDirty = true;
