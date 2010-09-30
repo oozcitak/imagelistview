@@ -796,6 +796,10 @@ namespace Manina.Windows.Forms
         internal ShellImageFileInfo GetImageFileInfo(string path)
         {
             ShellImageFileInfo imageInfo = new ShellImageFileInfo();
+
+            if (string.IsNullOrEmpty(path))
+                return imageInfo;
+
             try
             {
                 // Read file properties
@@ -860,6 +864,7 @@ namespace Manina.Windows.Forms
             {
                 imageInfo.Error = e;
             }
+
             return imageInfo;
         }
         #endregion

@@ -123,8 +123,11 @@ namespace Manina.Windows.Forms
         /// <returns>The thumbnail image from the given file or null if an error occurs.</returns>
         public static Image FromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
         {
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentException("Filename cannot be empty", "filename");
+
             if (size.Width <= 0 || size.Height <= 0)
-                throw new ArgumentException();
+                throw new ArgumentException("Thumbnail size cannot be empty.", "size");
 
 #if USEWIC
             // File can be read and an image is recognized.
