@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BonusRenderers.cs" />
+    <Compile Include="OpenFileDialogEditor.cs" />
     <Compile Include="ImageListViewColumnHeaderTypeConverter.cs" />
     <Compile Include="ShellInfoExtractor.cs" />
     <Compile Include="MetadataExtractor.cs" />
