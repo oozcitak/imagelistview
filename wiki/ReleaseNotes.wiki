@@ -3,7 +3,7 @@
 
 = 8.3 (30 September 2010) =
 
-This release aims better integration with the control designer. Some of the changes are  invisible to the user (ie. new InstanceDescriptors and default property values emit cleaner code in InitializeComponent), some are visible on the designer surface (ie. items can now be added to the control from the designer. Both thumbnail and item details will be fetched and shown on the designer), some changes fix long standing glitches (ie. editing child item collections from the designer could not be undone).
+This release aims better integration with the control designer. Some of the changes are  invisible to the user (ie. new !InstanceDescriptors and default property values emit cleaner code in !InitializeComponent), some are visible on the designer surface (ie. items can now be added to the control from the designer. Both thumbnail and item details will be fetched and shown on the designer), some changes fix long standing glitches (ie. editing child item collections from the designer could not be undone). There is also a minor bug fix and new properties for items.
 
   * Added Software and !FocalLength properties to items.
   * !IntegralScroll property now defaults to false.
@@ -13,11 +13,9 @@ This release aims better integration with the control designer. Some of the chan
   * Changes to the column header collection made from the designer can now be undone.
   * Items can now be added/modified from the designer.
   * Fixed a bug where drawing the control in details view without any columns threw an exception.
-  * Setting an item's filename property also sets the item text if the text was not
-previously set.
+  * Setting an item's filename property also sets the item text if the text was not previously set.
   * Added an open file dialog to the filename property of items for use with the designer.
-  * Removed preview items from the control designer. They are no longer necessary
-since items can be added at design-time.
+  * Removed preview items from the control designer. They are no longer necessary since items can be added at design-time.
 
 = 8.2 (29 September 2010) =
 
