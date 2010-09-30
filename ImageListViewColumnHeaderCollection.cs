@@ -182,6 +182,24 @@ namespace Manina.Windows.Forms
                 Add(new ImageListViewColumnHeader(type));
             }
             /// <summary>
+            /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="items">The items to add to the collection.</param>
+            public void AddRange(ImageListViewColumnHeader[] items)
+            {
+                if (mImageListView != null)
+                    mImageListView.mRenderer.SuspendPaint();
+
+                foreach (ImageListViewColumnHeader item in items)
+                    Add(item);
+
+                if (mImageListView != null)
+                {
+                    mImageListView.Refresh();
+                    mImageListView.mRenderer.ResumePaint();
+                }
+            }
+            /// <summary>
             /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             /// </summary>
             public void Clear()
