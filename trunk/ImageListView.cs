@@ -241,8 +241,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the collection of columns of the image list view.
         /// </summary>
-        [Category("Appearance"), Description("Gets the collection of columns of the image list view."), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ImageListViewColumnHeaderCollection Columns { get { return mColumns; } private set { mColumns = value; Refresh(); } }
+        [Category("Appearance"), Description("Gets the collection of columns of the image list view.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public ImageListViewColumnHeaderCollection Columns { get { return mColumns; } internal set { mColumns = value; Refresh(); } }
         /// <summary>
         /// Gets or sets the placeholder image.
         /// </summary>
@@ -674,7 +675,7 @@ namespace Manina.Windows.Forms
         {
             HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
         }
-        
+
         /// <summary>
         /// Determines if the colors should be serialized.
         /// </summary>
@@ -692,7 +693,7 @@ namespace Manina.Windows.Forms
         {
             Colors = ImageListViewColor.Default;
         }
-        
+
         /// <summary>
         /// Determines if the default image should be serialized.
         /// </summary>
