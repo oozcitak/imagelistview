@@ -33,34 +33,6 @@ namespace Manina.Windows.Forms
     {
         #region Member Variables
         private DesignerActionListCollection actionLists = null;
-        private ImageListView imageListView;
-        private ImageListViewItem[] items;
-        #endregion
-
-        #region Add/Remove Glyphs on Initialize/Dispose
-        /// <summary>
-        /// Initializes the designer with the specified component.
-        /// </summary>
-        /// <param name="component">The <see cref="T:System.ComponentModel.IComponent"/> 
-        /// to associate the designer with. This component must always be an instance of, 
-        /// or derive from, <see cref="T:System.Windows.Forms.Control"/>.</param>
-        public override void Initialize(IComponent component)
-        {
-            base.Initialize(component);
-
-            imageListView = (ImageListView)this.Control;
-
-            // Add preview items
-            items = new ImageListViewItem[3];
-            for (int i = 0; i < items.Length; i++)
-            {
-                ImageListViewItem item = new ImageListViewItem();
-                item.Text = "Item " + (i + 1).ToString();
-                item.mImageListView = imageListView;
-                item.Tag = null;
-                items[i] = item;
-            }
-        }
         #endregion
 
         #region Designer Action Lists
@@ -71,67 +43,12 @@ namespace Manina.Windows.Forms
         {
             get
             {
-                if (null == actionLists)
+                if (actionLists == null)
                 {
                     actionLists = base.ActionLists;
                     actionLists.Add(new ImageListViewActionLists(this.Component));
                 }
                 return actionLists;
-            }
-        }
-        #endregion
-
-        #region Paint Adornments
-        /// <summary>
-        /// Receives a call when the control that the designer is managing has painted 
-        /// its surface so the designer can paint any additional adornments on top of the control.
-        /// </summary>
-        /// <param name="pe">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> the designer 
-        /// can use to draw on the control.</param>
-        protected override void OnPaintAdornments(PaintEventArgs pe)
-        {
-            base.OnPaintAdornments(pe);
-
-            if (imageListView.Items.Count == 0)
-            {
-                imageListView.layoutManager.Update(true);
-
-                for (int i = 0; i < items.Length; i++)
-                {
-                    ImageListViewItem item = items[i];
-                    Rectangle bounds = imageListView.layoutManager.GetItemBounds(i);
-
-                    // Add custom columns
-                    if (item.Tag == null)
-                    {
-                        int c = 0;
-                        foreach (ImageListView.ImageListViewColumnHeader column in imageListView.Columns)
-                        {
-                            if (column.Type == ColumnType.Custom)
-                            {
-                                item.AddSubItemText(column.columnID);
-                                c++;
-                            }
-                        }
-                        item.Tag = c.ToString();
-                    }
-
-                    Rectangle itemArea = imageListView.layoutManager.ItemAreaBounds;
-                    Rectangle clip = Rectangle.Intersect(Rectangle.Intersect(bounds, itemArea), pe.ClipRectangle);
-                    //pe.Graphics.SetClip(clip);
-                    imageListView.mRenderer.DrawItem(pe.Graphics, item, ItemState.None, bounds);
-
-                    if (imageListView.ShowCheckBoxes)
-                    {
-                        Rectangle wbounds = imageListView.layoutManager.GetCheckBoxBounds(i);
-                        imageListView.mRenderer.DrawCheckBox(pe.Graphics, item, wbounds);
-                    }
-                    if (imageListView.ShowFileIcons)
-                    {
-                        Rectangle wbounds = imageListView.layoutManager.GetIconBounds(i);
-                        imageListView.mRenderer.DrawFileIcon(pe.Graphics, item, wbounds);
-                    }
-                }
             }
         }
         #endregion

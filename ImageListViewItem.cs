@@ -27,6 +27,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents an item in the image list view.
     /// </summary>
+    [TypeConverter(typeof(ImageListViewItemTypeConverter))]
     public class ImageListViewItem : ICloneable
     {
         #region Member Variables
@@ -81,7 +82,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets a value determining if the item is focused.
         /// </summary>
-        [Category("Appearance"), Browsable(false), Description("Gets a value determining if the item is focused.")]
+        [Category("Appearance"), Browsable(false), Description("Gets a value determining if the item is focused."), DefaultValue(false)]
         public bool Focused
         {
             get
@@ -163,7 +164,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the user-defined data associated with the item.
         /// </summary>
-        [Category("Data"), Browsable(false), Description("Gets or sets the user-defined data associated with the item."), TypeConverter(typeof(StringConverter))]
+        [Category("Data"), Browsable(true), Description("Gets or sets the user-defined data associated with the item."), TypeConverter(typeof(StringConverter))]
         public object Tag { get; set; }
         /// <summary>
         /// Gets or sets the text associated with this item. If left blank, item Text 
@@ -416,7 +417,24 @@ namespace Manina.Windows.Forms
             mVirtualItemKey = null;
             isVirtualItem = false;
 
+            Tag = null;
+
             subItems = new Dictionary<Guid, string>();
+        }
+        /// <summary>
+        /// Initializes a new instance of the ImageListViewItem class.
+        /// </summary>
+        /// <param name="filename">The image filename representing the item.</param>
+        /// <param name="text">Item text</param>
+        /// <param name="tag">The tag of the item.</param>
+        public ImageListViewItem(string filename, string text, object tag)
+            : this()
+        {
+            mFileName = filename;
+            if (string.IsNullOrEmpty(text))
+                text = Path.GetFileName(filename);
+            mText = text;
+            Tag = tag;
         }
         /// <summary>
         /// Initializes a new instance of the ImageListViewItem class.

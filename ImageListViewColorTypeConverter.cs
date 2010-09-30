@@ -31,7 +31,7 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal class ImageListViewColorTypeConverter : ExpandableObjectConverter
     {
-        #region Instance Methods
+        #region TypeConverter Overrides
         /// <summary>
         /// Returns whether this converter can convert the 
         /// object to the specified type, using the specified context.

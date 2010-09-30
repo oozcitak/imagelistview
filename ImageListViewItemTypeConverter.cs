@@ -27,9 +27,9 @@ using System.ComponentModel.Design.Serialization;
 namespace Manina.Windows.Forms
 {
     /// <summary>
-    /// Represents the type converter for the column headers of the image list view.
+    /// Represents the type converter for the items of the image list view.
     /// </summary>
-    internal class ImageListViewColumnHeaderTypeConverter : TypeConverter
+    internal class ImageListViewItemTypeConverter : TypeConverter
     {
         #region TypeConverter Overrides
         /// <summary>
@@ -57,22 +57,17 @@ namespace Manina.Windows.Forms
         /// <returns>An object that represents the converted value.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (value != null && value is ImageListView.ImageListViewColumnHeader)
+            if (value != null && value is ImageListViewItem)
             {
-                ImageListView.ImageListViewColumnHeader column = (ImageListView.ImageListViewColumnHeader)value;
+                ImageListViewItem item = (ImageListViewItem)value;
 
                 if (destinationType == typeof(InstanceDescriptor))
                 {
-                    string text = column.Text;
-                    // Used by the designer serializer
-                    if (text == column.DefaultText)
-                        text = string.Empty;
-
-                    ConstructorInfo consInfo = typeof(ImageListView.ImageListViewColumnHeader).GetConstructor(new Type[] { 
-                            typeof(ColumnType), typeof(string), typeof(int), typeof(int), typeof(bool)
+                    ConstructorInfo consInfo = typeof(ImageListViewItem).GetConstructor(new Type[] { 
+                            typeof(string), typeof(string), typeof(object)
                         });
                     return new InstanceDescriptor(consInfo, new object[] { 
-                        column.Type, text, column.Width, column.DisplayIndex, column.Visible
+                        item.FileName, item.Text, item.Tag
                     });
                 }
             }
