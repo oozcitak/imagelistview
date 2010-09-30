@@ -1012,7 +1012,10 @@ namespace Manina.Windows.Forms
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         // Sub text
-                        RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, uicolumns[0].Width - 2 * offset.Width, bounds.Height - 2 * offset.Height);
+                        int firstWidth = 0;
+                        if (uicolumns.Count > 0)
+                            firstWidth = uicolumns[0].Width;
+                        RectangleF rt = new RectangleF(bounds.Left + offset.Width, bounds.Top + offset.Height, firstWidth - 2 * offset.Width, bounds.Height - 2 * offset.Height);
                         foreach (ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
