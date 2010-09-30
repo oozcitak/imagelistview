@@ -265,6 +265,7 @@ namespace Manina.Windows.Forms
                 mItems.Clear();
 
                 mFocused = null;
+                lookUp.Clear();
                 collectionModified = true;
 
                 if (mImageListView != null)
