@@ -748,8 +748,6 @@ namespace Manina.Windows.Forms
         #region Worker Method
         /// <summary>
         /// Used by the worker thread to generate image thumbnails.
-        /// Once a thumbnail image is generated, the item will be redrawn
-        /// to replace the placeholder image.
         /// </summary>
         private void DoWork()
         {
