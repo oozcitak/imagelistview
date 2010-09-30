@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
+using System.Drawing.Design;
 
 namespace Manina.Windows.Forms
 {
@@ -186,6 +187,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the name of the image file represented by this item.
         /// </summary>        
         [Category("File Properties"), Browsable(true), Description("Gets or sets the name of the image file represented by this item.")]
+        [Editor(typeof(OpenFileDialogEditor), typeof(UITypeEditor))]
         public string FileName
         {
             get
@@ -198,7 +200,7 @@ namespace Manina.Windows.Forms
                 {
                     mFileName = value;
 
-                    if(string.IsNullOrEmpty(mText))
+                    if (string.IsNullOrEmpty(mText))
                         mText = Path.GetFileName(mFileName);
 
                     if (!isVirtualItem)
