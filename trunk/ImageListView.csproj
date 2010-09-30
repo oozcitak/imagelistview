@@ -124,6 +124,7 @@
     <EmbeddedResource Include="ImageListViewResources.de.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImageListViewResources.de.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ImageListViewResources.tr.resx">
       <Generator>ResXFileCodeGenerator</Generator>
