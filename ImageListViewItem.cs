@@ -663,6 +663,18 @@ namespace Manina.Windows.Forms
                     throw new ArgumentException("Unknown column type", "type");
             }
         }
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents this instance.
+        /// </summary>
+        public override string ToString()
+        {
+            if (!string.IsNullOrEmpty(mText))
+                return mText;
+            else if (!string.IsNullOrEmpty(mFileName))
+                return Path.GetFileName(mFileName);
+            else
+                return string.Format("Item {0}", mIndex);
+        }
         #endregion
 
         #region Helper Methods

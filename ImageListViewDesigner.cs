@@ -91,42 +91,46 @@ namespace Manina.Windows.Forms
         protected override void OnPaintAdornments(PaintEventArgs pe)
         {
             base.OnPaintAdornments(pe);
-            imageListView.layoutManager.Update(true);
 
-            for (int i = 0; i < items.Length; i++)
+            if (imageListView.Items.Count == 0)
             {
-                ImageListViewItem item = items[i];
-                Rectangle bounds = imageListView.layoutManager.GetItemBounds(i);
+                imageListView.layoutManager.Update(true);
 
-                // Add custom columns
-                if (item.Tag == null)
+                for (int i = 0; i < items.Length; i++)
                 {
-                    int c = 0;
-                    foreach (ImageListView.ImageListViewColumnHeader column in imageListView.Columns)
+                    ImageListViewItem item = items[i];
+                    Rectangle bounds = imageListView.layoutManager.GetItemBounds(i);
+
+                    // Add custom columns
+                    if (item.Tag == null)
                     {
-                        if (column.Type == ColumnType.Custom)
+                        int c = 0;
+                        foreach (ImageListView.ImageListViewColumnHeader column in imageListView.Columns)
                         {
-                            item.AddSubItemText(column.columnID);
-                            c++;
+                            if (column.Type == ColumnType.Custom)
+                            {
+                                item.AddSubItemText(column.columnID);
+                                c++;
+                            }
                         }
+                        item.Tag = c.ToString();
                     }
-                    item.Tag = c.ToString();
-                }
 
-                Rectangle itemArea = imageListView.layoutManager.ItemAreaBounds;
-                Rectangle clip = Rectangle.Intersect(Rectangle.Intersect(bounds, itemArea), pe.ClipRectangle);
-                //pe.Graphics.SetClip(clip);
-                imageListView.mRenderer.DrawItem(pe.Graphics, item, ItemState.None, bounds);
+                    Rectangle itemArea = imageListView.layoutManager.ItemAreaBounds;
+                    Rectangle clip = Rectangle.Intersect(Rectangle.Intersect(bounds, itemArea), pe.ClipRectangle);
+                    //pe.Graphics.SetClip(clip);
+                    imageListView.mRenderer.DrawItem(pe.Graphics, item, ItemState.None, bounds);
 
-                if (imageListView.ShowCheckBoxes)
-                {
-                    Rectangle wbounds = imageListView.layoutManager.GetCheckBoxBounds(i);
-                    imageListView.mRenderer.DrawCheckBox(pe.Graphics, item, wbounds);
-                }
-                if (imageListView.ShowFileIcons)
-                {
-                    Rectangle wbounds = imageListView.layoutManager.GetIconBounds(i);
-                    imageListView.mRenderer.DrawFileIcon(pe.Graphics, item, wbounds);
+                    if (imageListView.ShowCheckBoxes)
+                    {
+                        Rectangle wbounds = imageListView.layoutManager.GetCheckBoxBounds(i);
+                        imageListView.mRenderer.DrawCheckBox(pe.Graphics, item, wbounds);
+                    }
+                    if (imageListView.ShowFileIcons)
+                    {
+                        Rectangle wbounds = imageListView.layoutManager.GetIconBounds(i);
+                        imageListView.mRenderer.DrawFileIcon(pe.Graphics, item, wbounds);
+                    }
                 }
             }
         }
@@ -142,7 +146,8 @@ namespace Manina.Windows.Forms
         private ImageListView imageListView;
         private DesignerActionUIService designerService;
 
-        private PropertyDescriptor property;
+        private PropertyDescriptor columnProperty;
+        private PropertyDescriptor itemProperty;
         #endregion
 
         #region Constructor
@@ -200,14 +205,6 @@ namespace Manina.Windows.Forms
             get { return imageListView.View; }
             set { GetPropertyByName("View").SetValue(imageListView, value); }
         }
-        /// <summary>
-        /// Gets or sets the view mode of the designed ImageListView.
-        /// </summary>
-        public ImageListView.ImageListViewColumnHeaderCollection Columns
-        {
-            get { return imageListView.Columns; }
-            set { GetPropertyByName("Columns").SetValue(imageListView, value); }
-        }
         #endregion
 
         #region Instance Methods
@@ -220,13 +217,13 @@ namespace Manina.Windows.Forms
             IComponentChangeService ccs = (IComponentChangeService)GetService(typeof(IComponentChangeService));
 
             // Get the collection editor
-            property = GetPropertyByName("Columns");
-            UITypeEditor editor = (UITypeEditor)property.GetEditor(typeof(UITypeEditor));
+            columnProperty = GetPropertyByName("Columns");
+            UITypeEditor editor = (UITypeEditor)columnProperty.GetEditor(typeof(UITypeEditor));
             object value = imageListView.Columns;
 
             // Notify the designers of the change
             if (ccs != null)
-                ccs.OnComponentChanging(imageListView, property);
+                ccs.OnComponentChanging(imageListView, columnProperty);
 
             // Edit the value
             value = editor.EditValue(this, this, value);
@@ -234,7 +231,34 @@ namespace Manina.Windows.Forms
 
             // Notify the designers of the change
             if (ccs != null)
-                ccs.OnComponentChanged(imageListView, property, null, null);
+                ccs.OnComponentChanged(imageListView, columnProperty, null, null);
+
+            designerService.Refresh(Component);
+        }
+        /// <summary>
+        /// Invokes the editor for the items of the designed ImageListView.
+        /// </summary>
+        public void EditItems()
+        {
+            // IComponentChangeService is used to pass change notifications to the designer
+            IComponentChangeService ccs = (IComponentChangeService)GetService(typeof(IComponentChangeService));
+
+            // Get the collection editor
+            itemProperty = GetPropertyByName("Items");
+            UITypeEditor editor = (UITypeEditor)itemProperty.GetEditor(typeof(UITypeEditor));
+            object value = imageListView.Items;
+
+            // Notify the designers of the change
+            if (ccs != null)
+                ccs.OnComponentChanging(imageListView, itemProperty);
+
+            // Edit the value
+            value = editor.EditValue(this, this, value);
+            imageListView.Items = (ImageListView.ImageListViewItemCollection)value;
+
+            // Notify the designers of the change
+            if (ccs != null)
+                ccs.OnComponentChanged(imageListView, itemProperty, null, null);
 
             designerService.Refresh(Component);
         }
@@ -248,6 +272,7 @@ namespace Manina.Windows.Forms
         {
             DesignerActionItemCollection items = new DesignerActionItemCollection();
 
+            items.Add(new DesignerActionMethodItem(this, "EditItems", "Edit Items", true));
             items.Add(new DesignerActionMethodItem(this, "EditColumns", "Edit Columns", true));
 
             items.Add(new DesignerActionPropertyItem("View", "View"));
@@ -334,7 +359,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         PropertyDescriptor ITypeDescriptorContext.PropertyDescriptor
         {
-            get { return property; }
+            get { return columnProperty; }
         }
         #endregion
     }

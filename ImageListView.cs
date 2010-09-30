@@ -351,8 +351,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the collection of items contained in the image list view.
         /// </summary>
-        [Browsable(false), Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
-        public ImageListViewItemCollection Items { get { return mItems; } }
+        [Category("Behavior"), Description("Gets the collection of items contained in the image list view.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public ImageListViewItemCollection Items { get { return mItems; } internal set { mItems = value; Refresh(); } }
         /// <summary>
         /// Gets or sets whether multiple items can be selected.
         /// </summary>
