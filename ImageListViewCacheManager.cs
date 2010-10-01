@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
 
-namespace Manina.Windows.Forms
+namespace Manina.Windows.Forms.Obsolete
 {
     /// <summary>
     /// Represents the cache manager responsible for asynchronously loading

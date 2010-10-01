@@ -292,17 +292,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Image GetImageAsync(ImageListViewItem item, Size size)
             {
-                Image img = mImageListView.cacheManager.GetRendererImage(item.Guid, size, mImageListView.UseEmbeddedThumbnails);
+                Image img = mImageListView.GetLargeImage(item.Guid, size);
 
                 if (img == null)
-                {
-                    if (item.isVirtualItem)
-                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.VirtualItemKey,
-                            size, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
-                    else
-                        mImageListView.cacheManager.AddToRendererCache(item.Guid, item.FileName, size,
-                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
-                }
+                    mImageListView.LoadLargeImage(item.Guid, size);
 
                 return img;
             }

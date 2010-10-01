@@ -41,6 +41,7 @@ namespace Manina.Windows.Forms
             public Size Size;
             public UseEmbeddedThumbnails UseEmbeddedThumbnails;
             public bool AutoRotate;
+            public bool UserSupplied;
 
             public WorkItem(object key, string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
             {
@@ -50,6 +51,7 @@ namespace Manina.Windows.Forms
                 Size = size;
                 UseEmbeddedThumbnails = useEmbeddedThumbnails;
                 AutoRotate = autoRotate;
+                UserSupplied = false;
             }
 
             public WorkItem(object key, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
@@ -60,6 +62,18 @@ namespace Manina.Windows.Forms
                 Size = size;
                 UseEmbeddedThumbnails = useEmbeddedThumbnails;
                 AutoRotate = autoRotate;
+                UserSupplied = false;
+            }
+
+            public WorkItem(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            {
+                Key = key;
+                FileName = string.Empty;
+                Image = null;
+                Size = size;
+                UseEmbeddedThumbnails = useEmbeddedThumbnails;
+                AutoRotate = autoRotate;
+                UserSupplied = true;
             }
         }
         #endregion
@@ -251,6 +265,32 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region Load Async User
+        /// <summary>
+        /// Loads the image with the given key asynchronously.
+        /// The user will receive a GetUserImage event and will be 
+        /// responsible for returning an image. The event will run
+        /// on the worker thread.
+        /// </summary>
+        /// <param name="key">A object identifying this worker item.</param>
+        /// <param name="size">The size of the requested thumbnail. If this parameter is
+        /// Size.Empty the original image will be loaded.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded Exif thumbnail extraction behaviour.
+        /// This parameter is ignored if the size parameter is Size.Empty.</param>
+        /// <param name="autoRotate">true to automatically rotate the image based on 
+        /// orientation metadata; otherwise false.</param>
+        public void LoadAsync(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            Start();
+
+            lock (lockObject)
+            {
+                items.Enqueue(new WorkItem(key, size, useEmbeddedThumbnails, autoRotate));
+                Monitor.Pulse(lockObject);
+            }
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Determines whether the image loader is being stopped.
@@ -327,13 +367,24 @@ namespace Manina.Windows.Forms
             OnImageLoaderCompleted((AsyncImageLoaderCompletedEventArgs)arg);
         }
         /// <summary>
-        /// Raises the ImageLoaderCompleted event.
+        /// Raises the ImageLoaded event.
         /// </summary>
         /// <param name="e">An ImageLoaderCompletedEventArgs that contains event data.</param>
         protected virtual void OnImageLoaderCompleted(AsyncImageLoaderCompletedEventArgs e)
         {
-            if (ImageLoaderCompleted != null)
-                ImageLoaderCompleted(this, e);
+            if (ImageLoaded != null)
+                ImageLoaded(this, e);
+        }
+        /// <summary>
+        /// Raises the GetUserImage event.
+        /// </summary>
+        /// <param name="e">An ImageLoaderCompletedEventArgs that contains event data.</param>
+        protected virtual void OnGetUserImage(AsyncImageLoaderGetUserImageEventArgs e)
+        {
+            if (GetUserImage != null)
+                GetUserImage(this, e);
+            else
+                e.Error = new InvalidOperationException("OnGetUserImage event not handled.");
         }
         #endregion
 
@@ -353,7 +404,13 @@ namespace Manina.Windows.Forms
         /// Occurs when a load operation is completed.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when a load operation is completed.")]
-        public event AsyncImageLoaderCompletedEventHandler ImageLoaderCompleted;
+        public event AsyncImageLoaderCompletedEventHandler ImageLoaded;
+        /// <summary>
+        /// Occurs when a user supplied image is requested. This event
+        /// will run on the worker thread.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs when a user supplied image is requested.")]
+        public event AsyncImageLoaderGetUserImageEventHandler GetUserImage;
         #endregion
 
         #region Worker Method
@@ -407,6 +464,14 @@ namespace Manina.Windows.Forms
                                 image = ThumbnailExtractor.FromImage(request.Image,
                                     request.Size, request.UseEmbeddedThumbnails, request.AutoRotate);
                             }
+                            else if (request.UserSupplied)
+                            {
+                                AsyncImageLoaderGetUserImageEventArgs arg = new AsyncImageLoaderGetUserImageEventArgs(
+                                    request.Key, request.Size, request.UseEmbeddedThumbnails, request.AutoRotate);
+                                OnGetUserImage(arg);
+                                image = arg.Image;
+                                error = arg.Error;
+                            }
                         }
                         catch (Exception e)
                         {
@@ -414,7 +479,10 @@ namespace Manina.Windows.Forms
                         }
 
                         // Raise the image loaded event
-                        AsyncImageLoaderCompletedEventArgs result = new AsyncImageLoaderCompletedEventArgs(request.Key, image, error);
+                        AsyncImageLoaderCompletedEventArgs result =
+                            new AsyncImageLoaderCompletedEventArgs(
+                                request.Key, request.Size, request.UseEmbeddedThumbnails, request.AutoRotate, image, error
+                                );
                         context.Post(loaderCompleted, result);
                     }
 
