@@ -32,7 +32,7 @@ namespace Manina.Windows.Forms
     /// <param name="sender">The object that is the source of the event.</param>
     /// <param name="e">An ImageLoaderCompletedEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void ImageLoaderCompletedEventHandler(object sender, ImageLoaderCompletedEventArgs e);
+    public delegate void AsyncImageLoaderCompletedEventHandler(object sender, AsyncImageLoaderCompletedEventArgs e);
     #endregion
 
     #region Event Arguments
@@ -40,7 +40,7 @@ namespace Manina.Windows.Forms
     /// Represents the event arguments of the ImageLoaderCompleted event.
     /// </summary>
     [Serializable, ComVisible(true)]
-    public class ImageLoaderCompletedEventArgs
+    public class AsyncImageLoaderCompletedEventArgs
     {
         /// <summary>
         /// Gets the key of the item. The key is passed to the ImageLoader
@@ -63,7 +63,7 @@ namespace Manina.Windows.Forms
         /// <param name="key">The key of the item.</param>
         /// <param name="image">The loaded image.</param>
         /// <param name="error">The error that occurred while loading the image.</param>
-        public ImageLoaderCompletedEventArgs(object key, Image image, Exception error)
+        public AsyncImageLoaderCompletedEventArgs(object key, Image image, Exception error)
         {
             Key = key;
             Image = image;
