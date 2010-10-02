@@ -19,11 +19,12 @@ namespace Manina.Windows.Forms
         private readonly object lockObject;
 
         private Thread thread;
-        private SynchronizationContext context;
         private bool stopping;
         private bool started;
+        private SynchronizationContext context;
 
         private Queue<WorkItem> items;
+        private Queue<WorkItem> priorityItems;
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback loaderCompleted;
@@ -35,46 +36,128 @@ namespace Manina.Windows.Forms
         /// </summary>
         private class WorkItem
         {
-            public object Key;
-            public string FileName;
-            public Image Image;
-            public Size Size;
-            public UseEmbeddedThumbnails UseEmbeddedThumbnails;
-            public bool AutoRotate;
-            public bool UserSupplied;
+            #region Properties
+            /// <summary>
+            /// Gets the key identifying this item.
+            /// </summary>
+            public object Key { get; private set; }
+            /// <summary>
+            /// Gets the filename of the image file. Can be null if the
+            /// image source is given in the <see cref="Image"/> property
+            /// or the image is user supplied.
+            /// </summary>
+            public string FileName { get; private set; }
+            /// <summary>
+            /// Gets the source image. Can be null if the
+            /// image source is given in the <see cref="FileName"/> property
+            /// or the image is user supplied.
+            /// </summary>
+            public Image Image { get; private set; }
+            /// <summary>
+            /// Gets the size of the requested image.
+            /// </summary>
+            public Size Size { get; private set; }
+            /// <summary>
+            /// Gets embedded thumbnails usage behavior.
+            /// </summary>
+            public UseEmbeddedThumbnails UseEmbeddedThumbnails { get; private set; }
+            /// <summary>
+            /// Gets whether the image will be rotated based on Exif
+            /// rotation metadata.
+            /// </summary>
+            public bool AutoRotate { get; private set; }
+            /// <summary>
+            /// Gets whether the image will be requested from the user by raising a
+            /// <see cref="GetUserImage"/> event;
+            /// </summary>
+            public bool UserSupplied { get; private set; }
+            /// <summary>
+            /// Gets whether this item will be processed before other items without the
+            /// <see cref="IsPriorityItem"/> flag set.
+            /// </summary>
+            public bool IsPriorityItem { get; private set; }
+            #endregion
 
-            public WorkItem(object key, string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            #region Constructurs
+            /// <summary>
+            /// Initializes a new instance of the <see cref="WorkItem"/> class.
+            /// </summary>
+            /// <param name="key">The key identifying this item.</param>
+            /// <param name="filename">The filename of the image file. This parameter can be null.</param>
+            /// <param name="image">The source image. This parameter can be null.</param>
+            /// <param name="size">Requested image size.</param>
+            /// <param name="useEmbeddedThumbnails">Embedded thumbnails usage behavior.</param>
+            /// <param name="autoRotate">If true the image will be rotated based on Exif
+            /// rotation metadata; if false original orientation will be kept.</param>
+            /// <param name="isPriorityItem">If true this item will be processed before other items without the
+            /// <see cref="IsPriorityItem"/> flag set; if false the item will have normal priority.</param>
+            /// <param name="isUserSupplied">If true, the image will be requested from the user by raising a
+            /// <see cref="GetUserImage"/> event; if false the image will be extracted from either the <see cref="FileName"/> or
+            /// <see cref="Image"/> properties.</param>
+            private WorkItem(object key, string filename, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem, bool isUserSupplied)
             {
                 Key = key;
                 FileName = filename;
-                Image = null;
-                Size = size;
-                UseEmbeddedThumbnails = useEmbeddedThumbnails;
-                AutoRotate = autoRotate;
-                UserSupplied = false;
-            }
-
-            public WorkItem(object key, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
-            {
-                Key = key;
-                FileName = null;
                 Image = image;
                 Size = size;
                 UseEmbeddedThumbnails = useEmbeddedThumbnails;
                 AutoRotate = autoRotate;
-                UserSupplied = false;
+                IsPriorityItem = isPriorityItem;
+                UserSupplied = isUserSupplied;
             }
-
-            public WorkItem(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            /// <summary>
+            /// Initializes a new instance of the <see cref="WorkItem"/> class. Thee image will
+            /// be sampled from the source image given by the filename parameter.
+            /// </summary>
+            /// <param name="key">The key identifying this item.</param>
+            /// <param name="filename">The filename of the image file.</param>
+            /// <param name="size">Requested image size.</param>
+            /// <param name="useEmbeddedThumbnails">Embedded thumbnails usage behavior.</param>
+            /// <param name="autoRotate">If true the image will be rotated based on Exif
+            /// rotation metadata; if false original orientation will be kept.</param>
+            /// <param name="isPriorityItem">If true this item will be processed before other items without the
+            /// <see cref="IsPriorityItem"/> flag set; if false the item will have normal priority.</param>
+            public WorkItem(object key, string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem)
+                : this(key, filename, null, size, useEmbeddedThumbnails, autoRotate, isPriorityItem, false)
             {
-                Key = key;
-                FileName = string.Empty;
-                Image = null;
-                Size = size;
-                UseEmbeddedThumbnails = useEmbeddedThumbnails;
-                AutoRotate = autoRotate;
-                UserSupplied = true;
+                if (string.IsNullOrEmpty(filename))
+                    throw new ArgumentException();
             }
+            /// <summary>
+            /// Initializes a new instance of the <see cref="WorkItem"/> class. Thee image will
+            /// be sampled from the source image given by the image parameter.
+            /// </summary>
+            /// <param name="key">The key identifying this item.</param>
+            /// <param name="image">The source image. This parameter can be null.</param>
+            /// <param name="size">Requested image size.</param>
+            /// <param name="useEmbeddedThumbnails">Embedded thumbnails usage behavior.</param>
+            /// <param name="autoRotate">If true the image will be rotated based on Exif
+            /// rotation metadata; if false original orientation will be kept.</param>
+            /// <param name="isPriorityItem">If true this item will be processed before other items without the
+            /// <see cref="IsPriorityItem"/> flag set; if false the item will have normal priority.</param>
+            public WorkItem(object key, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem)
+                : this(key, null, image, size, useEmbeddedThumbnails, autoRotate, isPriorityItem, false)
+            {
+                if (image == null)
+                    throw new ArgumentException();
+            }
+            /// <summary>
+            /// Initializes a new instance of the <see cref="WorkItem"/> class. Thee image will
+            /// be requested from the user by raising a <see cref="GetUserImage"/> event.
+            /// </summary>
+            /// <param name="key">The key identifying this item.</param>
+            /// <param name="size">Requested image size.</param>
+            /// <param name="useEmbeddedThumbnails">Embedded thumbnails usage behavior.</param>
+            /// <param name="autoRotate">If true the image will be rotated based on Exif
+            /// rotation metadata; if false original orientation will be kept.</param>
+            /// <param name="isPriorityItem">If true this item will be processed before other items without the
+            /// <see cref="IsPriorityItem"/> flag set; if false the item will have normal priority.</param>
+            public WorkItem(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem)
+                : this(key, null, null, size, useEmbeddedThumbnails, autoRotate, isPriorityItem, true)
+            {
+                ;
+            }
+            #endregion
         }
         #endregion
 
@@ -87,9 +170,14 @@ namespace Manina.Windows.Forms
             lockObject = new object();
             stopping = false;
             started = false;
+            context = null;
+
+            thread = new Thread(new ThreadStart(DoWork));
+            thread.IsBackground = true;
 
             // Work items
             items = new Queue<WorkItem>();
+            priorityItems = new Queue<WorkItem>();
             cancelledItems = new Dictionary<object, bool>();
 
             // The loader complete callback
@@ -109,15 +197,31 @@ namespace Manina.Windows.Forms
         /// This parameter is ignored if the size parameter is Size.Empty.</param>
         /// <param name="autoRotate">true to automatically rotate the image based on 
         /// orientation metadata; otherwise false.</param>
-        public void LoadAsync(object key, string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        /// <param name="isPriorityItem">true if this image should be loaded before others in the queue.</param>
+        public void LoadAsync(object key, string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem)
         {
             Start();
 
             lock (lockObject)
             {
-                items.Enqueue(new WorkItem(key, filename, size, useEmbeddedThumbnails, autoRotate));
+                items.Enqueue(new WorkItem(key, filename, size, useEmbeddedThumbnails, autoRotate, isPriorityItem));
                 Monitor.Pulse(lockObject);
             }
+        }
+        /// <summary>
+        /// Loads the image with the specified filename asynchronously.
+        /// </summary>
+        /// <param name="key">A object identifying this worker item.</param>
+        /// <param name="filename">The path of an image file.</param>
+        /// <param name="size">The size of the requested thumbnail. If this parameter is
+        /// Size.Empty the original image will be loaded.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded Exif thumbnail extraction behaviour.
+        /// This parameter is ignored if the size parameter is Size.Empty.</param>
+        /// <param name="autoRotate">true to automatically rotate the image based on 
+        /// orientation metadata; otherwise false.</param>
+        public void LoadAsync(object key, string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            LoadAsync(key, filename, size, useEmbeddedThumbnails, autoRotate, false);
         }
         /// <summary>
         /// Loads the image with the specified filename asynchronously,
@@ -193,15 +297,31 @@ namespace Manina.Windows.Forms
         /// This parameter is ignored if the size parameter is Size.Empty.</param>
         /// <param name="autoRotate">true to automatically rotate the image based on 
         /// orientation metadata; otherwise false.</param>
-        public void LoadAsync(object key, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        /// <param name="isPriorityItem">true if this image should be loaded before others in the queue.</param>
+        public void LoadAsync(object key, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem)
         {
             Start();
 
             lock (lockObject)
             {
-                items.Enqueue(new WorkItem(key, image, size, useEmbeddedThumbnails, autoRotate));
+                items.Enqueue(new WorkItem(key, image, size, useEmbeddedThumbnails, autoRotate, isPriorityItem));
                 Monitor.Pulse(lockObject);
             }
+        }
+        /// <summary>
+        /// Loads the image from the given source image asynchronously.
+        /// </summary>
+        /// <param name="key">A object identifying this worker item.</param>
+        /// <param name="image">The source image.</param>
+        /// <param name="size">The size of the requested thumbnail. If this parameter is
+        /// Size.Empty the original image will be loaded.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded Exif thumbnail extraction behaviour.
+        /// This parameter is ignored if the size parameter is Size.Empty.</param>
+        /// <param name="autoRotate">true to automatically rotate the image based on 
+        /// orientation metadata; otherwise false.</param>
+        public void LoadAsync(object key, Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            LoadAsync(key, image, size, useEmbeddedThumbnails, autoRotate, false);
         }
         /// <summary>
         /// Loads the image with the specified filename asynchronously,
@@ -279,15 +399,33 @@ namespace Manina.Windows.Forms
         /// This parameter is ignored if the size parameter is Size.Empty.</param>
         /// <param name="autoRotate">true to automatically rotate the image based on 
         /// orientation metadata; otherwise false.</param>
-        public void LoadAsync(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        /// <param name="isPriorityItem">true if this image should be loaded before others in the queue.</param>
+        public void LoadAsync(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool isPriorityItem)
         {
             Start();
 
             lock (lockObject)
             {
-                items.Enqueue(new WorkItem(key, size, useEmbeddedThumbnails, autoRotate));
+                items.Enqueue(new WorkItem(key, size, useEmbeddedThumbnails, autoRotate, isPriorityItem));
                 Monitor.Pulse(lockObject);
             }
+        }
+        /// <summary>
+        /// Loads the image with the given key asynchronously.
+        /// The user will receive a GetUserImage event and will be 
+        /// responsible for returning an image. The event will run
+        /// on the worker thread.
+        /// </summary>
+        /// <param name="key">A object identifying this worker item.</param>
+        /// <param name="size">The size of the requested thumbnail. If this parameter is
+        /// Size.Empty the original image will be loaded.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded Exif thumbnail extraction behaviour.
+        /// This parameter is ignored if the size parameter is Size.Empty.</param>
+        /// <param name="autoRotate">true to automatically rotate the image based on 
+        /// orientation metadata; otherwise false.</param>
+        public void LoadAsync(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            LoadAsync(key, size, useEmbeddedThumbnails, autoRotate, false);
         }
         #endregion
 
@@ -307,13 +445,10 @@ namespace Manina.Windows.Forms
             if (started)
                 return;
 
-            // Get the synchronization context
-            if (context == null)
-                context = SynchronizationContext.Current;
+            // Get the current synchronization context
+            context = SynchronizationContext.Current;
 
             // Start the thread
-            thread = new Thread(new ThreadStart(DoWork));
-            thread.IsBackground = true;
             thread.Start();
             while (!thread.IsAlive) ;
 
@@ -337,8 +472,11 @@ namespace Manina.Windows.Forms
         {
             lock (lockObject)
             {
-                cancelledItems.Add(key, false);
-                Monitor.Pulse(lockObject);
+                if (!cancelledItems.ContainsKey(key))
+                {
+                    cancelledItems.Add(key, false);
+                    Monitor.Pulse(lockObject);
+                }
             }
         }
         /// <summary>
@@ -390,6 +528,13 @@ namespace Manina.Windows.Forms
 
         #region Instance Methods
         /// <summary>
+        /// Gets the apartment state of the worker thread.
+        /// </summary>
+        public ApartmentState GetApartmentState()
+        {
+            return thread.GetApartmentState();
+        }
+        /// <summary>
         /// Sets the apartment state of the worker thread. The apartment state
         /// cannot be changed after the worker thread is started.
         /// </summary>
@@ -424,7 +569,7 @@ namespace Manina.Windows.Forms
                 lock (lockObject)
                 {
                     // Wait until we have pending work items
-                    if (items.Count == 0)
+                    if (priorityItems.Count == 0 || items.Count == 0)
                         Monitor.Wait(lockObject);
                 }
 
@@ -436,14 +581,17 @@ namespace Manina.Windows.Forms
                     WorkItem request = null;
                     lock (lockObject)
                     {
-                        if (items.Count != 0)
-                        {
+                        // Check priority queue first
+                        if (priorityItems.Count != 0)
+                            request = priorityItems.Dequeue();
+
+                        // Check the normal queue
+                        if (request == null && items.Count != 0)
                             request = items.Dequeue();
 
-                            // Check if the item was removed
-                            if (cancelledItems.ContainsKey(request.Key))
-                                request = null;
-                        }
+                        // Check if the item was removed
+                        if (request != null && cancelledItems.ContainsKey(request.Key))
+                            request = null;
                     }
 
                     if (request != null)
@@ -481,7 +629,8 @@ namespace Manina.Windows.Forms
                         // Raise the image loaded event
                         AsyncImageLoaderCompletedEventArgs result =
                             new AsyncImageLoaderCompletedEventArgs(
-                                request.Key, request.Size, request.UseEmbeddedThumbnails, request.AutoRotate, image, error
+                                request.Key, request.Size, request.UseEmbeddedThumbnails,
+                                request.AutoRotate, image, request.IsPriorityItem, error
                                 );
                         context.Post(loaderCompleted, result);
                     }
@@ -489,7 +638,7 @@ namespace Manina.Windows.Forms
                     // Check if the cache is exhausted
                     lock (lockObject)
                     {
-                        if (items.Count == 0)
+                        if (priorityItems.Count == 0 && items.Count == 0)
                             queueFull = false;
                     }
 

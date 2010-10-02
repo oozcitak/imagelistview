@@ -222,7 +222,6 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the thumbnail image. If the thumbnail image is not cached, it will be 
         /// added to the cache queue and null will be returned.
-        /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the thumbnail image.")]
         public Image ThumbnailImage
@@ -232,7 +231,12 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Owner control is null.");
 
-                return mImageListView.GetThumbnailImage(mGuid);
+                Image img = mImageListView.GetThumbnailImage(mGuid);
+
+                if (img == null)
+                    mImageListView.LoadThumbnailImage(mGuid);
+
+                return null;
             }
         }
         /// <summary>
@@ -721,7 +725,7 @@ namespace Manina.Windows.Forms
                     if (img == null && mImageListView.ShellIconFallback)
                         img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
                     if (img == null)
-                        img = (Image)mImageListView.ErrorImage.Clone();
+                        img = mImageListView.ErrorImage;
                     return img;
                 }
 
@@ -738,7 +742,7 @@ namespace Manina.Windows.Forms
                 if (img == null && mImageListView.ShellIconFallback)
                     img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
                 if (img == null)
-                    img = (Image)mImageListView.DefaultImage.Clone();
+                    img = mImageListView.DefaultImage;
 
                 return img;
             }

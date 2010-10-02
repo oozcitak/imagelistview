@@ -73,6 +73,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         public Image Image { get; private set; }
         /// <summary>
+        /// Gets whether this item is a priority item.
+        /// </summary>
+        public bool IsPriorityItem { get; private set; }
+        /// <summary>
         /// Gets the error that occurred while loading the image.
         /// </summary>
         public Exception Error { get; private set; }
@@ -81,15 +85,20 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of the ImageLoaderCompletedEventArgs class.
         /// </summary>
         /// <param name="key">The key of the item.</param>
+        /// <param name="size">The size of the requested image.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail extraction behavior.</param>
+        /// <param name="autoRotate">Whether the image should be rotated based on orientation metadata.</param>
         /// <param name="image">The loaded image.</param>
+        /// <param name="isPriorityItem">Whether this item is a priority item.</param>
         /// <param name="error">The error that occurred while loading the image.</param>
-        public AsyncImageLoaderCompletedEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, Image image, Exception error)
+        public AsyncImageLoaderCompletedEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, Image image, bool isPriorityItem, Exception error)
         {
             Key = key;
             Size = size;
             UseEmbeddedThumbnails = useEmbeddedThumbnails;
             AutoRotate = autoRotate;
             Image = image;
+            IsPriorityItem = IsPriorityItem;
             Error = error;
         }
     }
@@ -131,6 +140,9 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of the ImageLoaderCompletedEventArgs class.
         /// </summary>
         /// <param name="key">The key of the item.</param>
+        /// <param name="size">The size of the requested image.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail extraction behavior.</param>
+        /// <param name="autoRotate">Whether the image should be rotated based on orientation metadata.</param>
         public AsyncImageLoaderGetUserImageEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
         {
             Key = key;
