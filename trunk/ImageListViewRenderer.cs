@@ -32,14 +32,18 @@ namespace Manina.Windows.Forms
         /// </summary>
         public class ImageListViewRenderer : IDisposable
         {
+            #region Constants
+            /// <summary>
+            /// Represents the time span after which the control deems to be needing a refresh.
+            /// </summary>
+            private static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 100);
+            #endregion
+
             #region Member Variables
             private bool mClip;
             internal ImageListView mImageListView;
             private BufferedGraphics bufferGraphics;
             private bool disposed;
-            private bool suspended;
-            private int suspendCount;
-            private bool needsPaint;
             private ItemDrawOrder mItemDrawOrder;
             private bool creatingGraphics;
             private DateTime lastRenderTime;
@@ -72,9 +76,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public virtual bool CanApplyColors { get { return true; } }
             /// <summary>
-            /// Gets the time the control was last redrawn.
+            /// Gets whether the lazy refresh intervaş is exceeded.
             /// </summary>
-            internal DateTime LastRenderTime { get { return lastRenderTime; } }
+            internal bool LazyRefreshIntervalExceeded { get { return ((DateTime.Now - lastRenderTime) > LazyRefreshInterval); } }
             #endregion
 
             #region Constructors
@@ -85,9 +89,6 @@ namespace Manina.Windows.Forms
             {
                 creatingGraphics = false;
                 disposed = false;
-                suspended = false;
-                suspendCount = 0;
-                needsPaint = true;
                 mClip = true;
                 mItemDrawOrder = ItemDrawOrder.ItemIndex;
                 lastRenderTime = DateTime.MinValue;
@@ -309,88 +310,9 @@ namespace Manina.Windows.Forms
 
             #region Internal Methods
             /// <summary>
-            /// Redraws the owner control.
-            /// </summary>
-            /// <param name="graphics">The System.Drawing.Graphics to draw on.</param>
-            /// <param name="forceUpdate">If true, forces an immediate update, even if
-            /// the renderer is suspended by a SuspendPaint call.</param>
-            internal void Refresh(Graphics graphics, bool forceUpdate)
-            {
-                if (forceUpdate || CanPaint())
-                    Render(graphics);
-                else
-                    needsPaint = true;
-            }
-            /// <summary>
-            /// Redraws the owner control.
-            /// <param name="graphics">The System.Drawing.Graphics to draw on.</param>
-            /// </summary>
-            internal void Refresh(Graphics graphics)
-            {
-                Refresh(graphics, false);
-            }
-            /// <summary>
-            /// Suspends painting until a matching ResumePaint call is made.
-            /// Used by the parent control as part of SuspendLayout.
-            /// </summary>
-            internal void SuspendPaint(bool ispublic)
-            {
-                if (ispublic)
-                    suspended = true;
-                else
-                    SuspendPaint();
-            }
-            /// <summary>
-            /// Resumes painting. This call must be matched by a prior SuspendPaint call.
-            /// Used by the parent control as part of ResumeLayout.
-            /// </summary>
-            internal void ResumePaint(bool ispublic)
-            {
-                if (ispublic)
-                {
-                    suspended = false;
-                    if (needsPaint) mImageListView.Refresh();
-                }
-                else
-                    ResumePaint();
-            }
-            /// <summary>
-            /// Suspends painting until a matching ResumePaint call is made.
-            /// </summary>
-            internal void SuspendPaint()
-            {
-                if (suspendCount == 0) needsPaint = false;
-                suspendCount++;
-            }
-            /// <summary>
-            /// Resumes painting. This call must be matched by a prior SuspendPaint call.
-            /// </summary>
-            internal void ResumePaint()
-            {
-                System.Diagnostics.Debug.Assert(
-                    suspendCount > 0,
-                    "Suspend count does not match resume count.",
-                    "ResumePaint() must be matched by a prior SuspendPaint() call."
-                    );
-
-                suspendCount--;
-                if (needsPaint)
-                    mImageListView.Refresh();
-            }
-            /// <summary>
-            /// Determines if the control can be painted.
-            /// </summary>
-            internal bool CanPaint()
-            {
-                if (suspended || suspendCount != 0)
-                    return false;
-                else
-                    return true;
-            }
-            /// <summary>
             /// Renders the control.
             /// </summary>
-            private void Render(Graphics graphics)
+            internal void Render(Graphics graphics)
             {
                 if (disposed) return;
 
