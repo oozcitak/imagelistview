@@ -241,7 +241,7 @@ namespace Manina.Windows.Forms
 
                 DoHitTest(e.Location);
 
-                mImageListView.mRenderer.SuspendPaint();
+                mImageListView.SuspendPaint();
 
                 // Do we need to scroll the view?
                 if (MouseSelecting && mImageListView.ScrollOrientation == ScrollOrientation.VerticalScroll && !scrollTimer.Enabled)
@@ -469,7 +469,7 @@ namespace Manina.Windows.Forms
                     mImageListView.Refresh();
                 }
 
-                mImageListView.mRenderer.ResumePaint();
+                mImageListView.ResumePaint();
 
                 // Change to size cursor if mouse is over a column separator or pane border
                 if (mImageListView.Cursor != Cursors.VSplit && mImageListView.Focused && !MouseSelecting)
@@ -494,7 +494,7 @@ namespace Manina.Windows.Forms
             {
                 DoHitTest(e.Location);
 
-                mImageListView.mRenderer.SuspendPaint();
+                mImageListView.SuspendPaint();
 
                 // Stop if we are scrolling
                 if (scrollTimer.Enabled)
@@ -664,7 +664,7 @@ namespace Manina.Windows.Forms
                 if ((e.Button & MouseButtons.Right) != MouseButtons.None)
                     RightButton = false;
 
-                mImageListView.mRenderer.ResumePaint();
+                mImageListView.ResumePaint();
             }
             /// <summary>
             /// Handles control's MouseDoubleClick event.
@@ -713,7 +713,7 @@ namespace Manina.Windows.Forms
                 ShiftKey = (e.Modifiers & Keys.Shift) == Keys.Shift;
                 ControlKey = (e.Modifiers & Keys.Control) == Keys.Control;
 
-                mImageListView.mRenderer.SuspendPaint();
+                mImageListView.SuspendPaint();
 
                 // If the shift key or the control key is pressed and there is no focused item
                 // set the first item as the focused item.
@@ -769,7 +769,7 @@ namespace Manina.Windows.Forms
                     }
                 }
 
-                mImageListView.mRenderer.ResumePaint();
+                mImageListView.ResumePaint();
             }
             /// <summary>
             /// Handles control's KeyUp event.
@@ -787,7 +787,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragDrop(DragEventArgs e)
             {
-                mImageListView.mRenderer.SuspendPaint();
+                mImageListView.SuspendPaint();
 
                 if (selfDragging)
                 {
@@ -828,7 +828,7 @@ namespace Manina.Windows.Forms
                 selfDragging = false;
 
                 mImageListView.Refresh();
-                mImageListView.mRenderer.ResumePaint();
+                mImageListView.ResumePaint();
             }
             /// <summary>
             /// Handles control's DragEnter event.

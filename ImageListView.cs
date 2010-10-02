@@ -57,10 +57,6 @@ namespace Manina.Windows.Forms
         /// Specifies that the control has a border with a sunken edge.
         /// </summary>
         private const int WS_EX_CLIENTEDGE = 0x00000200;
-        /// <summary>
-        /// Represents the time span after which the control deems to be needing a refresh.
-        /// </summary>
-        private static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 100);
         #endregion
 
         #region Member Variables
@@ -84,7 +80,6 @@ namespace Manina.Windows.Forms
         private bool mIntegralScroll;
         private ImageListViewItemCollection mItems;
         private int mPaneWidth;
-        internal ImageListViewRenderer mRenderer;
         private bool mRetryOnError;
         internal ImageListViewSelectedItemCollection mSelectedItems;
         internal ImageListViewCheckedItemCollection mCheckedItems;
@@ -101,12 +96,17 @@ namespace Manina.Windows.Forms
         private View mView;
         private Point mViewOffset;
 
+        // Renderer variables
+        internal ImageListViewRenderer mRenderer;
+        private bool suspended;
+        private int suspendCount;
+        private bool needsPaint;
+
         // Layout variables
         internal HScrollBar hScrollBar;
         internal VScrollBar vScrollBar;
         internal ImageListViewLayoutManager layoutManager;
         private bool disposed;
-        private bool forceRefresh;
 
         // Interaction variables
         internal ImageListViewNavigationManager navigationManager;
@@ -618,13 +618,13 @@ namespace Manina.Windows.Forms
             }
             set
             {
-                mRenderer.SuspendPaint();
+                SuspendPaint();
                 int current = layoutManager.FirstVisible;
                 mView = value;
                 layoutManager.Update();
                 EnsureVisible(current);
                 Refresh();
-                mRenderer.ResumePaint();
+                ResumePaint();
             }
         }
         /// <summary>
@@ -784,6 +784,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ImageListView()
         {
+            // Renderer parameters
+            suspended = false;
+            suspendCount = 0;
+            needsPaint = true;
+
             mColors = ImageListViewColor.Default;
             SetRenderer(new ImageListViewRenderer());
 
@@ -844,7 +849,6 @@ namespace Manina.Windows.Forms
 
             // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
-            forceRefresh = false;
 
             navigationManager = new ImageListViewNavigationManager(this);
 
@@ -1088,7 +1092,7 @@ namespace Manina.Windows.Forms
         public new void SuspendLayout()
         {
             base.SuspendLayout();
-            mRenderer.SuspendPaint(true);
+            SuspendPaint(true);
         }
         /// <summary>
         /// Resumes usual layout logic.
@@ -1105,7 +1109,7 @@ namespace Manina.Windows.Forms
         {
             base.ResumeLayout(performLayout);
             if (performLayout) Refresh();
-            mRenderer.ResumePaint(true);
+            ResumePaint(true);
         }
         /// <summary>
         /// Sets the renderer for this instance.
@@ -1138,7 +1142,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void SelectAll()
         {
-            mRenderer.SuspendPaint();
+            SuspendPaint();
 
             foreach (ImageListViewItem item in Items)
                 item.mSelected = true;
@@ -1146,17 +1150,17 @@ namespace Manina.Windows.Forms
             OnSelectionChangedInternal();
 
             Refresh();
-            mRenderer.ResumePaint();
+            ResumePaint();
         }
         /// <summary>
         /// Marks all items as unselected.
         /// </summary>
         public void ClearSelection()
         {
-            mRenderer.SuspendPaint();
+            SuspendPaint();
             mSelectedItems.Clear();
             Refresh();
-            mRenderer.ResumePaint();
+            ResumePaint();
         }
         /// <summary>
         /// Determines the image list view element under the specified coordinates.
@@ -1325,37 +1329,108 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Helper Methods
+        #region Rendering Methods
         /// <summary>
         /// Refreshes the control.
         /// </summary>
         /// <param name="force">Forces a refresh even if the renderer is suspended.</param>
-        /// <param name="lazy">Refreshed the control only if a set amount of time
+        /// <param name="lazy">Refreshes the control only if a set amount of time
         /// has passed since the last refresh.</param>
         internal void Refresh(bool force, bool lazy)
         {
             if (force)
+                base.Refresh();
+            else if (lazy && CanPaint())
             {
-                forceRefresh = force;
-                Refresh();
-                forceRefresh = false;
+                if (mRenderer.LazyRefreshIntervalExceeded)
+                    base.Refresh();
+                else
+                    needsPaint = true;
             }
-            else if (lazy)
-            {
-                if ((DateTime.Now - mRenderer.LastRenderTime) > LazyRefreshInterval)
-                    Refresh();
-            }
+            else if (CanPaint())
+                base.Refresh();
             else
-                Refresh();
+                needsPaint = true;
         }
         /// <summary>
-        /// Refreshes the control.
+        /// Redraws the owner control.
         /// </summary>
-        /// <param name="force">Forces a refresh even if the renderer is suspended.</param>
-        internal void Refresh(bool force)
+        /// <param name="force">If true, forces an immediate update, even if
+        /// the renderer is suspended by a SuspendPaint call.</param>
+        private void Refresh(bool force)
         {
             Refresh(force, false);
         }
+        /// <summary>
+        /// Redraws the owner control.
+        /// </summary>
+        private new void Refresh()
+        {
+            Refresh(false, false);
+        }
+        /// <summary>
+        /// Suspends painting until a matching ResumePaint call is made.
+        /// Used by the parent control as part of SuspendLayout.
+        /// </summary>
+        private void SuspendPaint(bool ispublic)
+        {
+            if (ispublic)
+                suspended = true;
+            else
+                SuspendPaint();
+        }
+        /// <summary>
+        /// Resumes painting. This call must be matched by a prior SuspendPaint call.
+        /// Used by the parent control as part of ResumeLayout.
+        /// </summary>
+        private void ResumePaint(bool ispublic)
+        {
+            if (ispublic)
+            {
+                suspended = false;
+                if (needsPaint) Refresh();
+            }
+            else
+                ResumePaint();
+        }
+        /// <summary>
+        /// Suspends painting until a matching ResumePaint call is made.
+        /// </summary>
+        private void SuspendPaint()
+        {
+            if (suspendCount == 0) needsPaint = false;
+            suspendCount++;
+        }
+        /// <summary>
+        /// Resumes painting. This call must be matched by a prior SuspendPaint call.
+        /// </summary>
+        private void ResumePaint()
+        {
+            System.Diagnostics.Debug.Assert(
+                suspendCount > 0,
+                "Suspend count does not match resume count.",
+                "ResumePaint() must be matched by a prior SuspendPaint() call."
+                );
+
+            suspendCount--;
+            if (needsPaint)
+                Refresh();
+        }
+        /// <summary>
+        /// Determines if the control can be painted.
+        /// </summary>
+        private bool CanPaint()
+        {
+            if (mRenderer == null)
+                return false;
+            if (suspended || suspendCount != 0)
+                return false;
+            else
+                return true;
+        }
+        #endregion
+
+        #region Helper Methods
         /// <summary>
         /// Determines whether the specified item is visible on the screen.
         /// </summary>
@@ -1491,7 +1566,7 @@ namespace Manina.Windows.Forms
         protected override void OnPaint(PaintEventArgs e)
         {
             if (!disposed && mRenderer != null)
-                mRenderer.Refresh(e.Graphics, forceRefresh);
+                mRenderer.Render(e.Graphics);
         }
         /// <summary>
         /// Handles the MouseDown event.
@@ -1526,7 +1601,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            mRenderer.SuspendPaint();
+            SuspendPaint();
 
             if (ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
@@ -1557,7 +1632,7 @@ namespace Manina.Windows.Forms
 
             OnMouseMove(e);
             Refresh(true);
-            mRenderer.ResumePaint();
+            ResumePaint();
 
             base.OnMouseWheel(e);
         }

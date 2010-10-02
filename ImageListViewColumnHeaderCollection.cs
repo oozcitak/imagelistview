@@ -188,7 +188,7 @@ namespace Manina.Windows.Forms
             public void AddRange(ImageListViewColumnHeader[] items)
             {
                 if (mImageListView != null)
-                    mImageListView.mRenderer.SuspendPaint();
+                    mImageListView.SuspendPaint();
 
                 foreach (ImageListViewColumnHeader item in items)
                     Add(item);
@@ -196,7 +196,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     mImageListView.Refresh();
-                    mImageListView.mRenderer.ResumePaint();
+                    mImageListView.ResumePaint();
                 }
             }
             /// <summary>

@@ -218,7 +218,7 @@ namespace Manina.Windows.Forms
             public void AddRange(ImageListViewItem[] items)
             {
                 if (mImageListView != null)
-                    mImageListView.mRenderer.SuspendPaint();
+                    mImageListView.SuspendPaint();
 
                 foreach (ImageListViewItem item in items)
                     Add(item);
@@ -226,7 +226,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     mImageListView.Refresh();
-                    mImageListView.mRenderer.ResumePaint();
+                    mImageListView.ResumePaint();
                 }
             }
             /// <summary>
@@ -236,7 +236,7 @@ namespace Manina.Windows.Forms
             public void AddRange(string[] filenames)
             {
                 if (mImageListView != null)
-                    mImageListView.mRenderer.SuspendPaint();
+                    mImageListView.SuspendPaint();
 
                 for (int i = 0; i < filenames.Length; i++)
                 {
@@ -246,7 +246,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     mImageListView.Refresh();
-                    mImageListView.mRenderer.ResumePaint();
+                    mImageListView.ResumePaint();
                 }
 
             }
