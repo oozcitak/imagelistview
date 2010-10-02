@@ -519,8 +519,8 @@ namespace Manina.Windows.Forms.Obsolete
             {
                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                 {
-                    mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
-                        mImageListView.OnThumbnailCachedInternal), guid, false);
+                 //   mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
+                   //     mImageListView.OnThumbnailCachedInternal), guid, false);
                     mImageListView.BeginInvoke(new RefreshDelegateInternal(
                         mImageListView.OnRefreshInternal));
                 }
@@ -591,8 +591,8 @@ namespace Manina.Windows.Forms.Obsolete
             {
                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                 {
-                    mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
-                        mImageListView.OnThumbnailCachedInternal), guid, false);
+                    //mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
+                        //mImageListView.OnThumbnailCachedInternal), guid, false);
                     mImageListView.BeginInvoke(new RefreshDelegateInternal(
                         mImageListView.OnRefreshInternal));
                 }
@@ -850,8 +850,8 @@ namespace Manina.Windows.Forms.Obsolete
                                 {
                                     VirtualItemThumbnailEventArgs e = new VirtualItemThumbnailEventArgs(
                                         request.VirtualItemKey, request.Size);
-                                    if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
-                                        mImageListView.RetrieveVirtualItemThumbnailInternal(e);
+                                    //if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                                      //  mImageListView.RetrieveVirtualItemThumbnailInternal(e);
                                     if (e.ThumbnailImage != null)
                                         thumb = e.ThumbnailImage;
                                 }
@@ -929,8 +929,8 @@ namespace Manina.Windows.Forms.Obsolete
                             {
                                 if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
                                 {
-                                    mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
-                                        mImageListView.OnThumbnailCachedInternal), guid, (result == null));
+                                    //mImageListView.BeginInvoke(new ThumbnailCachedEventHandlerInternal(
+                                      //  mImageListView.OnThumbnailCachedInternal), guid, (result == null));
                                 }
                             }
                             catch (ObjectDisposedException)

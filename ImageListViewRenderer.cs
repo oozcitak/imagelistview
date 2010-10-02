@@ -42,6 +42,7 @@ namespace Manina.Windows.Forms
             private bool needsPaint;
             private ItemDrawOrder mItemDrawOrder;
             private bool creatingGraphics;
+            private DateTime lastRenderTime;
             #endregion
 
             #region Properties
@@ -70,6 +71,10 @@ namespace Manina.Windows.Forms
             /// Gets a value indicating whether this renderer can apply custom colors.
             /// </summary>
             public virtual bool CanApplyColors { get { return true; } }
+            /// <summary>
+            /// Gets the time the control was last redrawn.
+            /// </summary>
+            internal DateTime LastRenderTime { get { return lastRenderTime; } }
             #endregion
 
             #region Constructors
@@ -85,6 +90,7 @@ namespace Manina.Windows.Forms
                 needsPaint = true;
                 mClip = true;
                 mItemDrawOrder = ItemDrawOrder.ItemIndex;
+                lastRenderTime = DateTime.MinValue;
             }
             #endregion
 
@@ -317,6 +323,7 @@ namespace Manina.Windows.Forms
             }
             /// <summary>
             /// Redraws the owner control.
+            /// <param name="graphics">The System.Drawing.Graphics to draw on.</param>
             /// </summary>
             internal void Refresh(Graphics graphics)
             {
@@ -375,7 +382,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal bool CanPaint()
             {
-                return (suspended == false && suspendCount == 0);
+                if (suspended || suspendCount != 0)
+                    return false;
+                else
+                    return true;
             }
             /// <summary>
             /// Renders the control.
@@ -388,6 +398,9 @@ namespace Manina.Windows.Forms
                 {
                     if (!RecreateBuffer(graphics)) return;
                 }
+
+                // Save the time of render
+                lastRenderTime = DateTime.Now;
 
                 // Update the layout
                 mImageListView.layoutManager.Update();
