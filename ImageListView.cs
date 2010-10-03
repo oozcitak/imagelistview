@@ -968,7 +968,7 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The GUID of the item to remove.</param>
         internal void CancelThumbnailRequest(Guid guid)
         {
-            thumbnailWorker.CancelAsync(guid);
+            //thumbnailWorker.CancelAsync(guid);
             pendingThumbnails.Remove(guid);
         }
         /// <summary>
@@ -1024,7 +1024,7 @@ namespace Manina.Windows.Forms
         {
             ImageListViewItem item = mItems[(Guid)e.Key];
 
-            if (e.IsPriorityItem)
+            if (e.HasPriority)
             {
                 cachedLargeImage = new ThumbnailCacheItem(
                     item.Guid, item.FileName, e.Size, e.Image,

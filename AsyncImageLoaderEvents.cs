@@ -46,8 +46,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments of the AsyncImageLoaderCompleted event.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class AsyncImageLoaderCompletedEventArgs
+    public class AsyncImageLoaderCompletedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the key of the item. The key is passed to the ImageLoader
@@ -73,9 +72,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         public Image Image { get; private set; }
         /// <summary>
-        /// Gets whether this item is a priority item.
+        /// Gets whether this image should be loaded before others in the queue.
         /// </summary>
-        public bool IsPriorityItem { get; private set; }
+        public bool HasPriority { get; private set; }
         /// <summary>
         /// Gets the error that occurred while loading the image.
         /// </summary>
@@ -89,24 +88,23 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail extraction behavior.</param>
         /// <param name="autoRotate">Whether the image should be rotated based on orientation metadata.</param>
         /// <param name="image">The loaded image.</param>
-        /// <param name="isPriorityItem">Whether this item is a priority item.</param>
+        /// <param name="hasPriority">true if this image should be loaded before others in the queue; otherwise false.</param>
         /// <param name="error">The error that occurred while loading the image.</param>
-        public AsyncImageLoaderCompletedEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, Image image, bool isPriorityItem, Exception error)
+        public AsyncImageLoaderCompletedEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, Image image, bool hasPriority, Exception error)
         {
             Key = key;
             Size = size;
             UseEmbeddedThumbnails = useEmbeddedThumbnails;
             AutoRotate = autoRotate;
             Image = image;
-            IsPriorityItem = IsPriorityItem;
+            HasPriority = hasPriority;
             Error = error;
         }
     }
     /// <summary>
     /// Represents the event arguments of the AsyncImageLoaderGetUserImage event.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class AsyncImageLoaderGetUserImageEventArgs
+    public class AsyncImageLoaderGetUserImageEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the key of the item. The key is passed to the ImageLoader
@@ -131,10 +129,6 @@ namespace Manina.Windows.Forms
         /// occurred while loading the image.
         /// </summary>
         public Image Image { get; set; }
-        /// <summary>
-        /// Gets the error that occurred while loading the image.
-        /// </summary>
-        public Exception Error { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the ImageLoaderCompletedEventArgs class.
@@ -147,7 +141,6 @@ namespace Manina.Windows.Forms
         {
             Key = key;
             Image = null;
-            Error = null;
             Size = size;
             UseEmbeddedThumbnails = useEmbeddedThumbnails;
             AutoRotate = autoRotate;
