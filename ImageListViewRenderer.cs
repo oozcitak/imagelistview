@@ -76,7 +76,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public virtual bool CanApplyColors { get { return true; } }
             /// <summary>
-            /// Gets whether the lazy refresh intervaş is exceeded.
+            /// Gets whether the lazy refresh interval is exceeded.
             /// </summary>
             internal bool LazyRefreshIntervalExceeded { get { return ((DateTime.Now - lastRenderTime) > LazyRefreshInterval); } }
             #endregion

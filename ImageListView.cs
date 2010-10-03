@@ -856,6 +856,8 @@ namespace Manina.Windows.Forms
             thumbnailWorker = new AsyncImageLoader();
             thumbnailWorker.ImageLoaded += new AsyncImageLoaderCompletedEventHandler(thumbnailWorker_ImageLoaded);
             thumbnailWorker.GetUserImage += new AsyncImageLoaderGetUserImageEventHandler(thumbnailWorker_GetUserImage);
+            thumbnailWorker.ImageLoaderFinished += new AsyncImageLoaderFinishedEventHandler(thumbnailWorker_ImageLoaderFinished);
+
             cachedThumbnails = new Dictionary<Guid, ThumbnailCacheItem>();
             pendingThumbnails = new Dictionary<Guid, bool>();
             cachedLargeImage = null;
@@ -949,8 +951,6 @@ namespace Manina.Windows.Forms
         /// was not cached.</returns>
         internal bool RemoveThumbnailImage(Guid guid)
         {
-            CancelThumbnailRequest(guid);
-
             ThumbnailCacheItem item = null;
             if (cachedThumbnails.TryGetValue(guid, out item))
             {
@@ -961,15 +961,6 @@ namespace Manina.Windows.Forms
             }
 
             return false;
-        }
-        /// <summary>
-        /// Cancells a pending thumbnail request.
-        /// </summary>
-        /// <param name="guid">The GUID of the item to remove.</param>
-        internal void CancelThumbnailRequest(Guid guid)
-        {
-            //thumbnailWorker.CancelAsync(guid);
-            pendingThumbnails.Remove(guid);
         }
         /// <summary>
         /// Loads a large image for the given item.
@@ -1019,7 +1010,8 @@ namespace Manina.Windows.Forms
         /// Handles the ImageLoaded event of the thumbnailWorker control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Manina.Windows.Forms.AsyncImageLoaderCompletedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="Manina.Windows.Forms.AsyncImageLoaderCompletedEventArgs"/> 
+        /// instance containing the event data.</param>
         private void thumbnailWorker_ImageLoaded(object sender, AsyncImageLoaderCompletedEventArgs e)
         {
             ImageListViewItem item = mItems[(Guid)e.Key];
@@ -1059,12 +1051,22 @@ namespace Manina.Windows.Forms
         /// Handles the GetUserImage event of the thumbnailWorker control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Manina.Windows.Forms.AsyncImageLoaderGetUserImageEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="Manina.Windows.Forms.AsyncImageLoaderGetUserImageEventArgs"/> 
+        /// instance containing the event data.</param>
         private void thumbnailWorker_GetUserImage(object sender, AsyncImageLoaderGetUserImageEventArgs e)
         {
             VirtualItemThumbnailEventArgs arg = new VirtualItemThumbnailEventArgs(e.Key, e.Size);
             OnRetrieveVirtualItemThumbnail(arg);
             e.Image = arg.ThumbnailImage;
+        }
+        /// <summary>
+        /// Handles the ImageLoaderFinished event of the thumbnailWorker control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void thumbnailWorker_ImageLoaderFinished(object sender, EventArgs e)
+        {
+            Refresh();
         }
         #endregion
 
@@ -1703,7 +1705,6 @@ namespace Manina.Windows.Forms
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
-            thumbnailWorker.Stop();
             itemCacheManager.Stop();
         }
         /// <summary>

@@ -26,6 +26,7 @@ namespace Manina.Windows.Forms
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback workCompletedCallback;
+        private readonly SendOrPostCallback queueEmptyCallback;
         #endregion
 
         #region Constructor
@@ -49,7 +50,8 @@ namespace Manina.Windows.Forms
             cancelledItems = new Dictionary<object, bool>();
 
             // The loader complete callback
-            workCompletedCallback = new SendOrPostCallback(this.WorkerCompletedCallback);
+            workCompletedCallback = new SendOrPostCallback(this.RunWorkerCompletedCallback);
+            queueEmptyCallback = new SendOrPostCallback(this.QueueEmptyCallback);
         }
         #endregion
 
@@ -108,7 +110,7 @@ namespace Manina.Windows.Forms
         private bool Stopping { get { lock (lockObject) { return stopping; } } }
         #endregion
 
-        #region Cancel and Stop
+        #region Cancel
         /// <summary>
         /// Cancels all pending operations.
         /// </summary>
@@ -137,20 +139,6 @@ namespace Manina.Windows.Forms
                 }
             }
         }
-        /// <summary>
-        /// Cancels all pending operations and stops the worker thread.
-        /// </summary>
-        public void Stop()
-        {
-            lock (lockObject)
-            {
-                if (!stopping)
-                {
-                    stopping = true;
-                    Monitor.Pulse(lockObject);
-                }
-            }
-        }
         #endregion
 
         #region Virtual Methods
@@ -158,9 +146,17 @@ namespace Manina.Windows.Forms
         /// Used to call <see cref="OnRunWorkerCompleted"/> by the synchronization context.
         /// </summary>
         /// <param name="arg">The argument.</param>
-        private void WorkerCompletedCallback(object arg)
+        private void RunWorkerCompletedCallback(object arg)
         {
             OnRunWorkerCompleted((QueuedWorkerCompletedEventArgs)arg);
+        }
+        /// <summary>
+        /// Used to call <see cref="OnWorkerFinished"/> by the synchronization context.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        private void QueueEmptyCallback(object arg)
+        {
+            OnWorkerFinished((EventArgs)arg);
         }
         /// <summary>
         /// Raises the RunWorkerCompleted event.
@@ -180,6 +176,15 @@ namespace Manina.Windows.Forms
             if (DoWork != null)
                 DoWork(this, e);
         }
+        /// <summary>
+        /// Raises the WorkerFinished event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
+        protected virtual void OnWorkerFinished(EventArgs e)
+        {
+            if (WorkerFinished != null)
+                WorkerFinished(this, e);
+        }
         #endregion
 
         #region Get/Set Apartment State
@@ -198,6 +203,21 @@ namespace Manina.Windows.Forms
         {
             thread.SetApartmentState(state);
         }
+        /// <summary>
+        /// Gets or sets a value indicating whether or not the worker thread is a background thread.
+        /// </summary>
+        [Browsable(true), Description("Gets or sets a value indicating whether or not the worker thread is a background thread."), Category("Behavior")]
+        public bool IsBackground
+        {
+            get
+            {
+                return thread.IsBackground;
+            }
+            set
+            {
+                thread.IsBackground = value;
+            }
+        }
         #endregion
 
         #region Public Events
@@ -212,6 +232,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when RunWorkerAsync is called.")]
         public event DoWorkEventHandler DoWork;
+        /// <summary>
+        /// Occurs after all items in the queue is processed.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs after all items in the queue is processed.")]
+        public event WorkerFinishedEventHandler WorkerFinished;
         #endregion
 
         #region Worker Method
@@ -304,6 +329,30 @@ namespace Manina.Windows.Forms
                         }
                     }
                 }
+                // Done processing queue
+                context.Post(queueEmptyCallback, new EventArgs());
+            }
+        }
+        #endregion
+
+        #region Dispose
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="T:System.ComponentModel.Component"/> 
+        /// and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; 
+        /// false to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            lock (lockObject)
+            {
+                if (!stopping)
+                {
+                    stopping = true;
+                    Monitor.Pulse(lockObject);
+                }
             }
         }
         #endregion
@@ -324,6 +373,13 @@ namespace Manina.Windows.Forms
     /// <param name="e">A <see cref="DoWorkEventArgs"/> that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void DoWorkEventHandler(object sender, DoWorkEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the WorkerFinished event.
+    /// </summary>
+    /// <param name="sender">The object that is the source of the event.</param>
+    /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void WorkerFinishedEventHandler(object sender, EventArgs e);
     #endregion
 
     #region Event Arguments
