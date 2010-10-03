@@ -68,7 +68,6 @@
     <Compile Include="AsyncImageLoader.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="AsyncImageLoaderEvents.cs" />
     <Compile Include="BonusRenderers.cs" />
     <Compile Include="QueuedBackgroundWorker.cs">
       <SubType>Component</SubType>

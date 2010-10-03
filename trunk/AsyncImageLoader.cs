@@ -147,6 +147,7 @@ namespace Manina.Windows.Forms
 
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            bw.WorkerFinished += new WorkerFinishedEventHandler(bw_WorkerFinished);
         }
         #endregion
 
@@ -168,7 +169,7 @@ namespace Manina.Windows.Forms
                     request.Key, request.Size, request.UseEmbeddedThumbnails,
                     request.AutoRotate, image, (e.Priority == 0 ? false : true), e.Error
                     );
-            OnImageLoaderCompleted(result);
+            OnImageLoaded(result);
         }
         /// <summary>
         /// Handles the DoWork event of the QueuedBackgroundWorker control.
@@ -200,8 +201,17 @@ namespace Manina.Windows.Forms
                 OnGetUserImage(arg);
                 image = arg.Image;
             }
-            
+
             e.Result = image;
+        }
+        /// <summary>
+        /// Handles the WorkerFinished event of the bw control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void bw_WorkerFinished(object sender, EventArgs e)
+        {
+            OnImageLoaderFinished(e);
         }
         #endregion
 
@@ -434,7 +444,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Cancel and Stop
+        #region Cancel
         /// <summary>
         /// Cancels all pending operations.
         /// </summary>
@@ -442,21 +452,14 @@ namespace Manina.Windows.Forms
         {
             bw.CancelAllAsync();
         }
-        /// <summary>
-        /// Cancels all pending operations and stops the worker thread.
-        /// </summary>
-        public void Stop()
-        {
-            bw.Stop();
-        }
         #endregion
 
         #region Virtual Methods
         /// <summary>
         /// Raises the ImageLoaded event.
         /// </summary>
-        /// <param name="e">An ImageLoaderCompletedEventArgs that contains event data.</param>
-        protected virtual void OnImageLoaderCompleted(AsyncImageLoaderCompletedEventArgs e)
+        /// <param name="e">An <see cref="AsyncImageLoaderCompletedEventArgs"/> that contains event data.</param>
+        protected virtual void OnImageLoaded(AsyncImageLoaderCompletedEventArgs e)
         {
             if (ImageLoaded != null)
                 ImageLoaded(this, e);
@@ -464,11 +467,20 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the GetUserImage event.
         /// </summary>
-        /// <param name="e">An ImageLoaderCompletedEventArgs that contains event data.</param>
+        /// <param name="e">An <see cref="AsyncImageLoaderGetUserImageEventArgs"/> that contains event data.</param>
         protected virtual void OnGetUserImage(AsyncImageLoaderGetUserImageEventArgs e)
         {
             if (GetUserImage != null)
                 GetUserImage(this, e);
+        }
+        /// <summary>
+        /// Raises the ImageLoaderFinished event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
+        protected virtual void OnImageLoaderFinished(EventArgs e)
+        {
+            if (ImageLoaderFinished != null)
+                ImageLoaderFinished(this, e);
         }
         #endregion
 
@@ -484,6 +496,141 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when a user supplied image is requested.")]
         public event AsyncImageLoaderGetUserImageEventHandler GetUserImage;
+        /// <summary>
+        /// Occurs after all images are loaded.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs after all images are loaded.")]
+        public event AsyncImageLoaderFinishedEventHandler ImageLoaderFinished;
         #endregion
     }
+
+    #region Event Delegates
+    /// <summary>
+    /// Represents the method that will handle the ImageLoaded event.
+    /// </summary>
+    /// <param name="sender">The object that is the source of the event.</param>
+    /// <param name="e">An <see cref="AsyncImageLoaderCompletedEventArgs"/> that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void AsyncImageLoaderCompletedEventHandler(object sender, AsyncImageLoaderCompletedEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the GetUserImage event.
+    /// </summary>
+    /// <param name="sender">The object that is the source of the event.</param>
+    /// <param name="e">An <see cref="AsyncImageLoaderGetUserImageEventArgs"/> that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void AsyncImageLoaderGetUserImageEventHandler(object sender, AsyncImageLoaderGetUserImageEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the ImageLoaderFinished event.
+    /// </summary>
+    /// <param name="sender">The object that is the source of the event.</param>
+    /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void AsyncImageLoaderFinishedEventHandler(object sender, EventArgs e);
+    #endregion
+
+    #region Event Arguments
+    /// <summary>
+    /// Represents the event arguments of the AsyncImageLoaderCompleted event.
+    /// </summary>
+    public class AsyncImageLoaderCompletedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the key of the item. The key is passed to the ImageLoader
+        /// with the LoadAsync method.
+        /// </summary>
+        public object Key { get; private set; }
+        /// <summary>
+        /// Gets the size of the requested image.
+        /// </summary>
+        public Size Size { get; private set; }
+        /// <summary>
+        /// Gets embedded thumbnail extraction behavior.
+        /// </summary>
+        public UseEmbeddedThumbnails UseEmbeddedThumbnails { get; private set; }
+        /// <summary>
+        /// Gets whether the image should be rotated based on orientation
+        /// metadata.
+        /// </summary>
+        public bool AutoRotate { get; private set; }
+        /// <summary>
+        /// Gets the loaded image. This property can be null if an error
+        /// occurred while loading the image.
+        /// </summary>
+        public Image Image { get; private set; }
+        /// <summary>
+        /// Gets whether this image should be loaded before others in the queue.
+        /// </summary>
+        public bool HasPriority { get; private set; }
+        /// <summary>
+        /// Gets the error that occurred while loading the image.
+        /// </summary>
+        public Exception Error { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the ImageLoaderCompletedEventArgs class.
+        /// </summary>
+        /// <param name="key">The key of the item.</param>
+        /// <param name="size">The size of the requested image.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail extraction behavior.</param>
+        /// <param name="autoRotate">Whether the image should be rotated based on orientation metadata.</param>
+        /// <param name="image">The loaded image.</param>
+        /// <param name="hasPriority">true if this image should be loaded before others in the queue; otherwise false.</param>
+        /// <param name="error">The error that occurred while loading the image.</param>
+        public AsyncImageLoaderCompletedEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, Image image, bool hasPriority, Exception error)
+        {
+            Key = key;
+            Size = size;
+            UseEmbeddedThumbnails = useEmbeddedThumbnails;
+            AutoRotate = autoRotate;
+            Image = image;
+            HasPriority = hasPriority;
+            Error = error;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments of the AsyncImageLoaderGetUserImage event.
+    /// </summary>
+    public class AsyncImageLoaderGetUserImageEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the key of the item. The key is passed to the ImageLoader
+        /// with the LoadAsync method.
+        /// </summary>
+        public object Key { get; private set; }
+        /// <summary>
+        /// Gets the size of the requested image.
+        /// </summary>
+        public Size Size { get; private set; }
+        /// <summary>
+        /// Gets embedded thumbnail extraction behavior.
+        /// </summary>
+        public UseEmbeddedThumbnails UseEmbeddedThumbnails { get; private set; }
+        /// <summary>
+        /// Gets whether the image should be rotated based on orientation
+        /// metadata.
+        /// </summary>
+        public bool AutoRotate { get; private set; }
+        /// <summary>
+        /// Gets or sets the loaded image. This property can be null if an error
+        /// occurred while loading the image.
+        /// </summary>
+        public Image Image { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the ImageLoaderCompletedEventArgs class.
+        /// </summary>
+        /// <param name="key">The key of the item.</param>
+        /// <param name="size">The size of the requested image.</param>
+        /// <param name="useEmbeddedThumbnails">Embedded thumbnail extraction behavior.</param>
+        /// <param name="autoRotate">Whether the image should be rotated based on orientation metadata.</param>
+        public AsyncImageLoaderGetUserImageEventArgs(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            Key = key;
+            Image = null;
+            Size = size;
+            UseEmbeddedThumbnails = useEmbeddedThumbnails;
+            AutoRotate = autoRotate;
+        }
+    }
+    #endregion
 }
