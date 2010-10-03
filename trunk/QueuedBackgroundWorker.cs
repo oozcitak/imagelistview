@@ -22,43 +22,10 @@ namespace Manina.Windows.Forms
         private bool started;
         private SynchronizationContext context;
 
-        private Queue<WorkItem>[] items;
+        private Queue<object>[] items;
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback workCompletedCallback;
-        #endregion
-
-        #region WorkItem Class
-        /// <summary>
-        /// Represents a work item in the thread queue.
-        /// </summary>
-        private class WorkItem
-        {
-            #region Properties
-            /// <summary>
-            /// Gets the key identifying this item.
-            /// </summary>
-            public object UserState { get; private set; }
-            /// <summary>
-            /// Gets user data for this item.
-            /// </summary>
-            public object Argument { get; private set; }
-            #endregion
-
-            #region Constructor
-            /// <summary>
-            /// Initializes a new instance of the <see cref="WorkItem"/> class.
-            /// </summary>
-            /// <param name="userState">The key identifying this item.</param>
-            /// <param name="argument">User data for this item.</param>
-            /// <param name="priority">The priority of this item.</param>
-            public WorkItem(object userState, object argument)
-            {
-                UserState = userState;
-                Argument = argument;
-            }
-            #endregion
-        }
         #endregion
 
         #region Constructor
@@ -76,7 +43,9 @@ namespace Manina.Windows.Forms
             thread.IsBackground = true;
 
             // Work items
-            items = new Queue<WorkItem>[6];
+            items = new Queue<object>[6];
+            for (int i = 0; i < 6; i++)
+                items[i] = new Queue<object>();
             cancelledItems = new Dictionary<object, bool>();
 
             // The loader complete callback
@@ -88,12 +57,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Starts processing a new background operation.
         /// </summary>
-        /// <param name="userState">A object identifying this work item.</param>
-        /// <param name="argument">A parameter for use by the background operation 
-        /// to be executed in the <see cref="DoWork"/> event handler.</param>
+        /// <param name="argument">The argument of an asynchronous operation.</param>
         /// <param name="priority">A value between 0 and 5 indicating the priority of this item.
         /// An item with a higher priority will be processed before items with lower priority.</param>
-        public void RunWorkerAsync(object userState, object argument, int priority)
+        public void RunWorkerAsync(object argument, int priority)
         {
             if (priority < 0 || priority > 5)
                 throw new ArgumentException("priority must be between 0 and 5 inclusive.", "priority");
@@ -113,34 +80,24 @@ namespace Manina.Windows.Forms
 
             lock (lockObject)
             {
-                items[priority].Enqueue(new WorkItem(userState, argument));
+                items[priority].Enqueue(argument);
                 Monitor.Pulse(lockObject);
             }
         }
         /// <summary>
         /// Starts processing a new background operation.
         /// </summary>
-        /// <param name="userState">A object identifying this work item.</param>
-        /// <param name="argument">A parameter for use by the background operation 
-        /// to be executed in the <see cref="DoWork"/> event handler.</param>
-        public void RunWorkerAsync(object userState, object argument)
+        /// <param name="argument">The argument of an asynchronous operation.</param>
+        public void RunWorkerAsync(object argument)
         {
-            RunWorkerAsync(userState, argument, 0);
-        }
-        /// <summary>
-        /// Starts processing a new background operation.
-        /// </summary>
-        /// <param name="userState">A object identifying this work item.</param>
-        public void RunWorkerAsync(object userState)
-        {
-            RunWorkerAsync(userState, null, 0);
+            RunWorkerAsync(argument, 0);
         }
         /// <summary>
         /// Starts processing a new background operation.
         /// </summary>
         public void RunWorkerAsync()
         {
-            RunWorkerAsync(null, null, 0);
+            RunWorkerAsync(null, 0);
         }
         #endregion
 
@@ -159,7 +116,7 @@ namespace Manina.Windows.Forms
         {
             lock (lockObject)
             {
-                foreach (Queue<WorkItem> queue in items)
+                foreach (Queue<object> queue in items)
                     queue.Clear();
 
                 Monitor.Pulse(lockObject);
@@ -168,13 +125,14 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Cancels processing the item with the given key.
         /// </summary>
-        public void CancelAsync(object userState)
+        /// <param name="argument">The argument of an asynchronous operation.</param>
+        public void CancelAsync(object argument)
         {
             lock (lockObject)
             {
-                if (!cancelledItems.ContainsKey(userState))
+                if (!cancelledItems.ContainsKey(argument))
                 {
-                    cancelledItems.Add(userState, false);
+                    cancelledItems.Add(argument, false);
                     Monitor.Pulse(lockObject);
                 }
             }
@@ -197,7 +155,7 @@ namespace Manina.Windows.Forms
 
         #region Virtual Methods
         /// <summary>
-        /// Used to call OnRunWorkerCompleted by the SynchronizationContext.
+        /// Used to call <see cref="OnRunWorkerCompleted"/> by the synchronization context.
         /// </summary>
         /// <param name="arg">The argument.</param>
         private void WorkerCompletedCallback(object arg)
@@ -207,7 +165,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the RunWorkerCompleted event.
         /// </summary>
-        /// <param name="e">An RunWorkerCompletedEventArgs that contains event data.</param>
+        /// <param name="e">A <see cref="QueuedWorkerCompletedEventArgs"/> that contains event data.</param>
         protected virtual void OnRunWorkerCompleted(QueuedWorkerCompletedEventArgs e)
         {
             if (RunWorkerCompleted != null)
@@ -216,19 +174,19 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the DoWork event.
         /// </summary>
-        /// <param name="e">An QueuedDoWorkEventArgs that contains event data.</param>
-        protected virtual void OnDoWork(QueuedDoWorkEventArgs e)
+        /// <param name="e">A <see cref="DoWorkEventArgs"/> that contains event data.</param>
+        protected virtual void OnDoWork(DoWorkEventArgs e)
         {
             if (DoWork != null)
                 DoWork(this, e);
         }
         #endregion
 
-        #region Apartment State Methods
+        #region Get/Set Apartment State
         /// <summary>
         /// Gets the apartment state of the worker thread.
         /// </summary>
-        protected ApartmentState GetApartmentState()
+        public ApartmentState GetApartmentState()
         {
             return thread.GetApartmentState();
         }
@@ -236,7 +194,7 @@ namespace Manina.Windows.Forms
         /// Sets the apartment state of the worker thread. The apartment state
         /// cannot be changed after any work is added to the work queue.
         /// </summary>
-        protected void SetApartmentState(ApartmentState state)
+        public void SetApartmentState(ApartmentState state)
         {
             thread.SetApartmentState(state);
         }
@@ -250,7 +208,7 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Browsable(true), Description("Occurs when the background operation of an item has completed.")]
         public event RunWorkerCompletedEventHandler RunWorkerCompleted;
         /// <summary>
-        /// Occurs when <see cref="RunWorkerAsync(object, object, bool)" /> is called.
+        /// Occurs when <see cref="RunWorkerAsync(object, int)" /> is called.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when RunWorkerAsync is called.")]
         public event DoWorkEventHandler DoWork;
@@ -268,7 +226,7 @@ namespace Manina.Windows.Forms
                 {
                     // Wait until we have pending work items
                     bool hasItems = false;
-                    foreach (Queue<WorkItem> queue in items)
+                    foreach (Queue<object> queue in items)
                     {
                         if (queue.Count > 0)
                         {
@@ -286,7 +244,8 @@ namespace Manina.Windows.Forms
                 while (queueFull && !Stopping)
                 {
                     // Get an item from the queue
-                    WorkItem request = null;
+                    object request = null;
+                    int priority = 0;
                     lock (lockObject)
                     {
                         // Check queues
@@ -294,13 +253,14 @@ namespace Manina.Windows.Forms
                         {
                             if (items[i].Count > 0)
                             {
+                                priority = i;
                                 request = items[i].Dequeue();
                                 break;
                             }
                         }
 
                         // Check if the item was removed
-                        if (request != null && cancelledItems.ContainsKey(request.UserState))
+                        if (request != null && cancelledItems.ContainsKey(request))
                             request = null;
                     }
 
@@ -309,14 +269,15 @@ namespace Manina.Windows.Forms
                         object result = null;
                         Exception error = null;
                         bool cancelled = false;
-                        // Read the image
+                        // Start the work
                         try
                         {
                             // Raise the do work complete event
-                            QueuedDoWorkEventArgs arg = new QueuedDoWorkEventArgs(request.UserState, request.Argument);
+                            DoWorkEventArgs arg = new DoWorkEventArgs(request);
                             OnDoWork(arg);
-                            result = arg.Result;
                             cancelled = arg.Cancel;
+                            if (!cancelled)
+                                result = arg.Result;
                         }
                         catch (Exception e)
                         {
@@ -324,8 +285,8 @@ namespace Manina.Windows.Forms
                         }
 
                         // Raise the work complete event
-                        QueuedWorkerCompletedEventArgs arg2 = new QueuedWorkerCompletedEventArgs(request.UserState,
-                            result, error, cancelled);
+                        QueuedWorkerCompletedEventArgs arg2 = new QueuedWorkerCompletedEventArgs(request,
+                            result, priority, error, cancelled);
                         context.Post(workCompletedCallback, arg2);
                     }
 
@@ -333,7 +294,7 @@ namespace Manina.Windows.Forms
                     lock (lockObject)
                     {
                         queueFull = false;
-                        foreach (Queue<WorkItem> queue in items)
+                        foreach (Queue<object> queue in items)
                         {
                             if (queue.Count > 0)
                             {
@@ -353,16 +314,16 @@ namespace Manina.Windows.Forms
     /// Represents the method that will handle the RunWorkerCompleted event.
     /// </summary>
     /// <param name="sender">The object that is the source of the event.</param>
-    /// <param name="e">A QueuedWorkerCompletedEventArgs that contains event data.</param>
+    /// <param name="e">A <see cref="QueuedWorkerCompletedEventArgs"/> that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void RunWorkerCompletedEventHandler(object sender, QueuedWorkerCompletedEventArgs e);
     /// <summary>
     /// Represents the method that will handle the DoWork event.
     /// </summary>
     /// <param name="sender">The object that is the source of the event.</param>
-    /// <param name="e">A QueuedDoWorkEventArgs that contains event data.</param>
+    /// <param name="e">A <see cref="DoWorkEventArgs"/> that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void DoWorkEventHandler(object sender, QueuedDoWorkEventArgs e);
+    public delegate void DoWorkEventHandler(object sender, DoWorkEventArgs e);
     #endregion
 
     #region Event Arguments
@@ -375,39 +336,24 @@ namespace Manina.Windows.Forms
         /// Gets a value that represents the result of an asynchronous operation.
         /// </summary>
         public object Result { get; private set; }
+        /// <summary>
+        /// Gets the priority of this item.
+        /// </summary>
+        public int Priority { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the QueuedWorkerCompletedEventArgs class.
         /// </summary>
-        /// <param name="userState">The unique identifier for the asynchronous task.</param>
+        /// <param name="argument">The argument of an asynchronous operation.</param>
         /// <param name="result">The result of an asynchronous operation.</param>
+        /// <param name="priority">A value between 0 and 5 indicating the priority of this item.</param>
         /// <param name="error">The error that occurred while loading the image.</param>
         /// <param name="cancelled">A value indicating whether the asynchronous operation was canceled.</param>
-        public QueuedWorkerCompletedEventArgs(object userState, object result, Exception error, bool cancelled)
-            : base(error, cancelled, userState)
+        public QueuedWorkerCompletedEventArgs(object argument, object result, int priority, Exception error, bool cancelled)
+            : base(error, cancelled, argument)
         {
             Result = result;
-        }
-    }
-    /// <summary>
-    /// Represents the event arguments of the DoWork event.
-    /// </summary>
-    public class QueuedDoWorkEventArgs : DoWorkEventArgs
-    {
-        /// <summary>
-        /// Gets the unique identifier for the asynchronous task.
-        /// </summary>
-        public object UserState { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the QueuedDoWorkEventArgs class.
-        /// </summary>
-        /// <param name="userState">The unique identifier for the asynchronous task.</param>
-        /// <param name="argument">The argument of an asynchronous operation.</param>
-        public QueuedDoWorkEventArgs(object userState, object argument)
-            : base(argument)
-        {
-            UserState = userState;
+            Priority = priority;
         }
     }
     #endregion
