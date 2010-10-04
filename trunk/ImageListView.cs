@@ -1491,7 +1491,6 @@ namespace Manina.Windows.Forms
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
-            thumbnailManager.Stop();
             itemCacheManager.Stop();
         }
         /// <summary>
