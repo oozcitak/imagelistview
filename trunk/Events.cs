@@ -170,8 +170,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for errors during cache operations.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class CacheErrorEventArgs
+    public class CacheErrorEventArgs : EventArgs
     {
          /// <summary>
         /// Gets the ImageListViewItem that is associated with this error.
@@ -203,8 +202,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for column related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class DropFileEventArgs
+    public class DropFileEventArgs : EventArgs
     {
         /// <summary>
         /// Gets or sets whether default event code will be processed.
@@ -237,8 +235,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for column related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ColumnEventArgs
+    public class ColumnEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewColumnHeader that is the target of the event.
@@ -257,8 +254,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for column click related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ColumnClickEventArgs
+    public class ColumnClickEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewColumnHeader that is the target of the event.
@@ -298,8 +294,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for column hover related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ColumnHoverEventArgs
+    public class ColumnHoverEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewColumnHeader that was previously hovered.
@@ -326,8 +321,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for item related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ItemEventArgs
+    public class ItemEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewItem that is the target of the event.
@@ -346,8 +340,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for item click related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ItemClickEventArgs
+    public class ItemClickEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewItem that is the target of the event.
@@ -397,8 +390,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for item hover related events.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ItemHoverEventArgs
+    public class ItemHoverEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewItem that was previously hovered.
@@ -446,8 +438,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments related to control layout.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class LayoutEventArgs
+    public class LayoutEventArgs : EventArgs
     {
         /// <summary>
         /// Gets or sets the rectangle bounding the item area.
@@ -466,8 +457,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for the thumbnail cached event.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class ThumbnailCachedEventArgs
+    public class ThumbnailCachedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the ImageListViewItem that is the target of the event.
@@ -493,8 +483,7 @@ namespace Manina.Windows.Forms
     /// Represents the event arguments related to virtual item 
     /// thumbnail requests.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class VirtualItemThumbnailEventArgs
+    public class VirtualItemThumbnailEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the key of the virtual item.
@@ -525,8 +514,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments related to virtual item images.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class VirtualItemImageEventArgs
+    public class VirtualItemImageEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the key of the virtual item.
@@ -550,8 +538,7 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments related to virtual item details.
     /// </summary>
-    [Serializable, ComVisible(true)]
-    public class VirtualItemDetailsEventArgs
+    public class VirtualItemDetailsEventArgs : EventArgs
     {
         /// <summary>
         /// Gets the key of the virtual item.

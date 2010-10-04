@@ -65,7 +65,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncImageLoader.cs">
+    <Compile Include="QueuedBackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="BonusRenderers.cs" />
@@ -178,9 +178,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\EmptyRatingImage.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AsyncImageLoader.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
