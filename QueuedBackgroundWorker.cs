@@ -21,6 +21,7 @@ namespace Manina.Windows.Forms
         private bool stopping;
         private bool started;
         private SynchronizationContext context;
+        private bool disposed;
 
         private Queue<object>[] items;
         private Dictionary<object, bool> cancelledItems;
@@ -39,6 +40,7 @@ namespace Manina.Windows.Forms
             stopping = false;
             started = false;
             context = null;
+            disposed = false;
 
             thread = new Thread(new ThreadStart(Run));
             thread.IsBackground = true;
@@ -173,8 +175,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Raises the DoWork event.
         /// </summary>
-        /// <param name="e">A <see cref="DoWorkEventArgs"/> that contains event data.</param>
-        protected virtual void OnDoWork(DoWorkEventArgs e)
+        /// <param name="e">A <see cref="QueuedWorkerDoWorkEventArgs"/> that contains event data.</param>
+        protected virtual void OnDoWork(QueuedWorkerDoWorkEventArgs e)
         {
             if (DoWork != null)
                 DoWork(this, e);
@@ -234,7 +236,7 @@ namespace Manina.Windows.Forms
         /// Occurs when <see cref="RunWorkerAsync(object, int)" /> is called.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when RunWorkerAsync is called.")]
-        public event DoWorkEventHandler DoWork;
+        public event QueuedWorkerDoWorkEventHandler DoWork;
         /// <summary>
         /// Occurs after all items in the queue is processed.
         /// </summary>
@@ -300,8 +302,8 @@ namespace Manina.Windows.Forms
                         // Start the work
                         try
                         {
-                            // Raise the do work complete event
-                            DoWorkEventArgs arg = new DoWorkEventArgs(request);
+                            // Raise the do work event
+                            QueuedWorkerDoWorkEventArgs arg = new QueuedWorkerDoWorkEventArgs(request, priority);
                             OnDoWork(arg);
                             cancelled = arg.Cancel;
                             if (!cancelled)
@@ -349,6 +351,9 @@ namespace Manina.Windows.Forms
         {
             base.Dispose(disposing);
 
+            if (disposed)
+                return;
+
             lock (lockObject)
             {
                 if (!stopping)
@@ -357,6 +362,8 @@ namespace Manina.Windows.Forms
                     Monitor.Pulse(lockObject);
                 }
             }
+
+            disposed = true;
         }
         #endregion
     }
