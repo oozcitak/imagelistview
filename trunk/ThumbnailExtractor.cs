@@ -177,6 +177,7 @@ namespace Manina.Windows.Forms
             }
 
             Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
+
             stream.Dispose();
             return thumb;
 #else

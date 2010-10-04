@@ -141,7 +141,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Virtual Methods
+        #region Delegate Callbacks
         /// <summary>
         /// Used to call <see cref="OnRunWorkerCompleted"/> by the synchronization context.
         /// </summary>
@@ -158,6 +158,9 @@ namespace Manina.Windows.Forms
         {
             OnWorkerFinished((EventArgs)arg);
         }
+        #endregion
+
+        #region Virtual Methods
         /// <summary>
         /// Raises the RunWorkerCompleted event.
         /// </summary>
@@ -226,7 +229,7 @@ namespace Manina.Windows.Forms
         /// has been canceled, or has raised an exception.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when the background operation of an item has completed.")]
-        public event RunWorkerCompletedEventHandler RunWorkerCompleted;
+        public event RunQueuedWorkerCompletedEventHandler RunWorkerCompleted;
         /// <summary>
         /// Occurs when <see cref="RunWorkerAsync(object, int)" /> is called.
         /// </summary>
@@ -236,7 +239,7 @@ namespace Manina.Windows.Forms
         /// Occurs after all items in the queue is processed.
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs after all items in the queue is processed.")]
-        public event WorkerFinishedEventHandler WorkerFinished;
+        public event QueuedWorkerFinishedEventHandler WorkerFinished;
         #endregion
 
         #region Worker Method
@@ -357,60 +360,4 @@ namespace Manina.Windows.Forms
         }
         #endregion
     }
-
-    #region Event Delegates
-    /// <summary>
-    /// Represents the method that will handle the RunWorkerCompleted event.
-    /// </summary>
-    /// <param name="sender">The object that is the source of the event.</param>
-    /// <param name="e">A <see cref="QueuedWorkerCompletedEventArgs"/> that contains event data.</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void RunWorkerCompletedEventHandler(object sender, QueuedWorkerCompletedEventArgs e);
-    /// <summary>
-    /// Represents the method that will handle the DoWork event.
-    /// </summary>
-    /// <param name="sender">The object that is the source of the event.</param>
-    /// <param name="e">A <see cref="DoWorkEventArgs"/> that contains event data.</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void DoWorkEventHandler(object sender, DoWorkEventArgs e);
-    /// <summary>
-    /// Represents the method that will handle the WorkerFinished event.
-    /// </summary>
-    /// <param name="sender">The object that is the source of the event.</param>
-    /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void WorkerFinishedEventHandler(object sender, EventArgs e);
-    #endregion
-
-    #region Event Arguments
-    /// <summary>
-    /// Represents the event arguments of the RunWorkerCompleted event.
-    /// </summary>
-    public class QueuedWorkerCompletedEventArgs : AsyncCompletedEventArgs
-    {
-        /// <summary>
-        /// Gets a value that represents the result of an asynchronous operation.
-        /// </summary>
-        public object Result { get; private set; }
-        /// <summary>
-        /// Gets the priority of this item.
-        /// </summary>
-        public int Priority { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the QueuedWorkerCompletedEventArgs class.
-        /// </summary>
-        /// <param name="argument">The argument of an asynchronous operation.</param>
-        /// <param name="result">The result of an asynchronous operation.</param>
-        /// <param name="priority">A value between 0 and 5 indicating the priority of this item.</param>
-        /// <param name="error">The error that occurred while loading the image.</param>
-        /// <param name="cancelled">A value indicating whether the asynchronous operation was canceled.</param>
-        public QueuedWorkerCompletedEventArgs(object argument, object result, int priority, Exception error, bool cancelled)
-            : base(error, cancelled, argument)
-        {
-            Result = result;
-            Priority = priority;
-        }
-    }
-    #endregion
 }

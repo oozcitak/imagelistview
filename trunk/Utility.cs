@@ -20,6 +20,7 @@ using System.Drawing;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Manina.Windows.Forms
 {
