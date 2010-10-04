@@ -164,27 +164,39 @@ namespace Manina.Windows.Forms
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void RefreshDelegateInternal();
+    /// <summary>
+    /// Represents the method that will handle the ThumbnailCached event. 
+    /// </summary>
+    /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+    /// <param name="error">Determimes whether an error occurred during thumbnail extraction.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void ThumbnailCachedEventHandlerInternal(Guid guid, bool error);
     #endregion
 
     #region Event Arguments
     /// <summary>
     /// Represents the event arguments for errors during cache operations.
     /// </summary>
-    public class CacheErrorEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class CacheErrorEventArgs
     {
-         /// <summary>
+        private ImageListViewItem mItem;
+        private Exception mError;
+        private CacheThread mCacheThread;
+
+        /// <summary>
         /// Gets the ImageListViewItem that is associated with this error.
         /// This parameter can be null.
         /// </summary>
-        public ImageListViewItem Item { get; private set; }
+        public ImageListViewItem Item { get { return mItem; } }
         /// <summary>
         /// Gets a value indicating which error occurred during an asynchronous operation.
         /// </summary>
-        public Exception Error { get; private set; }
+        public Exception Error { get { return mError; } }
         /// <summary>
         /// Gets the thread raising the error.
         /// </summary>
-        public CacheThread CacheThread { get; private set; }
+        public CacheThread CacheThread { get { return mCacheThread; } }
 
         /// <summary>
         /// Initializes a new instance of the CacheErrorEventArgs class.
@@ -194,31 +206,36 @@ namespace Manina.Windows.Forms
         /// <param name="cacheThread">The thread raising the error.</param>
         public CacheErrorEventArgs(ImageListViewItem item, Exception error, CacheThread cacheThread)
         {
-            Item = item;
-            Error = error;
-            CacheThread = cacheThread;
+            mItem = item;
+            mError = error;
+            mCacheThread = cacheThread;
         }
     }
     /// <summary>
     /// Represents the event arguments for column related events.
     /// </summary>
-    public class DropFileEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class DropFileEventArgs
     {
+        private bool mCancel;
+        private int mIndex;
+        private string[] mFileNames;
+
         /// <summary>
         /// Gets or sets whether default event code will be processed.
         /// When set to true, the control will automatically insert the new items.
         /// Otherwise, the control will not process the dropped files.
         /// </summary>
-        public bool Cancel { get; set; }
+        public bool Cancel { get { return mCancel; } set { mCancel = value; } }
         /// <summary>
         /// Gets the position of the insertion caret.
         /// This determines where the new items will be inserted.
         /// </summary>
-        public int Index { get; private set; }
+        public int Index { get { return mIndex; } }
         /// <summary>
         /// Gets the array of filenames droppped on the control.
         /// </summary>
-        public string[] FileNames { get; private set; }
+        public string[] FileNames { get { return mFileNames; } }
 
         /// <summary>
         /// Initializes a new instance of the DropFileEventArgs class.
@@ -227,20 +244,23 @@ namespace Manina.Windows.Forms
         /// <param name="fileNames">The array of filenames droppped on the control.</param>
         public DropFileEventArgs(int index, string[] fileNames)
         {
-            Cancel = false;
-            Index = index;
-            FileNames = fileNames;
+            mCancel = false;
+            mIndex = index;
+            mFileNames = fileNames;
         }
     }
     /// <summary>
     /// Represents the event arguments for column related events.
     /// </summary>
-    public class ColumnEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ColumnEventArgs
     {
+        private ImageListView.ImageListViewColumnHeader mColumn;
+
         /// <summary>
         /// Gets the ImageListViewColumnHeader that is the target of the event.
         /// </summary>
-        public ImageListView.ImageListViewColumnHeader Column { get; private set; }
+        public ImageListView.ImageListViewColumnHeader Column { get { return mColumn; } }
 
         /// <summary>
         /// Initializes a new instance of the ColumnEventArgs class.
@@ -248,34 +268,39 @@ namespace Manina.Windows.Forms
         /// <param name="column">The column that is the target of this event.</param>
         public ColumnEventArgs(ImageListView.ImageListViewColumnHeader column)
         {
-            Column = column;
+            mColumn = column;
         }
     }
     /// <summary>
     /// Represents the event arguments for column click related events.
     /// </summary>
-    public class ColumnClickEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ColumnClickEventArgs
     {
+        private ImageListView.ImageListViewColumnHeader mColumn;
+        private Point mLocation;
+        private MouseButtons mButtons;
+
         /// <summary>
         /// Gets the ImageListViewColumnHeader that is the target of the event.
         /// </summary>
-        public ImageListView.ImageListViewColumnHeader Column { get; private set; }
+        public ImageListView.ImageListViewColumnHeader Column { get { return mColumn; } }
         /// <summary>
         /// Gets the coordinates of the cursor.
         /// </summary>
-        public Point Location { get; private set; }
+        public Point Location { get { return mLocation; } }
         /// <summary>
         /// Gets the x-coordinates of the cursor.
         /// </summary>
-        public int X { get { return Location.X; } }
+        public int X { get { return mLocation.X; } }
         /// <summary>
         /// Gets the y-coordinates of the cursor.
         /// </summary>
-        public int Y { get { return Location.Y; } }
+        public int Y { get { return mLocation.Y; } }
         /// <summary>
         /// Gets the state of the mouse buttons.
         /// </summary>
-        public MouseButtons Buttons { get; private set; }
+        public MouseButtons Buttons { get { return mButtons; } }
 
         /// <summary>
         /// Initializes a new instance of the ColumnClickEventArgs class.
@@ -286,26 +311,30 @@ namespace Manina.Windows.Forms
         /// indicating which mouse button was pressed.</param>
         public ColumnClickEventArgs(ImageListView.ImageListViewColumnHeader column, Point location, MouseButtons buttons)
         {
-            Column = column;
-            Location = location;
-            Buttons = buttons;
+            mColumn = column;
+            mLocation = location;
+            mButtons = buttons;
         }
     }
     /// <summary>
     /// Represents the event arguments for column hover related events.
     /// </summary>
-    public class ColumnHoverEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ColumnHoverEventArgs
     {
+        private ImageListView.ImageListViewColumnHeader mPreviousColumn;
+        private ImageListView.ImageListViewColumnHeader mColumn;
+
         /// <summary>
         /// Gets the ImageListViewColumnHeader that was previously hovered.
         /// Returns null if there was no previously hovered column.
         /// </summary>
-        public ImageListView.ImageListViewColumnHeader PreviousColumn { get; private set; }
+        public ImageListView.ImageListViewColumnHeader PreviousColumn { get { return mPreviousColumn; } }
         /// <summary>
         /// Gets the currently hovered ImageListViewColumnHeader.
         /// Returns null if there is no hovered column.
         /// </summary>
-        public ImageListView.ImageListViewColumnHeader Column { get; private set; }
+        public ImageListView.ImageListViewColumnHeader Column { get { return mColumn; } }
 
         /// <summary>
         /// Initializes a new instance of the ColumnHoverEventArgs class.
@@ -314,19 +343,22 @@ namespace Manina.Windows.Forms
         /// <param name="previousColumn">The previously hovered column.</param>
         public ColumnHoverEventArgs(ImageListView.ImageListViewColumnHeader column, ImageListView.ImageListViewColumnHeader previousColumn)
         {
-            Column = column;
-            PreviousColumn = previousColumn;
+            mColumn = column;
+            mPreviousColumn = previousColumn;
         }
     }
     /// <summary>
     /// Represents the event arguments for item related events.
     /// </summary>
-    public class ItemEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ItemEventArgs
     {
+        private ImageListViewItem mItem;
+
         /// <summary>
         /// Gets the ImageListViewItem that is the target of the event.
         /// </summary>
-        public ImageListViewItem Item { get; private set; }
+        public ImageListViewItem Item { get { return mItem; } }
 
         /// <summary>
         /// Initializes a new instance of the ItemEventArgs class.
@@ -334,18 +366,24 @@ namespace Manina.Windows.Forms
         /// <param name="item">The item that is the target of this event.</param>
         public ItemEventArgs(ImageListViewItem item)
         {
-            Item = item;
+            mItem = item;
         }
     }
     /// <summary>
     /// Represents the event arguments for item click related events.
     /// </summary>
-    public class ItemClickEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ItemClickEventArgs
     {
+        private ImageListViewItem mItem;
+        private int mSubItemIndex;
+        private Point mLocation;
+        private MouseButtons mButtons;
+
         /// <summary>
         /// Gets the ImageListViewItem that is the target of the event.
         /// </summary>
-        public ImageListViewItem Item { get; private set; }
+        public ImageListViewItem Item { get { return mItem; } }
         /// <summary>
         /// Gets the index of the sub item under the hit point.
         /// The index returned is the 0-based index of the column
@@ -353,23 +391,23 @@ namespace Manina.Windows.Forms
         /// and display indices.
         /// Returns -1 if the hit point is not over a sub item.
         /// </summary>
-        public int SubItemIndex { get; private set; }
+        public int SubItemIndex { get { return mSubItemIndex; } }
         /// <summary>
         /// Gets the coordinates of the cursor.
         /// </summary>
-        public Point Location { get; private set; }
+        public Point Location { get { return mLocation; } }
         /// <summary>
         /// Gets the x-coordinates of the cursor.
         /// </summary>
-        public int X { get { return Location.X; } }
+        public int X { get { return mLocation.X; } }
         /// <summary>
         /// Gets the y-coordinates of the cursor.
         /// </summary>
-        public int Y { get { return Location.Y; } }
+        public int Y { get { return mLocation.Y; } }
         /// <summary>
         /// Gets the state of the mouse buttons.
         /// </summary>
-        public MouseButtons Buttons { get; private set; }
+        public MouseButtons Buttons { get { return mButtons; } }
 
         /// <summary>
         /// Initializes a new instance of the ItemClickEventArgs class.
@@ -381,27 +419,33 @@ namespace Manina.Windows.Forms
         /// indicating which mouse button was pressed.</param>
         public ItemClickEventArgs(ImageListViewItem item, int subItemIndex, Point location, MouseButtons buttons)
         {
-            Item = item;
-            SubItemIndex = subItemIndex;
-            Location = location;
-            Buttons = buttons;
+            mItem = item;
+            mSubItemIndex = subItemIndex;
+            mLocation = location;
+            mButtons = buttons;
         }
     }
     /// <summary>
     /// Represents the event arguments for item hover related events.
     /// </summary>
-    public class ItemHoverEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ItemHoverEventArgs
     {
+        private ImageListViewItem mPreviousItem;
+        private ImageListViewItem mItem;
+        private int mPreviousSubItemIndex;
+        private int mSubItemIndex;
+
         /// <summary>
         /// Gets the ImageListViewItem that was previously hovered.
         /// Returns null if there was no previously hovered item.
         /// </summary>
-        public ImageListViewItem PreviousItem { get; private set; }
+        public ImageListViewItem PreviousItem { get { return mPreviousItem; } }
         /// <summary>
         /// Gets the currently hovered ImageListViewItem.
         /// Returns null if there is no hovered item.
         /// </summary>
-        public ImageListViewItem Item { get; private set; }
+        public ImageListViewItem Item { get { return mItem; } }
         /// <summary>
         /// Gets the index of the sub item that was previously hovered.
         /// The index returned is the 0-based index of the column
@@ -409,7 +453,7 @@ namespace Manina.Windows.Forms
         /// and display indices.
         /// Returns -1 if the hit point is not over a sub item.
         /// </summary>
-        public int PreviousSubItemIndex { get; private set; }
+        public int PreviousSubItemIndex { get { return mPreviousSubItemIndex; } }
         /// <summary>
         /// Gets the index of the hovered sub item.
         /// The index returned is the 0-based index of the column
@@ -417,7 +461,7 @@ namespace Manina.Windows.Forms
         /// and display indices.
         /// Returns -1 if the hit point is not over a sub item.
         /// </summary>
-        public int SubItemIndex { get; private set; }
+        public int SubItemIndex { get { return mSubItemIndex; } }
 
         /// <summary>
         /// Initializes a new instance of the ItemEventArgs class.
@@ -428,17 +472,18 @@ namespace Manina.Windows.Forms
         /// <param name="previousSubItemIndex">The index of the sub item that was previously hovered.</param>
         public ItemHoverEventArgs(ImageListViewItem item, int subItemIndex, ImageListViewItem previousItem, int previousSubItemIndex)
         {
-            Item = item;
-            SubItemIndex = subItemIndex;
+            mItem = item;
+            mSubItemIndex = subItemIndex;
 
-            PreviousItem = previousItem;
-            PreviousSubItemIndex = previousSubItemIndex;
+            mPreviousItem = previousItem;
+            mPreviousSubItemIndex = previousSubItemIndex;
         }
     }
     /// <summary>
     /// Represents the event arguments related to control layout.
     /// </summary>
-    public class LayoutEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class LayoutEventArgs
     {
         /// <summary>
         /// Gets or sets the rectangle bounding the item area.
@@ -457,33 +502,38 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments for the thumbnail cached event.
     /// </summary>
-    public class ThumbnailCachedEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class ThumbnailCachedEventArgs
     {
+        private ImageListViewItem mItem;
+        private bool mError;
+
         /// <summary>
         /// Gets the ImageListViewItem that is the target of the event.
         /// </summary>
-        public ImageListViewItem Item { get; private set; }
+        public ImageListViewItem Item { get { return mItem; } }
         /// <summary>
-        /// Gets the error occurred during thumbnail extraction.
+        /// Gets whether an error occurred during thumbnail extraction.
         /// </summary>
-        public Exception Error { get; private set; }
+        public bool Error { get { return mError; } }
 
         /// <summary>
         /// Initializes a new instance of the ItemEventArgs class.
         /// </summary>
         /// <param name="item">The item that is the target of this event.</param>
-        /// <param name="error">The error that occurred during thumbnail extraction.</param>
-        public ThumbnailCachedEventArgs(ImageListViewItem item, Exception error)
+        /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
+        public ThumbnailCachedEventArgs(ImageListViewItem item, bool error)
         {
-            Item = item;
-            Error = error;
+            mItem = item;
+            mError = error;
         }
     }
     /// <summary>
     /// Represents the event arguments related to virtual item 
     /// thumbnail requests.
     /// </summary>
-    public class VirtualItemThumbnailEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class VirtualItemThumbnailEventArgs
     {
         /// <summary>
         /// Gets the key of the virtual item.
@@ -514,7 +564,8 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments related to virtual item images.
     /// </summary>
-    public class VirtualItemImageEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class VirtualItemImageEventArgs
     {
         /// <summary>
         /// Gets the key of the virtual item.
@@ -538,7 +589,8 @@ namespace Manina.Windows.Forms
     /// <summary>
     /// Represents the event arguments related to virtual item details.
     /// </summary>
-    public class VirtualItemDetailsEventArgs : EventArgs
+    [Serializable, ComVisible(true)]
+    public class VirtualItemDetailsEventArgs
     {
         /// <summary>
         /// Gets the key of the virtual item.

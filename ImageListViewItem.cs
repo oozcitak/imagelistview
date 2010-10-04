@@ -78,7 +78,7 @@ namespace Manina.Windows.Forms
         /// Gets the cache state of the item thumbnail.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the cache state of the item thumbnail.")]
-        public CacheState ThumbnailCacheState { get { return mImageListView.GetCacheState(mGuid); } }
+        public CacheState ThumbnailCacheState { get { return mImageListView.cacheManager.GetCacheState(mGuid); } }
         /// <summary>
         /// Gets a value determining if the item is focused.
         /// </summary>
@@ -209,7 +209,7 @@ namespace Manina.Windows.Forms
                         isDirty = true;
                         if (mImageListView != null)
                         {
-                            mImageListView.LoadThumbnailImage(mGuid);
+                            mImageListView.cacheManager.Remove(mGuid, true);
                             mImageListView.itemCacheManager.Remove(mGuid);
                             mImageListView.itemCacheManager.Add(mGuid, mFileName);
                             if (mImageListView.IsItemVisible(mGuid))
@@ -222,6 +222,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the thumbnail image. If the thumbnail image is not cached, it will be 
         /// added to the cache queue and null will be returned.
+        /// The returned image is a copy of the cached image and should be disposed by the user.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the thumbnail image.")]
         public Image ThumbnailImage
@@ -231,12 +232,17 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Owner control is null.");
 
-                Image img = mImageListView.GetThumbnailImage(mGuid);
+                if (ThumbnailCacheState != CacheState.Cached)
+                {
+                    if (isVirtualItem)
+                        mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                    else
+                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                }
 
-                if (img == null)
-                    mImageListView.LoadThumbnailImage(mGuid);
-
-                return null;
+                return mImageListView.cacheManager.GetImage(Guid);
             }
         }
         /// <summary>
@@ -489,6 +495,7 @@ namespace Manina.Windows.Forms
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
 
+            mImageListView.cacheManager.BeginItemEdit(mGuid);
             mImageListView.itemCacheManager.BeginItemEdit(mGuid);
 
             editing = true;
@@ -505,6 +512,7 @@ namespace Manina.Windows.Forms
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
 
+            mImageListView.cacheManager.EndItemEdit(mGuid);
             mImageListView.itemCacheManager.EndItemEdit(mGuid);
 
             editing = false;
@@ -525,7 +533,7 @@ namespace Manina.Windows.Forms
             isDirty = true;
             if (mImageListView != null)
             {
-                mImageListView.RemoveThumbnailImage(mGuid);
+                mImageListView.cacheManager.Remove(mGuid, true);
                 mImageListView.itemCacheManager.Remove(mGuid);
                 if (isVirtualItem)
                     mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey);
@@ -724,24 +732,28 @@ namespace Manina.Windows.Forms
                     if (img == null && mImageListView.ShellIconFallback)
                         img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
                     if (img == null)
-                        img = mImageListView.ErrorImage;
+                        img = (Image)mImageListView.ErrorImage.Clone();
                     return img;
                 }
 
-                img = mImageListView.GetThumbnailImage(Guid);
+                img = mImageListView.cacheManager.GetImage(Guid);
 
                 if (state == CacheState.Cached)
                     return img;
 
-                if (img == null)
-                    mImageListView.LoadThumbnailImage(Guid);
+                if (isVirtualItem)
+                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                else
+                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
 
                 if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
                     img = mImageListView.itemCacheManager.GetLargeIcon(mGuid);
                 if (img == null && mImageListView.ShellIconFallback)
                     img = mImageListView.itemCacheManager.GetSmallIcon(mGuid);
                 if (img == null)
-                    img = mImageListView.DefaultImage;
+                    img = (Image)mImageListView.DefaultImage.Clone();
 
                 return img;
             }

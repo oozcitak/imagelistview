@@ -65,16 +65,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="QueuedBackgroundWorker.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="BonusRenderers.cs" />
-    <Compile Include="QueuedBackgroundWorker.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ImageListViewItemTypeConverter.cs" />
     <Compile Include="OpenFileDialogEditor.cs" />
     <Compile Include="ImageListViewColumnHeaderTypeConverter.cs" />
+    <Compile Include="QueuedBackgroundWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ShellInfoExtractor.cs" />
     <Compile Include="MetadataExtractor.cs" />
     <Compile Include="ImageListViewColorTypeConverter.cs" />
@@ -132,9 +129,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ImageListViewResources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="ThumbnailCacheItem.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="ThumbnailExtractor.cs" />
     <Compile Include="Utility.cs" />
