@@ -78,7 +78,7 @@ namespace Manina.Windows.Forms
         /// Gets the cache state of the item thumbnail.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the cache state of the item thumbnail.")]
-        public CacheState ThumbnailCacheState { get { return mImageListView.cacheManager.GetCacheState(mGuid); } }
+        public CacheState ThumbnailCacheState { get { return mImageListView.thumbnailManager.GetCacheState(mGuid); } }
         /// <summary>
         /// Gets a value determining if the item is focused.
         /// </summary>
@@ -209,7 +209,7 @@ namespace Manina.Windows.Forms
                         isDirty = true;
                         if (mImageListView != null)
                         {
-                            mImageListView.cacheManager.Remove(mGuid, true);
+                            mImageListView.thumbnailManager.Remove(mGuid, true);
                             mImageListView.itemCacheManager.Remove(mGuid);
                             mImageListView.itemCacheManager.Add(mGuid, mFileName);
                             if (mImageListView.IsItemVisible(mGuid))
@@ -235,14 +235,14 @@ namespace Manina.Windows.Forms
                 if (ThumbnailCacheState != CacheState.Cached)
                 {
                     if (isVirtualItem)
-                        mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
+                        mImageListView.thumbnailManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
                             mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                     else
-                        mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
+                        mImageListView.thumbnailManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
                             mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
 
-                return mImageListView.cacheManager.GetImage(Guid);
+                return mImageListView.thumbnailManager.GetImage(Guid);
             }
         }
         /// <summary>
@@ -495,7 +495,7 @@ namespace Manina.Windows.Forms
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
 
-            mImageListView.cacheManager.BeginItemEdit(mGuid);
+            mImageListView.thumbnailManager.BeginItemEdit(mGuid);
             mImageListView.itemCacheManager.BeginItemEdit(mGuid);
 
             editing = true;
@@ -512,7 +512,7 @@ namespace Manina.Windows.Forms
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
 
-            mImageListView.cacheManager.EndItemEdit(mGuid);
+            mImageListView.thumbnailManager.EndItemEdit(mGuid);
             mImageListView.itemCacheManager.EndItemEdit(mGuid);
 
             editing = false;
@@ -533,7 +533,7 @@ namespace Manina.Windows.Forms
             isDirty = true;
             if (mImageListView != null)
             {
-                mImageListView.cacheManager.Remove(mGuid, true);
+                mImageListView.thumbnailManager.Remove(mGuid, true);
                 mImageListView.itemCacheManager.Remove(mGuid);
                 if (isVirtualItem)
                     mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey);
@@ -736,16 +736,16 @@ namespace Manina.Windows.Forms
                     return img;
                 }
 
-                img = mImageListView.cacheManager.GetImage(Guid);
+                img = mImageListView.thumbnailManager.GetImage(Guid);
 
                 if (state == CacheState.Cached)
                     return img;
 
                 if (isVirtualItem)
-                    mImageListView.cacheManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
+                    mImageListView.thumbnailManager.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
                         mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 else
-                    mImageListView.cacheManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
+                    mImageListView.thumbnailManager.Add(Guid, FileName, mImageListView.ThumbnailSize,
                         mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
 
                 if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)

@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="BonusRenderers.cs" />
     <Compile Include="ImageListViewItemTypeConverter.cs" />
+    <Compile Include="ImageListViewThumbnailManager.cs" />
     <Compile Include="OpenFileDialogEditor.cs" />
     <Compile Include="ImageListViewColumnHeaderTypeConverter.cs" />
     <Compile Include="QueuedBackgroundWorker.cs">
@@ -99,7 +100,6 @@
     <Compile Include="ImageListView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ImageListViewCacheManager.cs" />
     <Compile Include="ImageListViewColumnHeader.cs">
       <SubType>Component</SubType>
     </Compile>
