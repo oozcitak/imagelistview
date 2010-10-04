@@ -112,12 +112,7 @@ namespace Manina.Windows.Forms
         internal ImageListViewNavigationManager navigationManager;
 
         // Cache threads
-        private AsyncImageLoader thumbnailWorker;
-        private Dictionary<Guid, ThumbnailCacheItem> cachedThumbnails;
-        private Dictionary<Guid, bool> pendingThumbnails;
-        private ThumbnailCacheItem cachedLargeImage;
-        private long memoryUsed;
-
+        internal ImageListViewCacheManager cacheManager;
         internal ImageListViewItemCacheManager itemCacheManager;
         #endregion
 
@@ -183,6 +178,8 @@ namespace Manina.Windows.Forms
                         mCacheLimitAsItemCount = 0;
                         mCacheLimitAsMemory = 0;
                     }
+                    if (cacheManager != null)
+                        cacheManager.CacheMode = mCacheMode;
                 }
             }
         }
@@ -211,11 +208,15 @@ namespace Manina.Windows.Forms
                 {
                     mCacheLimitAsItemCount = 0;
                     mCacheLimitAsMemory = limit * 1024 * 1024;
+                    if (cacheManager != null)
+                        cacheManager.CacheLimitAsMemory = mCacheLimitAsMemory;
                 }
                 else if (int.TryParse(slimit, out limit))
                 {
                     mCacheLimitAsMemory = 0;
                     mCacheLimitAsItemCount = limit;
+                    if (cacheManager != null)
+                        cacheManager.CacheLimitAsItemCount = mCacheLimitAsItemCount;
                 }
                 else
                     throw new ArgumentException("Cache limit must be specified as either the count of thumbnail images or the memory allocated for cache (eg 10MB)", "value");
@@ -445,6 +446,8 @@ namespace Manina.Windows.Forms
             set
             {
                 mRetryOnError = value;
+                if (cacheManager != null)
+                    cacheManager.RetryOnError = mRetryOnError;
                 if (itemCacheManager != null)
                     itemCacheManager.RetryOnError = mRetryOnError;
             }
@@ -583,6 +586,8 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
+                    cacheManager.CurrentThumbnailSize = mThumbnailSize;
+                    cacheManager.Rebuild();
                     Refresh();
                 }
             }
@@ -602,6 +607,7 @@ namespace Manina.Windows.Forms
                 if (mUseEmbeddedThumbnails != value)
                 {
                     mUseEmbeddedThumbnails = value;
+                    cacheManager.Rebuild();
                     Refresh();
                 }
             }
@@ -849,224 +855,13 @@ namespace Manina.Windows.Forms
 
             // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
-
             navigationManager = new ImageListViewNavigationManager(this);
 
-            // Thumbnail worker
-            thumbnailWorker = new AsyncImageLoader();
-            thumbnailWorker.ImageLoaded += new AsyncImageLoaderCompletedEventHandler(thumbnailWorker_ImageLoaded);
-            thumbnailWorker.GetUserImage += new AsyncImageLoaderGetUserImageEventHandler(thumbnailWorker_GetUserImage);
-            thumbnailWorker.ImageLoaderFinished += new AsyncImageLoaderFinishedEventHandler(thumbnailWorker_ImageLoaderFinished);
-
-            cachedThumbnails = new Dictionary<Guid, ThumbnailCacheItem>();
-            pendingThumbnails = new Dictionary<Guid, bool>();
-            cachedLargeImage = null;
-            memoryUsed = 0;
-
+            cacheManager = new ImageListViewCacheManager(this);
+            cacheManager.CurrentThumbnailSize = mThumbnailSize;
             itemCacheManager = new ImageListViewItemCacheManager(this);
 
             disposed = false;
-        }
-        #endregion
-
-        #region AsyncImageLoader
-        /// <summary>
-        /// Gets the cache state of the specified item.
-        /// </summary>
-        /// <param name="guid">The guid representing the item.</param>
-        internal CacheState GetCacheState(Guid guid)
-        {
-            ThumbnailCacheItem item = null;
-            if (cachedThumbnails.TryGetValue(guid, out item))
-            {
-                return item.State;
-            }
-
-            return CacheState.Unknown;
-        }
-        /// <summary>
-        /// Gets the approximate amount of memory used by the thumbnail cache.
-        /// </summary>
-        /// <returns></returns>
-        internal long GetMemoryUsed()
-        {
-            return memoryUsed;
-        }
-        /// <summary>
-        /// Adds a thumbnail to the thumbnail cache.
-        /// </summary>
-        /// <param name="guid">The GUID of the item.</param>
-        /// <param name="filename">The filename.</param>
-        /// <param name="thumbnail">The thumbnail.</param>
-        internal void AddToCache(Guid guid, string filename, Image thumbnail)
-        {
-            cachedThumbnails.Add(guid, new ThumbnailCacheItem(
-                guid, filename, mThumbnailSize, thumbnail,
-                CacheState.Cached, mUseEmbeddedThumbnails, AutoRotateThumbnails
-                ));
-            if (thumbnail != null)
-                memoryUsed -= thumbnail.Width * thumbnail.Height * 24 / 8;
-
-            pendingThumbnails.Remove(guid);
-        }
-        /// <summary>
-        /// Adds a thumbnail to the thumbnail cache.
-        /// </summary>
-        /// <param name="guid">The GUID of the item.</param>
-        /// <param name="key">The virtual item key of the item.</param>
-        /// <param name="thumbnail">The thumbnail.</param>
-        internal void AddToCache(Guid guid, object key, Image thumbnail)
-        {
-            cachedThumbnails.Add(guid, new ThumbnailCacheItem(
-                guid, key, mThumbnailSize, thumbnail,
-                CacheState.Cached, mUseEmbeddedThumbnails, AutoRotateThumbnails
-                ));
-            if (thumbnail != null)
-                memoryUsed -= thumbnail.Width * thumbnail.Height * 24 / 8;
-
-            pendingThumbnails.Remove(guid);
-        }
-        /// <summary>
-        /// Loads the item thumbnail asynchronously.
-        /// </summary>
-        /// <param name="guid">The GUID of the item.</param>
-        internal void LoadThumbnailImage(Guid guid)
-        {
-            if (pendingThumbnails.ContainsKey(guid))
-                return;
-
-            ImageListViewItem item = mItems[guid];
-            OnThumbnailCaching(new ItemEventArgs(item));
-
-            if (item.isVirtualItem)
-                thumbnailWorker.LoadAsync(item.Guid, mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
-            else
-                thumbnailWorker.LoadAsync(item.Guid, item.FileName, mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
-        }
-        /// <summary>
-        /// Removes a thumbnail from the thumbnail cache.
-        /// </summary>
-        /// <param name="guid">The GUID of the item to remove.</param>
-        /// <returns>true if the thumbnail was removed; false if the thumbnail
-        /// was not cached.</returns>
-        internal bool RemoveThumbnailImage(Guid guid)
-        {
-            ThumbnailCacheItem item = null;
-            if (cachedThumbnails.TryGetValue(guid, out item))
-            {
-                if (item.Image != null)
-                    memoryUsed -= item.Image.Width * item.Image.Height * 24 / 8;
-                item.Dispose();
-                return cachedThumbnails.Remove(guid);
-            }
-
-            return false;
-        }
-        /// <summary>
-        /// Loads a large image for the given item.
-        /// </summary>
-        /// <param name="guid">The GUID of the item.</param>
-        /// <param name="size">The size of the requested image.</param>
-        internal void LoadLargeImage(Guid guid, Size size)
-        {
-            // Check if already cached
-            if (cachedLargeImage != null && cachedLargeImage.Size == size &&
-                cachedLargeImage.UseEmbeddedThumbnails == mUseEmbeddedThumbnails &&
-                cachedLargeImage.AutoRotate == AutoRotateThumbnails)
-                return;
-
-            ImageListViewItem item = mItems[guid];
-            OnThumbnailCaching(new ItemEventArgs(item));
-            if (item.isVirtualItem)
-                thumbnailWorker.LoadAsync(item.Guid, size, mUseEmbeddedThumbnails, AutoRotateThumbnails, true);
-            else
-                thumbnailWorker.LoadAsync(item.Guid, item.FileName, size, mUseEmbeddedThumbnails, AutoRotateThumbnails, true);
-        }
-        /// <summary>
-        /// Gets a thumbnail image or null if the thumbnail was not found.
-        /// </summary>
-        /// <param name="guid">The GUID of the item.</param>
-        internal Image GetThumbnailImage(Guid guid)
-        {
-            ThumbnailCacheItem item = null;
-            if (cachedThumbnails.TryGetValue(guid, out item))
-                return item.Image;
-
-            return null;
-        }
-        /// <summary>
-        /// Gets a thumbnail image or null if the thumbnail was not found.
-        /// </summary>
-        /// <param name="guid">The GUID of the item.</param>
-        /// <param name="size">Size of the requested image.</param>
-        internal Image GetLargeImage(Guid guid, Size size)
-        {
-            if (cachedLargeImage != null)
-                return cachedLargeImage.Image;
-
-            return null;
-        }
-        /// <summary>
-        /// Handles the ImageLoaded event of the thumbnailWorker control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Manina.Windows.Forms.AsyncImageLoaderCompletedEventArgs"/> 
-        /// instance containing the event data.</param>
-        private void thumbnailWorker_ImageLoaded(object sender, AsyncImageLoaderCompletedEventArgs e)
-        {
-            ImageListViewItem item = mItems[(Guid)e.Key];
-
-            if (e.HasPriority)
-            {
-                cachedLargeImage = new ThumbnailCacheItem(
-                    item.Guid, item.FileName, e.Size, e.Image,
-                    (e.Image == null ? CacheState.Error : CacheState.Cached),
-                    e.UseEmbeddedThumbnails, e.AutoRotate);
-            }
-            else
-            {
-                // Check to see if thumbnail parameters are changed while the 
-                // worker was fetching the image.
-                if (e.Size == mThumbnailSize && e.UseEmbeddedThumbnails == mUseEmbeddedThumbnails && e.AutoRotate == AutoRotateThumbnails)
-                {
-                    ThumbnailCacheItem result = new ThumbnailCacheItem(
-                        item.Guid, item.FileName, e.Size,
-                        e.Image, (e.Image == null ? CacheState.Error : CacheState.Cached),
-                        e.UseEmbeddedThumbnails, e.AutoRotate);
-
-                    cachedThumbnails.Remove(item.Guid);
-                    cachedThumbnails.Add(item.Guid, result);
-
-                    if (e.Image != null)
-                        memoryUsed += e.Image.Width * e.Image.Height * 24 / 8;
-                }
-            }
-
-            // Raise the thumbnail cached event.
-            OnThumbnailCached(new ThumbnailCachedEventArgs(item, e.Error));
-
-            Refresh(false, true);
-        }
-        /// <summary>
-        /// Handles the GetUserImage event of the thumbnailWorker control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="Manina.Windows.Forms.AsyncImageLoaderGetUserImageEventArgs"/> 
-        /// instance containing the event data.</param>
-        private void thumbnailWorker_GetUserImage(object sender, AsyncImageLoaderGetUserImageEventArgs e)
-        {
-            VirtualItemThumbnailEventArgs arg = new VirtualItemThumbnailEventArgs(e.Key, e.Size);
-            OnRetrieveVirtualItemThumbnail(arg);
-            e.Image = arg.ThumbnailImage;
-        }
-        /// <summary>
-        /// Handles the ImageLoaderFinished event of the thumbnailWorker control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void thumbnailWorker_ImageLoaderFinished(object sender, EventArgs e)
-        {
-            Refresh();
         }
         #endregion
 
@@ -1076,16 +871,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ClearThumbnailCache()
         {
-            foreach (ThumbnailCacheItem item in cachedThumbnails.Values)
-                item.Dispose();
-            cachedThumbnails.Clear();
-
-            if (cachedLargeImage != null)
-                cachedLargeImage.Dispose();
-            cachedLargeImage = null;
-
-            memoryUsed = 0;
-
+            cacheManager.Clear();
             Refresh();
         }
         /// <summary>
@@ -1705,6 +1491,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
+            cacheManager.Stop();
             itemCacheManager.Stop();
         }
         /// <summary>
@@ -1735,17 +1522,8 @@ namespace Manina.Windows.Forms
                     if (vScrollBar != null && vScrollBar.IsHandleCreated && !vScrollBar.IsDisposed)
                         vScrollBar.Dispose();
 
-                    // thumbnail cache
-                    foreach (ThumbnailCacheItem item in cachedThumbnails.Values)
-                        item.Dispose();
-                    cachedThumbnails.Clear();
-                    if (cachedLargeImage != null)
-                        cachedLargeImage.Dispose();
-                    cachedLargeImage = null;
-
                     // internal classes
-                    ClearThumbnailCache();
-                    thumbnailWorker.Dispose();
+                    cacheManager.Dispose();
                     itemCacheManager.Dispose();
                     navigationManager.Dispose();
                     if (mRenderer != null)
@@ -1911,6 +1689,18 @@ namespace Manina.Windows.Forms
             OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
         }
         /// <summary>
+        /// Raises the ThumbnailCached event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+        /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
+        internal void OnThumbnailCachedInternal(Guid guid, bool error)
+        {
+            ImageListViewItem item = null;
+            if (Items.TryGetValue(guid, out item))
+                OnThumbnailCached(new ThumbnailCachedEventArgs(item, error));
+        }
+        /// <summary>
         /// Raises the refresh event.
         /// This method is invoked from the thumbnail thread.
         /// </summary>
@@ -1973,6 +1763,23 @@ namespace Manina.Windows.Forms
         {
             if (RetrieveVirtualItemDetails != null)
                 RetrieveVirtualItemDetails(this, e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItem event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
+        internal virtual void RetrieveVirtualItemThumbnailInternal(VirtualItemThumbnailEventArgs e)
+        {
+            OnRetrieveVirtualItemThumbnail(e);
+        }
+        /// <summary>
+        /// Raises the RetrieveVirtualItemImage event.
+        /// </summary>
+        /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
+        internal virtual void RetrieveVirtualItemImageInternal(VirtualItemImageEventArgs e)
+        {
+            OnRetrieveVirtualItemImage(e);
         }
         /// <summary>
         /// Raises the RetrieveVirtualItemDetails event.
