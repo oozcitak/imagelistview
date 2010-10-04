@@ -81,7 +81,7 @@ namespace Manina.Windows.Forms
             internal bool LazyRefreshIntervalExceeded { get { return ((DateTime.Now - lastRenderTime) > LazyRefreshInterval); } }
             #endregion
 
-            #region Constructors
+            #region Constructor
             /// <summary>
             /// Initializes a new instance of the ImageListViewRenderer class.
             /// </summary>
