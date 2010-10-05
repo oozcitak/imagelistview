@@ -66,10 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BonusRenderers.cs" />
+    <Compile Include="ImageListViewCacheThumbnail.cs" />
     <Compile Include="QueuedBackgroundWorkerEvents.cs">
     </Compile>
     <Compile Include="ImageListViewItemTypeConverter.cs" />
-    <Compile Include="ImageListViewThumbnailManager.cs" />
     <Compile Include="OpenFileDialogEditor.cs" />
     <Compile Include="ImageListViewColumnHeaderTypeConverter.cs" />
     <Compile Include="QueuedBackgroundWorker.cs">

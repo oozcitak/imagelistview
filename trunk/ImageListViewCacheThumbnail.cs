@@ -26,7 +26,7 @@ namespace Manina.Windows.Forms
     /// Represents the cache manager responsible for asynchronously loading
     /// item thumbnails.
     /// </summary>
-    internal class ImageListViewThumbnailManager : IDisposable
+    internal class ImageListViewCacheThumbnail : IDisposable
     {
         #region Member Variables
         QueuedBackgroundWorker bw;
@@ -242,10 +242,10 @@ namespace Manina.Windows.Forms
 
         #region Constructor
         /// <summary>
-        /// Initializes a new instance of the ImageListViewCacheManager class.
+        /// Initializes a new instance of the <see cref="ImageListViewCacheThumbnail"/> class.
         /// </summary>
         /// <param name="owner">The owner control.</param>
-        public ImageListViewThumbnailManager(ImageListView owner)
+        public ImageListViewCacheThumbnail(ImageListView owner)
         {
             context = null;
             bw = new QueuedBackgroundWorker();
@@ -885,7 +885,7 @@ namespace Manina.Windows.Forms
         /// Releases unmanaged resources and performs other cleanup operations before the
         /// ImageListViewCacheManager is reclaimed by garbage collection.
         /// </summary>
-        ~ImageListViewThumbnailManager()
+        ~ImageListViewCacheThumbnail()
         {
             System.Diagnostics.Debug.Print("Finalizer of {0} called.", GetType());
             Dispose();
