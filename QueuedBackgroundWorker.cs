@@ -17,6 +17,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         private readonly object lockObject;
 
+        private int priorityQueues;
         private Thread thread;
         private bool stopping;
         private bool started;
@@ -46,8 +47,9 @@ namespace Manina.Windows.Forms
             thread.IsBackground = true;
 
             // Work items
-            items = new Queue<object>[6];
-            for (int i = 0; i < 6; i++)
+            priorityQueues = 5;
+            items = new Queue<object>[priorityQueues];
+            for (int i = 0; i < priorityQueues; i++)
                 items[i] = new Queue<object>();
             cancelledItems = new Dictionary<object, bool>();
 
@@ -62,12 +64,12 @@ namespace Manina.Windows.Forms
         /// Starts processing a new background operation.
         /// </summary>
         /// <param name="argument">The argument of an asynchronous operation.</param>
-        /// <param name="priority">A value between 0 and 5 indicating the priority of this item.
+        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> indicating the priority of this item.
         /// An item with a higher priority will be processed before items with lower priority.</param>
         public void RunWorkerAsync(object argument, int priority)
         {
-            if (priority < 0 || priority > 5)
-                throw new ArgumentException("priority must be between 0 and 5 inclusive.", "priority");
+            if (priority < 0 || priority >= priorityQueues)
+                throw new ArgumentException("priority must be between 0 and " + (priorityQueues - 1).ToString() + "  inclusive.", "priority");
 
             // Start the worker thread
             if (!started)
@@ -106,6 +108,25 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets or sets the number of priority queues. Number of queues
+        /// cannot be changed after any work is added to the work queue.
+        /// </summary>
+        [Browsable(true), Category("Behaviour"), DefaultValue(5)]
+        public int PriorityQueues
+        {
+            get { return priorityQueues; }
+            set
+            {
+                if (started)
+                    throw new System.Threading.ThreadStateException("The thread has already been started.");
+
+                priorityQueues = value;
+                items = new Queue<object>[priorityQueues];
+                for (int i = 0; i < priorityQueues; i++)
+                    items[i] = new Queue<object>();
+            }
+        }
         /// <summary>
         /// Determines whether the <see cref="QueuedBackgroundWorker"/> started working.
         /// </summary>
@@ -283,7 +304,7 @@ namespace Manina.Windows.Forms
                     lock (lockObject)
                     {
                         // Check queues
-                        for (int i = 5; i >= 0; i--)
+                        for (int i = priorityQueues - 1; i >= 0; i--)
                         {
                             if (items[i].Count > 0)
                             {
