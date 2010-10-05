@@ -35,9 +35,6 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal class MetadataExtractor
     {
-        #region Member Variables
-        bool wicError = false;
-        #endregion
 
         #region Exif Tag IDs
         const int TagImageDescription = 0x010E;
@@ -85,6 +82,16 @@ namespace Manina.Windows.Forms
             return DateTime.ParseExact(ExifAscii(value),
                 "yyyy:MM:dd HH:mm:ss",
                 System.Globalization.CultureInfo.InvariantCulture);
+        }
+        /// <summary>
+        /// Converts the given Exif data to DateTime.
+        /// </summary>
+        /// <param name="value">Exif data as a string.</param>
+        private static DateTime ExifDateTime(string value)
+        {
+            DateTime result = DateTime.MinValue;
+            DateTime.TryParse(value, out result);
+            return result;
         }
         /// <summary>
         /// Converts the given Exif data to an 16-bit unsigned integer.
@@ -228,8 +235,8 @@ namespace Manina.Windows.Forms
         /// <param name="path">Filepath of image</param>
         private void InitViaWpf(string path)
         {
+            bool wicError = false;
 #if USEWIC
-            wicError = false;
             try
             {
                 using (FileStream streamWpf = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -265,7 +272,6 @@ namespace Manina.Windows.Forms
 #if USEWIC
         /// <summary>
         /// Inits metadata via WIC/WPF (.NET 3.0).
-        /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
         /// </summary>
         /// <param name="frameWpf">Opened WPF image</param>
         private void InitViaWpf(BitmapFrame frameWpf)
@@ -275,7 +281,6 @@ namespace Manina.Windows.Forms
             DPIX = frameWpf.DpiX;
             DPIY = frameWpf.DpiY;
 
-            wicError = false;
             BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
             if (data != null)
             {
@@ -286,30 +291,6 @@ namespace Manina.Windows.Forms
                 catch (Exception eWpf)
                 {
                     Error = eWpf;
-                    wicError = true;
-                }
-
-                if (wicError)
-                {
-                    try
-                    {
-                        Image img = null;
-                        using (MemoryStream stream = new MemoryStream())
-                        {
-                            BmpBitmapEncoder e = new BmpBitmapEncoder();
-                            e.Frames.Add(BitmapFrame.Create(frameWpf));
-                            e.Save(stream);
-                            img = Image.FromStream(stream);
-                        }
-                        // WIC lacks a metadata reader.
-                        // Fall back to .NET 2.0 method.
-                        if (img != null)
-                            InitViaBmp(img);
-                    }
-                    catch (Exception eBmp)
-                    {
-                        Error = eBmp;
-                    }
                 }
             }
         }
@@ -470,55 +451,37 @@ namespace Manina.Windows.Forms
         {
             double dVal;
             int iVal;
-            DateTime dateTime;
             string str;
             Object val;
 
-            val = GetMetadataObject(data, "System.Subject");
-            if (val != null)
+            ImageDescription = data.Subject;
+            EquipmentManufacturer = data.CameraManufacturer;
+            EquipmentModel = str = data.CameraModel;
+            var authors = data.Author;
+            if (authors != null && authors.Count > 0)
             {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    ImageDescription = str;
-                }
+                string[] authorsArray = new string[authors.Count];
+                authors.CopyTo(authorsArray, 0);
+                Artist = string.Join(";", authorsArray).Trim();
             }
-            val = GetMetadataObject(data, "System.Photo.CameraManufacturer");
-            if (val != null)
-            {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    EquipmentManufacturer = str;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.CameraModel");
-            if (val != null)
-            {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    EquipmentModel = str;
-                }
-            }
-            val = GetMetadataObject(data, "System.Author");
-            if (val != null)
-            {
-                str = String.Concat((string[])val).Trim();
-                if (str != String.Empty)
-                {
-                    Artist = str;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.DateTaken");
-            if (val != null)
-            {
-                dateTime = ConvertFileTime((System.Runtime.InteropServices.ComTypes.FILETIME)val);
-                if (dateTime != DateTime.MinValue)
-                {
-                    DateTaken = dateTime;
-                }
-            }
+            string date = data.DateTaken;
+            if (!string.IsNullOrEmpty(date))
+                DateTaken = ExifDateTime(date);
+            Copyright = data.Copyright;
+            Comment = data.Comment;
+            Software = data.ApplicationName;
+            int simpleRating = data.Rating;
+            if (simpleRating == 1)
+                Rating = 1;
+            else if (simpleRating == 2)
+                Rating = 25;
+            else if (simpleRating == 3)
+                Rating = 50;
+            else if (simpleRating == 4)
+                Rating = 75;
+            else if (simpleRating == 5)
+                Rating = 99;
+            
             val = GetMetadataObject(data, "System.Photo.ExposureTime");
             if (val != null)
             {
@@ -546,57 +509,6 @@ namespace Manina.Windows.Forms
                     ISOSpeed = iVal;
                 }
             }
-            val = GetMetadataObject(data, "System.Copyright");
-            if (val != null)
-            {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    Copyright = str;
-                }
-            }
-            val = GetMetadataObject(data, "System.Comment");
-            if (val != null)
-            {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    Comment = str;
-                }
-            }
-            val = GetMetadataObject(data, "System.Rating");
-            if (val != null)
-            {
-                iVal = (ushort)val;
-                Rating = iVal;
-            }
-            if (Rating == 0)
-            {
-                val = GetMetadataObject(data, "System.SimpleRating");
-                if (val != null)
-                {
-                    iVal = (ushort)val;
-                    if (iVal == 1)
-                        Rating = 1;
-                    else if (iVal == 2)
-                        Rating = 25;
-                    else if (iVal == 3)
-                        Rating = 50;
-                    else if (iVal == 4)
-                        Rating = 75;
-                    else if (iVal == 5)
-                        Rating = 99;
-                }
-            }
-            val = GetMetadataObject(data, "System.ApplicationName");
-            if (val != null)
-            {
-                str = ((string)val).Trim();
-                if (str != String.Empty)
-                {
-                    Software = str;
-                }
-            }
             val = GetMetadataObject(data, "System.Photo.FocalLength");
             if (val != null)
             {
@@ -622,7 +534,6 @@ namespace Manina.Windows.Forms
             }
             catch (NotSupportedException)
             {
-                wicError = true;
                 val = null;
             }
             return val;
