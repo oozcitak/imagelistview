@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using System.Drawing;
 
 namespace Manina.Windows.Forms
 {
@@ -9,6 +10,7 @@ namespace Manina.Windows.Forms
     /// A background worker with a work queue.
     /// </summary>
     [Description("A background worker with a work queue.")]
+    [ToolboxBitmap(typeof(ImageListView))]
     [DefaultEvent("DoWork")]
     public class QueuedBackgroundWorker : Component
     {
