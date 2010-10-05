@@ -28,7 +28,7 @@ namespace Manina.Windows.Forms
     /// Represents the cache manager responsible for asynchronously loading
     /// item details.
     /// </summary>
-    internal class ImageListViewItemCacheManager : IDisposable
+    internal class ImageListViewCacheMetadata : IDisposable
     {
         #region Constants
         /// <summary>
@@ -269,7 +269,7 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of the ImageListViewItemCacheManager class.
         /// </summary>
         /// <param name="owner">The owner control.</param>
-        public ImageListViewItemCacheManager(ImageListView owner)
+        public ImageListViewCacheMetadata(ImageListView owner)
         {
             lockObject = new object();
 
@@ -513,7 +513,7 @@ namespace Manina.Windows.Forms
         /// Releases unmanaged resources and performs other cleanup operations before the
         /// ImageListViewItemCacheManager is reclaimed by garbage collection.
         /// </summary>
-        ~ImageListViewItemCacheManager()
+        ~ImageListViewCacheMetadata()
         {
             System.Diagnostics.Debug.Print("Finalizer of {0} called.", GetType());
             Dispose();

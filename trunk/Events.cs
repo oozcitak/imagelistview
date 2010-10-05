@@ -136,7 +136,7 @@ namespace Manina.Windows.Forms
     /// Updates item details.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal delegate void UpdateItemDetailsDelegateInternal(Guid guid, ImageListViewItemCacheManager.ShellImageFileInfo info);
+    internal delegate void UpdateItemDetailsDelegateInternal(Guid guid, ImageListViewCacheMetadata.ShellImageFileInfo info);
     /// <summary>
     /// Updates item details.
     /// </summary>

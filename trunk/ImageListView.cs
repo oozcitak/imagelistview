@@ -114,7 +114,7 @@ namespace Manina.Windows.Forms
         // Cache threads
         internal ImageListViewCacheThumbnail thumbnailCache;
         internal ImageListViewCacheShellInfo shellInfoCache;
-        internal ImageListViewItemCacheManager itemCacheManager;
+        internal ImageListViewCacheMetadata itemCacheManager;
         #endregion
 
         #region Properties
@@ -874,7 +874,7 @@ namespace Manina.Windows.Forms
             thumbnailCache = new ImageListViewCacheThumbnail(this);
             thumbnailCache.CurrentThumbnailSize = mThumbnailSize;
             shellInfoCache = new ImageListViewCacheShellInfo(this);
-            itemCacheManager = new ImageListViewItemCacheManager(this);
+            itemCacheManager = new ImageListViewCacheMetadata(this);
 
             disposed = false;
         }
@@ -1727,7 +1727,7 @@ namespace Manina.Windows.Forms
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(Guid guid, ImageListViewItemCacheManager.ShellImageFileInfo info)
+        internal void UpdateItemDetailsInternal(Guid guid, ImageListViewCacheMetadata.ShellImageFileInfo info)
         {
             ImageListViewItem item = null;
             if (mItems.TryGetValue(guid, out item))

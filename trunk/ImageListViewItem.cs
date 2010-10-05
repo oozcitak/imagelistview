@@ -920,7 +920,7 @@ namespace Manina.Windows.Forms
                 }
                 else
                 {
-                    ImageListViewItemCacheManager.ShellImageFileInfo info = mImageListView.itemCacheManager.GetImageFileInfo(mFileName);
+                    ImageListViewCacheMetadata.ShellImageFileInfo info = mImageListView.itemCacheManager.GetImageFileInfo(mFileName);
                     mImageListView.itemCacheManager.ForceAddToCache(mGuid, mVirtualItemKey, info);
 
                     UpdateDetailsInternal(info);
@@ -935,7 +935,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Invoked by the worker thread to update item details.
         /// </summary>
-        internal void UpdateDetailsInternal(ImageListViewItemCacheManager.ShellImageFileInfo info)
+        internal void UpdateDetailsInternal(ImageListViewCacheMetadata.ShellImageFileInfo info)
         {
             if (!isDirty) return;
 
