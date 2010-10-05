@@ -112,7 +112,7 @@ namespace Manina.Windows.Forms
         internal ImageListViewNavigationManager navigationManager;
 
         // Cache threads
-        internal ImageListViewThumbnailManager thumbnailManager;
+        internal ImageListViewCacheThumbnail thumbnailManager;
         internal ImageListViewItemCacheManager itemCacheManager;
         #endregion
 
@@ -868,7 +868,7 @@ namespace Manina.Windows.Forms
             layoutManager = new ImageListViewLayoutManager(this);
             navigationManager = new ImageListViewNavigationManager(this);
 
-            thumbnailManager = new ImageListViewThumbnailManager(this);
+            thumbnailManager = new ImageListViewCacheThumbnail(this);
             thumbnailManager.CurrentThumbnailSize = mThumbnailSize;
             itemCacheManager = new ImageListViewItemCacheManager(this);
 
