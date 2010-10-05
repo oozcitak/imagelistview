@@ -177,6 +177,11 @@ namespace Manina.Windows.Forms
                     {
                         mCacheLimitAsItemCount = 0;
                         mCacheLimitAsMemory = 0;
+                        if (thumbnailManager != null)
+                        {
+                            thumbnailManager.CacheLimitAsItemCount = 0;
+                            thumbnailManager.CacheLimitAsMemory = 0;
+                        }
                     }
                     if (thumbnailManager != null)
                         thumbnailManager.CacheMode = mCacheMode;
@@ -209,14 +214,20 @@ namespace Manina.Windows.Forms
                     mCacheLimitAsItemCount = 0;
                     mCacheLimitAsMemory = limit * 1024 * 1024;
                     if (thumbnailManager != null)
+                    {
+                        thumbnailManager.CacheLimitAsItemCount = 0;
                         thumbnailManager.CacheLimitAsMemory = mCacheLimitAsMemory;
+                    }
                 }
                 else if (int.TryParse(slimit, out limit))
                 {
                     mCacheLimitAsMemory = 0;
                     mCacheLimitAsItemCount = limit;
                     if (thumbnailManager != null)
+                    {
+                        thumbnailManager.CacheLimitAsMemory = 0;
                         thumbnailManager.CacheLimitAsItemCount = mCacheLimitAsItemCount;
+                    }
                 }
                 else
                     throw new ArgumentException("Cache limit must be specified as either the count of thumbnail images or the memory allocated for cache (eg 10MB)", "value");

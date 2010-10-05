@@ -107,7 +107,11 @@ namespace Manina.Windows.Forms
 
         #region Properties
         /// <summary>
-        /// Determines whether the QueuedBackgroundWorker being stopped.
+        /// Determines whether the <see cref="QueuedBackgroundWorker"/> started working.
+        /// </summary>
+        public bool Started { get { return started; } }
+        /// <summary>
+        /// Determines whether the <see cref="QueuedBackgroundWorker"/> being stopped.
         /// </summary>
         private bool Stopping { get { lock (lockObject) { return stopping; } } }
         #endregion
