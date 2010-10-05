@@ -17,235 +17,78 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Drawing;
-using System.Runtime.InteropServices;
+using System.Threading;
 using System.IO;
 
 namespace Manina.Windows.Forms
 {
     /// <summary>
     /// Represents the cache manager responsible for asynchronously loading
-    /// item details.
+    /// item metdata.
     /// </summary>
     internal class ImageListViewCacheMetadata : IDisposable
     {
-        #region Constants
-        /// <summary>
-        /// The cache manager will clean up removed items
-        /// if they exceed this amount.
-        /// </summary>
-        public const int CleanUpLimit = 200;
-        #endregion
-
         #region Member Variables
-        private readonly object lockObject;
+        QueuedBackgroundWorker bw;
+        private SynchronizationContext context;
 
         private ImageListView mImageListView;
-        private bool mRetryOnError;
-        private Thread mThread;
 
-        private Queue<CacheItem> toCache;
-        private Dictionary<Guid, CacheItem> itemCache;
         private Dictionary<Guid, bool> editCache;
+        private Dictionary<Guid, bool> processing;
+        private Dictionary<Guid, bool> removedItems;
 
-        private List<Guid> removedItems;
-
-        private Dictionary<string, CachedShellInfo> cachedShellInfo;
-
-        private volatile bool stopping;
-        private bool stopped;
         private bool disposed;
         #endregion
 
         #region Private Classes
         /// <summary>
-        /// Represents cached shell properties.
+        /// Represents an item in the cache.
         /// </summary>
-        private class CachedShellInfo : IDisposable
+        private class CacheItem
         {
-            private string mFileType;
-            private Image mSmallIcon;
-            private Image mLargeIcon;
-            private bool disposed;
+            /// <summary>
+            /// Gets the item guid.
+            /// </summary>
+            public Guid Guid { get; private set; }
+            /// <summary>
+            /// Gets the file name.
+            /// </summary>
+            public string FileName { get; private set; }
+            /// <summary>
+            /// Gets the virtual item key.
+            /// </summary>
+            public object VirtualItemKey { get; private set; }
+            /// <summary>
+            /// Gets whether this item is a virtual item.
+            /// </summary>
+            public bool IsVirtualItem { get; private set; }
 
             /// <summary>
-            /// Gets the mime type of the image file.
+            /// Initializes a new instance of the <see cref="CacheItem"/> class.
             /// </summary>
-            public string FileType { get { return mFileType; } }
-            /// <summary>
-            /// Gets the small shell icon of the image file.
-            /// </summary>
-            public Image SmallIcon { get { return mSmallIcon; } }
-            /// <summary>
-            /// Gets the large shell icon of the image file.
-            /// </summary>
-            public Image LargeIcon { get { return mLargeIcon; } }
-
-            /// <summary>
-            /// Initializes a new instance of the CachedShellInfo class.
-            /// </summary>
-            /// <param name="fileType">Mime type of the file.</param>
-            /// <param name="smallIcon">The small icon.</param>
-            /// <param name="largeIcon">The large icon.</param>
-            public CachedShellInfo(string fileType, Image smallIcon, Image largeIcon)
-            {
-                disposed = false;
-                mFileType = fileType;
-                mSmallIcon = smallIcon;
-                mLargeIcon = largeIcon;
-            }
-
-            /// <summary>
-            /// Performs application-defined tasks associated with freeing, 
-            /// releasing, or resetting unmanaged resources.
-            /// </summary>
-            public void Dispose()
-            {
-                if (!disposed)
-                {
-                    if (mSmallIcon != null)
-                        mSmallIcon.Dispose();
-                    if (mLargeIcon != null)
-                        mLargeIcon.Dispose();
-
-                    mSmallIcon = null;
-                    mLargeIcon = null;
-                    disposed = true;
-                }
-            }
-        }
-        /// <summary>
-        /// Represents an item in the thumbnail cache.
-        /// </summary>
-        private class CacheItem : IDisposable
-        {
-            private Guid mGuid;
-            private string mFileName;
-            private bool mIsVirtualItem;
-            private object mVirtualItemKey;
-            private Image mSmallIcon;
-            private Image mLargeIcon;
-            private bool disposed;
-
-            /// <summary>
-            /// Gets the guid of the item.
-            /// </summary>
-            public Guid Guid { get { return mGuid; } }
-            /// <summary>
-            /// Gets the name of the image file.
-            /// </summary>
-            public string FileName { get { return mFileName; } }
-            /// <summary>
-            /// Gets whether Item is a virtual item.
-            /// </summary>
-            public bool IsVirtualItem { get { return mIsVirtualItem; } }
-            /// <summary>
-            /// Gets the public key for the virtual item.
-            /// </summary>
-            public object VirtualItemKey { get { return mVirtualItemKey; } }
-            /// <summary>
-            /// Gets the cached small shell icon.
-            /// </summary>
-            public Image SmallIcon { get { return mSmallIcon; } }
-            /// <summary>
-            /// Gets the cached large shell icon.
-            /// </summary>
-            public Image LargeIcon { get { return mLargeIcon; } }
-
-            /// <summary>
-            /// Initializes a new instance of the CacheItem class.
-            /// </summary>
-            /// <param name="guid">The guid of the ImageListViewItem associated 
-            /// with this request.</param>
-            /// <param name="filename">The file system path to the image file.</param>
+            /// <param name="guid">The guid of the item.</param>
+            /// <param name="filename">The file name.</param>
             public CacheItem(Guid guid, string filename)
-                : this(guid, filename, null, null)
             {
-                ;
+                Guid = guid;
+                FileName = filename;
+                IsVirtualItem = false;
+                VirtualItemKey = null;
             }
             /// <summary>
-            /// Initializes a new instance of the CacheItem class.
+            /// Initializes a new instance of the <see cref="CacheItem"/> class.
             /// </summary>
-            /// <param name="guid">The guid of the ImageListViewItem associated 
-            /// with this request.</param>
-            /// <param name="filename">The file system path to the image file.</param>
-            /// <param name="smallIcon">The small shell icon.</param>
-            /// <param name="largeIcon">The small shell icon.</param>
-            public CacheItem(Guid guid, string filename, Image smallIcon, Image largeIcon)
+            /// <param name="guid">The guid of the item.</param>
+            /// <param name="virtualItemKey">The virtual item key.</param>
+            public CacheItem(Guid guid, object virtualItemKey)
             {
-                disposed = false;
-                mGuid = guid;
-                mFileName = filename;
-                mIsVirtualItem = false;
-                mVirtualItemKey = null;
-                mSmallIcon = smallIcon;
-                mLargeIcon = largeIcon;
+                Guid = guid;
+                FileName = null;
+                IsVirtualItem = true;
+                VirtualItemKey = virtualItemKey;
             }
-            /// <summary>
-            /// Initializes a new instance of the CacheItem class
-            /// for use with a virtual item.
-            /// </summary>
-            /// <param name="guid">The guid of the ImageListViewItem associated 
-            /// with this request.</param>
-            /// <param name="key">The public key for the virtual item.</param>
-            public CacheItem(Guid guid, object key)
-                : this(guid, key, null, null)
-            {
-                ;
-            }
-            /// <summary>
-            /// Initializes a new instance of the CacheItem class
-            /// for use with a virtual item.
-            /// </summary>
-            /// <param name="guid">The guid of the ImageListViewItem associated 
-            /// with this request.</param>
-            /// <param name="key">The public key for the virtual item.</param>
-            /// <param name="smallIcon">The small shell icon.</param>
-            /// <param name="largeIcon">The small shell icon.</param>
-            public CacheItem(Guid guid, object key, Image smallIcon, Image largeIcon)
-            {
-                disposed = false;
-                mGuid = guid;
-                mFileName = string.Empty;
-                mIsVirtualItem = true;
-                mVirtualItemKey = key;
-                mSmallIcon = smallIcon;
-                mLargeIcon = largeIcon;
-            }
-
-            /// <summary>
-            /// Performs application-defined tasks associated with 
-            /// freeing, releasing, or resetting unmanaged resources.
-            /// </summary>
-            public void Dispose()
-            {
-                if (!disposed)
-                {
-                    if (mSmallIcon != null)
-                        mSmallIcon.Dispose();
-                    if (mLargeIcon != null)
-                        mLargeIcon.Dispose();
-
-                    mSmallIcon = null;
-                    mLargeIcon = null;
-
-                    disposed = true;
-                    GC.SuppressFinalize(this);
-                }
-            }
-#if DEBUG
-            /// <summary>
-            /// Releases unmanaged resources and performs other cleanup operations before the
-            /// CacheItem is reclaimed by garbage collection.
-            /// </summary>
-            ~CacheItem()
-            {
-                if (mSmallIcon != null || mLargeIcon != null)
-                    System.Diagnostics.Debug.Print("Finalizer of {0} called for non-empty cache item.", GetType());
-                Dispose();
-            }
-#endif
         }
         #endregion
 
@@ -253,123 +96,201 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Determines whether the cache manager retries loading items on errors.
         /// </summary>
-        public bool RetryOnError { get { return mRetryOnError; } set { mRetryOnError = value; } }
-        /// <summary>
-        /// Determines whether the cache thread is being stopped.
-        /// </summary>
-        private bool Stopping { get { lock (lockObject) { return stopping; } } }
-        /// <summary>
-        /// Determines whether the cache thread is stopped.
-        /// </summary>
-        public bool Stopped { get { lock (lockObject) { return stopped; } } }
+        public bool RetryOnError { get; internal set; }
         #endregion
 
         #region Constructor
         /// <summary>
-        /// Initializes a new instance of the ImageListViewItemCacheManager class.
+        /// Initializes a new instance of the <see cref="ImageListViewCacheShellInfo"/> class.
         /// </summary>
         /// <param name="owner">The owner control.</param>
         public ImageListViewCacheMetadata(ImageListView owner)
         {
-            lockObject = new object();
+            context = null;
+            bw = new QueuedBackgroundWorker();
+            bw.SetApartmentState(ApartmentState.STA);
+            bw.IsBackground = true;
+            bw.DoWork += new QueuedWorkerDoWorkEventHandler(bw_DoWork);
+            bw.RunWorkerCompleted += new RunQueuedWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            bw.WorkerFinished += new QueuedWorkerFinishedEventHandler(bw_WorkerFinished);
 
             mImageListView = owner;
+            RetryOnError = false;
 
-            toCache = new Queue<CacheItem>();
-            itemCache = new Dictionary<Guid, CacheItem>();
             editCache = new Dictionary<Guid, bool>();
+            processing = new Dictionary<Guid, bool>();
+            removedItems = new Dictionary<Guid, bool>();
 
-            mThread = new Thread(new ThreadStart(DoWork));
-            // Metadata extractor is a COM wrapper hence requires a STA thread.
-            if (!mThread.TrySetApartmentState(ApartmentState.STA))
-                throw new Exception("Could not set worker thread's apartment state.");
-            mThread.IsBackground = true;
-
-            removedItems = new List<Guid>();
-
-            cachedShellInfo = new Dictionary<string, CachedShellInfo>();
-
-            stopping = false;
-            stopped = false;
             disposed = false;
+        }
+        #endregion
 
-            mThread.Start();
-            while (!mThread.IsAlive) ;
+        #region Context Callbacks
+        /// <summary>
+        /// Determines if the item is already being processed.
+        /// Sets the item as being processed if it is not already
+        /// being processed.
+        /// </summary>
+        /// <param name="guid">The guid of the cache item.</param>
+        /// <returns>true if the item is already being processed; otherwise false.</returns>
+        private bool IsProcessing(Guid guid)
+        {
+            bool processed = false;
+            SendOrPostCallback callback = delegate
+            {
+                processed = processing.ContainsKey(guid);
+                if (!processed)
+                    processing.Add(guid, false);
+            };
+            context.Send(callback, guid);
+            return processed;
+        }
+        /// <summary>
+        /// Determines if the item is in the edit cache on the UI thread.
+        /// </summary>
+        /// <param name="guid">The guid of the cache item.</param>
+        /// <returns>true if item is in the edit cache; otherwise false.</returns>
+        private bool IsEditing(Guid guid)
+        {
+            bool exists = false;
+            SendOrPostCallback callback = delegate
+            {
+                exists = editCache.ContainsKey(guid);
+            };
+            context.Send(callback, guid);
+            return exists;
+        }
+        /// <summary>
+        /// Determines if the item was updated on the UI thread.
+        /// </summary>
+        /// <param name="guid">The guid of the item.</param>
+        /// <returns>true if item is updated; otherwise false.</returns>
+        private bool IsUpdated(Guid guid)
+        {
+            bool dirty = false;
+            SendOrPostCallback callback = delegate
+            {
+                if (mImageListView != null)
+                    dirty = mImageListView.IsItemDirty(guid);
+            };
+            context.Send(callback, guid);
+            return !dirty;
+        }
+        #endregion
+
+        #region QueuedBackgroundWorker Events
+        /// <summary>
+        /// Handles the WorkerFinished event of the queued background worker.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        void bw_WorkerFinished(object sender, EventArgs e)
+        {
+            mImageListView.Refresh();
+        }
+        /// <summary>
+        /// Handles the RunWorkerCompleted event of the queued background worker.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Manina.Windows.Forms.QueuedWorkerCompletedEventArgs"/> 
+        /// instance containing the event data.</param>
+        void bw_RunWorkerCompleted(object sender, QueuedWorkerCompletedEventArgs e)
+        {
+            CacheItem request = e.UserState as CacheItem;
+
+            // We are done processing
+            processing.Remove(request.Guid);
+
+            if (e.Cancelled)
+                return;
+
+            // Get result
+            if (request.IsVirtualItem)
+            {
+                VirtualItemDetailsEventArgs info = e.Result as VirtualItemDetailsEventArgs;
+                mImageListView.UpdateItemDetailsInternal(request.Guid, info);
+            }
+            else
+            {
+                ShellImageFileInfo info = e.Result as ShellImageFileInfo;
+                mImageListView.UpdateItemDetailsInternal(request.Guid, info);
+            }
+
+            // Refresh the control lazily
+            if (mImageListView != null)
+                mImageListView.Refresh(false, true);
+
+            // Raise the CacheError event
+            if (e.Error != null && mImageListView != null)
+                mImageListView.OnCacheErrorInternal(request.Guid, e.Error, CacheThread.Details);
+        }
+        /// <summary>
+        /// Handles the DoWork event of the queued background worker.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs"/> instance 
+        /// containing the event data.</param>
+        void bw_DoWork(object sender, QueuedWorkerDoWorkEventArgs e)
+        {
+            CacheItem request = e.Argument as CacheItem;
+
+            // Is it already being processed?
+            if (IsProcessing(request.Guid))
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Is it being edited?
+            if (IsEditing(request.Guid))
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Was it fetched by the UI thread in the meantime?
+            if (IsUpdated(request.Guid))
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Get item details
+            if (request.IsVirtualItem)
+            {
+                VirtualItemDetailsEventArgs info = new VirtualItemDetailsEventArgs(request.VirtualItemKey);
+                mImageListView.RetrieveVirtualItemDetailsInternal(info);
+                e.Result = info;
+            }
+            else
+            {
+                ShellImageFileInfo info = ShellImageFileInfo.FromFile(request.FileName);
+                if (info.Error != null)
+                    throw info.Error;
+                e.Result = info;
+            }
         }
         #endregion
 
         #region Instance Methods
         /// <summary>
         /// Starts editing an item. While items are edited,
-        /// their original images will be seperately cached
-        /// instead of fetching them from the file.
+        /// the cache thread will not work on them to prevent collisions.
         /// </summary>
-        /// <param name="guid">The GUID of the item</param>
+        /// <param name="guid">The guid representing the item</param>
         public void BeginItemEdit(Guid guid)
         {
-            lock (lockObject)
-            {
-                if (!editCache.ContainsKey(guid))
-                    editCache.Add(guid, false);
-            }
+            if (!editCache.ContainsKey(guid))
+                editCache.Add(guid, false);
         }
         /// <summary>
         /// Ends editing an item. After this call, item
-        /// image will be continued to be fetched from the
-        /// file.
+        /// image will be continued to be fetched by the thread.
         /// </summary>
-        /// <param name="guid"></param>
+        /// <param name="guid">The guid representing the item.</param>
         public void EndItemEdit(Guid guid)
         {
-            lock (lockObject)
-            {
-                if (editCache.ContainsKey(guid))
-                {
-                    editCache.Remove(guid);
-                }
-            }
-        }
-        /// <summary>
-        /// Adds an item to the cache queue.
-        /// </summary>
-        public void Add(Guid guid, string filename)
-        {
-            lock (lockObject)
-            {
-                toCache.Enqueue(new CacheItem(guid, filename));
-                Monitor.Pulse(lockObject);
-            }
-        }
-        /// <summary>
-        /// Adds a virtual item to the cache queue.
-        /// </summary>
-        public void Add(Guid guid, object key)
-        {
-            lock (lockObject)
-            {
-                toCache.Enqueue(new CacheItem(guid, key));
-                Monitor.Pulse(lockObject);
-            }
-        }
-        /// <summary>
-        /// Clears the thumbnail cache.
-        /// </summary>
-        public void Clear()
-        {
-            lock (lockObject)
-            {
-                foreach (CacheItem item in itemCache.Values)
-                    item.Dispose();
-                itemCache.Clear();
-
-                foreach (CachedShellInfo item in cachedShellInfo.Values)
-                    item.Dispose();
-                cachedShellInfo.Clear();
-
-                removedItems.Clear();
-                toCache.Clear();
-                editCache.Clear();
-            }
+            editCache.Remove(guid);
         }
         /// <summary>
         /// Removes the given item from the cache.
@@ -377,131 +298,69 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The guid of the item to remove.</param>
         public void Remove(Guid guid)
         {
-            Remove(guid, false);
+            if (!removedItems.ContainsKey(guid))
+                removedItems.Add(guid, false);
         }
         /// <summary>
-        /// Removes the given item from the cache.
+        /// Clears the cache.
         /// </summary>
-        /// <param name="guid">The guid of the item to remove.</param>
-        /// <param name="removeNow">true to remove the item now; false to remove the
-        /// item later when the cache is purged.</param>
-        public void Remove(Guid guid, bool removeNow)
+        public void Clear()
         {
-            lock (lockObject)
-            {
-                CacheItem item = null;
-                if (!itemCache.TryGetValue(guid, out item))
-                    return;
+            bw.CancelAllAsync();
+            processing.Clear();
+        }
+        /// <summary>
+        /// Pushes the given item to the worker queue.
+        /// </summary>
+        /// <param name="item">The cache item.</param>
+        private void RunWorker(CacheItem item)
+        {
+            // Get the current synchronization context
+            if (context == null)
+                context = SynchronizationContext.Current;
 
-                if (removeNow)
-                {
-                    item.Dispose();
-                    itemCache.Remove(guid);
-                }
-                else
-                {
-                    removedItems.Add(guid);
+            // Already being processed?
+            if (processing.ContainsKey(item.Guid))
+                return;
 
-                    // Remove items now if we can free more than CleanUpLimit items
-                    if (removedItems.Count > CleanUpLimit)
-                    {
-                        CacheItem itemToRemove = null;
-                        foreach (Guid iguid in removedItems)
-                        {
-                            if (itemCache.TryGetValue(iguid, out itemToRemove))
-                            {
-                                itemToRemove.Dispose();
-                                itemCache.Remove(iguid);
-                            }
-                        }
-                        removedItems.Clear();
-                    }
-                }
-            }
+            // Add the item to the queue for processing
+            bw.RunWorkerAsync(item);
         }
         /// <summary>
-        /// Gets the small shell icon from the cache. If the image is not cached,
-        /// null will be returned.
-        /// </summary>
-        /// <param name="guid">The guid representing this item.</param>
-        public Image GetSmallIcon(Guid guid)
-        {
-            lock (lockObject)
-            {
-                CacheItem item = null;
-                if (itemCache.TryGetValue(guid, out item))
-                {
-                    Image img = item.SmallIcon;
-                    if (img != null)
-                        img = (Image)img.Clone();
-                    return img;
-                }
-            }
-            return null;
-        }
-        /// <summary>
-        /// Gets the large shell icon from the cache. If the image is not cached,
-        /// null will be returned.
-        /// </summary>
-        /// <param name="guid">The guid representing this item.</param>
-        public Image GetLargeIcon(Guid guid)
-        {
-            lock (lockObject)
-            {
-                CacheItem item = null;
-                if (itemCache.TryGetValue(guid, out item))
-                {
-                    Image img = item.LargeIcon;
-                    if (img != null)
-                        img = (Image)img.Clone();
-                    return img;
-                }
-            }
-            return null;
-        }
-        /// <summary>
-        /// Adds the given item to the cache bypassing the worker thread.
+        /// Adds the item to the cache queue.
         /// </summary>
         /// <param name="guid">Item guid.</param>
-        /// <param name="key">Virtual item key.</param>
-        /// <param name="info">File info.</param>
-        public void ForceAddToCache(Guid guid, object key, ShellImageFileInfo info)
+        /// <param name="filename">File name.</param>
+        public void Add(Guid guid, string filename)
         {
-            lock (lockObject)
-            {
-                // Is it already cached?
-                CacheItem cacheItem = null;
-                if (itemCache.TryGetValue(guid, out cacheItem))
-                {
-                    itemCache.Remove(guid);
-                    cacheItem.Dispose();
-                }
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentException("filename cannot be null", "extension");
 
-                itemCache.Add(guid, new CacheItem(guid, key, info.SmallIcon, info.LargeIcon));
-            }
+            // Add to cache queue
+            RunWorker(new CacheItem(guid, filename));
         }
         /// <summary>
-        /// Stops the cache manager.
+        /// Adds the item to the cache queue.
         /// </summary>
-        public void Stop()
+        /// <param name="guid">Item guid.</param>
+        /// <param name="virtualItemKey">The virtual item key.</param>
+        public void Add(Guid guid, object virtualItemKey)
         {
-            lock (lockObject)
-            {
-                if (!stopping)
-                {
-                    stopping = true;
-                    Monitor.Pulse(lockObject);
-                }
-            }
+            // Add to cache queue
+            RunWorker(new CacheItem(guid, virtualItemKey));
         }
+        #endregion
+
+        #region Dispose
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Performs application-defined tasks associated with freeing,
+        /// releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
             if (!disposed)
             {
-                Clear();
+                bw.Dispose();
 
                 disposed = true;
 
@@ -511,7 +370,7 @@ namespace Manina.Windows.Forms
 #if DEBUG
         /// <summary>
         /// Releases unmanaged resources and performs other cleanup operations before the
-        /// ImageListViewItemCacheManager is reclaimed by garbage collection.
+        /// ImageListViewCacheManager is reclaimed by garbage collection.
         /// </summary>
         ~ImageListViewCacheMetadata()
         {
@@ -521,247 +380,13 @@ namespace Manina.Windows.Forms
 #endif
         #endregion
 
-        #region Worker Method
-        /// <summary>
-        /// Used by the worker thread to read item data.
-        /// </summary>
-        private void DoWork()
-        {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-
-            while (!Stopping)
-            {
-                CacheItem item = null;
-
-                try
-                {
-                    lock (lockObject)
-                    {
-                        // Wait until we have items waiting to be cached
-                        if (toCache.Count == 0)
-                            Monitor.Wait(lockObject);
-
-                        sw.Start();
-                        // Get an item from the queue
-                        if (toCache.Count != 0)
-                        {
-                            item = toCache.Dequeue();
-
-                            // Is it being edited?
-                            if (editCache.ContainsKey(item.Guid))
-                                item = null;
-                        }
-                    }
-
-                    // Was it fetched by the UI thread in the meantime?
-                    bool isDirty = false;
-                    if (item != null)
-                    {
-                        try
-                        {
-                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
-                            {
-                                isDirty = (bool)mImageListView.Invoke(new CheckItemDirtyDelegateInternal(
-                                    mImageListView.IsItemDirty), item.Guid);
-                            }
-                        }
-                        catch (ObjectDisposedException)
-                        {
-                            if (!Stopping) throw;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            if (!Stopping) throw;
-                        }
-                    }
-                    if (!isDirty)
-                        item = null;
-
-                    // Read file info
-                    if (item != null)
-                    {
-                        if (item.IsVirtualItem)
-                        {
-                            VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(item.VirtualItemKey);
-                            mImageListView.RetrieveVirtualItemDetailsInternal(e);
-                            // Add to cache
-                            lock (lockObject)
-                            {
-                                // Is it already cached?
-                                CacheItem cacheItem = null;
-                                if (itemCache.TryGetValue(item.Guid, out cacheItem))
-                                {
-                                    itemCache.Remove(item.Guid);
-                                    cacheItem.Dispose();
-                                }
-
-                                itemCache.Add(item.Guid, new CacheItem(item.Guid, item.VirtualItemKey, e.SmallIcon, e.LargeIcon));
-                            }
-                            try
-                            {
-                                if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
-                                {
-                                    // Update item
-                                    mImageListView.Invoke(new UpdateVirtualItemDetailsDelegateInternal(
-                                        mImageListView.UpdateItemDetailsInternal), item.Guid, e);
-                                }
-                            }
-                            catch (ObjectDisposedException)
-                            {
-                                if (!Stopping) throw;
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                if (!Stopping) throw;
-                            }
-                        }
-                        else
-                        {
-                            // Update file info
-                            if (!Stopping)
-                            {
-                                ShellImageFileInfo info = this.GetImageFileInfo(item.FileName);
-                                if (info.Error == null)
-                                {
-                                    // Add to cache
-                                    lock (lockObject)
-                                    {
-                                        // Is it already cached?
-                                        CacheItem cacheItem = null;
-                                        if (itemCache.TryGetValue(item.Guid, out cacheItem))
-                                        {
-                                            itemCache.Remove(item.Guid);
-                                            cacheItem.Dispose();
-                                        }
-
-                                        itemCache.Add(item.Guid, new CacheItem(item.Guid, item.FileName, info.SmallIcon, info.LargeIcon));
-                                    }
-                                }
-                                else if (mRetryOnError)
-                                {
-                                    // Retry
-                                    lock (lockObject)
-                                    {
-                                        toCache.Enqueue(item);
-                                        CachedShellInfo cachedInfo;
-                                        if (!string.IsNullOrEmpty(info.Extension))
-                                        {
-                                            if (cachedShellInfo.TryGetValue(info.Extension, out cachedInfo))
-                                            {
-                                                cachedShellInfo.Remove(info.Extension);
-                                                cachedInfo.Dispose();
-                                            }
-                                        }
-                                    }
-                                }
-                                try
-                                {
-                                    if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
-                                    {
-                                        // Update item
-                                        mImageListView.Invoke(new UpdateItemDetailsDelegateInternal(
-                                            mImageListView.UpdateItemDetailsInternal), item.Guid, info);
-
-                                        // Delegate errors to the parent control
-                                        if (info.Error != null)
-                                        {
-                                            mImageListView.BeginInvoke(new CacheErrorEventHandlerInternal(
-                                                mImageListView.OnCacheErrorInternal),
-                                                (item == null ? Guid.Empty : item.Guid),
-                                                info.Error, CacheThread.Details);
-                                        }
-                                    }
-                                }
-                                catch (ObjectDisposedException)
-                                {
-                                    if (!Stopping) throw;
-                                }
-                                catch (InvalidOperationException)
-                                {
-                                    if (!Stopping) throw;
-                                }
-                            }
-                        }
-                    }
-
-                    // Check if the cache is exhausted
-                    bool queueFull = true;
-                    lock (lockObject)
-                    {
-                        if (toCache.Count == 0)
-                            queueFull = false;
-                    }
-
-                    // Do we need a refresh?
-                    sw.Stop();
-                    if (!queueFull || sw.ElapsedMilliseconds > 100)
-                    {
-                        try
-                        {
-                            if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
-                            {
-                                mImageListView.BeginInvoke(new RefreshDelegateInternal(
-                                    mImageListView.OnRefreshInternal));
-                            }
-                            sw.Reset();
-                        }
-                        catch (ObjectDisposedException)
-                        {
-                            if (!Stopping) throw;
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            if (!Stopping) throw;
-                        }
-                    }
-                    if (queueFull)
-                        sw.Start();
-                    else
-                    {
-                        sw.Stop();
-                        sw.Reset();
-                    }
-                }
-                catch (Exception exception)
-                {
-                    // Delegate the exception to the parent control
-                    try
-                    {
-                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
-                        {
-                            mImageListView.BeginInvoke(new CacheErrorEventHandlerInternal(
-                                mImageListView.OnCacheErrorInternal),
-                                (item == null ? Guid.Empty : item.Guid),
-                                exception, CacheThread.Details);
-                        }
-                    }
-                    finally
-                    {
-                        ;
-                    }
-                }
-                finally
-                {
-                    ;
-                }
-            }
-
-            lock (lockObject)
-            {
-                stopped = true;
-            }
-        }
-        #endregion
-
         #region Utility for Reading Image Details
         /// <summary>
         /// A utility class for reading image details.
         /// </summary>
-        internal struct ShellImageFileInfo
+        internal class ShellImageFileInfo
         {
             public FileAttributes FileAttributes;
-            public Image SmallIcon;
-            public Image LargeIcon;
             public DateTime CreationTime;
             public DateTime LastAccessTime;
             public DateTime LastWriteTime;
@@ -769,7 +394,7 @@ namespace Manina.Windows.Forms
             public string DirectoryName;
             public string DisplayName;
             public long Size;
-            public string TypeName;
+            // Image info
             public Size Dimensions;
             public SizeF Resolution;
             // Exif tags
@@ -787,85 +412,57 @@ namespace Manina.Windows.Forms
             public float FocalLength;
             // Error
             internal Exception Error;
-        }
 
-        /// <summary>
-        /// Gets image details for the given file.
-        /// </summary>
-        /// <param name="path">The path to an image file.</param>
-        internal ShellImageFileInfo GetImageFileInfo(string path)
-        {
-            ShellImageFileInfo imageInfo = new ShellImageFileInfo();
+            /// <summary>
+            /// Gets image details for the given file.
+            /// </summary>
+            /// <param name="path">The path to an image file.</param>
+            public static ShellImageFileInfo FromFile(string path)
+            {
+                ShellImageFileInfo imageInfo = new ShellImageFileInfo();
 
-            if (string.IsNullOrEmpty(path))
+                if (string.IsNullOrEmpty(path))
+                    return imageInfo;
+
+                try
+                {
+                    // Read file properties
+                    FileInfo info = new FileInfo(path);
+                    imageInfo.FileAttributes = info.Attributes;
+                    imageInfo.CreationTime = info.CreationTime;
+                    imageInfo.LastAccessTime = info.LastAccessTime;
+                    imageInfo.LastWriteTime = info.LastWriteTime;
+                    imageInfo.Size = info.Length;
+                    imageInfo.DirectoryName = info.DirectoryName;
+                    imageInfo.DisplayName = info.Name;
+                    imageInfo.Extension = info.Extension;
+
+                    // Get metadata
+                    MetadataExtractor metadata = MetadataExtractor.FromFile(path);
+                    imageInfo.Dimensions = new Size(metadata.Width, metadata.Height);
+                    imageInfo.Resolution = new SizeF((float)metadata.DPIX, (float)metadata.DPIY);
+                    imageInfo.ImageDescription = metadata.ImageDescription ?? "";
+                    imageInfo.EquipmentModel = metadata.EquipmentModel ?? "";
+                    imageInfo.DateTaken = metadata.DateTaken;
+                    imageInfo.Artist = metadata.Artist ?? "";
+                    imageInfo.Copyright = metadata.Copyright ?? "";
+                    imageInfo.ExposureTime = (float)metadata.ExposureTime;
+                    imageInfo.FNumber = (float)metadata.FNumber;
+                    imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
+                    imageInfo.UserComment = metadata.Comment ?? "";
+                    imageInfo.Rating = (ushort)(metadata.Rating);
+                    imageInfo.Software = metadata.Software ?? "";
+                    imageInfo.FocalLength = (float)metadata.FocalLength;
+                    if (metadata.Error != null)
+                        imageInfo.Error = metadata.Error;
+                }
+                catch (Exception e)
+                {
+                    imageInfo.Error = e;
+                }
+
                 return imageInfo;
-
-            try
-            {
-                // Read file properties
-                FileInfo info = new FileInfo(path);
-                imageInfo.FileAttributes = info.Attributes;
-                imageInfo.CreationTime = info.CreationTime;
-                imageInfo.LastAccessTime = info.LastAccessTime;
-                imageInfo.LastWriteTime = info.LastWriteTime;
-                imageInfo.Size = info.Length;
-                imageInfo.DirectoryName = info.DirectoryName;
-                imageInfo.DisplayName = info.Name;
-                imageInfo.Extension = info.Extension;
-
-                // Read shell properties
-                CachedShellInfo shellInfo = null;
-                bool fileTypeCached = false;
-                lock (lockObject)
-                {
-                    fileTypeCached = cachedShellInfo.TryGetValue(imageInfo.Extension, out shellInfo);
-                }
-                if (!fileTypeCached)
-                {
-                    ShellInfoExtractor shellEx = ShellInfoExtractor.FromFile(info.Extension);
-                    shellInfo = new CachedShellInfo(shellEx.FileType, shellEx.SmallIcon, shellEx.LargeIcon);
-                    if (!string.IsNullOrEmpty(info.Extension))
-                    {
-                        lock (lockObject)
-                        {
-                            if (!cachedShellInfo.ContainsKey(info.Extension))
-                                cachedShellInfo.Add(info.Extension, shellInfo);
-                        }
-                    }
-                    if (shellEx.Error != null)
-                        imageInfo.Error = shellEx.Error;
-                }
-                imageInfo.TypeName = shellInfo.FileType;
-                if (shellInfo.SmallIcon != null)
-                    imageInfo.SmallIcon = (Image)shellInfo.SmallIcon.Clone();
-                if (shellInfo.LargeIcon != null)
-                    imageInfo.LargeIcon = (Image)shellInfo.LargeIcon.Clone();
-
-                // Get metadata
-                MetadataExtractor metadata = MetadataExtractor.FromFile(path);
-                imageInfo.Dimensions = new Size(metadata.Width, metadata.Height);
-                imageInfo.Resolution = new SizeF((float)metadata.DPIX, (float)metadata.DPIY);
-                imageInfo.ImageDescription = metadata.ImageDescription ?? "";
-                imageInfo.EquipmentModel = metadata.EquipmentModel ?? "";
-                imageInfo.DateTaken = metadata.DateTaken;
-                imageInfo.Artist = metadata.Artist ?? "";
-                imageInfo.Copyright = metadata.Copyright ?? "";
-                imageInfo.ExposureTime = (float)metadata.ExposureTime;
-                imageInfo.FNumber = (float)metadata.FNumber;
-                imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
-                imageInfo.UserComment = metadata.Comment ?? "";
-                imageInfo.Rating = (ushort)(metadata.Rating);
-                imageInfo.Software = metadata.Software ?? "";
-                imageInfo.FocalLength = (float)metadata.FocalLength;
-                if (metadata.Error != null)
-                    imageInfo.Error = metadata.Error;
             }
-            catch (Exception e)
-            {
-                imageInfo.Error = e;
-            }
-
-            return imageInfo;
         }
         #endregion
     }

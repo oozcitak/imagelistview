@@ -26,10 +26,10 @@ using System.Reflection;
 namespace Manina.Windows.Forms
 {
     /// <summary>
-    /// Represents an image list view control.
+    /// Represents a listview control for image files.
     /// </summary>
     [ToolboxBitmap(typeof(ImageListView))]
-    [Description("Represents an image list view control.")]
+    [Description("Represents a listview control for image files.")]
     [DefaultEvent("ItemClick")]
     [DefaultProperty("Items")]
     [Designer(typeof(ImageListViewDesigner))]
@@ -1499,14 +1499,6 @@ namespace Manina.Windows.Forms
         {
             base.OnLostFocus(e);
             Refresh();
-        }
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.HandleDestroyed"/> event.
-        /// </summary>
-        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
-        protected override void OnHandleDestroyed(EventArgs e)
-        {
-            itemCacheManager.Stop();
         }
         /// <summary>
         /// Releases the unmanaged resources used by the control and its child controls 

@@ -658,9 +658,9 @@ namespace Manina.Windows.Forms
                 case ColumnType.Custom:
                     throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
                 case ColumnType.Name:
-                        return Text;
+                    return Text;
                 case ColumnType.FileName:
-                        return FileName;
+                    return FileName;
                 case ColumnType.DateAccessed:
                     if (mDateAccessed == DateTime.MinValue)
                         return "";
@@ -920,9 +920,7 @@ namespace Manina.Windows.Forms
                 }
                 else
                 {
-                    ImageListViewCacheMetadata.ShellImageFileInfo info = mImageListView.itemCacheManager.GetImageFileInfo(mFileName);
-                    mImageListView.itemCacheManager.ForceAddToCache(mGuid, mVirtualItemKey, info);
-
+                    ImageListViewCacheMetadata.ShellImageFileInfo info = ImageListViewCacheMetadata.ShellImageFileInfo.FromFile(mFileName);
                     UpdateDetailsInternal(info);
 
                     if (info.Error == null)
@@ -939,12 +937,13 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
+            // File info
             mDateAccessed = info.LastAccessTime;
             mDateCreated = info.CreationTime;
             mDateModified = info.LastWriteTime;
             mFileSize = info.Size;
-            mFileType = info.TypeName;
             mFilePath = info.DirectoryName;
+            // Image info
             mDimensions = info.Dimensions;
             mResolution = info.Resolution;
             // Exif tags
@@ -970,6 +969,7 @@ namespace Manina.Windows.Forms
         {
             if (!isDirty) return;
 
+            // File info
             mDateAccessed = info.DateAccessed;
             mDateCreated = info.DateCreated;
             mDateModified = info.DateModified;
@@ -977,6 +977,7 @@ namespace Manina.Windows.Forms
             mFileSize = info.FileSize;
             mFileType = info.FileType;
             mFilePath = info.FilePath;
+            // Image info
             mDimensions = info.Dimensions;
             mResolution = info.Resolution;
             // Exif tags
