@@ -82,7 +82,7 @@ namespace Manina.Windows.Forms
             long mem = Math.Max(0, p.PrivateMemorySize64 - baseMem);
 
             // Display memory stats
-            string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(mImageListView.thumbnailManager.MemoryUsed));
+            string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(mImageListView.thumbnailCache.MemoryUsed));
             SizeF sz = g.MeasureString(s, ImageListView.Font);
             Rectangle r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5, 115, (int)sz.Height);
             using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))

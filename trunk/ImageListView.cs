@@ -112,7 +112,8 @@ namespace Manina.Windows.Forms
         internal ImageListViewNavigationManager navigationManager;
 
         // Cache threads
-        internal ImageListViewCacheThumbnail thumbnailManager;
+        internal ImageListViewCacheThumbnail thumbnailCache;
+        internal ImageListViewCacheShellInfo shellInfoCache;
         internal ImageListViewItemCacheManager itemCacheManager;
         #endregion
 
@@ -177,14 +178,14 @@ namespace Manina.Windows.Forms
                     {
                         mCacheLimitAsItemCount = 0;
                         mCacheLimitAsMemory = 0;
-                        if (thumbnailManager != null)
+                        if (thumbnailCache != null)
                         {
-                            thumbnailManager.CacheLimitAsItemCount = 0;
-                            thumbnailManager.CacheLimitAsMemory = 0;
+                            thumbnailCache.CacheLimitAsItemCount = 0;
+                            thumbnailCache.CacheLimitAsMemory = 0;
                         }
                     }
-                    if (thumbnailManager != null)
-                        thumbnailManager.CacheMode = mCacheMode;
+                    if (thumbnailCache != null)
+                        thumbnailCache.CacheMode = mCacheMode;
                 }
             }
         }
@@ -213,20 +214,20 @@ namespace Manina.Windows.Forms
                 {
                     mCacheLimitAsItemCount = 0;
                     mCacheLimitAsMemory = limit * 1024 * 1024;
-                    if (thumbnailManager != null)
+                    if (thumbnailCache != null)
                     {
-                        thumbnailManager.CacheLimitAsItemCount = 0;
-                        thumbnailManager.CacheLimitAsMemory = mCacheLimitAsMemory;
+                        thumbnailCache.CacheLimitAsItemCount = 0;
+                        thumbnailCache.CacheLimitAsMemory = mCacheLimitAsMemory;
                     }
                 }
                 else if (int.TryParse(slimit, out limit))
                 {
                     mCacheLimitAsMemory = 0;
                     mCacheLimitAsItemCount = limit;
-                    if (thumbnailManager != null)
+                    if (thumbnailCache != null)
                     {
-                        thumbnailManager.CacheLimitAsMemory = 0;
-                        thumbnailManager.CacheLimitAsItemCount = mCacheLimitAsItemCount;
+                        thumbnailCache.CacheLimitAsMemory = 0;
+                        thumbnailCache.CacheLimitAsItemCount = mCacheLimitAsItemCount;
                     }
                 }
                 else
@@ -457,8 +458,10 @@ namespace Manina.Windows.Forms
             set
             {
                 mRetryOnError = value;
-                if (thumbnailManager != null)
-                    thumbnailManager.RetryOnError = mRetryOnError;
+                if (thumbnailCache != null)
+                    thumbnailCache.RetryOnError = mRetryOnError;
+                if (shellInfoCache != null)
+                    shellInfoCache.RetryOnError = mRetryOnError;
                 if (itemCacheManager != null)
                     itemCacheManager.RetryOnError = mRetryOnError;
             }
@@ -597,8 +600,8 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
-                    thumbnailManager.CurrentThumbnailSize = mThumbnailSize;
-                    thumbnailManager.Rebuild();
+                    thumbnailCache.CurrentThumbnailSize = mThumbnailSize;
+                    thumbnailCache.Rebuild();
                     Refresh();
                 }
             }
@@ -618,7 +621,7 @@ namespace Manina.Windows.Forms
                 if (mUseEmbeddedThumbnails != value)
                 {
                     mUseEmbeddedThumbnails = value;
-                    thumbnailManager.Rebuild();
+                    thumbnailCache.Rebuild();
                     Refresh();
                 }
             }
@@ -868,8 +871,9 @@ namespace Manina.Windows.Forms
             layoutManager = new ImageListViewLayoutManager(this);
             navigationManager = new ImageListViewNavigationManager(this);
 
-            thumbnailManager = new ImageListViewCacheThumbnail(this);
-            thumbnailManager.CurrentThumbnailSize = mThumbnailSize;
+            thumbnailCache = new ImageListViewCacheThumbnail(this);
+            thumbnailCache.CurrentThumbnailSize = mThumbnailSize;
+            shellInfoCache = new ImageListViewCacheShellInfo(this);
             itemCacheManager = new ImageListViewItemCacheManager(this);
 
             disposed = false;
@@ -882,7 +886,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ClearThumbnailCache()
         {
-            thumbnailManager.Clear();
+            thumbnailCache.Clear();
             Refresh();
         }
         /// <summary>
@@ -1533,7 +1537,8 @@ namespace Manina.Windows.Forms
                         vScrollBar.Dispose();
 
                     // internal classes
-                    thumbnailManager.Dispose();
+                    thumbnailCache.Dispose();
+                    shellInfoCache.Dispose();
                     itemCacheManager.Dispose();
                     navigationManager.Dispose();
                     if (mRenderer != null)
