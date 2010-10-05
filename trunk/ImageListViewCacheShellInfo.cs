@@ -247,6 +247,9 @@ namespace Manina.Windows.Forms
         /// <param name="extension">File extension.</param>
         public CacheState GetCacheState(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("extension cannot be null", "extension");
+
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
                 return item.State;
@@ -322,6 +325,9 @@ namespace Manina.Windows.Forms
         /// <param name="extension">File extension.</param>
         public Image GetSmallIcon(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("extension cannot be null", "extension");
+
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
             {
@@ -336,6 +342,9 @@ namespace Manina.Windows.Forms
         /// <param name="extension">File extension.</param>
         public Image GetLargeIcon(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("extension cannot be null", "extension");
+
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
             {
