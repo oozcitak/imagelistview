@@ -49,53 +49,44 @@ namespace Manina.Windows.Forms
         /// </summary>
         private class CacheItem : IDisposable
         {
-            private Guid mGuid;
-            private string mFileName;
-            private Size mSize;
-            private Image mImage;
-            private CacheState mState;
-            private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
-            private bool mAutoRotate;
-            private bool mIsVirtualItem;
             private bool disposed;
-            private object mVirtualItemKey;
 
             /// <summary>
             /// Gets the guid of the item.
             /// </summary>
-            public Guid Guid { get { return mGuid; } }
+            public Guid Guid { get; private set; }
             /// <summary>
             /// Gets the name of the image file.
             /// </summary>
-            public string FileName { get { return mFileName; } }
+            public string FileName { get; private set; }
             /// <summary>
             /// Gets the size of the requested thumbnail.
             /// </summary>
-            public Size Size { get { return mSize; } }
+            public Size Size { get; private set; }
             /// <summary>
             /// Gets the cached image.
             /// </summary>
-            public Image Image { get { return mImage; } }
+            public Image Image { get; private set; }
             /// <summary>
             /// Gets or sets the state of the cache item.
             /// </summary>
-            public CacheState State { get { return mState; } set { mState = value; } }
+            public CacheState State { get; set; }
             /// <summary>
             /// Gets embedded thumbnail extraction behavior.
             /// </summary>
-            public UseEmbeddedThumbnails UseEmbeddedThumbnails { get { return mUseEmbeddedThumbnails; } }
+            public UseEmbeddedThumbnails UseEmbeddedThumbnails { get; private set; }
             /// <summary>
             /// Gets Exif rotation behavior.
             /// </summary>
-            public bool AutoRotate { get { return mAutoRotate; } }
+            public bool AutoRotate { get; private set; }
             /// <summary>
             /// Gets whether this item represents a virtual ImageListViewItem.
             /// </summary>
-            public bool IsVirtualItem { get { return mIsVirtualItem; } }
+            public bool IsVirtualItem { get; private set; }
             /// <summary>
             /// Gets the public key for the virtual item.
             /// </summary>
-            public object VirtualItemKey { get { return mVirtualItemKey; } }
+            public object VirtualItemKey { get; private set; }
 
             /// <summary>
             /// Initializes a new instance of the CacheItem class
@@ -124,15 +115,15 @@ namespace Manina.Windows.Forms
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
             public CacheItem(Guid guid, object key, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
             {
-                mGuid = guid;
-                mVirtualItemKey = key;
-                mFileName = string.Empty;
-                mSize = size;
-                mImage = image;
-                mState = state;
-                mUseEmbeddedThumbnails = useEmbeddedThumbnails;
-                mAutoRotate = autoRotate;
-                mIsVirtualItem = true;
+                Guid = guid;
+                VirtualItemKey = key;
+                FileName = string.Empty;
+                Size = size;
+                Image = image;
+                State = state;
+                UseEmbeddedThumbnails = useEmbeddedThumbnails;
+                AutoRotate = autoRotate;
+                IsVirtualItem = true;
                 disposed = false;
             }
             /// <summary>
@@ -160,14 +151,14 @@ namespace Manina.Windows.Forms
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
             public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
             {
-                mGuid = guid;
-                mFileName = filename;
-                mSize = size;
-                mImage = image;
-                mState = state;
-                mUseEmbeddedThumbnails = useEmbeddedThumbnails;
-                mAutoRotate = autoRotate;
-                mIsVirtualItem = false;
+                Guid = guid;
+                FileName = filename;
+                Size = size;
+                Image = image;
+                State = state;
+                UseEmbeddedThumbnails = useEmbeddedThumbnails;
+                AutoRotate = autoRotate;
+                IsVirtualItem = false;
                 disposed = false;
             }
 
@@ -179,10 +170,10 @@ namespace Manina.Windows.Forms
             {
                 if (!disposed)
                 {
-                    if (mImage != null)
+                    if (Image != null)
                     {
-                        mImage.Dispose();
-                        mImage = null;
+                        Image.Dispose();
+                        Image = null;
                     }
 
                     disposed = true;
@@ -196,7 +187,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             ~CacheItem()
             {
-                if (mImage != null)
+                if (Image != null)
                     System.Diagnostics.Debug.Print("Finalizer of {0} called for non-empty cache item.", GetType());
                 Dispose();
             }
