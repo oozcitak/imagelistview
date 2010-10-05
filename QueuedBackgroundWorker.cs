@@ -130,7 +130,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public bool Started { get { return started; } }
         /// <summary>
-        /// Determines whether the <see cref="QueuedBackgroundWorker"/> being stopped.
+        /// Determines whether the <see cref="QueuedBackgroundWorker"/> is being stopped.
         /// </summary>
         private bool Stopping { get { lock (lockObject) { return stopping; } } }
         #endregion
@@ -235,17 +235,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets a value indicating whether or not the worker thread is a background thread.
         /// </summary>
         [Browsable(true), Description("Gets or sets a value indicating whether or not the worker thread is a background thread."), Category("Behavior")]
-        public bool IsBackground
-        {
-            get
-            {
-                return thread.IsBackground;
-            }
-            set
-            {
-                thread.IsBackground = value;
-            }
-        }
+        public bool IsBackground { get { return thread.IsBackground; } set { thread.IsBackground = value; } }
         #endregion
 
         #region Public Events

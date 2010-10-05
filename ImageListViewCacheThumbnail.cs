@@ -240,6 +240,7 @@ namespace Manina.Windows.Forms
         {
             context = null;
             bw = new QueuedBackgroundWorker();
+            bw.IsBackground = true;
             bw.DoWork += new QueuedWorkerDoWorkEventHandler(bw_DoWork);
             bw.RunWorkerCompleted += new RunQueuedWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.WorkerFinished += new QueuedWorkerFinishedEventHandler(bw_WorkerFinished);

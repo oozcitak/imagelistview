@@ -85,15 +85,6 @@ namespace Manina.Windows.Forms
                 State = state;
                 disposed = false;
             }
-            /// <summary>
-            /// Initializes an empty instance of the <see cref="CacheItem"/> class.
-            /// </summary>
-            /// <param name="extension">The file extension.</param>
-            public CacheItem(string extension)
-                : this(extension, null, null, string.Empty, CacheState.Unknown)
-            {
-                ;
-            }
 
             /// <summary>
             /// Performs application-defined tasks associated with 
@@ -138,35 +129,6 @@ namespace Manina.Windows.Forms
         /// Determines whether the cache manager retries loading items on errors.
         /// </summary>
         public bool RetryOnError { get; internal set; }
-        /// <summary>
-        /// Gets or sets the cache mode.
-        /// </summary>
-        public CacheMode CacheMode { get; internal set; }
-        /// <summary>
-        /// Gets or sets the cache limit as count of items.
-        /// </summary>
-        public int CacheLimitAsItemCount { get; internal set; }
-        /// <summary>
-        /// Gets or sets the cache limit as allocated memory in MB.
-        /// </summary>
-        public long CacheLimitAsMemory { get; internal set; }
-        /// <summary>
-        /// Gets the approximate amount of memory used by the cache.
-        /// </summary>
-        public long MemoryUsed { get; private set; }
-        /// <summary>
-        /// Gets the approximate amount of memory used by removed items in the cache.
-        /// This memory can be reclaimed by calling <see cref="Purge()"/>.
-        /// </summary>
-        public long MemoryUsedByRemoved { get; private set; }
-        /// <summary>
-        /// Returns the count of items in the cache.
-        /// </summary>
-        public long CacheSize { get { return shellCache.Count; } }
-        /// <summary>
-        /// Gets or sets the current thumbnail size.
-        /// </summary>
-        public Size CurrentThumbnailSize { get; set; }
         #endregion
 
         #region Constructor
@@ -178,20 +140,16 @@ namespace Manina.Windows.Forms
         {
             context = null;
             bw = new QueuedBackgroundWorker();
+            bw.SetApartmentState(ApartmentState.STA);
+            bw.IsBackground = true;
             bw.DoWork += new QueuedWorkerDoWorkEventHandler(bw_DoWork);
             bw.RunWorkerCompleted += new RunQueuedWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.WorkerFinished += new QueuedWorkerFinishedEventHandler(bw_WorkerFinished);
 
             mImageListView = owner;
-            CacheMode = CacheMode.OnDemand;
-            CacheLimitAsItemCount = 0;
-            CacheLimitAsMemory = 20 * 1024 * 1024;
             RetryOnError = false;
 
             shellCache = new Dictionary<string, CacheItem>();
-
-            MemoryUsed = 0;
-            MemoryUsedByRemoved = 0;
 
             disposed = false;
         }
@@ -330,15 +288,15 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Pushes the given item to the worker queue.
         /// </summary>
-        /// <param name="item">The item to add to the worker queue.</param>
-        private void RunWorker(CacheItem item)
+        /// <param name="extension">File extension.</param>
+        private void RunWorker(string extension)
         {
             // Get the current synchronization context
             if (context == null)
                 context = SynchronizationContext.Current;
 
             // Add the item to the queue for processing
-            bw.RunWorkerAsync(item);
+            bw.RunWorkerAsync(extension);
         }
         /// <summary>
         /// Adds the item to the cache queue.
@@ -346,13 +304,16 @@ namespace Manina.Windows.Forms
         /// <param name="extension">File extension.</param>
         public void Add(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("extension cannot be null", "extension");
+
             // Already cached?
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
                 return;
 
             // Add to cache queue
-            RunWorker(new CacheItem(extension));
+            RunWorker(extension);
         }
         /// <summary>
         /// Gets the small shell icon for the given file extension from the cache.

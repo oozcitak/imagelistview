@@ -121,15 +121,15 @@ namespace Manina.Windows.Forms
 
                     if (mImageListView != null)
                     {
-                        mImageListView.thumbnailManager.Remove(oldItem.Guid);
+                        mImageListView.thumbnailCache.Remove(oldItem.Guid);
                         mImageListView.itemCacheManager.Remove(oldItem.Guid);
                         if (mImageListView.CacheMode == CacheMode.Continuous)
                         {
                             if (item.isVirtualItem)
-                                mImageListView.thumbnailManager.Add(item.Guid, item.VirtualItemKey,
+                                mImageListView.thumbnailCache.Add(item.Guid, item.VirtualItemKey,
                                     mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                             else
-                                mImageListView.thumbnailManager.Add(item.Guid, item.FileName,
+                                mImageListView.thumbnailCache.Add(item.Guid, item.FileName,
                                     mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                         }
                         if (item.isVirtualItem)
@@ -188,7 +188,7 @@ namespace Manina.Windows.Forms
                 ImageListViewItem item = new ImageListViewItem(filename);
                 if (mImageListView != null && initialThumbnail != null)
                 {
-                    mImageListView.thumbnailManager.Add(item.Guid, filename, mImageListView.ThumbnailSize,
+                    mImageListView.thumbnailCache.Add(item.Guid, filename, mImageListView.ThumbnailSize,
                         initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
                 Add(item);
@@ -213,7 +213,7 @@ namespace Manina.Windows.Forms
                 ImageListViewItem item = new ImageListViewItem(key, text);
                 if (mImageListView != null && initialThumbnail != null)
                 {
-                    mImageListView.thumbnailManager.Add(item.Guid, key, mImageListView.ThumbnailSize,
+                    mImageListView.thumbnailCache.Add(item.Guid, key, mImageListView.ThumbnailSize,
                         initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
                 Add(item);
@@ -271,7 +271,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView != null)
                 {
                     mImageListView.itemCacheManager.Clear();
-                    mImageListView.thumbnailManager.Clear();
+                    mImageListView.thumbnailCache.Clear();
                     mImageListView.SelectedItems.Clear();
                     mImageListView.Refresh();
                 }
@@ -333,7 +333,7 @@ namespace Manina.Windows.Forms
                 collectionModified = true;
                 if (mImageListView != null)
                 {
-                    mImageListView.thumbnailManager.Remove(item.Guid);
+                    mImageListView.thumbnailCache.Remove(item.Guid);
                     mImageListView.itemCacheManager.Remove(item.Guid);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
@@ -408,44 +408,13 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void AddInternal(ImageListViewItem item)
             {
-                // Check if the file already exists
-                if (mImageListView != null && !item.isVirtualItem && !mImageListView.AllowDuplicateFileNames)
-                {
-                    if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
-                        return;
-                }
-                item.owner = this;
-                item.mIndex = mItems.Count;
-                mItems.Add(item);
-                lookUp.Add(item.Guid, item);
-                collectionModified = true;
-                if (mImageListView != null)
-                {
-                    item.mImageListView = mImageListView;
-
-                    foreach (ImageListViewColumnHeader header in mImageListView.Columns)
-                        if (header.Type == ColumnType.Custom)
-                            item.AddSubItemText(header.columnID);
-
-                    if (mImageListView.CacheMode == CacheMode.Continuous)
-                    {
-                        if (item.isVirtualItem)
-                            mImageListView.thumbnailManager.Add(item.Guid, item.VirtualItemKey,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
-                        else
-                            mImageListView.thumbnailManager.Add(item.Guid, item.FileName,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
-                    }
-
-                    if (item.isVirtualItem)
-                        mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
-                    else
-                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName); ;
-                }
+                InsertInternal(-1, item);
             }
             /// <summary>
             /// Inserts the given item without raising a selection changed event.
             /// </summary>
+            /// <param name="index">Insertion index. If index is -1 the item is added to the end of the list.</param>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to add.</param>
             internal void InsertInternal(int index, ImageListViewItem item)
             {
                 // Check if the file already exists
@@ -455,30 +424,59 @@ namespace Manina.Windows.Forms
                         return;
                 }
                 item.owner = this;
-                item.mIndex = index;
-                for (int i = index; i < mItems.Count; i++)
-                    mItems[i].mIndex++;
-                mItems.Insert(index, item);
+                if (index == -1)
+                {
+                    item.mIndex = mItems.Count;
+                    mItems.Add(item);
+                }
+                else
+                {
+                    item.mIndex = index;
+                    for (int i = index; i < mItems.Count; i++)
+                        mItems[i].mIndex++;
+                    mItems.Insert(index, item);
+                }
                 lookUp.Add(item.Guid, item);
                 collectionModified = true;
                 if (mImageListView != null)
                 {
                     item.mImageListView = mImageListView;
 
+                    // Create sub item texts for custom columns
+                    foreach (ImageListViewColumnHeader header in mImageListView.Columns)
+                        if (header.Type == ColumnType.Custom)
+                            item.AddSubItemText(header.columnID);
+
+                    // Add to thumbnail cache
                     if (mImageListView.CacheMode == CacheMode.Continuous)
                     {
                         if (item.isVirtualItem)
-                            mImageListView.thumbnailManager.Add(item.Guid, item.VirtualItemKey,
+                            mImageListView.thumbnailCache.Add(item.Guid, item.VirtualItemKey,
                                 mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                         else
-                            mImageListView.thumbnailManager.Add(item.Guid, item.FileName,
+                            mImageListView.thumbnailCache.Add(item.Guid, item.FileName,
                                 mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                     }
 
+                    // Add to details cache
                     if (item.isVirtualItem)
                         mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
                     else
-                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName); ;
+                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName);
+
+                    // Add to shell info cache
+                    if (!item.isVirtualItem)
+                    {
+                        string extension = item.extension;
+                        CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
+                        if (state == CacheState.Error && mImageListView.RetryOnError == true)
+                        {
+                            mImageListView.shellInfoCache.Remove(extension);
+                            mImageListView.shellInfoCache.Add(extension);
+                        }
+                        else if (state == CacheState.Unknown)
+                            mImageListView.shellInfoCache.Add(extension);
+                    }
                 }
             }
             /// <summary>
@@ -501,7 +499,7 @@ namespace Manina.Windows.Forms
                 if (item == mFocused) mFocused = null;
                 if (removeFromCache && mImageListView != null)
                 {
-                    mImageListView.thumbnailManager.Remove(item.Guid);
+                    mImageListView.thumbnailCache.Remove(item.Guid);
                     mImageListView.itemCacheManager.Remove(item.Guid);
                 }
                 mItems.Remove(item);
