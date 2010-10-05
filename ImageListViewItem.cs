@@ -795,6 +795,9 @@ namespace Manina.Windows.Forms
 
             if (imageType == CachedImageType.SmallIcon || imageType == CachedImageType.LargeIcon)
             {
+                if (string.IsNullOrEmpty(extension))
+                    return mImageListView.DefaultImage;
+
                 CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
                 if (state == CacheState.Cached)
                 {
@@ -825,6 +828,9 @@ namespace Manina.Windows.Forms
 
                 if (state == CacheState.Error)
                 {
+                    if (string.IsNullOrEmpty(extension))
+                        return mImageListView.ErrorImage;
+
                     if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32)
                         img = mImageListView.shellInfoCache.GetLargeIcon(extension);
                     if (img == null && mImageListView.ShellIconFallback)
@@ -845,6 +851,9 @@ namespace Manina.Windows.Forms
                 else
                     mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
                         mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+
+                if (img == null && string.IsNullOrEmpty(extension))
+                    return mImageListView.DefaultImage;
 
                 if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
                     img = mImageListView.shellInfoCache.GetLargeIcon(extension);
