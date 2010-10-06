@@ -41,7 +41,7 @@
     <Optimize>true</Optimize>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DesignerDebug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug Designer|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\DesignerDebug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;BONUSPACK;USEWIC</DefineConstants>
@@ -49,14 +49,6 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Dedug Designer|AnyCPU' ">
-    <OutputPath>bin\Dedug Designer\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug Designer|AnyCPU' ">
-    <OutputPath>bin\Debug Designer\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>bin\Debug Designer\ImageListView.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
