@@ -1,6 +1,15 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 9.0 (06 October 2010) =
+
+This release introduces the !QueuedBackgroundWorker. This component is used internally by !ImageListView for its worker threads but it can also be used as a stand alone component. It is basically a multi-queued version of the .Net !BackgroundWorker with some additional features. This release is a major rewrite and it is quite possible that I introduced new bugs.
+
+  * Rebuilding the thumbnail cache now obeys the !CacheMode property of the control, ie. if the !CacheMode is set to Continuous, all item thumbnails will be fetched again after clearing the cache.
+  * Shell info (icons and file type) are now handled by a new thread. Shell info is now cached by filename extension.
+  * Added the new !QueuedBackgroundWorker component.
+  * More rendering logic is moved to the control from the renderer, preventing unnecessary redraws.
+
 = 8.3 (30 September 2010) =
 
 This release aims better integration with the control designer. Some of the changes are  invisible to the user (ie. new !InstanceDescriptors and default property values emit cleaner code in !InitializeComponent), some are visible on the designer surface (ie. items can now be added to the control from the designer. Both thumbnail and item details will be fetched and shown on the designer), some changes fix long standing glitches (ie. editing child item collections from the designer could not be undone). There is also a minor bug fix and new properties for items.
