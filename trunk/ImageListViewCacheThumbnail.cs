@@ -852,13 +852,9 @@ namespace Manina.Windows.Forms
         {
             CacheItem item = null;
             if (thumbCache.TryGetValue(guid, out item))
-            {
-                Image img = item.Image;
-                if (img != null)
-                    img = (Image)img.Clone();
-                return img;
-            }
-            return null;
+                return item.Image;
+            else
+                return null;
         }
         #endregion
 
@@ -907,7 +903,7 @@ namespace Manina.Windows.Forms
         private void RunWorker(CacheItem item)
         {
             RunWorker(item, 0);
-        }       
+        }
         #endregion
 
         #region Dispose
