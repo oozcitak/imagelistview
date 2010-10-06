@@ -187,8 +187,12 @@ namespace Manina.Windows.Forms
                             thumbnailCache.CacheLimitAsMemory = 0;
                         }
                     }
+
                     if (thumbnailCache != null)
                         thumbnailCache.CacheMode = mCacheMode;
+
+                    // Rebuild the cache
+                    ClearThumbnailCache();
                 }
             }
         }
@@ -856,8 +860,23 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ClearThumbnailCache()
         {
-            thumbnailCache.Clear();
-            Refresh();
+            if (thumbnailCache != null)
+            {
+                thumbnailCache.Clear();
+                if (CacheMode == CacheMode.Continuous)
+                {
+                    foreach (ImageListViewItem item in mItems)
+                    {
+                        if (item.isVirtualItem)
+                            thumbnailCache.Add(item.Guid, item.VirtualItemKey,
+                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
+                        else
+                            thumbnailCache.Add(item.Guid, item.FileName,
+                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
+                    }
+                }
+                Refresh();
+            }
         }
         /// <summary>
         /// Temporarily suspends the layout logic for the control.
