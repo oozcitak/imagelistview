@@ -969,7 +969,7 @@ namespace Manina.Windows.Forms
                                 // Rating stars
                                 if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
                                 {
-                                    int rating = item.StarRating;
+                                    int rating = item.GetSimpleRating();
                                     if (rating > 0)
                                     {
                                         int w = mImageListView.RatingImage.Width;
