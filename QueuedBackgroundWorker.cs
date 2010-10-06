@@ -328,18 +328,13 @@ namespace Manina.Windows.Forms
 
                     if (request != null)
                     {
-                        object result = null;
                         Exception error = null;
-                        bool cancelled = false;
                         // Start the work
+                        QueuedWorkerDoWorkEventArgs arg = new QueuedWorkerDoWorkEventArgs(request, priority);
                         try
                         {
                             // Raise the do work event
-                            QueuedWorkerDoWorkEventArgs arg = new QueuedWorkerDoWorkEventArgs(request, priority);
                             OnDoWork(arg);
-                            cancelled = arg.Cancel;
-                            if (!cancelled)
-                                result = arg.Result;
                         }
                         catch (Exception e)
                         {
@@ -348,7 +343,7 @@ namespace Manina.Windows.Forms
 
                         // Raise the work complete event
                         QueuedWorkerCompletedEventArgs arg2 = new QueuedWorkerCompletedEventArgs(request,
-                            result, priority, error, cancelled);
+                            arg.Result, priority, error, arg.Cancel);
                         context.Post(workCompletedCallback, arg2);
                     }
 
