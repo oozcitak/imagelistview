@@ -139,14 +139,31 @@ namespace Manina.Windows.Forms
 
         #region Cancel
         /// <summary>
-        /// Cancels all pending operations.
+        /// Cancels all pending operations in all queues.
         /// </summary>
-        public void CancelAllAsync()
+        public void CancelAsync()
         {
             lock (lockObject)
             {
                 foreach (Queue<object> queue in items)
                     queue.Clear();
+
+                Monitor.Pulse(lockObject);
+            }
+        }
+        /// <summary>
+        /// Cancels all pending operations in the given queue.
+        /// </summary>
+        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> 
+        /// indicating the priority queue to cancel.</param>
+        public void CancelAsync(int priority)
+        {
+            if (priority < 0 || priority >= priorityQueues)
+                throw new ArgumentException("priority must be between 0 and " + (priorityQueues - 1).ToString() + "  inclusive.", "priority");
+
+            lock (lockObject)
+            {
+                items[priority].Clear();
 
                 Monitor.Pulse(lockObject);
             }

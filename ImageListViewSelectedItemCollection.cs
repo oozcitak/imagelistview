@@ -35,9 +35,9 @@ namespace Manina.Windows.Forms
 
             #region Constructors
             /// <summary>
-            /// Initializes a new instance of the ImageListViewSelectedItemCollection class.
+            /// Initializes a new instance of the <see cref="ImageListViewSelectedItemCollection"/> class.
             /// </summary>
-            /// <param name="owner">The ImageListView owning this collection.</param>
+            /// <param name="owner">The <see cref="ImageListView"/> owning this collection.</param>
             internal ImageListViewSelectedItemCollection(ImageListView owner)
             {
                 mImageListView = owner;
@@ -46,7 +46,7 @@ namespace Manina.Windows.Forms
 
             #region Properties
             /// <summary>
-            /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Gets the number of elements contained in the <see cref="ImageListViewSelectedItemCollection"/>.
             /// </summary>
             [Category("Behavior"), Browsable(true), Description("Gets the number of elements contained in the collection.")]
             public int Count
@@ -59,17 +59,17 @@ namespace Manina.Windows.Forms
                     return count;
                 }
             }            /// <summary>
-            /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+            /// Gets a value indicating whether the <see cref="ImageListViewSelectedItemCollection"/> is read-only.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets a value indicating whether the collection is read-only.")]
             public bool IsReadOnly { get { return true; } }
             /// <summary>
-            /// Gets the ImageListView owning this collection.
+            /// Gets the <see cref="ImageListView"/> owning this collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this collection.")]
             public ImageListView ImageListView { get { return mImageListView; } }
             /// <summary>
-            /// Gets or sets the item at the specified index.
+            /// Gets or sets the <see cref="ImageListViewItem"/> at the specified index.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item at the specified index")]
             public ImageListViewItem this[int index]
@@ -90,11 +90,11 @@ namespace Manina.Windows.Forms
 
             #region Instance Methods
             /// <summary>
-            /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+            /// Determines whether the <see cref="ImageListViewSelectedItemCollection"/> contains a specific value.
             /// </summary>
-            /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to locate in the <see cref="ImageListViewSelectedItemCollection"/>.</param>
             /// <returns>
-            /// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+            /// true if <paramref name="item"/> is found in the <see cref="ImageListViewSelectedItemCollection"/>; otherwise, false.
             /// </returns>
             public bool Contains(ImageListViewItem item)
             {

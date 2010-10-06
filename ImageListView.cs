@@ -862,8 +862,8 @@ namespace Manina.Windows.Forms
             vScrollBar = new VScrollBar();
             hScrollBar.Visible = false;
             vScrollBar.Visible = false;
-            hScrollBar.Scroll += new ScrollEventHandler(hScrollBar_Scroll);
-            vScrollBar.Scroll += new ScrollEventHandler(vScrollBar_Scroll);
+            hScrollBar.Scroll += hScrollBar_Scroll;
+            vScrollBar.Scroll += vScrollBar_Scroll;
             Controls.Add(hScrollBar);
             Controls.Add(vScrollBar);
 
@@ -1512,7 +1512,11 @@ namespace Manina.Windows.Forms
             {
                 if (disposing)
                 {
-                    // resources
+                    // Events
+                    hScrollBar.Scroll -= hScrollBar_Scroll;
+                    vScrollBar.Scroll -= vScrollBar_Scroll;
+
+                    // Resources
                     if (mDefaultImage != null)
                         mDefaultImage.Dispose();
                     if (mErrorImage != null)
@@ -1691,8 +1695,7 @@ namespace Manina.Windows.Forms
         internal void OnCacheErrorInternal(Guid guid, Exception error, CacheThread cacheThread)
         {
             ImageListViewItem item = null;
-            if (guid != Guid.Empty)
-                Items.TryGetValue(guid, out item);
+            mItems.TryGetValue(guid, out item);
             OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
         }
         /// <summary>
@@ -1700,12 +1703,14 @@ namespace Manina.Windows.Forms
         /// This method is invoked from the thumbnail thread.
         /// </summary>
         /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+        /// <param name="thumbnail">The cached image.</param>
+        /// <param name="size">Requested thumbnail size.</param>
         /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
-        internal void OnThumbnailCachedInternal(Guid guid, bool error)
+        internal void OnThumbnailCachedInternal(Guid guid, Image thumbnail, Size size, bool error)
         {
             ImageListViewItem item = null;
-            if (Items.TryGetValue(guid, out item))
-                OnThumbnailCached(new ThumbnailCachedEventArgs(item, error));
+            if (mItems.TryGetValue(guid, out item))
+                OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size, error));
         }
         /// <summary>
         /// Raises the refresh event.
@@ -1737,9 +1742,21 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Raises the ThumbnailCaching event.
+        /// This method is invoked from the thumbnail thread.
         /// </summary>
-        /// <param name="e">A ItemEventArgs that contains event data.</param>
-        protected virtual void OnThumbnailCaching(ItemEventArgs e)
+        /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
+        /// <param name="size">Requested thumbnail size.</param>
+        internal void OnThumbnailCachingInternal(Guid guid, Size size)
+        {
+            ImageListViewItem item = null;
+            if (mItems.TryGetValue(guid, out item))
+                OnThumbnailCaching(new ThumbnailCachingEventArgs(item, size));
+        }
+        /// <summary>
+        /// Raises the ThumbnailCaching event.
+        /// </summary>
+        /// <param name="e">A ThumbnailCachingEventArgs that contains event data.</param>
+        protected virtual void OnThumbnailCaching(ThumbnailCachingEventArgs e)
         {
             if (ThumbnailCaching != null)
                 ThumbnailCaching(this, e);
