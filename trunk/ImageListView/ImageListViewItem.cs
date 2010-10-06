@@ -61,6 +61,7 @@ namespace Manina.Windows.Forms
         private ushort mISOSpeed;
         private string mUserComment;
         private ushort mRating;
+        private ushort mStarRating;
         private string mSoftware;
         private float mFocalLength;
         // Used for virtual items
@@ -420,25 +421,7 @@ namespace Manina.Windows.Forms
         /// Gets the star rating between 0-5 (Windows specific).
         /// </summary>
         [Category("Image Properties"), Browsable(true), Description("Gets the star rating between 0-5.")]
-        public ushort StarRating
-        {
-            get
-            {
-                UpdateFileInfo();
-                if (mRating >= 1 && mRating <= 12)
-                    return 1;
-                else if (mRating >= 13 && mRating <= 37)
-                    return 2;
-                else if (mRating >= 38 && mRating <= 62)
-                    return 3;
-                else if (mRating >= 63 && mRating <= 87)
-                    return 4;
-                else if (mRating >= 88 && mRating <= 99)
-                    return 5;
-
-                return 0;
-            }
-        }
+        public ushort StarRating { get { UpdateFileInfo(); return mStarRating; } }
         /// <summary>
         /// Gets the name of the application that created this file.
         /// </summary>
@@ -706,7 +689,8 @@ namespace Manina.Windows.Forms
                             return "";
                         }
                     }
-                    return FileType;
+                    else
+                        return "";
                 case ColumnType.Dimensions:
                     if (mDimensions == Size.Empty)
                         return "";
@@ -779,6 +763,32 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Gets the simpel rating (0-5)
+        /// </summary>
+        /// <returns></returns>
+        internal ushort GetSimpleRating()
+        {
+            return mStarRating;
+        }
+        /// <summary>
+        /// Sets the simple rating (0-5) from rating (0-99).
+        /// </summary>
+        private void UpdateRating()
+        {
+            if (mRating >= 1 && mRating <= 12)
+                mStarRating = 1;
+            else if (mRating >= 13 && mRating <= 37)
+                mStarRating = 2;
+            else if (mRating >= 38 && mRating <= 62)
+                mStarRating = 3;
+            else if (mRating >= 63 && mRating <= 87)
+                mStarRating = 4;
+            else if (mRating >= 88 && mRating <= 99)
+                mStarRating = 5;
+            else
+                mStarRating = 0;
+        }
         /// <summary>
         /// Gets an image from the cache manager.
         /// If the thumbnail image is not cached, it will be 
@@ -969,6 +979,8 @@ namespace Manina.Windows.Forms
             mSoftware = info.Software;
             mFocalLength = info.FocalLength;
 
+            UpdateRating();
+
             isDirty = false;
         }
         /// <summary>
@@ -1003,6 +1015,8 @@ namespace Manina.Windows.Forms
             mSoftware = info.Software;
             mFocalLength = info.FocalLength;
 
+            UpdateRating();
+
             isDirty = false;
         }
         #endregion
@@ -1025,6 +1039,8 @@ namespace Manina.Windows.Forms
             item.mFileName = mFileName;
             item.mFilePath = mFilePath;
             item.mFileSize = mFileSize;
+
+            // Image info
             item.mDimensions = mDimensions;
             item.mResolution = mResolution;
 
@@ -1039,6 +1055,7 @@ namespace Manina.Windows.Forms
             item.mISOSpeed = mISOSpeed;
             item.mUserComment = mUserComment;
             item.mRating = mRating;
+            item.mStarRating = mStarRating;
             item.mSoftware = mSoftware;
             item.mFocalLength = mFocalLength;
 
