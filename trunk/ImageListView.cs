@@ -115,6 +115,9 @@ namespace Manina.Windows.Forms
         internal ImageListViewCacheThumbnail thumbnailCache;
         internal ImageListViewCacheShellInfo shellInfoCache;
         internal ImageListViewCacheMetadata itemCacheManager;
+
+        // Resource manager
+        private ResourceManager resources;
         #endregion
 
         #region Properties
@@ -269,12 +272,7 @@ namespace Manina.Windows.Forms
             get
             {
                 if (mDefaultImage == null)
-                {
-                    ResourceManager manager = new ResourceManager(
-                        "Manina.Windows.Forms.ImageListViewResources",
-                        Assembly.GetExecutingAssembly());
-                    return manager.GetObject("DefaultImage") as Image;
-                }
+                    return resources.GetObject("DefaultImage") as Image;
                 else
                     return mDefaultImage;
             }
@@ -308,12 +306,7 @@ namespace Manina.Windows.Forms
             get
             {
                 if (mErrorImage == null)
-                {
-                    ResourceManager manager = new ResourceManager(
-                        "Manina.Windows.Forms.ImageListViewResources",
-                        Assembly.GetExecutingAssembly());
-                    return manager.GetObject("ErrorImage") as Image;
-                }
+                    return resources.GetObject("ErrorImage") as Image;
                 else
                     return mErrorImage;
             }
@@ -404,12 +397,7 @@ namespace Manina.Windows.Forms
             get
             {
                 if (mRatingImage == null)
-                {
-                    ResourceManager manager = new ResourceManager(
-                        "Manina.Windows.Forms.ImageListViewResources",
-                        Assembly.GetExecutingAssembly());
-                    return manager.GetObject("RatingImage") as Image;
-                }
+                    return resources.GetObject("RatingImage") as Image;
                 else
                     return mRatingImage;
             }
@@ -429,14 +417,9 @@ namespace Manina.Windows.Forms
             get
             {
                 if (mEmptyRatingImage == null)
-                {
-                    ResourceManager manager = new ResourceManager(
-                        "Manina.Windows.Forms.ImageListViewResources",
-                        Assembly.GetExecutingAssembly());
-                    return manager.GetObject("EmptyRatingImage") as Image;
-                }
+                    return resources.GetObject("EmptyRatingImage") as Image;
                 else
-                    return mRatingImage;
+                    return mEmptyRatingImage;
             }
             set
             {
@@ -727,10 +710,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ResetDefaultImage()
         {
-            ResourceManager manager = new ResourceManager(
-                "Manina.Windows.Forms.ImageListViewResources",
-                Assembly.GetExecutingAssembly());
-            DefaultImage = manager.GetObject("DefaultImage") as Image;
+            DefaultImage = resources.GetObject("DefaultImage") as Image;
             mDefaultImageChanged = false;
         }
 
@@ -748,10 +728,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ResetErrorImage()
         {
-            ResourceManager manager = new ResourceManager(
-                "Manina.Windows.Forms.ImageListViewResources",
-                Assembly.GetExecutingAssembly());
-            ErrorImage = manager.GetObject("ErrorImage") as Image;
+            ErrorImage = resources.GetObject("ErrorImage") as Image;
             mErrorImageChanged = false;
         }
 
@@ -769,10 +746,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ResetRatingImage()
         {
-            ResourceManager manager = new ResourceManager(
-                "Manina.Windows.Forms.ImageListViewResources",
-                Assembly.GetExecutingAssembly());
-            RatingImage = manager.GetObject("RatingImage") as Image;
+            RatingImage = resources.GetObject("RatingImage") as Image;
             mRatingImageChanged = false;
         }
 
@@ -790,10 +764,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ResetEmptyRatingImage()
         {
-            ResourceManager manager = new ResourceManager(
-                "Manina.Windows.Forms.ImageListViewResources",
-                Assembly.GetExecutingAssembly());
-            EmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
+            EmptyRatingImage = resources.GetObject("EmptyRatingImage") as Image;
             mEmptyRatingImageChanged = false;
         }
         #endregion
@@ -824,12 +795,11 @@ namespace Manina.Windows.Forms
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 20 * 1024 * 1024;
             mColumns = new ImageListViewColumnHeaderCollection(this);
-            ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources",
-                Assembly.GetExecutingAssembly());
-            mDefaultImage = manager.GetObject("DefaultImage") as Image;
-            mErrorImage = manager.GetObject("ErrorImage") as Image;
-            mRatingImage = manager.GetObject("RatingImage") as Image;
-            mEmptyRatingImage = manager.GetObject("EmptyRatingImage") as Image;
+            resources = new ResourceManager("Manina.Windows.Forms.ImageListViewResources", GetType().Assembly);
+            mDefaultImage = resources.GetObject("DefaultImage") as Image;
+            mErrorImage = resources.GetObject("ErrorImage") as Image;
+            mRatingImage = resources.GetObject("RatingImage") as Image;
+            mEmptyRatingImage = resources.GetObject("EmptyRatingImage") as Image;
             HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
             mIntegralScroll = false;
             mItems = new ImageListViewItemCollection(this);

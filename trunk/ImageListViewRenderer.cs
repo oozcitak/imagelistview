@@ -966,21 +966,22 @@ namespace Manina.Windows.Forms
                                 }
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;
-
+                                // Rating stars
                                 if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
                                 {
-                                    string srating = item.GetSubItemText(ColumnType.Rating);
-                                    if (!string.IsNullOrEmpty(srating))
+                                    int rating = item.StarRating;
+                                    if (rating > 0)
                                     {
                                         int w = mImageListView.RatingImage.Width;
                                         int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
-                                        int rating = item.StarRating;
-                                        if (rating < 0) rating = 0;
-                                        if (rating > 5) rating = 5;
-                                        for (int i = 1; i <= rating; i++)
-                                            g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
-                                        for (int i = rating + 1; i <= 5; i++)
-                                            g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+
+                                        for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (rating >= i)
+                                                g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                            else
+                                                g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                        }
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)

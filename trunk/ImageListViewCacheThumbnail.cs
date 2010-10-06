@@ -243,9 +243,9 @@ namespace Manina.Windows.Forms
             context = null;
             bw = new QueuedBackgroundWorker();
             bw.IsBackground = true;
-            bw.DoWork += new QueuedWorkerDoWorkEventHandler(bw_DoWork);
-            bw.RunWorkerCompleted += new RunQueuedWorkerCompletedEventHandler(bw_RunWorkerCompleted);
-            bw.WorkerFinished += new QueuedWorkerFinishedEventHandler(bw_WorkerFinished);
+            bw.DoWork += bw_DoWork;
+            bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+            bw.WorkerFinished += bw_WorkerFinished;
 
             mImageListView = owner;
             CacheMode = CacheMode.OnDemand;
@@ -919,6 +919,10 @@ namespace Manina.Windows.Forms
         {
             if (!disposed)
             {
+                bw.DoWork += bw_DoWork;
+                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+                bw.WorkerFinished += bw_WorkerFinished;
+
                 Clear();
                 bw.Dispose();
 

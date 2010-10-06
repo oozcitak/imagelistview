@@ -110,9 +110,9 @@ namespace Manina.Windows.Forms
             bw = new QueuedBackgroundWorker();
             bw.SetApartmentState(ApartmentState.STA);
             bw.IsBackground = true;
-            bw.DoWork += new QueuedWorkerDoWorkEventHandler(bw_DoWork);
-            bw.RunWorkerCompleted += new RunQueuedWorkerCompletedEventHandler(bw_RunWorkerCompleted);
-            bw.WorkerFinished += new QueuedWorkerFinishedEventHandler(bw_WorkerFinished);
+            bw.DoWork += bw_DoWork;
+            bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+            bw.WorkerFinished += bw_WorkerFinished;
 
             mImageListView = owner;
             RetryOnError = false;
@@ -341,6 +341,10 @@ namespace Manina.Windows.Forms
         {
             if (!disposed)
             {
+                bw.DoWork -= bw_DoWork;
+                bw.RunWorkerCompleted -= bw_RunWorkerCompleted;
+                bw.WorkerFinished -= bw_WorkerFinished;
+
                 bw.Dispose();
 
                 disposed = true;
