@@ -241,9 +241,9 @@ namespace Manina.Windows.Forms
             else
             {
                 ShellImageFileInfo info = ShellImageFileInfo.FromFile(request.FileName);
+                e.Result = info;
                 if (info.Error != null)
                     throw info.Error;
-                e.Result = info;
             }
         }
         #endregion
