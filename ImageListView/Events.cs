@@ -557,14 +557,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         public object Key { get; private set; }
         /// <summary>
-        /// Gets the small shell icon of the image file represented by this item.
-        /// </summary>
-        public Image SmallIcon { get; set; }
-        /// <summary>
-        /// Gets the large shell icon of the image file represented by this item.
-        /// </summary>
-        public Image LargeIcon { get; set; }
-        /// <summary>
         /// Gets or sets the last access date of the image file represented by this item.
         /// </summary>
         public DateTime DateAccessed { get; set; }
