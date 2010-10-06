@@ -348,8 +348,7 @@ namespace Manina.Windows.Forms
             [Localizable(true)]
             private string GetDefaultText(ColumnType type)
             {
-                ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources",
-                    Assembly.GetExecutingAssembly());
+                ResourceManager manager = new ResourceManager("Manina.Windows.Forms.ImageListViewResources", GetType().Assembly);
                 return manager.GetString(type.ToString());
             }
             #endregion
