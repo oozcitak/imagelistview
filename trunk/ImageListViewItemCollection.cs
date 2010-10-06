@@ -41,9 +41,9 @@ namespace Manina.Windows.Forms
 
             #region Constructors
             /// <summary>
-            /// Initializes a new instance of the ImageListViewItemCollection class.
+            /// Initializes a new instance of the <see cref="ImageListViewItemCollection"/>  class.
             /// </summary>
-            /// <param name="owner">The ImageListView owning this collection.</param>
+            /// <param name="owner">The <see cref="ImageListView"/> owning this collection.</param>
             internal ImageListViewItemCollection(ImageListView owner)
             {
                 mItems = new List<ImageListViewItem>();
@@ -56,14 +56,14 @@ namespace Manina.Windows.Forms
 
             #region Properties
             /// <summary>
-            /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Gets the number of elements contained in the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             public int Count
             {
                 get { return mItems.Count; }
             }
             /// <summary>
-            /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+            /// Gets a value indicating whether the <see cref="ImageListViewItemCollection"/> is read-only.
             /// </summary>
             public bool IsReadOnly
             {
@@ -88,12 +88,12 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Gets the ImageListView owning this collection.
+            /// Gets the <see cref="ImageListView"/> owning this collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this collection.")]
             public ImageListView ImageListView { get { return mImageListView; } }
             /// <summary>
-            /// Gets or sets the item at the specified index.
+            /// Gets or sets the <see cref="ImageListViewItem"/> at the specified index.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item at the specified index.")]
             public ImageListViewItem this[int index]
@@ -142,7 +142,7 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Gets the item with the specified Guid.
+            /// Gets the <see cref="ImageListViewItem"/> with the specified Guid.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item with the specified Guid.")]
             internal ImageListViewItem this[Guid guid]
@@ -156,9 +156,9 @@ namespace Manina.Windows.Forms
 
             #region Instance Methods
             /// <summary>
-            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
-            /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to add to the <see cref="ImageListViewItemCollection"/>.</param>
             public void Add(ImageListViewItem item)
             {
                 AddInternal(item);
@@ -171,7 +171,7 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="filename">The name of the image file.</param>
             public void Add(string filename)
@@ -179,7 +179,7 @@ namespace Manina.Windows.Forms
                 Add(new ImageListViewItem(filename));
             }
             /// <summary>
-            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="filename">The name of the image file.</param>
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
@@ -194,7 +194,7 @@ namespace Manina.Windows.Forms
                 Add(item);
             }
             /// <summary>
-            /// Adds a virtual item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds a virtual item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
@@ -203,7 +203,7 @@ namespace Manina.Windows.Forms
                 Add(key, text, null);
             }
             /// <summary>
-            /// Adds a virtual item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds a virtual item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
@@ -219,9 +219,10 @@ namespace Manina.Windows.Forms
                 Add(item);
             }
             /// <summary>
-            /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds a range of items to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
-            /// <param name="items">The items to add to the collection.</param>
+            /// <param name="items">An array of <see cref="ImageListViewItem"/> 
+            /// to add to the <see cref="ImageListViewItemCollection"/>.</param>
             public void AddRange(ImageListViewItem[] items)
             {
                 if (mImageListView != null)
@@ -237,7 +238,7 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Adds a range of items to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="filenames">The names or the image files.</param>
             public void AddRange(string[] filenames)
@@ -258,7 +259,7 @@ namespace Manina.Windows.Forms
 
             }
             /// <summary>
-            /// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Removes all items from the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             public void Clear()
             {
@@ -277,11 +278,14 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+            /// Determines whether the <see cref="ImageListViewItemCollection"/> 
+            /// contains a specific value.
             /// </summary>
-            /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            /// <param name="item">The object to locate in the 
+            /// <see cref="ImageListViewItemCollection"/>.</param>
             /// <returns>
-            /// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+            /// true if <paramref name="item"/> is found in the 
+            /// <see cref="ImageListViewItemCollection"/>; otherwise, false.
             /// </returns>
             public bool Contains(ImageListViewItem item)
             {
@@ -291,20 +295,19 @@ namespace Manina.Windows.Forms
             /// Returns an enumerator that iterates through the collection.
             /// </summary>
             /// <returns>
-            /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+            /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> 
+            /// that can be used to iterate through the collection.
             /// </returns>
             public IEnumerator<ImageListViewItem> GetEnumerator()
             {
                 return mItems.GetEnumerator();
             }
             /// <summary>
-            /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
+            /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
             /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-            /// <param name="item">The object to insert into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
-            /// 	<paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.
-            /// </exception>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to 
+            /// insert into the <see cref="ImageListViewItemCollection"/>.</param>
             public void Insert(int index, ImageListViewItem item)
             {
                 InsertInternal(index, item);
@@ -317,11 +320,69 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="filename">The name of the image file.</param>
+            public void Insert(int index, string filename)
+            {
+                Insert(index, new ImageListViewItem(filename));
+            }
+            /// <summary>
+            /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="filename">The name of the image file.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            public void Insert(int index, string filename, Image initialThumbnail)
+            {
+                ImageListViewItem item = new ImageListViewItem(filename);
+                if (mImageListView != null && initialThumbnail != null)
+                {
+                    mImageListView.thumbnailCache.Add(item.Guid, filename, mImageListView.ThumbnailSize,
+                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                }
+                Insert(index, item);
+            }
+            /// <summary>
+            /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
+            public void Insert(int index, object key, string text)
+            {
+                Insert(index, key, text, null);
+            }
+            /// <summary>
+            /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            public void Insert(int index, object key, string text, Image initialThumbnail)
+            {
+                ImageListViewItem item = new ImageListViewItem(key, text);
+                if (mImageListView != null && initialThumbnail != null)
+                {
+                    mImageListView.thumbnailCache.Add(item.Guid, key, mImageListView.ThumbnailSize,
+                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                }
+                Insert(index, item);
+            }
+
+            /// <summary>
+            /// Removes the first occurrence of a specific object 
+            /// from the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to remove 
+            /// from the <see cref="ImageListViewItemCollection"/>.</param>
             /// <returns>
-            /// true if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// true if <paramref name="item"/> was successfully removed from the 
+            /// <see cref="ImageListViewItemCollection"/>; otherwise, false. This method also 
+            /// returns false if <paramref name="item"/> is not found in the original 
+            /// <see cref="ImageListViewItemCollection"/>.
             /// </returns>
             public bool Remove(ImageListViewItem item)
             {
@@ -342,12 +403,9 @@ namespace Manina.Windows.Forms
                 return ret;
             }
             /// <summary>
-            /// Removes the <see cref="T:System.Collections.Generic.IList`1"/> item at the specified index.
+            /// Removes the <see cref="ImageListViewItem"/> at the specified index.
             /// </summary>
             /// <param name="index">The zero-based index of the item to remove.</param>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
-            /// 	<paramref name="index"/> is not a valid index in the <see cref="T:System.Collections.Generic.IList`1"/>.
-            /// </exception>
             public void RemoveAt(int index)
             {
                 ImageListViewItem item = mItems[index];

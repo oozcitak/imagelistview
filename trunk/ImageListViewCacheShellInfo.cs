@@ -289,19 +289,6 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Pushes the given item to the worker queue.
-        /// </summary>
-        /// <param name="extension">File extension.</param>
-        private void RunWorker(string extension)
-        {
-            // Get the current synchronization context
-            if (context == null)
-                context = SynchronizationContext.Current;
-
-            // Add the item to the queue for processing
-            bw.RunWorkerAsync(extension);
-        }
-        /// <summary>
         /// Adds the item to the cache queue.
         /// </summary>
         /// <param name="extension">File extension.</param>
@@ -365,6 +352,22 @@ namespace Manina.Windows.Forms
                 return item.FileType;
             }
             return null;
+        }
+        #endregion
+
+        #region RunWorker
+        /// <summary>
+        /// Pushes the given item to the worker queue.
+        /// </summary>
+        /// <param name="extension">File extension.</param>
+        private void RunWorker(string extension)
+        {
+            // Get the current synchronization context
+            if (context == null)
+                context = SynchronizationContext.Current;
+
+            // Add the item to the queue for processing
+            bw.RunWorkerAsync(extension);
         }
         #endregion
 

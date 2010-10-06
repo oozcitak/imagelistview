@@ -127,25 +127,6 @@ namespace Manina.Windows.Forms
 
         #region Context Callbacks
         /// <summary>
-        /// Determines if the item is already being processed.
-        /// Sets the item as being processed if it is not already
-        /// being processed.
-        /// </summary>
-        /// <param name="guid">The guid of the cache item.</param>
-        /// <returns>true if the item is already being processed; otherwise false.</returns>
-        private bool IsProcessing(Guid guid)
-        {
-            bool processed = false;
-            SendOrPostCallback callback = delegate
-            {
-                processed = processing.ContainsKey(guid);
-                if (!processed)
-                    processing.Add(guid, false);
-            };
-            context.Send(callback, guid);
-            return processed;
-        }
-        /// <summary>
         /// Determines if the item is in the edit cache on the UI thread.
         /// </summary>
         /// <param name="guid">The guid of the cache item.</param>
@@ -201,6 +182,8 @@ namespace Manina.Windows.Forms
             // We are done processing
             processing.Remove(request.Guid);
 
+            // Do not process the result if the cache operation
+            // was cancelled.
             if (e.Cancelled)
                 return;
 
@@ -233,13 +216,6 @@ namespace Manina.Windows.Forms
         void bw_DoWork(object sender, QueuedWorkerDoWorkEventArgs e)
         {
             CacheItem request = e.Argument as CacheItem;
-
-            // Is it already being processed?
-            if (IsProcessing(request.Guid))
-            {
-                e.Cancel = true;
-                return;
-            }
 
             // Is it being edited?
             if (IsEditing(request.Guid))
@@ -306,25 +282,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Clear()
         {
-            bw.CancelAllAsync();
+            bw.CancelAsync();
             processing.Clear();
-        }
-        /// <summary>
-        /// Pushes the given item to the worker queue.
-        /// </summary>
-        /// <param name="item">The cache item.</param>
-        private void RunWorker(CacheItem item)
-        {
-            // Get the current synchronization context
-            if (context == null)
-                context = SynchronizationContext.Current;
-
-            // Already being processed?
-            if (processing.ContainsKey(item.Guid))
-                return;
-
-            // Add the item to the queue for processing
-            bw.RunWorkerAsync(item);
         }
         /// <summary>
         /// Adds the item to the cache queue.
@@ -348,6 +307,28 @@ namespace Manina.Windows.Forms
         {
             // Add to cache queue
             RunWorker(new CacheItem(guid, virtualItemKey));
+        }
+        #endregion
+
+        #region RunWorker
+        /// <summary>
+        /// Pushes the given item to the worker queue.
+        /// </summary>
+        /// <param name="item">The cache item.</param>
+        private void RunWorker(CacheItem item)
+        {
+            // Get the current synchronization context
+            if (context == null)
+                context = SynchronizationContext.Current;
+
+            // Already being processed?
+            if (processing.ContainsKey(item.Guid))
+                return;
+            else
+                processing.Add(item.Guid, false);
+
+            // Add the item to the queue for processing
+            bw.RunWorkerAsync(item);
         }
         #endregion
 
