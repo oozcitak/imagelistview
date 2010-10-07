@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms.VisualStyles;
 
 namespace Manina.Windows.Forms
 {
@@ -936,7 +937,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Draw item text
-                    SizeF szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
+                    SizeF szt = TextRenderer.MeasureText(g, item.Text, ImageListView.Font);
                     RectangleF rt;
                     using (StringFormat sf = new StringFormat())
                     {
@@ -1555,6 +1556,360 @@ namespace Manina.Windows.Forms
             {
                 if (ImageListView.View == View.Details)
                     base.DrawFileIcon(g, item, bounds);
+            }
+        }
+        #endregion
+
+        #region ThemeRenderer
+        /// <summary>
+        /// Displays the control in the current system theme.
+        /// This renderer cannot be themed.
+        /// </summary>
+        public class ThemeRenderer : ImageListView.ImageListViewRenderer
+        {
+            // Check boxes
+            private VisualStyleRenderer rCheckedNormal = null;
+            private VisualStyleRenderer rUncheckedNormal = null;
+            // File icons
+            private VisualStyleRenderer rFileIcon = null;
+            // Column headers
+            private VisualStyleRenderer rColumnNormal = null;
+            private VisualStyleRenderer rColumnHovered = null;
+            private VisualStyleRenderer rColumnSorted = null;
+            private VisualStyleRenderer rColumnSortedHovered = null;
+            private VisualStyleRenderer rSortAscending = null;
+            private VisualStyleRenderer rSortDescending = null;
+            // Items
+            private VisualStyleRenderer rItemNormal = null;
+            private VisualStyleRenderer rItemHovered = null;
+            private VisualStyleRenderer rItemSelected = null;
+            private VisualStyleRenderer rItemHoveredSelected = null;
+            private VisualStyleRenderer rItemSelectedHidden = null;
+
+            /// <summary>
+            /// Gets whether visual styles are supported.
+            /// </summary>
+            public bool VisualStylesEnabled { get; private set; }
+
+            /// <summary>
+            /// Gets a value indicating whether this renderer can apply custom colors.
+            /// </summary>
+            /// <value></value>
+            public override bool CanApplyColors { get { return false; } }
+
+            /// <summary>
+            /// Initializes a new instance of the ThemeRenderer class.
+            /// </summary>
+            public ThemeRenderer()
+            {
+                VisualStylesEnabled = Application.RenderWithVisualStyles;
+
+                // Create renderers
+                if (VisualStylesEnabled)
+                {
+                    // Check boxes
+                    rCheckedNormal = GetRenderer(VisualStyleElement.Button.CheckBox.CheckedNormal);
+                    rUncheckedNormal = GetRenderer(VisualStyleElement.Button.CheckBox.UncheckedNormal);
+                    // File icons
+                    rFileIcon = GetRenderer(VisualStyleElement.Button.PushButton.Normal);
+                    // Column headers
+                    rColumnNormal = GetRenderer("Header", 1, 1);
+                    rColumnHovered = GetRenderer("Header", 1, 2);
+                    rColumnSorted = GetRenderer("Header", 1, 4);
+                    rColumnSortedHovered = GetRenderer("Header", 1, 5);
+                    rSortAscending = GetRenderer(VisualStyleElement.Header.SortArrow.SortedUp);
+                    rSortDescending = GetRenderer(VisualStyleElement.Header.SortArrow.SortedDown);
+                    // Items
+                    rItemNormal = GetRenderer("Explorer::ListView", 1, 1);
+                    rItemHovered = GetRenderer("Explorer::ListView", 1, 2);
+                    rItemSelected = GetRenderer("Explorer::ListView", 1, 3);
+                    rItemHoveredSelected = GetRenderer("Explorer::ListView", 1, 6);
+                    rItemSelectedHidden = GetRenderer("Explorer::ListView", 1, 5);
+                }
+            }
+
+            /// <summary>
+            /// Returns a renderer for the given element.
+            /// </summary>
+            private VisualStyleRenderer GetRenderer(VisualStyleElement e)
+            {
+                if (VisualStyleRenderer.IsElementDefined(e))
+                    return new VisualStyleRenderer(e);
+                else
+                    return null;
+            }
+
+            /// <summary>
+            /// Returns a renderer for the given element.
+            /// </summary>
+            private VisualStyleRenderer GetRenderer(string className, int part, int state)
+            {
+                VisualStyleElement e = VisualStyleElement.CreateElement(className, part, state);
+                if (VisualStyleRenderer.IsElementDefined(e))
+                    return new VisualStyleRenderer(e);
+                else
+                    return null;
+            }
+
+            /// <summary>
+            /// Draws the checkbox icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the checkbox in client coordinates.</param>
+            public override void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                VisualStyleRenderer renderer;
+                if (item.Checked)
+                    renderer = rCheckedNormal;
+                else
+                    renderer = rUncheckedNormal;
+
+                if (VisualStylesEnabled && renderer != null)
+                    renderer.DrawBackground(g, bounds, bounds);
+                else
+                    base.DrawCheckBox(g, item, bounds);
+            }
+
+            /// <summary>
+            /// Draws the file icon for the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="bounds">The bounding rectangle of the file icon in client coordinates.</param>
+            public override void DrawFileIcon(Graphics g, ImageListViewItem item, Rectangle bounds)
+            {
+                Image icon = item.GetCachedImage(CachedImageType.SmallIcon);
+
+                if (icon != null && VisualStylesEnabled && rFileIcon != null)
+                    rFileIcon.DrawImage(g, bounds, icon);
+                else
+                    base.DrawFileIcon(g, item, bounds);
+            }
+
+            /// <summary>
+            /// Draws the column headers.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="column">The ImageListViewColumnHeader to draw.</param>
+            /// <param name="state">The current view state of column.</param>
+            /// <param name="bounds">The bounding rectangle of column in client coordinates.</param>
+            public override void DrawColumnHeader(Graphics g, ImageListView.ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
+            {
+                SortOrder order = SortOrder.None;
+                if (ImageListView.SortOrder != SortOrder.None &&
+                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
+                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                    order = ImageListView.SortOrder;
+
+                VisualStyleRenderer rBack;
+                if (((state & ColumnState.Hovered) == ColumnState.Hovered) && order != SortOrder.None)
+                    rBack = rColumnSortedHovered;
+                else if (((state & ColumnState.Hovered) == ColumnState.Hovered) && order == SortOrder.None)
+                    rBack = rColumnHovered;
+                else if (((state & ColumnState.Hovered) == ColumnState.None) && order != SortOrder.None)
+                    rBack = rColumnSorted;
+                else
+                    rBack = rColumnNormal;
+
+                VisualStyleRenderer rSort;
+                if (order == SortOrder.Ascending)
+                    rSort = rSortAscending;
+                else
+                    rSort = rSortDescending;
+
+                // Background
+                if (VisualStylesEnabled && rBack != null && rSort != null)
+                {
+                    // Background
+                    rBack.DrawBackground(g, bounds, bounds);
+                    // Sort arrow
+                    if (order != SortOrder.None)
+                    {
+                        Size sz = rSort.GetPartSize(g, System.Windows.Forms.VisualStyles.ThemeSizeType.True);
+                        Rectangle sortBounds = new Rectangle(new Point(0, 0), sz);
+                        sortBounds.Offset(bounds.X + (bounds.Width - sz.Width) / 2, 0);
+                        rSort.DrawBackground(g, sortBounds, sortBounds);
+                    }
+
+                    // Text
+                    if (bounds.Width > 4)
+                    {
+                        Rectangle textBounds = bounds;
+                        textBounds.Inflate(-3, 0);
+                        TextRenderer.DrawText(g, column.Text,
+                            SystemFonts.MenuFont, textBounds, SystemColors.ControlText,
+                            TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+                    }
+                }
+                else
+                    base.DrawColumnHeader(g, column, state, bounds);
+            }
+
+            /// <summary>
+            /// Draws the extender after the last column.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="bounds">The bounding rectangle of extender column in client coordinates.</param>
+            public override void DrawColumnExtender(Graphics g, Rectangle bounds)
+            {
+                if (VisualStylesEnabled && rColumnNormal != null)
+                    rColumnNormal.DrawBackground(g, bounds, bounds);
+                else
+                    base.DrawColumnExtender(g, bounds);
+            }
+
+            /// <summary>
+            /// Returns item size for the given view mode.
+            /// </summary>
+            /// <param name="view">The view mode for which the measurement should be made.</param>
+            /// <returns></returns>
+            public override Size MeasureItem(View view)
+            {
+                Size sz = base.MeasureItem(view);
+                if (view != View.Details)
+                {
+                    sz.Width += 6;
+                    sz.Height += 6;
+                }
+                return sz;
+            }
+
+            /// <summary>
+            /// Draws the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="state">The current view state of item.</param>
+            /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
+            public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
+            {
+                VisualStyleRenderer rBack;
+
+                if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    rBack = rItemSelectedHidden;
+                else if (((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None))
+                    rBack = rItemHoveredSelected;
+                else if ((state & ItemState.Selected) != ItemState.None)
+                    rBack = rItemSelected;
+                else if ((state & ItemState.Hovered) != ItemState.None)
+                    rBack = rItemHovered;
+                else
+                    rBack = rItemNormal;
+
+                if (VisualStylesEnabled && rBack != null)
+                {
+                    // Do not draw the background of normal items
+                    if (((state & ItemState.Hovered) != ItemState.None) || ((state & ItemState.Selected) != ItemState.None))
+                        rBack.DrawBackground(g, bounds, bounds);
+
+                    Size itemPadding = new Size(7, 7);
+
+                    // Draw the image
+                    if (ImageListView.View != View.Details)
+                    {
+                        Image img = item.GetCachedImage(CachedImageType.Thumbnail);
+                        if (img != null)
+                        {
+                            Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize));
+                            // Image background
+                            Rectangle imgback = pos;
+                            imgback.Inflate(3, 3);
+                            g.FillRectangle(SystemBrushes.Window, imgback);
+                            // Image border
+                            if (img.Width > 32 && img.Height > 32)
+                            {
+                                using (Pen pen = new Pen(Color.FromArgb(224, 224, 244)))
+                                {
+                                    g.DrawRectangle(pen, imgback.X, imgback.Y, imgback.Width - 1, imgback.Height - 1);
+                                }
+                            }
+                            // Image
+                            g.DrawImage(img, pos);
+                        }
+
+                        // Draw item text
+                        Size szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
+                        Rectangle rt = new Rectangle(
+                            bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height,
+                            ImageListView.ThumbnailSize.Width, szt.Height);
+                        TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, SystemColors.ControlText,
+                            TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+                    }
+                    else // if (ImageListView.View == View.Details)
+                    {
+                        List<ImageListView.ImageListViewColumnHeader> uicolumns = ImageListView.Columns.GetDisplayedColumns();
+
+                        // Separators 
+                        int x = bounds.Left - 2;
+                        foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
+                        {
+                            x += column.Width;
+                            if (!ReferenceEquals(column, uicolumns[uicolumns.Count - 1]))
+                            {
+                                using (Pen pGray32 = new Pen(Color.FromArgb(32, 128, 128, 128)))
+                                {
+                                    g.DrawLine(pGray32, x, bounds.Top, x, bounds.Bottom);
+                                }
+                            }
+                        }
+                        Size offset = new Size(2, (bounds.Height - ImageListView.Font.Height) / 2);
+                        // Sub text
+                        int firstWidth = 0;
+                        if (uicolumns.Count > 0)
+                            firstWidth = uicolumns[0].Width;
+                        Rectangle rt = new Rectangle(bounds.Left + offset.Width, bounds.Top + offset.Height, firstWidth - 2 * offset.Width, bounds.Height - 2 * offset.Height);
+                        foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
+                        {
+                            rt.Width = column.Width - 2 * offset.Width;
+                            using (Brush bItemFore = new SolidBrush(SystemColors.ControlText))
+                            {
+                                int iconOffset = 0;
+                                if (column.Type == ColumnType.Name)
+                                {
+                                    // Allocate space for checkbox and file icon
+                                    if (ImageListView.ShowCheckBoxes && ImageListView.ShowFileIcons)
+                                        iconOffset += 2 * 16 + 3 * 2;
+                                    else if (ImageListView.ShowCheckBoxes)
+                                        iconOffset += 16 + 2 * 2;
+                                    else if (ImageListView.ShowFileIcons)
+                                        iconOffset += 16 + 2 * 2;
+                                }
+                                rt.X += iconOffset;
+                                rt.Width -= iconOffset;
+                                // Rating stars
+                                if (column.Type == ColumnType.Rating && ImageListView.RatingImage != null && ImageListView.EmptyRatingImage != null)
+                                {
+                                    int rating = item.GetSimpleRating();
+                                    if (rating > 0)
+                                    {
+                                        int w = ImageListView.RatingImage.Width;
+                                        int y = (int)(rt.Top + (rt.Height - ImageListView.RatingImage.Height) / 2.0f);
+
+                                        for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (rating >= i)
+                                                g.DrawImage(ImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                            else
+                                                g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                        }
+                                    }
+                                }
+                                else if (column.Type == ColumnType.Custom)
+                                    TextRenderer.DrawText(g, item.GetSubItemText(column.columnID), ImageListView.Font, rt, SystemColors.ControlText,
+                                        TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+                                else
+                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, SystemColors.ControlText,
+                                        TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+
+                                rt.X -= iconOffset;
+                            }
+                            rt.X += column.Width;
+                        }
+                    }
+                }
+                else
+                    base.DrawItem(g, item, state, bounds);
             }
         }
         #endregion
