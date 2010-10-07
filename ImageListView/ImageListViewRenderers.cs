@@ -1767,7 +1767,7 @@ namespace Manina.Windows.Forms
             public override Size MeasureItem(View view)
             {
                 Size sz = base.MeasureItem(view);
-                if (view != View.Details)
+                if (VisualStylesEnabled && view != View.Details)
                 {
                     sz.Width += 6;
                     sz.Height += 6;
@@ -1907,6 +1907,15 @@ namespace Manina.Windows.Forms
                             rt.X += column.Width;
                         }
                     }
+
+                    // Focus rectangle
+                    if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                    {
+                        Rectangle focusBounds = bounds;
+                        focusBounds.Inflate(-2, -2);
+                        ControlPaint.DrawFocusRectangle(g, focusBounds);
+                    }
+
                 }
                 else
                     base.DrawItem(g, item, state, bounds);
