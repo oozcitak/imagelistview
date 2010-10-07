@@ -42,14 +42,14 @@ namespace Manina.Windows.Forms
         private struct ColorComboBoxItem
         {
             public string Name;
-            public FieldInfo Field;
+            public PropertyInfo Field;
 
             public override string ToString()
             {
                 return Name;
             }
 
-            public ColorComboBoxItem(FieldInfo field)
+            public ColorComboBoxItem(PropertyInfo field)
             {
                 Name = field.Name;
                 Field = field;
@@ -83,7 +83,7 @@ namespace Manina.Windows.Forms
             // Find and add custom colors
             Type colorType = typeof(ImageListViewColor);
             i = 0;
-            foreach (FieldInfo field in colorType.GetFields(BindingFlags.Public | BindingFlags.Static))
+            foreach (PropertyInfo field in colorType.GetProperties(BindingFlags.Public | BindingFlags.Static))
             {
                 colorToolStripComboBox.Items.Add(new ColorComboBoxItem(field));
                 if (field.Name == "Default")
@@ -182,8 +182,8 @@ namespace Manina.Windows.Forms
         private void colorToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             Type t = typeof(ImageListViewColor);
-            FieldInfo field = ((ColorComboBoxItem)colorToolStripComboBox.SelectedItem).Field;
-            ImageListViewColor color = (ImageListViewColor)field.GetValue(null);
+            PropertyInfo field = ((ColorComboBoxItem)colorToolStripComboBox.SelectedItem).Field;
+            ImageListViewColor color = (ImageListViewColor)field.GetValue(null, null);
             imageListView1.Colors = color;
         }
 

@@ -990,20 +990,10 @@ namespace Manina.Windows.Forms
                     }
 
                     // Draw item text
-                    SizeF szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
-                    RectangleF rt;
-                    using (StringFormat sf = new StringFormat())
-                    {
-                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height, ImageListView.ThumbnailSize.Width, szt.Height);
-                        sf.Alignment = StringAlignment.Center;
-                        sf.FormatFlags = StringFormatFlags.NoWrap;
-                        sf.LineAlignment = StringAlignment.Center;
-                        sf.Trimming = StringTrimming.EllipsisCharacter;
-                        using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
-                        {
-                            g.DrawString(item.Text, ImageListView.Font, bItemFore, rt, sf);
-                        }
-                    }
+                    Size szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
+                    Rectangle rt = new Rectangle(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height, ImageListView.ThumbnailSize.Width, szt.Height);
+                    TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, SystemColors.ControlText,
+                        TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
                 }
                 else // if (ImageListView.View == View.Details)
                 {
