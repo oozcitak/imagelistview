@@ -360,9 +360,7 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (ImageListView.SortOrder != SortOrder.None &&
-                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                if (ImageListView.SortOrder != SortOrder.None && ((state & ColumnState.SortColumn) != ColumnState.None))
                 {
                     Image img = null;
                     if (ImageListView.SortOrder == SortOrder.Ascending)
@@ -1213,9 +1211,7 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (ImageListView.SortOrder != SortOrder.None &&
-                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                if (ImageListView.SortOrder != SortOrder.None && ((state & ColumnState.SortColumn) != ColumnState.None))
                 {
                     Image img = null;
                     if (ImageListView.SortOrder == SortOrder.Ascending)
@@ -1698,8 +1694,7 @@ namespace Manina.Windows.Forms
             {
                 SortOrder order = SortOrder.None;
                 if (ImageListView.SortOrder != SortOrder.None &&
-                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                    ((state & ColumnState.SortColumn) != ColumnState.None))
                     order = ImageListView.SortOrder;
 
                 VisualStyleRenderer rBack;

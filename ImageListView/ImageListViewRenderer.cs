@@ -349,6 +349,9 @@ namespace Manina.Windows.Forms
                         state |= ColumnState.SeparatorHovered;
                     if (ReferenceEquals(ImageListView.navigationManager.SelectedSeparator, column))
                         state |= ColumnState.SeparatorSelected;
+                    if (ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
+                        ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                        state |= ColumnState.SortColumn;
 
                     Rectangle bounds = new Rectangle(x, y, column.Width, h);
                     if (Clip)
@@ -1222,9 +1225,7 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (ImageListView.SortOrder != SortOrder.None &&
-                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                if (ImageListView.SortOrder != SortOrder.None && ((state & ColumnState.SortColumn) != ColumnState.None))
                 {
                     Image img = null;
                     if (ImageListView.SortOrder == SortOrder.Ascending)
