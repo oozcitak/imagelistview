@@ -141,13 +141,13 @@ namespace Manina.Windows.Forms
                     }
 
                     // Shade sort column
-                    List<ImageListView.ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
+                    List<ImageListView.ImageListViewColumnHeader> uicolumns = ImageListView.Columns.GetDisplayedColumns();
                     int x = bounds.Left - 1;
                     foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                     {
-                        if (mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
-                            mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID &&
-                            mImageListView.SortOrder != SortOrder.None &&
+                        if (ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
+                            ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID &&
+                            ImageListView.SortOrder != SortOrder.None &&
                             (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None)
                         {
                             Rectangle subItemBounds = bounds;
@@ -162,7 +162,7 @@ namespace Manina.Windows.Forms
                         x += column.Width;
                     }
                     // Separators 
-                    x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
+                    x = ImageListView.layoutManager.ColumnHeaderBounds.Left;
                     foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                     {
                         x += column.Width;
@@ -176,7 +176,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Item texts
-                    Size offset = new Size(2, (bounds.Height - mImageListView.Font.Height) / 2);
+                    Size offset = new Size(2, (bounds.Height - ImageListView.Font.Height) / 2);
                     using (StringFormat sf = new StringFormat())
                     {
                         sf.FormatFlags = StringFormatFlags.NoWrap;
@@ -190,26 +190,26 @@ namespace Manina.Windows.Forms
                             rt.Width = column.Width - 2 * offset.Width;
                             using (Brush bItemFore = new SolidBrush(Color.White))
                             {
-                                if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
+                                if (column.Type == ColumnType.Rating && ImageListView.RatingImage != null && ImageListView.EmptyRatingImage != null)
                                 {
                                     string srating = item.GetSubItemText(ColumnType.Rating);
                                     if (!string.IsNullOrEmpty(srating))
                                     {
-                                        int w = mImageListView.RatingImage.Width;
-                                        int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                        int w = ImageListView.RatingImage.Width;
+                                        int y = (int)(rt.Top + (rt.Height - ImageListView.RatingImage.Height) / 2.0f);
                                         int rating = item.StarRating;
                                         if (rating < 0) rating = 0;
                                         if (rating > 5) rating = 5;
                                         for (int i = 1; i <= rating; i++)
-                                            g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                            g.DrawImage(ImageListView.RatingImage, rt.Left + (i - 1) * w, y);
                                         for (int i = rating + 1; i <= 5; i++)
-                                            g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                            g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.columnID), ImageListView.Font, bItemFore, rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
                             }
                             rt.X += column.Width;
                         }
@@ -328,7 +328,7 @@ namespace Manina.Windows.Forms
             public override void DrawColumnHeader(Graphics g, ImageListView.ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
             {
                 // Paint background
-                if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
+                if (ImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds,
                         Color.FromArgb(64, 96, 144, 240), Color.FromArgb(196, 96, 144, 240), LinearGradientMode.Vertical))
@@ -359,14 +359,14 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None &&
-                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
-                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
+                if (ImageListView.SortOrder != SortOrder.None &&
+                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
+                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
-                    if (mImageListView.SortOrder == SortOrder.Ascending)
+                    if (ImageListView.SortOrder == SortOrder.Ascending)
                         img = ImageListViewResources.SortAscending;
-                    else if (mImageListView.SortOrder == SortOrder.Descending)
+                    else if (ImageListView.SortOrder == SortOrder.Descending)
                         img = ImageListViewResources.SortDescending;
                     g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
                     textOffset += img.Width;
@@ -386,7 +386,7 @@ namespace Manina.Windows.Forms
                         using (Brush brush = new SolidBrush(Color.White))
                         {
                             g.DrawString(column.Text,
-                                (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont),
+                                (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont),
                                 brush, bounds, sf);
                         }
                     }
@@ -463,10 +463,10 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (ImageListView.Columns.HasType(ColumnType.Name) && ImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         string text = item.GetSubItemText(ColumnType.Name);
-                        int y = Utility.DrawStringPair(g, bounds, "", text, mImageListView.Font,
+                        int y = Utility.DrawStringPair(g, bounds, "", text, ImageListView.Font,
                             Brushes.White, Brushes.White);
                         bounds.Y += 2 * y;
                         bounds.Height -= 2 * y;
@@ -474,20 +474,20 @@ namespace Manina.Windows.Forms
 
                     // File type
                     string fileType = item.GetSubItemText(ColumnType.FileType);
-                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
+                    if (ImageListView.Columns.HasType(ColumnType.FileType) && ImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
                     {
                         using (Brush bCaption = new SolidBrush(Color.FromArgb(196, 196, 196)))
                         using (Brush bText = new SolidBrush(Color.White))
                         {
-                            int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
-                                fileType, mImageListView.Font, bCaption, bText);
+                            int y = Utility.DrawStringPair(g, bounds, ImageListView.Columns[ColumnType.FileType].Text + ": ",
+                                fileType, ImageListView.Font, bCaption, bText);
                             bounds.Y += y;
                             bounds.Height -= y;
                         }
                     }
 
                     // Metatada
-                    foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                    foreach (ImageListView.ImageListViewColumnHeader column in ImageListView.Columns)
                     {
                         if (column.Type == ColumnType.ImageDescription)
                         {
@@ -513,7 +513,7 @@ namespace Manina.Windows.Forms
                                 using (Brush bText = new SolidBrush(Color.White))
                                 {
                                     int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
-                                        mImageListView.Font, bCaption, bText);
+                                        ImageListView.Font, bCaption, bText);
                                     bounds.Y += y;
                                     bounds.Height -= y;
                                 }
@@ -731,7 +731,7 @@ namespace Manina.Windows.Forms
                             {
                                 g.DrawRectangle(pOuterBorder, pos);
                             }
-                            if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
+                            if (System.Math.Min(ImageListView.ThumbnailSize.Width, ImageListView.ThumbnailSize.Height) > 32)
                             {
                                 using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                                 {
@@ -1017,20 +1017,20 @@ namespace Manina.Windows.Forms
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;
 
-                                if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
+                                if (column.Type == ColumnType.Rating && ImageListView.RatingImage != null && ImageListView.EmptyRatingImage != null)
                                 {
-                                    int w = mImageListView.RatingImage.Width;
-                                    int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                    int w = ImageListView.RatingImage.Width;
+                                    int y = (int)(rt.Top + (rt.Height - ImageListView.RatingImage.Height) / 2.0f);
                                     int rating = item.StarRating;
                                     if (rating < 0) rating = 0;
                                     if (rating > 5) rating = 5;
                                     for (int i = 1; i <= rating; i++)
-                                        g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                        g.DrawImage(ImageListView.RatingImage, rt.Left + (i - 1) * w, y);
                                     for (int i = rating + 1; i <= 5; i++)
-                                        g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                        g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.columnID), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
 
@@ -1056,7 +1056,7 @@ namespace Manina.Windows.Forms
                 if (item != null && image != null)
                 {
                     // Calculate image bounds
-                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
                     Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin));
                     // Draw image
                     g.DrawImage(image, pos);
@@ -1094,7 +1094,7 @@ namespace Manina.Windows.Forms
                 if (item != null && image != null)
                 {
                     // Calculate image bounds
-                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
                     Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin), 50.0f, 0.0f);
                     // Draw image
                     g.DrawImage(image, pos);
@@ -1112,13 +1112,13 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (ImageListView.Columns.HasType(ColumnType.Name) && ImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         string text = item.GetSubItemText(ColumnType.Name);
                         using (SolidBrush bLabel = new SolidBrush(SystemColors.GrayText))
                         using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
                         {
-                            int y = Utility.DrawStringPair(g, bounds, "", text, mImageListView.Font, bLabel, bText);
+                            int y = Utility.DrawStringPair(g, bounds, "", text, ImageListView.Font, bLabel, bText);
                             bounds.Y += 2 * y;
                             bounds.Height -= 2 * y;
                         }
@@ -1126,20 +1126,20 @@ namespace Manina.Windows.Forms
 
                     // File type
                     string fileType = item.GetSubItemText(ColumnType.FileType);
-                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
+                    if (ImageListView.Columns.HasType(ColumnType.FileType) && ImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
                     {
                         using (SolidBrush bLabel = new SolidBrush(SystemColors.GrayText))
                         using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
                         {
-                            int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
-                                fileType, mImageListView.Font, bLabel, bText);
+                            int y = Utility.DrawStringPair(g, bounds, ImageListView.Columns[ColumnType.FileType].Text + ": ",
+                                fileType, ImageListView.Font, bLabel, bText);
                             bounds.Y += y;
                             bounds.Height -= y;
                         }
                     }
 
                     // Metatada
-                    foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                    foreach (ImageListView.ImageListViewColumnHeader column in ImageListView.Columns)
                     {
                         if (column.Type == ColumnType.ImageDescription)
                         {
@@ -1165,7 +1165,7 @@ namespace Manina.Windows.Forms
                                 using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
                                 {
                                     int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
-                                        mImageListView.Font, bLabel, bText);
+                                        ImageListView.Font, bLabel, bText);
                                     bounds.Y += y;
                                     bounds.Height -= y;
                                 }
@@ -1184,7 +1184,7 @@ namespace Manina.Windows.Forms
             public override void DrawColumnHeader(Graphics g, ImageListView.ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
             {
                 // Paint background
-                if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
+                if (ImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, Color.FromArgb(16, SystemColors.Highlight), Color.FromArgb(64, SystemColors.Highlight), LinearGradientMode.Vertical))
                     {
@@ -1212,14 +1212,14 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None &&
-                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
-                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
+                if (ImageListView.SortOrder != SortOrder.None &&
+                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
+                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
-                    if (mImageListView.SortOrder == SortOrder.Ascending)
+                    if (ImageListView.SortOrder == SortOrder.Ascending)
                         img = ImageListViewResources.SortAscending;
-                    else if (mImageListView.SortOrder == SortOrder.Descending)
+                    else if (ImageListView.SortOrder == SortOrder.Descending)
                         img = ImageListViewResources.SortDescending;
                     if (img != null)
                     {
@@ -1241,7 +1241,7 @@ namespace Manina.Windows.Forms
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
                         {
-                            g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), bText, bounds, sf);
+                            g.DrawString(column.Text, (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont), bText, bounds, sf);
                         }
                     }
                 }
@@ -1350,8 +1350,6 @@ namespace Manina.Windows.Forms
             {
                 base.InitializeGraphics(g);
 
-                Clip = false;
-
                 ItemDrawOrder = ItemDrawOrder.NormalSelectedHovered;
             }
             /// <summary>
@@ -1375,20 +1373,23 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
             public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
-                if (ImageListView.View == Manina.Windows.Forms.View.Thumbnails)
+                Clip = (ImageListView.View == Manina.Windows.Forms.View.Details);
+
+                if (ImageListView.View != Manina.Windows.Forms.View.Details)
                 {
                     // Zoom on mouse over
                     if ((state & ItemState.Hovered) != ItemState.None)
                     {
                         bounds.Inflate((int)(bounds.Width * mZoomRatio), (int)(bounds.Height * mZoomRatio));
-                        if (bounds.Bottom > ItemAreaBounds.Bottom)
-                            bounds.Y = ItemAreaBounds.Bottom - bounds.Height;
-                        if (bounds.Top < ItemAreaBounds.Top)
-                            bounds.Y = ItemAreaBounds.Top;
-                        if (bounds.Right > ItemAreaBounds.Right)
-                            bounds.X = ItemAreaBounds.Right - bounds.Width;
-                        if (bounds.Left < ItemAreaBounds.Left)
-                            bounds.X = ItemAreaBounds.Left;
+                        Rectangle controlBounds = ImageListView.ClientRectangle;
+                        if (bounds.Bottom > controlBounds.Bottom)
+                            bounds.Y = controlBounds.Bottom - bounds.Height;
+                        if (bounds.Top < controlBounds.Top)
+                            bounds.Y = controlBounds.Top;
+                        if (bounds.Right > controlBounds.Right)
+                            bounds.X = controlBounds.Right - bounds.Width;
+                        if (bounds.Left < controlBounds.Left)
+                            bounds.X = controlBounds.Left;
                     }
 
                     // Get item image

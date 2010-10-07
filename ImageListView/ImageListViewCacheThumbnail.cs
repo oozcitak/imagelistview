@@ -37,8 +37,10 @@ namespace Manina.Windows.Forms
         private Dictionary<Guid, CacheItem> thumbCache;
         private Dictionary<Guid, bool> processing;
         private Guid processingRendererItem;
+        private Guid processingGalleryItem;
         private Dictionary<Guid, bool> editCache;
         private CacheItem rendererItem;
+        private CacheItem galleryItem;
 
         private List<Guid> removedItems;
 
@@ -257,8 +259,10 @@ namespace Manina.Windows.Forms
             editCache = new Dictionary<Guid, bool>();
             processing = new Dictionary<Guid, bool>();
             processingRendererItem = Guid.Empty;
+            processingGalleryItem = Guid.Empty;
 
             rendererItem = null;
+            galleryItem = null;
 
             MemoryUsed = 0;
             MemoryUsedByRemoved = 0;
@@ -337,11 +341,14 @@ namespace Manina.Windows.Forms
         {
             CacheItem request = e.UserState as CacheItem;
             CacheItem result = e.Result as CacheItem;
-            bool rendererRequest = (e.Priority > 0);
+            bool rendererRequest = (e.Priority == 1);
+            bool galleryRequest = (e.Priority == 2);
 
             // We are done processing
             if (rendererRequest)
                 processingRendererItem = Guid.Empty;
+            else if (galleryRequest)
+                processingGalleryItem = Guid.Empty;
             else
                 processing.Remove(request.Guid);
 
@@ -354,12 +361,19 @@ namespace Manina.Windows.Forms
             // images in gallery and pane views and images requested with
             // the ImageListViewRenderer.GetImageAsync method.
             // Items with 0 priority are regular thumbnails.
-            if (e.Priority > 0)
+            if (e.Priority == 1)
             {
                 if (rendererItem != null)
                     rendererItem.Dispose();
 
                 rendererItem = result;
+            }
+            else if (e.Priority == 2)
+            {
+                if (galleryItem != null)
+                    galleryItem.Dispose();
+
+                galleryItem = result;
             }
             else if (result != null)
             {
@@ -407,10 +421,11 @@ namespace Manina.Windows.Forms
         {
             CacheItem request = e.Argument as CacheItem;
             Guid guid = request.Guid;
-            bool rendererRequest = (e.Priority > 0);
+            bool rendererRequest = (e.Priority == 1);
+            bool galleryRequest = (e.Priority == 2);
 
             // Is it already cached?
-            if (!rendererRequest)
+            if (!rendererRequest && !galleryRequest)
             {
                 CacheItem existing = GetFromCacheCallback(guid);
                 if (existing != null && existing.Size == CurrentThumbnailSize)
@@ -428,7 +443,7 @@ namespace Manina.Windows.Forms
             }
 
             // Is it outside the visible area?
-            if (!rendererRequest && (CacheMode == CacheMode.OnDemand) && !IsItemVisibleCallback(guid))
+            if (!rendererRequest && !galleryRequest && (CacheMode == CacheMode.OnDemand) && !IsItemVisibleCallback(guid))
             {
                 e.Cancel = true;
                 return;
@@ -785,6 +800,48 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Adds the image to the gallery cache queue.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="filename">Filesystem path to the image file.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        public void AddToGalleryCache(Guid guid, string filename,
+            Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            // Already cached?
+            if (galleryItem != null && galleryItem.Guid == guid &&
+                galleryItem.Size == thumbSize &&
+                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                return;
+
+            // Add to cache queue
+            RunWorker(new CacheItem(guid, filename,
+                thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate), 2);
+        }
+        /// <summary>
+        /// Adds the virtual item image to the gallery cache queue.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="key">The key of this item.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        public void AddToGalleryCache(Guid guid, object key, Size thumbSize,
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+        {
+            // Already cached?
+            if (galleryItem != null && galleryItem.Guid == guid &&
+                galleryItem.Size == thumbSize &&
+                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                return;
+
+            // Add to cache queue
+            RunWorker(new CacheItem(guid, key, thumbSize,
+                null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate), 2);
+        }
+        /// <summary>
         /// Adds the image to the renderer cache queue.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
@@ -840,6 +897,23 @@ namespace Manina.Windows.Forms
                 rendererItem.Size == thumbSize &&
                 rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
                 return rendererItem.Image;
+            else
+                return null;
+        }
+        /// <summary>
+        /// Gets the image from the gallery cache. If the image is not cached,
+        /// null will be returned.
+        /// </summary>
+        /// <param name="guid">The guid representing this item.</param>
+        /// <param name="thumbSize">Requested thumbnail size.</param>
+        /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
+        public Image GetGalleryImage(Guid guid, Size thumbSize,
+            UseEmbeddedThumbnails useEmbeddedThumbnails)
+        {
+            if (galleryItem != null && galleryItem.Guid == guid &&
+                galleryItem.Size == thumbSize &&
+                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                return galleryItem.Image;
             else
                 return null;
         }

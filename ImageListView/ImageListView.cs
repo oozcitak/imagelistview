@@ -915,7 +915,7 @@ namespace Manina.Windows.Forms
                 mRenderer.Dispose();
 
             mRenderer = renderer;
-            mRenderer.mImageListView = this;
+            mRenderer.ImageListView = this;
             if (layoutManager != null)
                 layoutManager.Update(true);
 

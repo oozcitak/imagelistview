@@ -40,11 +40,8 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Member Variables
-            private bool mClip;
-            internal ImageListView mImageListView;
             private BufferedGraphics bufferGraphics;
             private bool disposed;
-            private ItemDrawOrder mItemDrawOrder;
             private bool creatingGraphics;
             private DateTime lastRenderTime;
             #endregion
@@ -53,24 +50,28 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the ImageListView owning this item.
             /// </summary>
-            public ImageListView ImageListView { get { return mImageListView; } }
+            public ImageListView ImageListView { get; internal set; }
             /// <summary>
             /// Gets or sets whether the graphics is clipped to the bounds of 
             /// drawing elements.
             /// </summary>
-            public bool Clip { get { return mClip; } set { mClip = value; } }
+            public bool Clip { get; set; }
             /// <summary>
             /// Gets or sets the order by which items are drawn.
             /// </summary>
-            public ItemDrawOrder ItemDrawOrder { get { return mItemDrawOrder; } set { mItemDrawOrder = value; } }
+            public ItemDrawOrder ItemDrawOrder { get; set; }
+            /// <summary>
+            /// Gets or sets whether items are drawn before of after headers and the gallery images.
+            /// </summary>
+            public bool ItemsDrawnFirst { get; set; }
             /// <summary>
             /// Gets the rectangle bounding the item display area.
             /// </summary>
-            public Rectangle ItemAreaBounds { get { return mImageListView.layoutManager.ItemAreaBounds; } }
+            public Rectangle ItemAreaBounds { get { return ImageListView.layoutManager.ItemAreaBounds; } }
             /// <summary>
             /// Gets the rectangle bounding the column headers.
             /// </summary>
-            public Rectangle ColumnHeaderBounds { get { return mImageListView.layoutManager.ColumnHeaderBounds; } }
+            public Rectangle ColumnHeaderBounds { get { return ImageListView.layoutManager.ColumnHeaderBounds; } }
             /// <summary>
             /// Gets a value indicating whether this renderer can apply custom colors.
             /// </summary>
@@ -89,8 +90,9 @@ namespace Manina.Windows.Forms
             {
                 creatingGraphics = false;
                 disposed = false;
-                mClip = true;
-                mItemDrawOrder = ItemDrawOrder.ItemIndex;
+                Clip = true;
+                ItemsDrawnFirst = false;
+                ItemDrawOrder = ItemDrawOrder.ItemIndex;
                 lastRenderTime = DateTime.MinValue;
             }
             #endregion
@@ -299,16 +301,16 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Image GetImageAsync(ImageListViewItem item, Size size)
             {
-                Image img = mImageListView.thumbnailCache.GetRendererImage(item.Guid, size, mImageListView.UseEmbeddedThumbnails);
+                Image img = ImageListView.thumbnailCache.GetRendererImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails);
 
                 if (img == null)
                 {
                     if (item.isVirtualItem)
-                        mImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.VirtualItemKey,
-                            size, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                        ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.VirtualItemKey,
+                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
                     else
-                        mImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.FileName, size,
-                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
+                        ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.FileName, size,
+                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
                 }
 
                 return img;
@@ -317,8 +319,342 @@ namespace Manina.Windows.Forms
 
             #region Internal Methods
             /// <summary>
+            /// Renders the background of the control.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderBackground(Graphics g)
+            {
+                g.SetClip(ImageListView.layoutManager.ClientArea);
+                DrawBackground(g, ImageListView.layoutManager.ClientArea);
+            }
+            /// <summary>
+            /// Renders the column header.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderColumnHeaders(Graphics g)
+            {
+                if (ImageListView.View != View.Details)
+                    return;
+
+                int x = ImageListView.layoutManager.ColumnHeaderBounds.Left;
+                int y = ImageListView.layoutManager.ColumnHeaderBounds.Top;
+                int h = MeasureColumnHeaderHeight();
+                int lastX = 0;
+                foreach (ImageListViewColumnHeader column in ImageListView.Columns.GetDisplayedColumns())
+                {
+                    ColumnState state = ColumnState.None;
+                    if (ReferenceEquals(ImageListView.navigationManager.HoveredColumn, column))
+                        state |= ColumnState.Hovered;
+                    if (ReferenceEquals(ImageListView.navigationManager.HoveredSeparator, column))
+                        state |= ColumnState.SeparatorHovered;
+                    if (ReferenceEquals(ImageListView.navigationManager.SelectedSeparator, column))
+                        state |= ColumnState.SeparatorSelected;
+
+                    Rectangle bounds = new Rectangle(x, y, column.Width, h);
+                    if (Clip)
+                    {
+                        Rectangle clip = Rectangle.Intersect(bounds, ImageListView.layoutManager.ClientArea);
+                        g.SetClip(clip);
+                    }
+                    else
+                        g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                    DrawColumnHeader(g, column, state, bounds);
+
+                    x += column.Width;
+                    lastX = bounds.Right;
+                }
+
+                // Extender column
+                if (ImageListView.Columns.Count != 0)
+                {
+                    if (lastX < ImageListView.layoutManager.ClientArea.Right)
+                    {
+                        Rectangle extender = new Rectangle(
+                            lastX,
+                            ImageListView.layoutManager.ColumnHeaderBounds.Top,
+                            ImageListView.layoutManager.ClientArea.Right - lastX,
+                            ImageListView.layoutManager.ColumnHeaderBounds.Height);
+                        if (Clip)
+                            g.SetClip(extender);
+                        else
+                            g.SetClip(ImageListView.layoutManager.ClientArea);
+                        DrawColumnExtender(g, extender);
+                    }
+                }
+                else
+                {
+                    Rectangle extender = ImageListView.layoutManager.ColumnHeaderBounds;
+                    if (Clip)
+                        g.SetClip(extender);
+                    else
+                        g.SetClip(ImageListView.layoutManager.ClientArea);
+                    DrawColumnExtender(g, extender);
+                }
+            }
+            /// <summary>
+            /// Renders the large gallery image.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderGalleryImage(Graphics g)
+            {
+                if (ImageListView.View != View.Gallery)
+                    return;
+
+                Rectangle bounds = ImageListView.layoutManager.ClientArea;
+                bounds.Height -= ImageListView.layoutManager.ItemAreaBounds.Height;
+
+                ImageListViewItem item = null;
+                if (ImageListView.Items.FocusedItem != null)
+                    item = ImageListView.Items.FocusedItem;
+                else if (ImageListView.SelectedItems.Count != 0)
+                    item = ImageListView.SelectedItems[0];
+                else if (ImageListView.Items.Count != 0)
+                    item = ImageListView.Items[0];
+
+                Image image = null;
+                if (item != null && bounds.Width > 4 && bounds.Height > 4)
+                {
+                    image = GetGalleryImageAsync(item, bounds.Size);
+                    if (image == null) image = item.GetCachedImage(CachedImageType.Thumbnail);
+                }
+
+                if (Clip)
+                    g.SetClip(bounds);
+                else
+                    g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                DrawGalleryImage(g, item, image, bounds);
+            }
+            /// <summary>
+            /// Renders the pane.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderPane(Graphics g)
+            {
+                if (ImageListView.View != View.Pane)
+                    return;
+
+                Rectangle bounds = ImageListView.layoutManager.ClientArea;
+                bounds.Width = ImageListView.mPaneWidth;
+
+                ImageListViewItem item = null;
+                if (ImageListView.Items.FocusedItem != null)
+                    item = ImageListView.Items.FocusedItem;
+                else if (ImageListView.SelectedItems.Count != 0)
+                    item = ImageListView.SelectedItems[0];
+                else if (ImageListView.Items.Count != 0)
+                    item = ImageListView.Items[0];
+
+                Image image = null;
+                if (item != null && bounds.Width > 4 && bounds.Height > 4)
+                {
+                    image = GetGalleryImageAsync(item, new Size(bounds.Width, 65535));
+                    if (image == null) image = item.GetCachedImage(CachedImageType.Thumbnail);
+                }
+
+                if (Clip)
+                    g.SetClip(bounds);
+                else
+                    g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                DrawPane(g, item, image, bounds);
+            }
+            /// <summary>
+            /// Renders the items.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderItems(Graphics g)
+            {
+                // Is the control empty?
+                if (ImageListView.Items.Count == 0)
+                    return;
+                // No items visible?
+                if (ImageListView.layoutManager.FirstPartiallyVisible == -1 ||
+                    ImageListView.layoutManager.LastPartiallyVisible == -1)
+                    return;
+                // No columns displayed?
+                if (ImageListView.View == View.Details && ImageListView.Columns.GetDisplayedColumns().Count == 0)
+                    return;
+
+                List<DrawItemParams> drawItemParams = new List<DrawItemParams>();
+                for (int i = ImageListView.layoutManager.FirstPartiallyVisible; i <= ImageListView.layoutManager.LastPartiallyVisible; i++)
+                {
+                    ImageListViewItem item = ImageListView.Items[i];
+
+                    // Determine item state
+                    ItemState state = ItemState.None;
+                    ItemHighlightState highlightState = ImageListView.navigationManager.HighlightState(item);
+                    if (highlightState == ItemHighlightState.HighlightedAndSelected ||
+                        (highlightState == ItemHighlightState.NotHighlighted && item.Selected))
+                        state |= ItemState.Selected;
+
+                    if (ReferenceEquals(ImageListView.navigationManager.HoveredItem, item) &&
+                        ImageListView.navigationManager.MouseSelecting == false)
+                        state |= ItemState.Hovered;
+
+                    if (item.Focused)
+                        state |= ItemState.Focused;
+
+                    // Get item bounds
+                    Rectangle bounds = ImageListView.layoutManager.GetItemBounds(i);
+
+                    // Add to params to be sorted and drawn
+                    drawItemParams.Add(new DrawItemParams(item, state, bounds));
+                }
+
+                // Sort items by draw order
+                drawItemParams.Sort(new ItemDrawOrderComparer(ItemDrawOrder));
+
+                // Draw items
+                foreach (DrawItemParams param in drawItemParams)
+                {
+                    if (Clip)
+                    {
+                        Rectangle clip = Rectangle.Intersect(param.Bounds, ImageListView.layoutManager.ItemAreaBounds);
+                        g.SetClip(clip);
+                    }
+                    else
+                        g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                    // Draw the item
+                    DrawItem(g, param.Item, param.State, param.Bounds);
+
+                    // Draw sub item overlays
+                    if (ImageListView.View == View.Details)
+                    {
+                        int xc1 = ImageListView.layoutManager.ColumnHeaderBounds.Left;
+                        int colIndex = 0;
+                        foreach (ImageListViewColumnHeader column in ImageListView.Columns.GetDisplayedColumns())
+                        {
+                            Rectangle subBounds = new Rectangle(xc1, param.Bounds.Y, column.Width, param.Bounds.Height);
+                            if (Clip)
+                            {
+                                Rectangle clip = Rectangle.Intersect(subBounds, ImageListView.layoutManager.ItemAreaBounds);
+                                g.SetClip(clip);
+                            }
+
+                            // Check if the mouse is over the sub item
+                            bool subItemHovered = ((param.State & ItemState.Hovered) != ItemState.None) &&
+                                (ImageListView.navigationManager.HoveredSubItem == colIndex);
+
+                            DrawSubItemItemOverlay(g, param.Item, param.State, colIndex, subItemHovered, subBounds);
+
+                            colIndex++;
+                            xc1 += column.Width;
+                        }
+                    }
+
+                    // Draw the checkbox and file icon
+                    if (ImageListView.ShowCheckBoxes)
+                    {
+                        Rectangle cBounds = ImageListView.layoutManager.GetCheckBoxBounds(param.Item.Index);
+                        if (Clip)
+                        {
+                            Rectangle clip = Rectangle.Intersect(cBounds, ImageListView.layoutManager.ItemAreaBounds);
+                            g.SetClip(clip);
+                        }
+                        else
+                            g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                        DrawCheckBox(g, param.Item, cBounds);
+                    }
+                    if (ImageListView.ShowFileIcons)
+                    {
+                        Rectangle cBounds = ImageListView.layoutManager.GetIconBounds(param.Item.Index);
+                        if (Clip)
+                        {
+                            Rectangle clip = Rectangle.Intersect(cBounds, ImageListView.layoutManager.ItemAreaBounds);
+                            g.SetClip(clip);
+                        }
+                        else
+                            g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                        DrawFileIcon(g, param.Item, cBounds);
+                    }
+                }
+            }
+            /// <summary>
+            /// Renders the overlay.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderOverlay(Graphics g)
+            {
+                g.SetClip(ImageListView.layoutManager.ClientArea);
+                DrawOverlay(g, ImageListView.layoutManager.ClientArea);
+            }
+            /// <summary>
+            /// Renders the drag-drop insertion caret.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderInsertionCaret(Graphics g)
+            {
+                if (ImageListView.navigationManager.DropTarget == null)
+                    return;
+
+                Rectangle bounds = ImageListView.layoutManager.GetItemBounds(ImageListView.navigationManager.DropTarget.Index);
+                if (ImageListView.View == View.Details)
+                {
+                    if (ImageListView.navigationManager.DropToRight)
+                        bounds.Offset(0, ImageListView.layoutManager.ItemSizeWithMargin.Height);
+                    bounds.Offset(0, -1);
+                    bounds.Height = 2;
+                }
+                else
+                {
+                    if (ImageListView.navigationManager.DropToRight)
+                        bounds.Offset(ImageListView.layoutManager.ItemSizeWithMargin.Width, 0);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
+                    bounds.Offset(-(itemMargin.Width - 2) / 2 - 2, 0);
+                    bounds.Width = 2;
+                }
+                if (Clip)
+                    g.SetClip(bounds);
+                else
+                    g.SetClip(ImageListView.layoutManager.ClientArea);
+                DrawInsertionCaret(g, bounds);
+            }
+            /// <summary>
+            /// Renders the selection rectangle.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderSelectionRectangle(Graphics g)
+            {
+                if (!ImageListView.navigationManager.MouseSelecting)
+                    return;
+
+                Rectangle sel = ImageListView.navigationManager.SelectionRectangle;
+                if (sel.Height > 0 && sel.Width > 0)
+                {
+                    if (Clip)
+                    {
+                        Rectangle selclip = new Rectangle(sel.Left, sel.Top, sel.Width + 1, sel.Height + 1);
+                        g.SetClip(selclip);
+                    }
+                    else
+                        g.SetClip(ImageListView.layoutManager.ClientArea);
+                    g.ExcludeClip(ImageListView.layoutManager.ColumnHeaderBounds);
+                    DrawSelectionRectangle(g, sel);
+                }
+            }
+            /// <summary>
+            /// Renders the area between scrollbars.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderScrollbarFiller(Graphics g)
+            {
+                if (!ImageListView.hScrollBar.Visible || !ImageListView.vScrollBar.Visible)
+                    return;
+
+                Rectangle bounds = ImageListView.layoutManager.ClientArea;
+                Rectangle filler = new Rectangle(bounds.Right, bounds.Bottom, ImageListView.vScrollBar.Width, ImageListView.hScrollBar.Height);
+                g.SetClip(filler);
+                g.FillRectangle(SystemBrushes.Control, filler);
+            }
+            /// <summary>
             /// Renders the control.
             /// </summary>
+            /// <param name="graphics">The graphics to draw on.</param>
             internal void Render(Graphics graphics)
             {
                 if (disposed) return;
@@ -329,298 +665,69 @@ namespace Manina.Windows.Forms
                 }
 
                 // Update the layout
-                mImageListView.layoutManager.Update();
+                ImageListView.layoutManager.Update();
 
                 // Set drawing area
                 Graphics g = bufferGraphics.Graphics;
                 g.ResetClip();
 
                 // Draw background
-                g.SetClip(mImageListView.layoutManager.ClientArea);
-                DrawBackground(g, mImageListView.layoutManager.ClientArea);
+                RenderBackground(g);
 
-                // Draw column headers
-                if (mImageListView.View == View.Details)
+                // Draw items if they should be drawn first
+                bool itemsDrawn = false;
+                if (ItemsDrawnFirst)
                 {
-                    int x = mImageListView.layoutManager.ColumnHeaderBounds.Left;
-                    int y = mImageListView.layoutManager.ColumnHeaderBounds.Top;
-                    int h = MeasureColumnHeaderHeight();
-                    int lastX = 0;
-                    foreach (ImageListViewColumnHeader column in mImageListView.Columns.GetDisplayedColumns())
-                    {
-                        ColumnState state = ColumnState.None;
-                        if (ReferenceEquals(mImageListView.navigationManager.HoveredColumn, column))
-                            state |= ColumnState.Hovered;
-                        if (ReferenceEquals(mImageListView.navigationManager.HoveredSeparator, column))
-                            state |= ColumnState.SeparatorHovered;
-                        if (ReferenceEquals(mImageListView.navigationManager.SelectedSeparator, column))
-                            state |= ColumnState.SeparatorSelected;
-
-                        Rectangle bounds = new Rectangle(x, y, column.Width, h);
-                        if (mClip)
-                        {
-                            Rectangle clip = Rectangle.Intersect(bounds, mImageListView.layoutManager.ClientArea);
-                            g.SetClip(clip);
-                        }
-                        else
-                            g.SetClip(mImageListView.layoutManager.ClientArea);
-
-                        DrawColumnHeader(g, column, state, bounds);
-
-                        x += column.Width;
-                        lastX = bounds.Right;
-                    }
-
-                    // Extender column
-                    if (mImageListView.Columns.Count != 0)
-                    {
-                        if (lastX < mImageListView.layoutManager.ClientArea.Right)
-                        {
-                            Rectangle extender = new Rectangle(
-                                lastX,
-                                mImageListView.layoutManager.ColumnHeaderBounds.Top,
-                                mImageListView.layoutManager.ClientArea.Right - lastX,
-                                mImageListView.layoutManager.ColumnHeaderBounds.Height);
-                            if (mClip)
-                                g.SetClip(extender);
-                            else
-                                g.SetClip(mImageListView.layoutManager.ClientArea);
-                            DrawColumnExtender(g, extender);
-                        }
-                    }
-                    else
-                    {
-                        Rectangle extender = mImageListView.layoutManager.ColumnHeaderBounds;
-                        if (mClip)
-                            g.SetClip(extender);
-                        else
-                            g.SetClip(mImageListView.layoutManager.ClientArea);
-                        DrawColumnExtender(g, extender);
-                    }
-                }
-
-                // Draw items
-                if (mImageListView.Items.Count > 0 &&
-                    (mImageListView.View != View.Details ||
-                    (mImageListView.View == View.Details && mImageListView.Columns.GetDisplayedColumns().Count != 0)) &&
-                    mImageListView.layoutManager.FirstPartiallyVisible != -1 &&
-                    mImageListView.layoutManager.LastPartiallyVisible != -1)
-                {
-                    List<DrawItemParams> drawItemParams = new List<DrawItemParams>();
-                    for (int i = mImageListView.layoutManager.FirstPartiallyVisible; i <= mImageListView.layoutManager.LastPartiallyVisible; i++)
-                    {
-                        ImageListViewItem item = mImageListView.Items[i];
-
-                        // Determine item state
-                        ItemState state = ItemState.None;
-                        ItemHighlightState highlightState = mImageListView.navigationManager.HighlightState(item);
-                        if (highlightState == ItemHighlightState.HighlightedAndSelected ||
-                            (highlightState == ItemHighlightState.NotHighlighted && item.Selected))
-                            state |= ItemState.Selected;
-
-                        if (ReferenceEquals(mImageListView.navigationManager.HoveredItem, item) &&
-                            mImageListView.navigationManager.MouseSelecting == false)
-                            state |= ItemState.Hovered;
-
-                        if (item.Focused)
-                            state |= ItemState.Focused;
-
-                        // Get item bounds
-                        Rectangle bounds = mImageListView.layoutManager.GetItemBounds(i);
-
-                        // Add to params to be sorted and drawn
-                        drawItemParams.Add(new DrawItemParams(item, state, bounds));
-                    }
-
-                    // Sort items by draw order
-                    drawItemParams.Sort(new ItemDrawOrderComparer(mItemDrawOrder));
-
-                    // Draw items
-                    foreach (DrawItemParams param in drawItemParams)
-                    {
-                        if (mClip)
-                        {
-                            Rectangle clip = Rectangle.Intersect(param.Bounds, mImageListView.layoutManager.ItemAreaBounds);
-                            g.SetClip(clip);
-                        }
-                        else
-                            g.SetClip(mImageListView.layoutManager.ClientArea);
-
-                        // Draw the item
-                        DrawItem(g, param.Item, param.State, param.Bounds);
-
-                        // Draw sub item overlays
-                        if (mImageListView.View == View.Details)
-                        {
-                            int xc1 = mImageListView.layoutManager.ColumnHeaderBounds.Left;
-                            int colIndex = 0;
-                            foreach (ImageListViewColumnHeader column in mImageListView.Columns.GetDisplayedColumns())
-                            {
-                                Rectangle subBounds = new Rectangle(xc1, param.Bounds.Y, column.Width, param.Bounds.Height);
-                                if (mClip)
-                                {
-                                    Rectangle clip = Rectangle.Intersect(subBounds, mImageListView.layoutManager.ItemAreaBounds);
-                                    g.SetClip(clip);
-                                }
-
-                                // Check if the mouse is over the sub item
-                                bool subItemHovered = ((param.State & ItemState.Hovered) != ItemState.None) &&
-                                    (mImageListView.navigationManager.HoveredSubItem == colIndex);
-
-                                DrawSubItemItemOverlay(g, param.Item, param.State, colIndex, subItemHovered, subBounds);
-
-                                colIndex++;
-                                xc1 += column.Width;
-                            }
-                        }
-
-                        // Draw the checkbox and file icon
-                        if (ImageListView.ShowCheckBoxes)
-                        {
-                            Rectangle cBounds = ImageListView.layoutManager.GetCheckBoxBounds(param.Item.Index);
-                            if (mClip)
-                            {
-                                Rectangle clip = Rectangle.Intersect(cBounds, mImageListView.layoutManager.ItemAreaBounds);
-                                g.SetClip(clip);
-                            }
-                            else
-                                g.SetClip(mImageListView.layoutManager.ClientArea);
-
-                            DrawCheckBox(g, param.Item, cBounds);
-                        }
-                        if (ImageListView.ShowFileIcons)
-                        {
-                            Rectangle cBounds = ImageListView.layoutManager.GetIconBounds(param.Item.Index);
-                            if (mClip)
-                            {
-                                Rectangle clip = Rectangle.Intersect(cBounds, mImageListView.layoutManager.ItemAreaBounds);
-                                g.SetClip(clip);
-                            }
-                            else
-                                g.SetClip(mImageListView.layoutManager.ClientArea);
-
-                            DrawFileIcon(g, param.Item, cBounds);
-                        }
-                    }
+                    RenderItems(g);
+                    itemsDrawn = true;
                 }
 
                 // Draw the large preview image in Gallery mode
-                if (mImageListView.View == View.Gallery)
-                {
-                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
-                    bounds.Height -= mImageListView.layoutManager.ItemAreaBounds.Height;
-
-                    ImageListViewItem item = null;
-                    if (mImageListView.Items.FocusedItem != null)
-                        item = mImageListView.Items.FocusedItem;
-                    else if (mImageListView.SelectedItems.Count != 0)
-                        item = mImageListView.SelectedItems[0];
-                    else if (mImageListView.Items.Count != 0)
-                        item = mImageListView.Items[0];
-
-                    Image image = null;
-                    if (item != null && bounds.Width > 4 && bounds.Height > 4)
-                    {
-                        image = GetImageAsync(item, bounds.Size);
-                        if (image == null) image = item.GetCachedImage(CachedImageType.Thumbnail);
-                    }
-
-                    if (mClip)
-                        g.SetClip(bounds);
-                    else
-                        g.SetClip(mImageListView.layoutManager.ClientArea);
-
-                    DrawGalleryImage(g, item, image, bounds);
-                }
+                RenderGalleryImage(g);
 
                 // Draw the left-pane
-                if (mImageListView.View == View.Pane)
-                {
-                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
-                    bounds.Width = mImageListView.mPaneWidth;
+                RenderPane(g);
 
-                    ImageListViewItem item = null;
-                    if (mImageListView.Items.FocusedItem != null)
-                        item = mImageListView.Items.FocusedItem;
-                    else if (mImageListView.SelectedItems.Count != 0)
-                        item = mImageListView.SelectedItems[0];
-                    else if (mImageListView.Items.Count != 0)
-                        item = mImageListView.Items[0];
+                // Draw column headers
+                RenderColumnHeaders(g);
 
-                    Image image = null;
-                    if (item != null && bounds.Width > 4 && bounds.Height > 4)
-                    {
-                        image = GetImageAsync(item, new Size(bounds.Width, 65535));
-                        if (image == null) image = item.GetCachedImage(CachedImageType.Thumbnail);
-                    }
-
-                    if (mClip)
-                        g.SetClip(bounds);
-                    else
-                        g.SetClip(mImageListView.layoutManager.ClientArea);
-
-                    DrawPane(g, item, image, bounds);
-                }
+                // Draw items if they should be drawn last.
+                if (!itemsDrawn)
+                    RenderItems(g);
 
                 // Draw the overlay image
-                g.SetClip(mImageListView.layoutManager.ClientArea);
-                DrawOverlay(g, mImageListView.layoutManager.ClientArea);
+                RenderOverlay(g);
 
                 // Draw the selection rectangle
-                if (mImageListView.navigationManager.MouseSelecting)
-                {
-                    Rectangle sel = mImageListView.navigationManager.SelectionRectangle;
-                    if (sel.Height > 0 && sel.Width > 0)
-                    {
-                        if (mClip)
-                        {
-                            Rectangle selclip = new Rectangle(sel.Left, sel.Top, sel.Width + 1, sel.Height + 1);
-                            g.SetClip(selclip);
-                        }
-                        else
-                            g.SetClip(mImageListView.layoutManager.ClientArea);
-                        g.ExcludeClip(mImageListView.layoutManager.ColumnHeaderBounds);
-                        DrawSelectionRectangle(g, sel);
-                    }
-                }
+                RenderSelectionRectangle(g);
 
                 // Draw the insertion caret
-                if (mImageListView.navigationManager.DropTarget != null)
-                {
-                    Rectangle bounds = mImageListView.layoutManager.GetItemBounds(mImageListView.navigationManager.DropTarget.Index);
-                    if (mImageListView.View == View.Details)
-                    {
-                        if (mImageListView.navigationManager.DropToRight)
-                            bounds.Offset(0, mImageListView.layoutManager.ItemSizeWithMargin.Height);
-                        bounds.Offset(0, -1);
-                        bounds.Height = 2;
-                    }
-                    else
-                    {
-                        if (mImageListView.navigationManager.DropToRight)
-                            bounds.Offset(mImageListView.layoutManager.ItemSizeWithMargin.Width, 0);
-                        Size itemMargin = MeasureItemMargin(mImageListView.View);
-                        bounds.Offset(-(itemMargin.Width - 2) / 2 - 2, 0);
-                        bounds.Width = 2;
-                    }
-                    if (mClip)
-                        g.SetClip(bounds);
-                    else
-                        g.SetClip(mImageListView.layoutManager.ClientArea);
-                    DrawInsertionCaret(g, bounds);
-                }
+                RenderInsertionCaret(g);
 
                 // Scrollbar filler
-                if (mImageListView.hScrollBar.Visible && mImageListView.vScrollBar.Visible)
-                {
-                    Rectangle bounds = mImageListView.layoutManager.ClientArea;
-                    Rectangle filler = new Rectangle(bounds.Right, bounds.Bottom, mImageListView.vScrollBar.Width, mImageListView.hScrollBar.Height);
-                    g.SetClip(filler);
-                    g.FillRectangle(SystemBrushes.Control, filler);
-                }
+                RenderScrollbarFiller(g);
 
                 // Draw on to the control
                 bufferGraphics.Render(graphics);
+            }
+            /// <summary>
+            /// Loads and returns the large gallery image for the given item.
+            /// </summary>
+            private Image GetGalleryImageAsync(ImageListViewItem item, Size size)
+            {
+                Image img = ImageListView.thumbnailCache.GetGalleryImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails);
+
+                if (img == null)
+                {
+                    if (item.isVirtualItem)
+                        ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.VirtualItemKey,
+                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                    else
+                        ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.FileName, size,
+                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                }
+
+                return img;
             }
             /// <summary>
             /// Clears the graphics buffer objects.
@@ -647,8 +754,8 @@ namespace Manina.Windows.Forms
                 if (disposed)
                     throw (new ObjectDisposedException("bufferContext"));
 
-                int width = System.Math.Max(mImageListView.Width, 1);
-                int height = System.Math.Max(mImageListView.Height, 1);
+                int width = System.Math.Max(ImageListView.Width, 1);
+                int height = System.Math.Max(ImageListView.Height, 1);
 
                 bufferContext.MaximumBuffer = new Size(width, height);
 
@@ -704,10 +811,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public virtual int MeasureColumnHeaderHeight()
             {
-                if (mImageListView.disposed || mImageListView.HeaderFont == null)
+                if (ImageListView.disposed || ImageListView.HeaderFont == null)
                     return 24;
                 else
-                    return System.Math.Max(mImageListView.HeaderFont.Height + 4, 24);
+                    return System.Math.Max(ImageListView.HeaderFont.Height + 4, 24);
             }
             /// <summary>
             /// Returns the spacing between items for the given view mode.
@@ -729,13 +836,13 @@ namespace Manina.Windows.Forms
                 Size itemSize = new Size();
 
                 // Reference text height
-                int textHeight = mImageListView.Font.Height;
+                int textHeight = ImageListView.Font.Height;
 
                 if (view == View.Details)
                 {
                     // Calculate total column width
                     int colWidth = 0;
-                    foreach (ImageListViewColumnHeader column in mImageListView.Columns)
+                    foreach (ImageListViewColumnHeader column in ImageListView.Columns)
                         if (column.Visible) colWidth += column.Width;
 
                     itemSize = new Size(colWidth, textHeight + 2 * textHeight / 6); // textHeight / 6 = vertical space between item border and text
@@ -743,7 +850,7 @@ namespace Manina.Windows.Forms
                 else
                 {
                     Size itemPadding = new Size(4, 4);
-                    itemSize = mImageListView.ThumbnailSize + itemPadding + itemPadding;
+                    itemSize = ImageListView.ThumbnailSize + itemPadding + itemPadding;
                     itemSize.Height += textHeight + System.Math.Max(4, textHeight / 3); // textHeight / 3 = vertical space between thumbnail and text
                 }
 
@@ -830,21 +937,21 @@ namespace Manina.Windows.Forms
                 }
 
                 // Paint background Selected
-                if ((mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
-                    (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
+                if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                    (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                 {
                     using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
                     {
-                        Utility.FillRoundedRectangle(g, bSelected, bounds, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.FillRoundedRectangle(g, bSelected, bounds, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
 
                 // Paint background unfocused
-                else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Brush bGray64 = new LinearGradientBrush(bounds, ImageListView.Colors.UnFocusedColor1, ImageListView.Colors.UnFocusedColor2, LinearGradientMode.Vertical))
                     {
-                        Utility.FillRoundedRectangle(g, bGray64, bounds, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.FillRoundedRectangle(g, bGray64, bounds, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
 
@@ -853,17 +960,17 @@ namespace Manina.Windows.Forms
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.HoverColor1, ImageListView.Colors.HoverColor2, LinearGradientMode.Vertical))
                     {
-                        Utility.FillRoundedRectangle(g, bHovered, bounds, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.FillRoundedRectangle(g, bHovered, bounds, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
 
-                if (mImageListView.View != View.Details)
+                if (ImageListView.View != View.Details)
                 {
                     // Draw the image
                     Image img = item.GetCachedImage(CachedImageType.Thumbnail);
                     if (img != null)
                     {
-                        Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, mImageListView.ThumbnailSize));
+                        Rectangle pos = Utility.GetSizedImageBounds(img, new Rectangle(bounds.Location + itemPadding, ImageListView.ThumbnailSize));
                         g.DrawImage(img, pos);
                         // Draw image border
                         if (Math.Min(pos.Width, pos.Height) > 32)
@@ -872,7 +979,7 @@ namespace Manina.Windows.Forms
                             {
                                 g.DrawRectangle(pOuterBorder, pos);
                             }
-                            if (System.Math.Min(mImageListView.ThumbnailSize.Width, mImageListView.ThumbnailSize.Height) > 32)
+                            if (System.Math.Min(ImageListView.ThumbnailSize.Width, ImageListView.ThumbnailSize.Height) > 32)
                             {
                                 using (Pen pInnerBorder = new Pen(ImageListView.Colors.ImageInnerBorderColor))
                                 {
@@ -883,33 +990,33 @@ namespace Manina.Windows.Forms
                     }
 
                     // Draw item text
-                    SizeF szt = TextRenderer.MeasureText(item.Text, mImageListView.Font);
+                    SizeF szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
                     RectangleF rt;
                     using (StringFormat sf = new StringFormat())
                     {
-                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + mImageListView.ThumbnailSize.Height, mImageListView.ThumbnailSize.Width, szt.Height);
+                        rt = new RectangleF(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height, ImageListView.ThumbnailSize.Width, szt.Height);
                         sf.Alignment = StringAlignment.Center;
                         sf.FormatFlags = StringFormatFlags.NoWrap;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
-                            g.DrawString(item.Text, mImageListView.Font, bItemFore, rt, sf);
+                            g.DrawString(item.Text, ImageListView.Font, bItemFore, rt, sf);
                         }
                     }
                 }
-                else // if (mImageListView.View == View.Details)
+                else // if (ImageListView.View == View.Details)
                 {
-                    List<ImageListViewColumnHeader> uicolumns = mImageListView.Columns.GetDisplayedColumns();
+                    List<ImageListViewColumnHeader> uicolumns = ImageListView.Columns.GetDisplayedColumns();
 
                     // Shade sort column
                     int x = bounds.Left - 1;
                     foreach (ImageListViewColumnHeader column in uicolumns)
                     {
-                        if (mImageListView.SortOrder != SortOrder.None &&
-                            mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
+                        if (ImageListView.SortOrder != SortOrder.None &&
+                            ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
                             (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None &&
-                            mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
+                            ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
                         {
                             Rectangle subItemBounds = bounds;
                             subItemBounds.X = x;
@@ -936,7 +1043,7 @@ namespace Manina.Windows.Forms
                             }
                         }
                     }
-                    Size offset = new Size(2, (bounds.Height - mImageListView.Font.Height) / 2);
+                    Size offset = new Size(2, (bounds.Height - ImageListView.Font.Height) / 2);
                     using (StringFormat sf = new StringFormat())
                     {
                         sf.FormatFlags = StringFormatFlags.NoWrap;
@@ -967,27 +1074,27 @@ namespace Manina.Windows.Forms
                                 rt.X += iconOffset;
                                 rt.Width -= iconOffset;
                                 // Rating stars
-                                if (column.Type == ColumnType.Rating && mImageListView.RatingImage != null && mImageListView.EmptyRatingImage != null)
+                                if (column.Type == ColumnType.Rating && ImageListView.RatingImage != null && ImageListView.EmptyRatingImage != null)
                                 {
                                     int rating = item.GetSimpleRating();
                                     if (rating > 0)
                                     {
-                                        int w = mImageListView.RatingImage.Width;
-                                        int y = (int)(rt.Top + (rt.Height - mImageListView.RatingImage.Height) / 2.0f);
+                                        int w = ImageListView.RatingImage.Width;
+                                        int y = (int)(rt.Top + (rt.Height - ImageListView.RatingImage.Height) / 2.0f);
 
                                         for (int i = 1; i <= 5; i++)
                                         {
                                             if (rating >= i)
-                                                g.DrawImage(mImageListView.RatingImage, rt.Left + (i - 1) * w, y);
+                                                g.DrawImage(ImageListView.RatingImage, rt.Left + (i - 1) * w, y);
                                             else
-                                                g.DrawImage(mImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
+                                                g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                         }
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.columnID), mImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.columnID), ImageListView.Font, bItemFore, rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), mImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
 
                                 rt.X -= iconOffset;
                             }
@@ -997,45 +1104,45 @@ namespace Manina.Windows.Forms
                 }
 
                 // Item border
-                if (mImageListView.View != View.Details)
+                if (ImageListView.View != View.Details)
                 {
                     using (Pen pWhite128 = new Pen(Color.FromArgb(128, ImageListView.Colors.ControlBackColor)))
                     {
-                        Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                if (mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                     {
-                        Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                else if (!mImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Pen pGray128 = new Pen(ImageListView.Colors.UnFocusedBorderColor))
                     {
-                        Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.DrawRoundedRectangle(g, pGray128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                else if (mImageListView.View != View.Details && (state & ItemState.Selected) == ItemState.None)
+                else if (ImageListView.View != View.Details && (state & ItemState.Selected) == ItemState.None)
                 {
                     using (Pen pGray64 = new Pen(ImageListView.Colors.BorderColor))
                     {
-                        Utility.DrawRoundedRectangle(g, pGray64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.DrawRoundedRectangle(g, pGray64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
 
-                if (mImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
+                if (ImageListView.Focused && ((state & ItemState.Hovered) != ItemState.None))
                 {
                     using (Pen pHighlight64 = new Pen(ImageListView.Colors.HoverBorderColor))
                     {
-                        Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (mImageListView.View == View.Details ? 2 : 4));
+                        Utility.DrawRoundedRectangle(g, pHighlight64, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
 
                 // Focus rectangle
-                if (mImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
+                if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
                 {
                     ControlPaint.DrawFocusRectangle(g, bounds);
                 }
@@ -1097,7 +1204,7 @@ namespace Manina.Windows.Forms
             public virtual void DrawColumnHeader(Graphics g, ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
             {
                 // Paint background
-                if (mImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
+                if (ImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderHoverColor1, ImageListView.Colors.ColumnHeaderHoverColor2, LinearGradientMode.Vertical))
                     {
@@ -1125,14 +1232,14 @@ namespace Manina.Windows.Forms
 
                 // Draw the sort arrow
                 int textOffset = 4;
-                if (mImageListView.SortOrder != SortOrder.None &&
-                    mImageListView.SortColumn >= 0 && mImageListView.SortColumn < mImageListView.Columns.Count &&
-                    mImageListView.Columns[mImageListView.SortColumn].columnID == column.columnID)
+                if (ImageListView.SortOrder != SortOrder.None &&
+                    ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
+                    ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
                 {
                     Image img = null;
-                    if (mImageListView.SortOrder == SortOrder.Ascending)
+                    if (ImageListView.SortOrder == SortOrder.Ascending)
                         img = ImageListViewResources.SortAscending;
-                    else if (mImageListView.SortOrder == SortOrder.Descending)
+                    else if (ImageListView.SortOrder == SortOrder.Descending)
                         img = ImageListViewResources.SortDescending;
                     if (img != null)
                     {
@@ -1154,7 +1261,7 @@ namespace Manina.Windows.Forms
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
                         {
-                            g.DrawString(column.Text, (mImageListView.HeaderFont == null ? mImageListView.Font : mImageListView.HeaderFont), bText, bounds, sf);
+                            g.DrawString(column.Text, (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont), bText, bounds, sf);
                         }
                     }
                 }
@@ -1182,7 +1289,7 @@ namespace Manina.Windows.Forms
                 if (item != null && image != null)
                 {
                     // Calculate image bounds
-                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
                     Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin), 50.0f, 0.0f);
                     // Draw image
                     g.DrawImage(image, pos);
@@ -1204,13 +1311,13 @@ namespace Manina.Windows.Forms
                     bounds.Height -= pos.Height + 16;
 
                     // Item text
-                    if (mImageListView.Columns.HasType(ColumnType.Name) && mImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
+                    if (ImageListView.Columns.HasType(ColumnType.Name) && ImageListView.Columns[ColumnType.Name].Visible && bounds.Height > 0)
                     {
                         string itemText = item.GetSubItemText(ColumnType.Name);
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
-                            int y = Utility.DrawStringPair(g, bounds, "", itemText, mImageListView.Font, bLabel, bText);
+                            int y = Utility.DrawStringPair(g, bounds, "", itemText, ImageListView.Font, bLabel, bText);
                             bounds.Y += 2 * y;
                             bounds.Height -= 2 * y;
                         }
@@ -1218,20 +1325,20 @@ namespace Manina.Windows.Forms
 
                     // File type
                     string fileType = item.GetSubItemText(ColumnType.FileType);
-                    if (mImageListView.Columns.HasType(ColumnType.FileType) && mImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
+                    if (ImageListView.Columns.HasType(ColumnType.FileType) && ImageListView.Columns[ColumnType.FileType].Visible && bounds.Height > 0 && !string.IsNullOrEmpty(fileType))
                     {
                         using (SolidBrush bLabel = new SolidBrush(ImageListView.Colors.PaneLabelColor))
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
                         {
-                            int y = Utility.DrawStringPair(g, bounds, mImageListView.Columns[ColumnType.FileType].Text + ": ",
-                                fileType, mImageListView.Font, bLabel, bText);
+                            int y = Utility.DrawStringPair(g, bounds, ImageListView.Columns[ColumnType.FileType].Text + ": ",
+                                fileType, ImageListView.Font, bLabel, bText);
                             bounds.Y += y;
                             bounds.Height -= y;
                         }
                     }
 
                     // Metatada
-                    foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                    foreach (ImageListView.ImageListViewColumnHeader column in ImageListView.Columns)
                     {
                         if (column.Type == ColumnType.ImageDescription)
                         {
@@ -1257,7 +1364,7 @@ namespace Manina.Windows.Forms
                                 using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ForeColor))
                                 {
                                     int y = Utility.DrawStringPair(g, bounds, caption + ": ", text,
-                                        mImageListView.Font, bLabel, bText);
+                                        ImageListView.Font, bLabel, bText);
                                     bounds.Y += y;
                                     bounds.Height -= y;
                                 }
@@ -1278,7 +1385,7 @@ namespace Manina.Windows.Forms
                 if (item != null && image != null)
                 {
                     // Calculate image bounds
-                    Size itemMargin = MeasureItemMargin(mImageListView.View);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
                     Rectangle pos = Utility.GetSizedImageBounds(image, new Rectangle(bounds.Location + itemMargin, bounds.Size - itemMargin - itemMargin));
                     // Draw image
                     g.DrawImage(image, pos);
