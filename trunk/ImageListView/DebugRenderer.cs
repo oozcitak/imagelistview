@@ -50,16 +50,16 @@ namespace Manina.Windows.Forms
         /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
         public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
         {
-            if (item.Index == mImageListView.layoutManager.FirstPartiallyVisible ||
-                item.Index == mImageListView.layoutManager.LastPartiallyVisible)
+            if (item.Index == ImageListView.layoutManager.FirstPartiallyVisible ||
+                item.Index == ImageListView.layoutManager.LastPartiallyVisible)
             {
                 using (Brush b = new HatchBrush(HatchStyle.BackwardDiagonal, Color.Green, Color.Transparent))
                 {
                     g.FillRectangle(b, bounds);
                 }
             }
-            if (item.Index == mImageListView.layoutManager.FirstVisible ||
-                item.Index == mImageListView.layoutManager.LastVisible)
+            if (item.Index == ImageListView.layoutManager.FirstVisible ||
+                item.Index == ImageListView.layoutManager.LastVisible)
             {
                 using (Brush b = new HatchBrush(HatchStyle.ForwardDiagonal, Color.Red, Color.Transparent))
                 {
@@ -82,7 +82,7 @@ namespace Manina.Windows.Forms
             long mem = Math.Max(0, p.PrivateMemorySize64 - baseMem);
 
             // Display memory stats
-            string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(mImageListView.thumbnailCache.MemoryUsed));
+            string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(ImageListView.thumbnailCache.MemoryUsed));
             SizeF sz = g.MeasureString(s, ImageListView.Font);
             Rectangle r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5, 115, (int)sz.Height);
             using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))
@@ -108,7 +108,7 @@ namespace Manina.Windows.Forms
 
             // Is left button down?
             r = new Rectangle(r.Left + 5, r.Top + 5, 15, 15);
-            if (mImageListView.navigationManager.LeftButton)
+            if (ImageListView.navigationManager.LeftButton)
             {
                 g.FillRectangle(Brushes.DarkGray, r);
             }
@@ -117,7 +117,7 @@ namespace Manina.Windows.Forms
             r.Offset(15, 0);
 
             // Is right button down?
-            if (mImageListView.navigationManager.RightButton)
+            if (ImageListView.navigationManager.RightButton)
             {
                 g.FillRectangle(Brushes.DarkGray, r);
             }
@@ -126,34 +126,34 @@ namespace Manina.Windows.Forms
 
             // Is shift key down?
             Color tColor = Color.Gray;
-            if (mImageListView.navigationManager.ShiftKey)
+            if (ImageListView.navigationManager.ShiftKey)
                 tColor = Color.Black;
             using (Brush b = new SolidBrush(tColor))
             {
-                g.DrawString("Shift", mImageListView.Font, b, r.Location);
+                g.DrawString("Shift", ImageListView.Font, b, r.Location);
             }
             r.Offset(0, 12);
 
             // Is control key down?
             tColor = Color.Gray;
-            if (mImageListView.navigationManager.ControlKey)
+            if (ImageListView.navigationManager.ControlKey)
                 tColor = Color.Black;
             using (Brush b = new SolidBrush(tColor))
             {
-                g.DrawString("Control", mImageListView.Font, b, r.Location);
+                g.DrawString("Control", ImageListView.Font, b, r.Location);
             }
             r.Offset(0, 20);
 
             // Display hit test details for item area
             ImageListView.HitInfo h = null;
-            mImageListView.HitTest(mImageListView.PointToClient(Control.MousePosition), out h);
+            ImageListView.HitTest(ImageListView.PointToClient(Control.MousePosition), out h);
 
             tColor = Color.Gray;
             if (h.InItemArea)
                 tColor = Color.Black;
             using (Brush b = new SolidBrush(tColor))
             {
-                    g.DrawString("InItemArea (" + h.ItemIndex.ToString() + ")", mImageListView.Font, b, r.Location);
+                    g.DrawString("InItemArea (" + h.ItemIndex.ToString() + ")", ImageListView.Font, b, r.Location);
             }
             r.Offset(0, 12);
 
@@ -165,7 +165,7 @@ namespace Manina.Windows.Forms
             {
                 if (h.Column != null)
                 {
-                    g.DrawString("InHeaderArea (" + h.Column.ToString() + ")", mImageListView.Font, b, r.Location);
+                    g.DrawString("InHeaderArea (" + h.Column.ToString() + ")", ImageListView.Font, b, r.Location);
                 }
             }
             r.Offset(0, 12);
@@ -176,7 +176,7 @@ namespace Manina.Windows.Forms
                 tColor = Color.Black;
             using (Brush b = new SolidBrush(tColor))
             {
-                g.DrawString("InPaneArea " + (h.PaneBorder ? " (Border)" : ""), mImageListView.Font, b, r.Location);
+                g.DrawString("InPaneArea " + (h.PaneBorder ? " (Border)" : ""), ImageListView.Font, b, r.Location);
             }
             r.Offset(0, 12);
         }

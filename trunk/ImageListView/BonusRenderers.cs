@@ -244,7 +244,7 @@ namespace Manina.Windows.Forms
                 {
                     try
                     {
-                        if (mImageListView != null && mImageListView.IsHandleCreated && !mImageListView.IsDisposed)
+                        if (ImageListView != null && ImageListView.IsHandleCreated && !ImageListView.IsDisposed)
                         {
                             if (ImageListView.InvokeRequired)
                                 ImageListView.BeginInvoke((MethodInvoker)delegate { ImageListView.Refresh(); });
