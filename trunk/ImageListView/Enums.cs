@@ -89,6 +89,10 @@ namespace Manina.Windows.Forms
         /// Column separator is being dragged.
         /// </summary>
         SeparatorSelected = 4,
+        /// <summary>
+        /// The column is the sort column.
+        /// </summary>
+        SortColumn,
     }
     /// <summary>
     /// Represents the type of information displayed in an image list view column.
