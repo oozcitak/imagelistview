@@ -449,14 +449,9 @@ namespace Manina.Windows.Forms
         /// <param name="data">metadata</param>
         private void InitViaWpf(BitmapMetadata data)
         {
-            double dVal;
-            int iVal;
-            string str;
-            Object val;
-
             ImageDescription = data.Subject;
             EquipmentManufacturer = data.CameraManufacturer;
-            EquipmentModel = str = data.CameraModel;
+            EquipmentModel = data.CameraModel;
             var authors = data.Author;
             if (authors != null && authors.Count > 0)
             {
@@ -464,9 +459,10 @@ namespace Manina.Windows.Forms
                 authors.CopyTo(authorsArray, 0);
                 Artist = string.Join(";", authorsArray).Trim();
             }
-            string date = data.DateTaken;
-            if (!string.IsNullOrEmpty(date))
-                DateTaken = ExifDateTime(date);
+            if (data.DateTaken != null)
+            {
+                DateTaken = DateTime.Parse(data.DateTaken);
+            }
             Copyright = data.Copyright;
             Comment = data.Comment;
             Software = data.ApplicationName;
@@ -482,59 +478,39 @@ namespace Manina.Windows.Forms
             else if (simpleRating == 5)
                 Rating = 99;
 
-            val = GetMetadataObject(data, "System.Photo.ExposureTime");
+            Object val;
+
+            // Exposure time
+            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=33434}", "/xmp/exif:ExposureTime");
             if (val != null)
-            {
-                dVal = (double)val;
-                if (dVal != 0.0)
-                {
-                    ExposureTime = dVal;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.FNumber");
+                ExposureTime = ExifDouble(BitConverter.GetBytes((ulong)val));
+            // FNumber
+            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=33437}", "/xmp/exif:FNumber");
             if (val != null)
-            {
-                dVal = (double)val;
-                if (dVal != 0.0)
-                {
-                    FNumber = dVal;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.ISOSpeed");
+                FNumber = ExifDouble(BitConverter.GetBytes((ulong)val));
+            // ISOSpeed
+            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed");
             if (val != null)
-            {
-                iVal = (ushort)val;
-                if (iVal != 0)
-                {
-                    ISOSpeed = iVal;
-                }
-            }
-            val = GetMetadataObject(data, "System.Photo.FocalLength");
+                ISOSpeed = (ushort)val;
+            // FocalLength
+            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=37386}", "/xmp/exif:FocalLength");
             if (val != null)
-            {
-                dVal = (double)val;
-                if (dVal != 0.0)
-                {
-                    FocalLength = dVal;
-                }
-            }
+                FocalLength = ExifDouble(BitConverter.GetBytes((ulong)val));
         }
         /// <summary>
         /// Returns the metadata for the given query.
         /// </summary>
         /// <param name="metadata">The image metadata.</param>
-        /// <param name="query">Query string.</param>
+        /// <param name="query">A list of query strings.</param>
         /// <returns>Metadata object or null if the metadata as not found.</returns>
-        private object GetMetadataObject(BitmapMetadata metadata, string query)
+        private object GetMetadataObject(BitmapMetadata metadata, params string[] query)
         {
             object val = null;
-            try
+            foreach (string q in query)
             {
-                val = metadata.GetQuery(query);
-            }
-            catch (NotSupportedException)
-            {
-                val = null;
+                val = metadata.GetQuery(q);
+                if (val != null)
+                    return val;
             }
             return val;
         }

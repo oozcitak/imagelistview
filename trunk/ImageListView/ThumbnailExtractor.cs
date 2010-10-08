@@ -427,7 +427,11 @@ namespace Manina.Windows.Forms
             {
                 try
                 {
-                    object obj = data.GetQuery("/app1/ifd/exif/subifd:{uint=" + TagOrientation.ToString() + "}");
+                    // Look at Exif IFD
+                    object obj = data.GetQuery("/app1/ifd/{ushort=274}");
+                    // Try the XMP metadata
+                    if (obj == null)
+                        obj = data.GetQuery("/xmp/tiff:Orientation");
                     if (obj == null)
                         return 0;
                     ushort orientationFlag = (ushort)obj;
