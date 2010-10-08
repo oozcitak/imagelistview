@@ -241,10 +241,12 @@ namespace Manina.Windows.Forms
                 {
                     if (isVirtualItem)
                         mImageListView.thumbnailCache.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
-                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, mImageListView.UseWIC);
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                     else
                         mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
-                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, mImageListView.UseWIC);
+                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
                 return mImageListView.thumbnailCache.GetImage(Guid);
@@ -857,10 +859,12 @@ namespace Manina.Windows.Forms
 
                 if (isVirtualItem)
                     mImageListView.thumbnailCache.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
-                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, mImageListView.UseWIC);
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 else
                     mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
-                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, mImageListView.UseWIC);
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, 
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
 
                 if (img == null && string.IsNullOrEmpty(extension))
                     return mImageListView.DefaultImage;

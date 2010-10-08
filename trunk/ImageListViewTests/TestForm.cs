@@ -250,7 +250,7 @@ namespace ImageListViewTests
         private bool benchMarking = false;
         private System.Diagnostics.Stopwatch benchmarkSW = new System.Diagnostics.Stopwatch();
         private long lastThumbnailTime = 0;
-        private bool oldWIC;
+        private Manina.Windows.Forms.UseWIC oldWIC;
         private Manina.Windows.Forms.CacheMode oldCM;
         private Manina.Windows.Forms.UseEmbeddedThumbnails oldET;
 
@@ -269,7 +269,7 @@ namespace ImageListViewTests
                 oldCM = imageListView.CacheMode;
 
                 imageListView.Items.Clear();
-                imageListView.UseWIC = useWIC;
+                imageListView.UseWIC = (useWIC ? Manina.Windows.Forms.UseWIC.Auto : Manina.Windows.Forms.UseWIC.Never);
                 if (useET)
                     imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Auto;
                 else

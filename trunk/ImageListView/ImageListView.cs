@@ -93,7 +93,7 @@ namespace Manina.Windows.Forms
         private Size mCheckBoxPadding;
         private Size mThumbnailSize;
         private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
-        private bool mUseWIC;
+        private UseWIC mUseWIC;
         private View mView;
         private Point mViewOffset;
 
@@ -616,8 +616,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets whether Windows Imaging Compomnent will be used.
         /// </summary>
-        [Browsable(false), Category("Behavior"), Description("Gets or sets whether Windows Imaging Compomnent will be used."), DefaultValue(true)]
-        public bool UseWIC
+        [Browsable(false), Category("Behavior"), Description("Gets or sets whether Windows Imaging Compomnent will be used."), DefaultValue(typeof(UseWIC), "Auto")]
+        public UseWIC UseWIC
         {
             get
             {
@@ -847,7 +847,7 @@ namespace Manina.Windows.Forms
             Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
-            mUseWIC = true;
+            mUseWIC = UseWIC.Auto;
             mView = View.Thumbnails;
             mViewOffset = new Point(0, 0);
 
@@ -889,10 +889,12 @@ namespace Manina.Windows.Forms
                     {
                         if (item.isVirtualItem)
                             thumbnailCache.Add(item.Guid, item.VirtualItemKey,
-                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails, UseWIC);
+                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails,
+                                (mUseWIC == UseWIC.Auto || mUseWIC == UseWIC.ThumbnailsOnly));
                         else
                             thumbnailCache.Add(item.Guid, item.FileName,
-                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails, UseWIC);
+                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails,
+                                (mUseWIC == UseWIC.Auto || mUseWIC == UseWIC.ThumbnailsOnly));
                     }
                 }
                 Refresh();
