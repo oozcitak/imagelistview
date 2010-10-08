@@ -57,6 +57,7 @@ namespace ImageListViewTests
             if (benchMarking)
             {
                 lastThumbnailTime = benchmarkSW.ElapsedMilliseconds;
+                cachedThumbnailCount++;
             }
             else
             {
@@ -195,6 +196,14 @@ namespace ImageListViewTests
         {
             imageListView.MultiSelect = !imageListView.MultiSelect;
         }
+        // Use WIC
+        private void UseWIC_Click(object sender, EventArgs e)
+        {
+            if (imageListView.UseWIC == Manina.Windows.Forms.UseWIC.Auto)
+                imageListView.UseWIC = Manina.Windows.Forms.UseWIC.Never;
+            else
+                imageListView.UseWIC = Manina.Windows.Forms.UseWIC.Auto;
+        }
         // Embedded thumbnails
         private void UseEmbeddedThumbnails_Click(object sender, EventArgs e)
         {
@@ -226,15 +235,23 @@ namespace ImageListViewTests
             AllowDuplicateFilenames.Checked = imageListView.AllowDuplicateFileNames;
             IntegralScroll.Checked = imageListView.IntegralScroll;
             MultiSelect.Checked = imageListView.MultiSelect;
+            UseWIC.Checked = (imageListView.UseWIC == Manina.Windows.Forms.UseWIC.Auto);
             UseEmbeddedThumbnails.Checked = (imageListView.UseEmbeddedThumbnails == Manina.Windows.Forms.UseEmbeddedThumbnails.Auto);
             AutoRotateThumbnails.Checked = imageListView.AutoRotateThumbnails;
 
-            string focused = imageListView.Items.FocusedItem == null ? "" : ", focused: " + imageListView.Items.FocusedItem.Index.ToString();
-            StatusLabel.Text = string.Format("{0} items: {1} selected, {2} checked{3}",
-                imageListView.Items.Count,
-                imageListView.SelectedItems.Count,
-                imageListView.CheckedItems.Count,
-                focused);
+            if (benchMarking)
+            {
+                StatusLabel.Text = string.Format("Extracted thumbnail {0} of {1}", cachedThumbnailCount, imageListView.Items.Count);
+            }
+            else
+            {
+                string focused = imageListView.Items.FocusedItem == null ? "" : ", focused: " + imageListView.Items.FocusedItem.Index.ToString();
+                StatusLabel.Text = string.Format("{0} items: {1} selected, {2} checked{3}",
+                    imageListView.Items.Count,
+                    imageListView.SelectedItems.Count,
+                    imageListView.CheckedItems.Count,
+                    focused);
+            }
         }
         #endregion
 
@@ -250,9 +267,8 @@ namespace ImageListViewTests
         private bool benchMarking = false;
         private System.Diagnostics.Stopwatch benchmarkSW = new System.Diagnostics.Stopwatch();
         private long lastThumbnailTime = 0;
-        private Manina.Windows.Forms.UseWIC oldWIC;
         private Manina.Windows.Forms.CacheMode oldCM;
-        private Manina.Windows.Forms.UseEmbeddedThumbnails oldET;
+        private int cachedThumbnailCount = 0;
 
         // StartBenchmark
         private void StartBenchmark_Click(object sender, EventArgs e)
@@ -261,23 +277,12 @@ namespace ImageListViewTests
 
             if (ChooseBenchmarkPath.ShowDialog() == DialogResult.OK)
             {
-                bool useWIC = BenchmarkUseWIC.Checked;
-                bool useET = BenchmarkUseEmbeddedThumbnails.Checked;
-
-                oldWIC = imageListView.UseWIC;
-                oldET = imageListView.UseEmbeddedThumbnails;
                 oldCM = imageListView.CacheMode;
 
                 imageListView.Items.Clear();
-                imageListView.UseWIC = (useWIC ? Manina.Windows.Forms.UseWIC.Auto : Manina.Windows.Forms.UseWIC.Never);
-                if (useET)
-                    imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Auto;
-                else
-                    imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Never;
                 imageListView.CacheMode = Manina.Windows.Forms.CacheMode.Continuous;
 
                 TestToolStrip.Enabled = false;
-                BenchmarkToolStrip.Enabled = false;
                 imageListView.Enabled = false;
                 EventsListBox.Enabled = false;
 
@@ -287,10 +292,15 @@ namespace ImageListViewTests
                 benchmarkSW.Reset();
                 benchmarkSW.Start();
                 lastThumbnailTime = 0;
+                cachedThumbnailCount = 0;
 
                 imageListView.SuspendLayout();
-                foreach (string file in Directory.GetFiles(ChooseBenchmarkPath.SelectedPath, "*.jpg"))
-                    imageListView.Items.Add(file);
+                foreach (string file in Directory.GetFiles(ChooseBenchmarkPath.SelectedPath))
+                    if (string.Compare(Path.GetExtension(file), ".jpg", StringComparison.OrdinalIgnoreCase) == 0 ||
+                        string.Compare(Path.GetExtension(file), ".png", StringComparison.OrdinalIgnoreCase) == 0 ||
+                        string.Compare(Path.GetExtension(file), ".gif", StringComparison.OrdinalIgnoreCase) == 0 ||
+                        string.Compare(Path.GetExtension(file), ".bmp", StringComparison.OrdinalIgnoreCase) == 0)
+                        imageListView.Items.Add(file);
             }
         }
 
@@ -304,12 +314,9 @@ namespace ImageListViewTests
                 benchmarkSW.Stop();
 
                 TestToolStrip.Enabled = true;
-                BenchmarkToolStrip.Enabled = true;
                 imageListView.Enabled = true;
                 EventsListBox.Enabled = true;
 
-                imageListView.UseWIC = oldWIC;
-                imageListView.UseEmbeddedThumbnails = oldET;
                 imageListView.CacheMode = oldCM;
                 imageListView.ResumeLayout();
 
@@ -318,7 +325,7 @@ namespace ImageListViewTests
                 sb.AppendLine();
                 sb.AppendFormat("Cached {0} images in {1} milliseconds.", imageListView.Items.Count, lastThumbnailTime);
 
-                if (MessageBox.Show(sb.ToString() + Environment.NewLine + Environment.NewLine + "Copy information to clipboard?", "ImageListView Benchmark", MessageBoxButtons.YesNo, MessageBoxIcon.Information)== DialogResult.Yes )
+                if (MessageBox.Show(sb.ToString() + Environment.NewLine + Environment.NewLine + "Copy information to clipboard?", "ImageListView Benchmark", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     Clipboard.SetText(sb.ToString());
                 }
