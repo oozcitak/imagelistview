@@ -65,12 +65,11 @@
             this.AllowDuplicateFilenames = new System.Windows.Forms.ToolStripButton();
             this.IntegralScroll = new System.Windows.Forms.ToolStripButton();
             this.MultiSelect = new System.Windows.Forms.ToolStripButton();
+            this.UseWIC = new System.Windows.Forms.ToolStripButton();
             this.UseEmbeddedThumbnails = new System.Windows.Forms.ToolStripButton();
             this.AutoRotateThumbnails = new System.Windows.Forms.ToolStripButton();
-            this.BenchmarkToolStrip = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
-            this.BenchmarkUseWIC = new System.Windows.Forms.ToolStripButton();
-            this.BenchmarkUseEmbeddedThumbnails = new System.Windows.Forms.ToolStripButton();
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
@@ -84,7 +83,6 @@
             this.splitContainer1.SuspendLayout();
             this.EventListContextMenu.SuspendLayout();
             this.TestToolStrip.SuspendLayout();
-            this.BenchmarkToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -103,7 +101,6 @@
             // toolStripContainer1.LeftToolStripPanel
             // 
             this.toolStripContainer1.LeftToolStripPanel.Controls.Add(this.TestToolStrip);
-            this.toolStripContainer1.LeftToolStripPanel.Controls.Add(this.BenchmarkToolStrip);
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
             this.toolStripContainer1.Size = new System.Drawing.Size(758, 621);
@@ -181,6 +178,7 @@
             // TestToolStrip
             // 
             this.TestToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.TestToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TestToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel2,
             this.AddOneItem,
@@ -204,12 +202,16 @@
             this.AllowDuplicateFilenames,
             this.IntegralScroll,
             this.MultiSelect,
+            this.UseWIC,
             this.UseEmbeddedThumbnails,
-            this.AutoRotateThumbnails});
+            this.AutoRotateThumbnails,
+            this.toolStripSeparator4,
+            this.toolStripLabel5,
+            this.StartBenchmark});
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 431);
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 508);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
             // 
@@ -457,6 +459,17 @@
             this.MultiSelect.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.MultiSelect.Click += new System.EventHandler(this.MultiSelect_Click);
             // 
+            // UseWIC
+            // 
+            this.UseWIC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.UseWIC.Image = ((System.Drawing.Image)(resources.GetObject("UseWIC.Image")));
+            this.UseWIC.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.UseWIC.Name = "UseWIC";
+            this.UseWIC.Size = new System.Drawing.Size(137, 17);
+            this.UseWIC.Text = "Use WIC";
+            this.UseWIC.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.UseWIC.Click += new System.EventHandler(this.UseWIC_Click);
+            // 
             // UseEmbeddedThumbnails
             // 
             this.UseEmbeddedThumbnails.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -479,19 +492,10 @@
             this.AutoRotateThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AutoRotateThumbnails.Click += new System.EventHandler(this.AutoRotateThumbnails_Click);
             // 
-            // BenchmarkToolStrip
+            // toolStripSeparator4
             // 
-            this.BenchmarkToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.BenchmarkToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripLabel5,
-            this.BenchmarkUseWIC,
-            this.BenchmarkUseEmbeddedThumbnails,
-            this.StartBenchmark});
-            this.BenchmarkToolStrip.Location = new System.Drawing.Point(0, 434);
-            this.BenchmarkToolStrip.Name = "BenchmarkToolStrip";
-            this.BenchmarkToolStrip.Size = new System.Drawing.Size(139, 88);
-            this.BenchmarkToolStrip.TabIndex = 2;
-            this.BenchmarkToolStrip.Text = "Benchmark Toolbar";
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(137, 6);
             // 
             // toolStripLabel5
             // 
@@ -500,32 +504,6 @@
             this.toolStripLabel5.Size = new System.Drawing.Size(137, 13);
             this.toolStripLabel5.Text = "Benchmark:";
             this.toolStripLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // BenchmarkUseWIC
-            // 
-            this.BenchmarkUseWIC.Checked = true;
-            this.BenchmarkUseWIC.CheckOnClick = true;
-            this.BenchmarkUseWIC.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.BenchmarkUseWIC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.BenchmarkUseWIC.Image = ((System.Drawing.Image)(resources.GetObject("BenchmarkUseWIC.Image")));
-            this.BenchmarkUseWIC.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.BenchmarkUseWIC.Name = "BenchmarkUseWIC";
-            this.BenchmarkUseWIC.Size = new System.Drawing.Size(137, 17);
-            this.BenchmarkUseWIC.Text = "Use WIC";
-            this.BenchmarkUseWIC.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // BenchmarkUseEmbeddedThumbnails
-            // 
-            this.BenchmarkUseEmbeddedThumbnails.Checked = true;
-            this.BenchmarkUseEmbeddedThumbnails.CheckOnClick = true;
-            this.BenchmarkUseEmbeddedThumbnails.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.BenchmarkUseEmbeddedThumbnails.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.BenchmarkUseEmbeddedThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("BenchmarkUseEmbeddedThumbnails.Image")));
-            this.BenchmarkUseEmbeddedThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.BenchmarkUseEmbeddedThumbnails.Name = "BenchmarkUseEmbeddedThumbnails";
-            this.BenchmarkUseEmbeddedThumbnails.Size = new System.Drawing.Size(137, 17);
-            this.BenchmarkUseEmbeddedThumbnails.Text = "Use Embedded Thumbnails";
-            this.BenchmarkUseEmbeddedThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // StartBenchmark
             // 
@@ -572,8 +550,6 @@
             this.EventListContextMenu.ResumeLayout(false);
             this.TestToolStrip.ResumeLayout(false);
             this.TestToolStrip.PerformLayout();
-            this.BenchmarkToolStrip.ResumeLayout(false);
-            this.BenchmarkToolStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -618,12 +594,11 @@
         private System.Windows.Forms.ContextMenuStrip EventListContextMenu;
         private System.Windows.Forms.ToolStripMenuItem ClearEventList;
         private System.Windows.Forms.FolderBrowserDialog ChooseBenchmarkPath;
-        private System.Windows.Forms.ToolStrip BenchmarkToolStrip;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel5;
-        private System.Windows.Forms.ToolStripButton BenchmarkUseWIC;
-        private System.Windows.Forms.ToolStripButton BenchmarkUseEmbeddedThumbnails;
-        private System.Windows.Forms.ToolStripButton StartBenchmark;
         private System.Windows.Forms.Timer CheckBenchmarkEndTimer;
+        private System.Windows.Forms.ToolStripButton UseWIC;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel5;
+        private System.Windows.Forms.ToolStripButton StartBenchmark;
     }
 }
 
