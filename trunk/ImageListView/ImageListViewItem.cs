@@ -217,7 +217,8 @@ namespace Manina.Windows.Forms
                         {
                             mImageListView.thumbnailCache.Remove(mGuid, true);
                             mImageListView.itemCacheManager.Remove(mGuid);
-                            mImageListView.itemCacheManager.Add(mGuid, mFileName);
+                            mImageListView.itemCacheManager.Add(mGuid, mFileName,
+                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                             if (mImageListView.IsItemVisible(mGuid))
                                 mImageListView.Refresh();
                         }
@@ -579,9 +580,11 @@ namespace Manina.Windows.Forms
                 mImageListView.thumbnailCache.Remove(mGuid, true);
                 mImageListView.itemCacheManager.Remove(mGuid);
                 if (isVirtualItem)
-                    mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey);
+                    mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                 else
-                    mImageListView.itemCacheManager.Add(mGuid, mFileName);
+                    mImageListView.itemCacheManager.Add(mGuid, mFileName, 
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                 mImageListView.Refresh();
             }
         }
@@ -943,7 +946,8 @@ namespace Manina.Windows.Forms
                 }
                 else
                 {
-                    ImageListViewCacheMetadata.ShellImageFileInfo info = ImageListViewCacheMetadata.ShellImageFileInfo.FromFile(mFileName);
+                    ImageListViewCacheMetadata.ImageMetadata info = ImageListViewCacheMetadata.ImageMetadata.FromFile(mFileName,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                     UpdateDetailsInternal(info);
 
                     if (info.Error == null)
@@ -956,7 +960,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Invoked by the worker thread to update item details.
         /// </summary>
-        internal void UpdateDetailsInternal(ImageListViewCacheMetadata.ShellImageFileInfo info)
+        internal void UpdateDetailsInternal(ImageListViewCacheMetadata.ImageMetadata info)
         {
             if (!isDirty) return;
 
