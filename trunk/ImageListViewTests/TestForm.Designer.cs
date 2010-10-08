@@ -31,14 +31,14 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
+            this.imageListView = new Manina.Windows.Forms.ImageListView();
             this.EventsListBox = new System.Windows.Forms.ListBox();
             this.EventListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ClearEventList = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.TestToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.AddOneItem = new System.Windows.Forms.ToolStripButton();
             this.AddItems = new System.Windows.Forms.ToolStripButton();
@@ -67,16 +67,24 @@
             this.MultiSelect = new System.Windows.Forms.ToolStripButton();
             this.UseEmbeddedThumbnails = new System.Windows.Forms.ToolStripButton();
             this.AutoRotateThumbnails = new System.Windows.Forms.ToolStripButton();
+            this.BenchmarkToolStrip = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
+            this.BenchmarkUseWIC = new System.Windows.Forms.ToolStripButton();
+            this.BenchmarkUseEmbeddedThumbnails = new System.Windows.Forms.ToolStripButton();
+            this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
+            this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
+            this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.StatusStrip.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.EventListContextMenu.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
+            this.TestToolStrip.SuspendLayout();
+            this.BenchmarkToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -84,32 +92,33 @@
             // 
             // toolStripContainer1.BottomToolStripPanel
             // 
-            this.toolStripContainer1.BottomToolStripPanel.Controls.Add(this.statusStrip1);
+            this.toolStripContainer1.BottomToolStripPanel.Controls.Add(this.StatusStrip);
             // 
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(550, 429);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(619, 574);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // toolStripContainer1.LeftToolStripPanel
             // 
-            this.toolStripContainer1.LeftToolStripPanel.Controls.Add(this.toolStrip1);
+            this.toolStripContainer1.LeftToolStripPanel.Controls.Add(this.TestToolStrip);
+            this.toolStripContainer1.LeftToolStripPanel.Controls.Add(this.BenchmarkToolStrip);
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
             this.toolStripContainer1.Name = "toolStripContainer1";
-            this.toolStripContainer1.Size = new System.Drawing.Size(689, 476);
+            this.toolStripContainer1.Size = new System.Drawing.Size(758, 621);
             this.toolStripContainer1.TabIndex = 2;
             this.toolStripContainer1.Text = "toolStripContainer1";
             // 
-            // statusStrip1
+            // StatusStrip
             // 
-            this.statusStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.StatusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 0);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(689, 22);
-            this.statusStrip1.TabIndex = 0;
+            this.StatusStrip.Location = new System.Drawing.Point(0, 0);
+            this.StatusStrip.Name = "StatusStrip";
+            this.StatusStrip.Size = new System.Drawing.Size(758, 22);
+            this.StatusStrip.TabIndex = 0;
             // 
             // StatusLabel
             // 
@@ -125,33 +134,23 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.imageListView1);
+            this.splitContainer1.Panel1.Controls.Add(this.imageListView);
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.EventsListBox);
-            this.splitContainer1.Size = new System.Drawing.Size(550, 429);
-            this.splitContainer1.SplitterDistance = 378;
+            this.splitContainer1.Size = new System.Drawing.Size(619, 574);
+            this.splitContainer1.SplitterDistance = 425;
             this.splitContainer1.TabIndex = 1;
             // 
-            // imageListView1
+            // imageListView
             // 
-            this.imageListView1.AllowDuplicateFileNames = true;
-            this.imageListView1.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Dimensions, "", 100, 3, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Resolution, "", 100, 4, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 5, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 6, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 7, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
-            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView1.Location = new System.Drawing.Point(0, 0);
-            this.imageListView1.Name = "imageListView1";
-            this.imageListView1.Size = new System.Drawing.Size(378, 429);
-            this.imageListView1.TabIndex = 0;
+            this.imageListView.AllowDuplicateFileNames = true;
+            this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView.Location = new System.Drawing.Point(0, 0);
+            this.imageListView.Name = "imageListView";
+            this.imageListView.Size = new System.Drawing.Size(425, 574);
+            this.imageListView.TabIndex = 0;
             // 
             // EventsListBox
             // 
@@ -161,7 +160,7 @@
             this.EventsListBox.IntegralHeight = false;
             this.EventsListBox.Location = new System.Drawing.Point(0, 0);
             this.EventsListBox.Name = "EventsListBox";
-            this.EventsListBox.Size = new System.Drawing.Size(168, 429);
+            this.EventsListBox.Size = new System.Drawing.Size(190, 574);
             this.EventsListBox.TabIndex = 0;
             // 
             // EventListContextMenu
@@ -179,11 +178,10 @@
             this.ClearEventList.Text = "Clear";
             this.ClearEventList.Click += new System.EventHandler(this.ClearEventList_Click);
             // 
-            // toolStrip1
+            // TestToolStrip
             // 
-            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
-            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TestToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.TestToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel2,
             this.AddOneItem,
             this.AddItems,
@@ -208,13 +206,12 @@
             this.MultiSelect,
             this.UseEmbeddedThumbnails,
             this.AutoRotateThumbnails});
-            this.toolStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(139, 429);
-            this.toolStrip1.Stretch = true;
-            this.toolStrip1.TabIndex = 2;
-            this.toolStrip1.Text = "toolStrip1";
+            this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
+            this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
+            this.TestToolStrip.Name = "TestToolStrip";
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 431);
+            this.TestToolStrip.TabIndex = 2;
+            this.TestToolStrip.Text = "Test Toolbar";
             // 
             // toolStripLabel2
             // 
@@ -345,28 +342,28 @@
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(152, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(127, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(152, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(127, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(152, 22);
+            this.ViewPane.Size = new System.Drawing.Size(127, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(152, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(127, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
             // 
@@ -482,11 +479,81 @@
             this.AutoRotateThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AutoRotateThumbnails.Click += new System.EventHandler(this.AutoRotateThumbnails_Click);
             // 
+            // BenchmarkToolStrip
+            // 
+            this.BenchmarkToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.BenchmarkToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel5,
+            this.BenchmarkUseWIC,
+            this.BenchmarkUseEmbeddedThumbnails,
+            this.StartBenchmark});
+            this.BenchmarkToolStrip.Location = new System.Drawing.Point(0, 434);
+            this.BenchmarkToolStrip.Name = "BenchmarkToolStrip";
+            this.BenchmarkToolStrip.Size = new System.Drawing.Size(139, 88);
+            this.BenchmarkToolStrip.TabIndex = 2;
+            this.BenchmarkToolStrip.Text = "Benchmark Toolbar";
+            // 
+            // toolStripLabel5
+            // 
+            this.toolStripLabel5.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.toolStripLabel5.Name = "toolStripLabel5";
+            this.toolStripLabel5.Size = new System.Drawing.Size(137, 13);
+            this.toolStripLabel5.Text = "Benchmark:";
+            this.toolStripLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // BenchmarkUseWIC
+            // 
+            this.BenchmarkUseWIC.Checked = true;
+            this.BenchmarkUseWIC.CheckOnClick = true;
+            this.BenchmarkUseWIC.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BenchmarkUseWIC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.BenchmarkUseWIC.Image = ((System.Drawing.Image)(resources.GetObject("BenchmarkUseWIC.Image")));
+            this.BenchmarkUseWIC.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BenchmarkUseWIC.Name = "BenchmarkUseWIC";
+            this.BenchmarkUseWIC.Size = new System.Drawing.Size(137, 17);
+            this.BenchmarkUseWIC.Text = "Use WIC";
+            this.BenchmarkUseWIC.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // BenchmarkUseEmbeddedThumbnails
+            // 
+            this.BenchmarkUseEmbeddedThumbnails.Checked = true;
+            this.BenchmarkUseEmbeddedThumbnails.CheckOnClick = true;
+            this.BenchmarkUseEmbeddedThumbnails.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BenchmarkUseEmbeddedThumbnails.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.BenchmarkUseEmbeddedThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("BenchmarkUseEmbeddedThumbnails.Image")));
+            this.BenchmarkUseEmbeddedThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BenchmarkUseEmbeddedThumbnails.Name = "BenchmarkUseEmbeddedThumbnails";
+            this.BenchmarkUseEmbeddedThumbnails.Size = new System.Drawing.Size(137, 17);
+            this.BenchmarkUseEmbeddedThumbnails.Text = "Use Embedded Thumbnails";
+            this.BenchmarkUseEmbeddedThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // StartBenchmark
+            // 
+            this.StartBenchmark.BackColor = System.Drawing.SystemColors.Control;
+            this.StartBenchmark.Image = ((System.Drawing.Image)(resources.GetObject("StartBenchmark.Image")));
+            this.StartBenchmark.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.StartBenchmark.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.StartBenchmark.Name = "StartBenchmark";
+            this.StartBenchmark.Size = new System.Drawing.Size(137, 20);
+            this.StartBenchmark.Text = "Start Benchmark";
+            this.StartBenchmark.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.StartBenchmark.Click += new System.EventHandler(this.StartBenchmark_Click);
+            // 
+            // ChooseBenchmarkPath
+            // 
+            this.ChooseBenchmarkPath.Description = "Select a folder containing JPEG images.";
+            this.ChooseBenchmarkPath.ShowNewFolderButton = false;
+            // 
+            // CheckBenchmarkEndTimer
+            // 
+            this.CheckBenchmarkEndTimer.Interval = 2000;
+            this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(689, 476);
+            this.ClientSize = new System.Drawing.Size(758, 621);
             this.Controls.Add(this.toolStripContainer1);
             this.Name = "TestForm";
             this.Text = "ImageListView Tests";
@@ -497,23 +564,25 @@
             this.toolStripContainer1.LeftToolStripPanel.PerformLayout();
             this.toolStripContainer1.ResumeLayout(false);
             this.toolStripContainer1.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.StatusStrip.ResumeLayout(false);
+            this.StatusStrip.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
             this.EventListContextMenu.ResumeLayout(false);
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
+            this.TestToolStrip.ResumeLayout(false);
+            this.TestToolStrip.PerformLayout();
+            this.BenchmarkToolStrip.ResumeLayout(false);
+            this.BenchmarkToolStrip.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private Manina.Windows.Forms.ImageListView imageListView1;
+        private Manina.Windows.Forms.ImageListView imageListView;
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStrip TestToolStrip;
         private System.Windows.Forms.ToolStripButton AddItems;
         private System.Windows.Forms.ToolStripButton InsertItemAtIndex0;
         private System.Windows.Forms.ToolStripButton RemoveItemAtIndex0;
@@ -542,12 +611,19 @@
         private System.Windows.Forms.ToolStripButton UseEmbeddedThumbnails;
         private System.Windows.Forms.ToolStripButton AutoRotateThumbnails;
         private System.Windows.Forms.ToolStripButton AddOneItem;
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.StatusStrip StatusStrip;
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListBox EventsListBox;
         private System.Windows.Forms.ContextMenuStrip EventListContextMenu;
         private System.Windows.Forms.ToolStripMenuItem ClearEventList;
+        private System.Windows.Forms.FolderBrowserDialog ChooseBenchmarkPath;
+        private System.Windows.Forms.ToolStrip BenchmarkToolStrip;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel5;
+        private System.Windows.Forms.ToolStripButton BenchmarkUseWIC;
+        private System.Windows.Forms.ToolStripButton BenchmarkUseEmbeddedThumbnails;
+        private System.Windows.Forms.ToolStripButton StartBenchmark;
+        private System.Windows.Forms.Timer CheckBenchmarkEndTimer;
     }
 }
 
