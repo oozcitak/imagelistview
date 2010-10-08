@@ -94,17 +94,13 @@ namespace Manina.Windows.Forms
                     }
 
                     // .Net 2.0 fallback
-                    Image img = GetThumbnailBmp(image, size);
+                    Image img = GetThumbnailBmp(image, size,
+                        useExifOrientation ? GetRotation(image) : 0);
                     return img;
                 }
 
-                int rotate = 0;
-                if (useExifOrientation)
-                {
-                    rotate = GetRotation(frameWpf);
-                }
-
-                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
+                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
+                    useExifOrientation ? GetRotation(frameWpf) : 0);
                 stream.Dispose();
                 return thumb;
 #else
@@ -116,7 +112,9 @@ namespace Manina.Windows.Forms
             else
             {
                 // .Net 2.0 fallback
-                Image img = GetThumbnailBmp(image, size);
+                Image img = GetThumbnailBmp(image, size,
+                    useExifOrientation ? GetRotation(image) : 0);
+
                 return img;
             }
         }
@@ -179,18 +177,13 @@ namespace Manina.Windows.Forms
                     }
 
                     // .Net 2.0 fallback
-                    Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
+                    Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
+                        useExifOrientation ? GetRotation(filename) : 0);
                     return img;
                 }
 
-
-                int rotate = 0;
-                if (useExifOrientation)
-                {
-                    rotate = GetRotation(frameWpf);
-                }
-
-                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
+                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
+                    useExifOrientation ? GetRotation(frameWpf) : 0);
 
                 stream.Dispose();
                 return thumb;
@@ -203,7 +196,8 @@ namespace Manina.Windows.Forms
             else
             {
                 // .Net 2.0 fallback
-                Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
+                Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
+                    useExifOrientation ? GetRotation(filename) : 0);
                 return img;
             }
         }
@@ -215,8 +209,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="image">The source image.</param>
         /// <param name="size">Requested image size.</param>
+        /// <param name="rotate">Rotation angle.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image GetThumbnailBmp(Image image, Size size)
+        internal static Image GetThumbnailBmp(Image image, Size size, int rotate)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -224,16 +219,19 @@ namespace Manina.Windows.Forms
             Image thumb = null;
             try
             {
-                Size scaled = Utility.GetSizedImageBounds(image, size);
-                thumb = new Bitmap(scaled.Width, scaled.Height);
-                using (Graphics g = Graphics.FromImage(thumb))
+                double scale;
+                if (rotate % 180 != 0)
                 {
-                    g.PixelOffsetMode = PixelOffsetMode.None;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.Clear(System.Drawing.Color.Transparent);
-
-                    g.DrawImage(image, 0, 0, scaled.Width, scaled.Height);
+                    scale = Math.Min(size.Height / (double)image.Width,
+                        size.Width / (double)image.Height);
                 }
+                else
+                {
+                    scale = Math.Min(size.Width / (double)image.Width,
+                        size.Height / (double)image.Height);
+                }
+
+                thumb = ScaleDownRotateBitmap(image, scale, rotate);
             }
             catch
             {
@@ -250,8 +248,9 @@ namespace Manina.Windows.Forms
         /// <param name="filename">The filename pointing to an image.</param>
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
+        /// <param name="rotate">Rotation angle.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image GetThumbnailBmp(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails)
+        internal static Image GetThumbnailBmp(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, int rotate)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -382,15 +381,19 @@ namespace Manina.Windows.Forms
             // Create the thumbnail
             try
             {
-                Size scaled = Utility.GetSizedImageBounds(source, size);
-                thumb = new Bitmap(source, scaled.Width, scaled.Height);
-                using (Graphics g = Graphics.FromImage(thumb))
+                double scale;
+                if (rotate % 180 != 0)
                 {
-                    g.PixelOffsetMode = PixelOffsetMode.None;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.Clear(System.Drawing.Color.Transparent);
-                    g.DrawImage(source, 0, 0, scaled.Width, scaled.Height);
+                    scale = Math.Min(size.Height / (double)source.Width,
+                        size.Width / (double)source.Height);
                 }
+                else
+                {
+                    scale = Math.Min(size.Width / (double)source.Width,
+                        size.Height / (double)source.Height);
+                }
+
+                thumb = ScaleDownRotateBitmap(source, scale, rotate);
             }
             catch
             {
@@ -617,23 +620,19 @@ namespace Manina.Windows.Forms
             thumbWpf.Source = sourceWpf;
             TransformGroup transform = new TransformGroup();
 
-            // Scale
-            if ((float)scale < 1.0f) // Only downscale
-            {
-                double xScale = Math.Max(1.0 / (double)sourceWpf.PixelWidth, scale);
-                double yScale = Math.Max(1.0 / (double)sourceWpf.PixelHeight, scale);
-                if (angle < 0)
-                {
-                    xScale = -xScale;
-                    angle = (-angle) % 360;
-                }
-                transform.Children.Add(new ScaleTransform(xScale, yScale));
-            }
-
             // Rotation
-            if (angle != 0)
+            if (Math.Abs(angle) % 360 != 0)
+                transform.Children.Add(new RotateTransform(Math.Abs(angle)));
+
+            // Scale
+            if ((float)scale < 1.0f || angle < 0) // Only downscale
             {
-                transform.Children.Add(new RotateTransform(angle));
+                double xScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceWpf.PixelWidth, scale));
+                double yScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceWpf.PixelHeight, scale));
+
+                if (angle < 0)
+                    xScale = -xScale;
+                transform.Children.Add(new ScaleTransform(xScale, yScale));
             }
 
             // Apply the tranformation
@@ -680,12 +679,124 @@ namespace Manina.Windows.Forms
             BitmapData data = bmp.LockBits(rect, ImageLockMode.WriteOnly, formatBmp);
             bmpWpf.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
             bmp.UnlockBits(data);
-#if DEBUG
-            bmp.Tag = "WIC";
-#endif
+
             return bmp;
         }
 #endif
+        /// <summary>
+        /// Returns Exif rotation in degrees. Returns 0 if the metadata 
+        /// does not exist or could not be read. A negative value means
+        /// the image needs to be mirrored about the vertical axis.
+        /// </summary>
+        /// <param name="img">Image.</param>
+        private static int GetRotation(Image img)
+        {
+            try
+            {
+                PropertyItem prop = img.GetPropertyItem(TagOrientation);
+                ushort orientationFlag = BitConverter.ToUInt16(prop.Value, 0);
+                if (orientationFlag == 1)
+                    return 0;
+                else if (orientationFlag == 2)
+                    return -360;
+                else if (orientationFlag == 3)
+                    return 180;
+                else if (orientationFlag == 4)
+                    return -180;
+                else if (orientationFlag == 5)
+                    return -90;
+                else if (orientationFlag == 6)
+                    return 90;
+                else if (orientationFlag == 7)
+                    return -270;
+                else if (orientationFlag == 8)
+                    return 270;
+            }
+            catch
+            {
+                ;
+            }
+
+            return 0;
+        }
+        /// <summary>
+        /// Returns Exif rotation in degrees. Returns 0 if the metadata 
+        /// does not exist or could not be read. A negative value means
+        /// the image needs to be mirrored about the vertical axis.
+        /// </summary>
+        /// <param name="filename">Image.</param>
+        private static int GetRotation(string filename)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    using (Image img = Image.FromStream(stream, false, false))
+                    {
+                        return GetRotation(img);
+                    }
+                }
+            }
+            catch
+            {
+                ;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Scales down and rotates an image.
+        /// </summary>
+        /// <param name="source">Original image</param>
+        /// <param name="scale">Uniform scaling factor</param>
+        /// <param name="angle">Rotation angle</param>
+        /// <returns>Scaled and rotated image</returns>
+        private static Image ScaleDownRotateBitmap(Image source, double scale, int angle)
+        {
+            if (angle % 90 != 0)
+            {
+                throw new ArgumentException("Rotation angle should be a multiple of 90 degrees.", "angle");
+            }
+
+            // Do not upscale and no rotation.
+            if ((float)scale >= 1.0f && angle == 0)
+            {
+                return new Bitmap(source);
+            }
+
+            int sourceWidth = source.Width;
+            int sourceHeight = source.Height;
+
+            // Scale
+            double xScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceWidth, scale));
+            double yScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceHeight, scale));
+
+            int width = (int)((double)sourceWidth * xScale);
+            int height = (int)((double)sourceHeight * yScale);
+            int thumbWidth = Math.Abs(angle) % 180 == 0 ? width : height;
+            int thumbHeight = Math.Abs(angle) % 180 == 0 ? height : width;
+
+            Image thumb = new Bitmap(thumbWidth, thumbHeight);
+            using (Graphics g = Graphics.FromImage(thumb))
+            {
+                g.PixelOffsetMode = PixelOffsetMode.None;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.Clear(System.Drawing.Color.Transparent);
+
+                g.TranslateTransform(-sourceWidth / 2, -sourceHeight / 2, MatrixOrder.Append);
+                if (Math.Abs(angle) % 360 != 0)
+                    g.RotateTransform(Math.Abs(angle), MatrixOrder.Append);
+                if (angle < 0)
+                    xScale = -xScale;
+                g.ScaleTransform((float)xScale, (float)yScale, MatrixOrder.Append);
+                g.TranslateTransform(thumbWidth / 2, thumbHeight / 2, MatrixOrder.Append);
+
+                g.DrawImage(source, 0, 0);
+            }
+
+            return thumb;
+        }
         #endregion
     }
 }

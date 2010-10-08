@@ -505,14 +505,13 @@ namespace Manina.Windows.Forms
         /// <returns>Metadata object or null if the metadata as not found.</returns>
         private object GetMetadataObject(BitmapMetadata metadata, params string[] query)
         {
-            object val = null;
             foreach (string q in query)
             {
-                val = metadata.GetQuery(q);
+                object val = metadata.GetQuery(q);
                 if (val != null)
                     return val;
             }
-            return val;
+            return null;
         }
 #endif
         /// <summary>
