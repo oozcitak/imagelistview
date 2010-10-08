@@ -84,6 +84,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public bool AutoRotate { get; private set; }
             /// <summary>
+            /// Gets whether Windows Imaging Component will be used.
+            /// </summary>
+            public bool UseWIC { get; private set; }
+            /// <summary>
             /// Gets whether this item represents a virtual ImageListViewItem.
             /// </summary>
             public bool IsVirtualItem { get; private set; }
@@ -102,7 +106,7 @@ namespace Manina.Windows.Forms
             /// <param name="image">The thumbnail image.</param>
             /// <param name="state">The cache state of the item.</param>
             public CacheItem(Guid guid, object key, Size size, Image image, CacheState state)
-                : this(guid, key, size, image, state, UseEmbeddedThumbnails.Auto, true)
+                : this(guid, key, size, image, state, UseEmbeddedThumbnails.Auto, true, true)
             {
                 ;
             }
@@ -117,7 +121,8 @@ namespace Manina.Windows.Forms
             /// <param name="state">The cache state of the item.</param>
             /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
-            public CacheItem(Guid guid, object key, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            /// <param name="useWIC">Whether to use WIC.</param>
+            public CacheItem(Guid guid, object key, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
             {
                 Guid = guid;
                 VirtualItemKey = key;
@@ -127,6 +132,7 @@ namespace Manina.Windows.Forms
                 State = state;
                 UseEmbeddedThumbnails = useEmbeddedThumbnails;
                 AutoRotate = autoRotate;
+                UseWIC = useWIC;
                 IsVirtualItem = true;
                 disposed = false;
             }
@@ -139,7 +145,7 @@ namespace Manina.Windows.Forms
             /// <param name="image">The thumbnail image.</param>
             /// <param name="state">The cache state of the item.</param>
             public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state)
-                : this(guid, filename, size, image, state, UseEmbeddedThumbnails.Auto, true)
+                : this(guid, filename, size, image, state, UseEmbeddedThumbnails.Auto, true, true)
             {
                 ;
             }
@@ -153,7 +159,8 @@ namespace Manina.Windows.Forms
             /// <param name="state">The cache state of the item.</param>
             /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
-            public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            /// <param name="useWIC">Whether to use WIC.</param>
+            public CacheItem(Guid guid, string filename, Size size, Image image, CacheState state, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
             {
                 Guid = guid;
                 FileName = filename;
@@ -162,6 +169,7 @@ namespace Manina.Windows.Forms
                 State = state;
                 UseEmbeddedThumbnails = useEmbeddedThumbnails;
                 AutoRotate = autoRotate;
+                UseWIC = useWIC;
                 IsVirtualItem = false;
                 disposed = false;
             }
@@ -465,7 +473,7 @@ namespace Manina.Windows.Forms
             {
                 // Extract the thumbnail from the source image.
                 thumb = ThumbnailExtractor.FromFile(request.FileName,
-                    request.Size, request.UseEmbeddedThumbnails, request.AutoRotate);
+                    request.Size, request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
             }
 
             // Return the thumbnail
@@ -474,12 +482,12 @@ namespace Manina.Windows.Forms
             {
                 result = new CacheItem(request.Guid, request.FileName,
                     request.Size, null, CacheState.Error,
-                    request.UseEmbeddedThumbnails, request.AutoRotate);
+                    request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
             }
             else
                 result = new CacheItem(guid, request.FileName,
                     request.Size, thumb, CacheState.Cached,
-                    request.UseEmbeddedThumbnails, request.AutoRotate);
+                    request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
 
             e.Result = result;
         }
@@ -694,8 +702,9 @@ namespace Manina.Windows.Forms
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void Add(Guid guid, string filename, Size thumbSize,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             CacheItem item = null;
@@ -712,7 +721,7 @@ namespace Manina.Windows.Forms
             // Add to cache queue
             RunWorker(new CacheItem(guid, filename,
                 thumbSize, null, CacheState.Unknown,
-                useEmbeddedThumbnails, autoRotate));
+                useEmbeddedThumbnails, autoRotate, useWIC));
         }
         /// <summary>
         /// Adds the image to the cache queue.
@@ -723,8 +732,9 @@ namespace Manina.Windows.Forms
         /// <param name="thumb">Thumbnail image to add to cache.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void Add(Guid guid, string filename, Size thumbSize, Image thumb,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             CacheItem item = null;
@@ -735,8 +745,8 @@ namespace Manina.Windows.Forms
             }
             // Add to cache
             thumbCache.Add(guid, new CacheItem(guid, filename, thumbSize,
-                ThumbnailExtractor.FromImage(thumb, thumbSize, useEmbeddedThumbnails, autoRotate),
-                CacheState.Cached));
+                ThumbnailExtractor.FromImage(thumb, thumbSize, useEmbeddedThumbnails, autoRotate, useWIC),
+                CacheState.Cached, useEmbeddedThumbnails, autoRotate, useWIC));
 
             if (mImageListView != null)
             {
@@ -752,8 +762,9 @@ namespace Manina.Windows.Forms
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void Add(Guid guid, object key, Size thumbSize,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             CacheItem item = null;
@@ -765,7 +776,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheItem(guid, key, thumbSize, null,
-                CacheState.Unknown, useEmbeddedThumbnails, autoRotate));
+                CacheState.Unknown, useEmbeddedThumbnails, autoRotate, useWIC));
         }
         /// <summary>
         /// Adds a virtual item to the cache.
@@ -776,8 +787,9 @@ namespace Manina.Windows.Forms
         /// <param name="thumb">Thumbnail image to add to cache.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void Add(Guid guid, object key, Size thumbSize, Image thumb,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             CacheItem item = null;
@@ -789,8 +801,8 @@ namespace Manina.Windows.Forms
 
             // Add to cache
             thumbCache.Add(guid, new CacheItem(guid, key, thumbSize,
-                ThumbnailExtractor.FromImage(thumb, thumbSize, useEmbeddedThumbnails, autoRotate),
-                CacheState.Cached, useEmbeddedThumbnails, autoRotate));
+                ThumbnailExtractor.FromImage(thumb, thumbSize, useEmbeddedThumbnails, autoRotate, useWIC),
+                CacheState.Cached, useEmbeddedThumbnails, autoRotate, useWIC));
 
             // Raise the cache events
             if (mImageListView != null)
@@ -807,18 +819,20 @@ namespace Manina.Windows.Forms
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void AddToGalleryCache(Guid guid, string filename,
-            Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             if (galleryItem != null && galleryItem.Guid == guid &&
                 galleryItem.Size == thumbSize &&
-                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
+                galleryItem.UseWIC == useWIC)
                 return;
 
             // Add to cache queue
             RunWorker(new CacheItem(guid, filename,
-                thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate), 2);
+                thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate, useWIC), 2);
         }
         /// <summary>
         /// Adds the virtual item image to the gallery cache queue.
@@ -828,18 +842,20 @@ namespace Manina.Windows.Forms
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void AddToGalleryCache(Guid guid, object key, Size thumbSize,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             if (galleryItem != null && galleryItem.Guid == guid &&
                 galleryItem.Size == thumbSize &&
-                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
+                galleryItem.UseWIC == useWIC)
                 return;
 
             // Add to cache queue
             RunWorker(new CacheItem(guid, key, thumbSize,
-                null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate), 2);
+                null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate, useWIC), 2);
         }
         /// <summary>
         /// Adds the image to the renderer cache queue.
@@ -849,18 +865,20 @@ namespace Manina.Windows.Forms
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void AddToRendererCache(Guid guid, string filename,
-            Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             if (rendererItem != null && rendererItem.Guid == guid &&
                 rendererItem.Size == thumbSize &&
-                rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
+                rendererItem.UseWIC == useWIC)
                 return;
 
             // Add to cache queue
             RunWorker(new CacheItem(guid, filename,
-                thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate), 1);
+                thumbSize, null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate, useWIC), 1);
         }
         /// <summary>
         /// Adds the virtual item image to the renderer cache queue.
@@ -870,18 +888,20 @@ namespace Manina.Windows.Forms
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
+        /// <param name="useWIC">Whether to use WIC.</param>
         public void AddToRendererCache(Guid guid, object key, Size thumbSize,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
             if (rendererItem != null && rendererItem.Guid == guid &&
                 rendererItem.Size == thumbSize &&
-                rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails)
+                rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
+                rendererItem.UseWIC == useWIC)
                 return;
 
             // Add to cache queue
             RunWorker(new CacheItem(guid, key, thumbSize,
-                null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate), 1);
+                null, CacheState.Unknown, useEmbeddedThumbnails, autoRotate, useWIC), 1);
         }
         /// <summary>
         /// Gets the image from the renderer cache. If the image is not cached,

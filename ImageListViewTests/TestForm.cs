@@ -24,10 +24,10 @@ namespace ImageListViewTests
             string picturePath = Path.GetDirectoryName(Path.GetDirectoryName(Application.StartupPath)) + Path.DirectorySeparatorChar + "Pictures";
             files = Directory.GetFiles(picturePath, "*.jpg");
 
-            imageListView1.RetrieveVirtualItemThumbnail += new Manina.Windows.Forms.RetrieveVirtualItemThumbnailEventHandler(imageListView1_RetrieveVirtualItemThumbnail);
-            imageListView1.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
-            imageListView1.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
-            imageListView1.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
+            imageListView.RetrieveVirtualItemThumbnail += new Manina.Windows.Forms.RetrieveVirtualItemThumbnailEventHandler(imageListView1_RetrieveVirtualItemThumbnail);
+            imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
+            imageListView.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
+            imageListView.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
         }
         #endregion
 
@@ -48,26 +48,37 @@ namespace ImageListViewTests
         // Cache error
         void imageListView1_CacheError(object sender, Manina.Windows.Forms.CacheErrorEventArgs e)
         {
-            LogEvent(string.Format("!!! {0} -> {1}", (e.CacheThread == Manina.Windows.Forms.CacheThread.Thumbnail ? "Thumbnail" : "Details"), e.Error.Message));
+            if (!benchMarking)
+                LogEvent(string.Format("!!! {0} -> {1}", (e.CacheThread == Manina.Windows.Forms.CacheThread.Thumbnail ? "Thumbnail" : "Details"), e.Error.Message));
         }
         // Thumbnail cached
         void imageListView1_ThumbnailCached(object sender, Manina.Windows.Forms.ThumbnailCachedEventArgs e)
         {
-            int index = -1;
-            if (e.Item != null)
-                index = e.Item.Index;
-            if (e.Error)
-                LogEvent(string.Format("<-- {0} !!!", index));
+            if (benchMarking)
+            {
+                lastThumbnailTime = benchmarkSW.ElapsedMilliseconds;
+            }
             else
-                LogEvent(string.Format("<-- {0} ({1})", index, e.Size));
+            {
+                int index = -1;
+                if (e.Item != null)
+                    index = e.Item.Index;
+                if (e.Error)
+                    LogEvent(string.Format("<-- {0} !!!", index));
+                else
+                    LogEvent(string.Format("<-- {0} ({1})", index, e.Size));
+            }
         }
         // Thumbnail caching
         void imageListView1_ThumbnailCaching(object sender, Manina.Windows.Forms.ThumbnailCachingEventArgs e)
         {
-            int index = -1;
-            if (e.Item != null)
-                index = e.Item.Index;
-            LogEvent(string.Format("--> {0} ({1})", index, e.Size));
+            if (!benchMarking)
+            {
+                int index = -1;
+                if (e.Item != null)
+                    index = e.Item.Index;
+                LogEvent(string.Format("--> {0} ({1})", index, e.Size));
+            }
         }
         // Log event to list box
         private void LogEvent(string message)
@@ -81,39 +92,39 @@ namespace ImageListViewTests
         // Add items
         private void AddItems_Click(object sender, EventArgs e)
         {
-            imageListView1.SuspendLayout();
+            imageListView.SuspendLayout();
             for (int i = 0; i < 1000 / files.Length; i++)
-                imageListView1.Items.AddRange(files);
-            imageListView1.ResumeLayout();
+                imageListView.Items.AddRange(files);
+            imageListView.ResumeLayout();
         }
         // Add item
         private void AddOneItem_Click(object sender, EventArgs e)
         {
-            imageListView1.Items.Add(files[0]);
+            imageListView.Items.Add(files[0]);
         }
         // Insert item
         private void InsertItemAtIndex0_Click(object sender, EventArgs e)
         {
-            imageListView1.Items.Insert(0, files[0]);
+            imageListView.Items.Insert(0, files[0]);
         }
         // Remove item
         private void RemoveItemAtIndex0_Click(object sender, EventArgs e)
         {
-            imageListView1.Items.RemoveAt(0);
+            imageListView.Items.RemoveAt(0);
         }
         // Clear items
         private void ClearItems_Click(object sender, EventArgs e)
         {
-            imageListView1.Items.Clear();
+            imageListView.Items.Clear();
         }
         // Add virtual items
         private void AddVirtualItems_Click(object sender, EventArgs e)
         {
-            imageListView1.SuspendLayout();
+            imageListView.SuspendLayout();
             for (int i = 0; i < 1000 / files.Length; i++)
                 for (int j = 0; j < files.Length; j++)
-                    imageListView1.Items.Add(files[j], files[j]);
-            imageListView1.ResumeLayout();
+                    imageListView.Items.Add(files[j], files[j]);
+            imageListView.ResumeLayout();
         }
         #endregion
 
@@ -121,7 +132,7 @@ namespace ImageListViewTests
         // Rebuild thumbnails
         private void RebuildThumbnails_Click(object sender, EventArgs e)
         {
-            imageListView1.ClearThumbnailCache();
+            imageListView.ClearThumbnailCache();
         }
         #endregion
 
@@ -129,34 +140,34 @@ namespace ImageListViewTests
         // View modes
         private void ViewThumbnails_Click(object sender, EventArgs e)
         {
-            imageListView1.View = Manina.Windows.Forms.View.Thumbnails;
+            imageListView.View = Manina.Windows.Forms.View.Thumbnails;
         }
         private void ViewGallery_Click(object sender, EventArgs e)
         {
-            imageListView1.View = Manina.Windows.Forms.View.Gallery;
+            imageListView.View = Manina.Windows.Forms.View.Gallery;
         }
         private void ViewPane_Click(object sender, EventArgs e)
         {
-            imageListView1.View = Manina.Windows.Forms.View.Pane;
+            imageListView.View = Manina.Windows.Forms.View.Pane;
         }
         private void ViewDetails_Click(object sender, EventArgs e)
         {
-            imageListView1.View = Manina.Windows.Forms.View.Details;
+            imageListView.View = Manina.Windows.Forms.View.Details;
         }
         // Show file icons
         private void ShowFileIcons_Click(object sender, EventArgs e)
         {
-            imageListView1.ShowFileIcons = !imageListView1.ShowFileIcons;
+            imageListView.ShowFileIcons = !imageListView.ShowFileIcons;
         }
         // Show checkboxes
         private void ShowCheckboxes_Click(object sender, EventArgs e)
         {
-            imageListView1.ShowCheckBoxes = !imageListView1.ShowCheckBoxes;
+            imageListView.ShowCheckBoxes = !imageListView.ShowCheckBoxes;
         }
         // Show scroll bars
         private void ShowScrollbars_Click(object sender, EventArgs e)
         {
-            imageListView1.ScrollBars = !imageListView1.ScrollBars;
+            imageListView.ScrollBars = !imageListView.ScrollBars;
         }
         #endregion
 
@@ -164,65 +175,65 @@ namespace ImageListViewTests
         // Cache mode
         private void CacheOnDemand_Click(object sender, EventArgs e)
         {
-            if (imageListView1.CacheMode == Manina.Windows.Forms.CacheMode.Continuous)
-                imageListView1.CacheMode = Manina.Windows.Forms.CacheMode.OnDemand;
+            if (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.Continuous)
+                imageListView.CacheMode = Manina.Windows.Forms.CacheMode.OnDemand;
             else
-                imageListView1.CacheMode = Manina.Windows.Forms.CacheMode.Continuous;
+                imageListView.CacheMode = Manina.Windows.Forms.CacheMode.Continuous;
         }
         // Duplicte filenames
         private void AllowDuplicateFilenames_Click(object sender, EventArgs e)
         {
-            imageListView1.AllowDuplicateFileNames = !imageListView1.AllowDuplicateFileNames;
+            imageListView.AllowDuplicateFileNames = !imageListView.AllowDuplicateFileNames;
         }
         // Integral scroll
         private void IntegralScroll_Click(object sender, EventArgs e)
         {
-            imageListView1.IntegralScroll = !imageListView1.IntegralScroll;
+            imageListView.IntegralScroll = !imageListView.IntegralScroll;
         }
         // Multi select
         private void MultiSelect_Click(object sender, EventArgs e)
         {
-            imageListView1.MultiSelect = !imageListView1.MultiSelect;
+            imageListView.MultiSelect = !imageListView.MultiSelect;
         }
         // Embedded thumbnails
         private void UseEmbeddedThumbnails_Click(object sender, EventArgs e)
         {
-            if (imageListView1.UseEmbeddedThumbnails == Manina.Windows.Forms.UseEmbeddedThumbnails.Auto)
-                imageListView1.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Never;
+            if (imageListView.UseEmbeddedThumbnails == Manina.Windows.Forms.UseEmbeddedThumbnails.Auto)
+                imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Never;
             else
-                imageListView1.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Auto;
+                imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Auto;
         }
         // Auto rotate thumbnails
         private void AutoRotateThumbnails_Click(object sender, EventArgs e)
         {
-            imageListView1.AutoRotateThumbnails = !imageListView1.AutoRotateThumbnails;
+            imageListView.AutoRotateThumbnails = !imageListView.AutoRotateThumbnails;
         }
         #endregion
 
         #region Update UI
         void Application_Idle(object sender, EventArgs e)
         {
-            ViewThumbnails.Checked = (imageListView1.View == Manina.Windows.Forms.View.Thumbnails);
-            ViewGallery.Checked = (imageListView1.View == Manina.Windows.Forms.View.Gallery);
-            ViewPane.Checked = (imageListView1.View == Manina.Windows.Forms.View.Pane);
-            ViewDetails.Checked = (imageListView1.View == Manina.Windows.Forms.View.Details);
+            ViewThumbnails.Checked = (imageListView.View == Manina.Windows.Forms.View.Thumbnails);
+            ViewGallery.Checked = (imageListView.View == Manina.Windows.Forms.View.Gallery);
+            ViewPane.Checked = (imageListView.View == Manina.Windows.Forms.View.Pane);
+            ViewDetails.Checked = (imageListView.View == Manina.Windows.Forms.View.Details);
 
-            ShowFileIcons.Checked = imageListView1.ShowFileIcons;
-            ShowCheckboxes.Checked = imageListView1.ShowCheckBoxes;
-            ShowScrollbars.Checked = imageListView1.ScrollBars;
+            ShowFileIcons.Checked = imageListView.ShowFileIcons;
+            ShowCheckboxes.Checked = imageListView.ShowCheckBoxes;
+            ShowScrollbars.Checked = imageListView.ScrollBars;
 
-            CacheOnDemand.Checked = (imageListView1.CacheMode == Manina.Windows.Forms.CacheMode.OnDemand);
-            AllowDuplicateFilenames.Checked = imageListView1.AllowDuplicateFileNames;
-            IntegralScroll.Checked = imageListView1.IntegralScroll;
-            MultiSelect.Checked = imageListView1.MultiSelect;
-            UseEmbeddedThumbnails.Checked = (imageListView1.UseEmbeddedThumbnails == Manina.Windows.Forms.UseEmbeddedThumbnails.Auto);
-            AutoRotateThumbnails.Checked = imageListView1.AutoRotateThumbnails;
+            CacheOnDemand.Checked = (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.OnDemand);
+            AllowDuplicateFilenames.Checked = imageListView.AllowDuplicateFileNames;
+            IntegralScroll.Checked = imageListView.IntegralScroll;
+            MultiSelect.Checked = imageListView.MultiSelect;
+            UseEmbeddedThumbnails.Checked = (imageListView.UseEmbeddedThumbnails == Manina.Windows.Forms.UseEmbeddedThumbnails.Auto);
+            AutoRotateThumbnails.Checked = imageListView.AutoRotateThumbnails;
 
-            string focused = imageListView1.Items.FocusedItem == null ? "" : ", focused: " + imageListView1.Items.FocusedItem.Index.ToString();
+            string focused = imageListView.Items.FocusedItem == null ? "" : ", focused: " + imageListView.Items.FocusedItem.Index.ToString();
             StatusLabel.Text = string.Format("{0} items: {1} selected, {2} checked{3}",
-                imageListView1.Items.Count,
-                imageListView1.SelectedItems.Count,
-                imageListView1.CheckedItems.Count,
+                imageListView.Items.Count,
+                imageListView.SelectedItems.Count,
+                imageListView.CheckedItems.Count,
                 focused);
         }
         #endregion
@@ -232,6 +243,86 @@ namespace ImageListViewTests
         private void ClearEventList_Click(object sender, EventArgs e)
         {
             EventsListBox.Items.Clear();
+        }
+        #endregion
+
+        #region Benchmarks
+        private bool benchMarking = false;
+        private System.Diagnostics.Stopwatch benchmarkSW = new System.Diagnostics.Stopwatch();
+        private long lastThumbnailTime = 0;
+        private bool oldWIC;
+        private Manina.Windows.Forms.CacheMode oldCM;
+        private Manina.Windows.Forms.UseEmbeddedThumbnails oldET;
+
+        // StartBenchmark
+        private void StartBenchmark_Click(object sender, EventArgs e)
+        {
+            benchMarking = true;
+
+            if (ChooseBenchmarkPath.ShowDialog() == DialogResult.OK)
+            {
+                bool useWIC = BenchmarkUseWIC.Checked;
+                bool useET = BenchmarkUseEmbeddedThumbnails.Checked;
+
+                oldWIC = imageListView.UseWIC;
+                oldET = imageListView.UseEmbeddedThumbnails;
+                oldCM = imageListView.CacheMode;
+
+                imageListView.Items.Clear();
+                imageListView.UseWIC = useWIC;
+                if (useET)
+                    imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Auto;
+                else
+                    imageListView.UseEmbeddedThumbnails = Manina.Windows.Forms.UseEmbeddedThumbnails.Never;
+                imageListView.CacheMode = Manina.Windows.Forms.CacheMode.Continuous;
+
+                TestToolStrip.Enabled = false;
+                BenchmarkToolStrip.Enabled = false;
+                imageListView.Enabled = false;
+                EventsListBox.Enabled = false;
+
+                benchMarking = true;
+                CheckBenchmarkEndTimer.Enabled = true;
+
+                benchmarkSW.Reset();
+                benchmarkSW.Start();
+                lastThumbnailTime = 0;
+
+                imageListView.SuspendLayout();
+                foreach (string file in Directory.GetFiles(ChooseBenchmarkPath.SelectedPath, "*.jpg"))
+                    imageListView.Items.Add(file);
+            }
+        }
+
+        // Check if the benchmark ended
+        private void CheckBenchmarkEndTimer_Tick(object sender, EventArgs e)
+        {
+            if ((benchmarkSW.ElapsedMilliseconds - lastThumbnailTime) > 2000)
+            {
+                CheckBenchmarkEndTimer.Enabled = false;
+                benchMarking = false;
+                benchmarkSW.Stop();
+
+                TestToolStrip.Enabled = true;
+                BenchmarkToolStrip.Enabled = true;
+                imageListView.Enabled = true;
+                EventsListBox.Enabled = true;
+
+                imageListView.UseWIC = oldWIC;
+                imageListView.UseEmbeddedThumbnails = oldET;
+                imageListView.CacheMode = oldCM;
+                imageListView.ResumeLayout();
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("Benchmark Results:");
+                sb.AppendLine();
+                sb.AppendFormat("Cached {0} images in {1} milliseconds.", imageListView.Items.Count, lastThumbnailTime);
+
+                if (MessageBox.Show(sb.ToString() + Environment.NewLine + Environment.NewLine + "Copy information to clipboard?", "ImageListView Benchmark", MessageBoxButtons.YesNo, MessageBoxIcon.Information)== DialogResult.Yes )
+                {
+                    Clipboard.SetText(sb.ToString());
+                }
+            }
         }
         #endregion
     }

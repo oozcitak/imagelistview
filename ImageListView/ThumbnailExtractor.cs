@@ -51,63 +51,74 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+        /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
         /// <returns>The thumbnail image from the given image or null if an error occurs.</returns>
-        public static Image FromImage(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
+        public static Image FromImage(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
+
+            if (useWIC)
+            {
 #if USEWIC
-            MemoryStream stream = null;
-            BitmapFrame frameWpf = null;
-            try
-            {
-                stream = new MemoryStream();
-
-                image.Save(stream, ImageFormat.MemoryBmp);
-                // Performance vs image quality settings.
-                // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
-                // if the file contains no embedded thumbnail. The image quality is only slightly worse.
-                frameWpf = BitmapFrame.Create(stream,
-                    BitmapCreateOptions.IgnoreColorProfile,
-                    BitmapCacheOption.None);
-            }
-            catch
-            {
-                if (stream != null)
+                MemoryStream stream = null;
+                BitmapFrame frameWpf = null;
+                try
                 {
-                    stream.Dispose();
-                    stream = null;
+                    stream = new MemoryStream();
+
+                    image.Save(stream, ImageFormat.MemoryBmp);
+                    // Performance vs image quality settings.
+                    // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
+                    // if the file contains no embedded thumbnail. The image quality is only slightly worse.
+                    frameWpf = BitmapFrame.Create(stream,
+                        BitmapCreateOptions.IgnoreColorProfile,
+                        BitmapCacheOption.None);
                 }
-                frameWpf = null;
-            }
-
-            if (stream == null || frameWpf == null)
-            {
-                if (stream != null)
+                catch
                 {
-                    stream.Dispose();
-                    stream = null;
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                        stream = null;
+                    }
+                    frameWpf = null;
                 }
 
-                // .Net 2.0 fallback
-                Image img = GetThumbnailBmp(image, size);
-                return img;
-            }
+                if (stream == null || frameWpf == null)
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                        stream = null;
+                    }
 
-            int rotate = 0;
-            if (useExifOrientation)
-            {
-                rotate = GetRotation(frameWpf);
-            }
+                    // .Net 2.0 fallback
+                    Image img = GetThumbnailBmp(image, size);
+                    return img;
+                }
 
-            Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
-            stream.Dispose();
-            return thumb;
+                int rotate = 0;
+                if (useExifOrientation)
+                {
+                    rotate = GetRotation(frameWpf);
+                }
+
+                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
+                stream.Dispose();
+                return thumb;
 #else
             // .Net 2.0 fallback
             Image img = GetThumbnailBmp(image, size);
             return img;
 #endif
+            }
+            else
+            {
+                // .Net 2.0 fallback
+                Image img = GetThumbnailBmp(image, size);
+                return img;
+            }
         }
         /// <summary>
         /// Creates a thumbnail from the given image file.
@@ -120,8 +131,9 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+        /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
         /// <returns>The thumbnail image from the given file or null if an error occurs.</returns>
-        public static Image FromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
+        public static Image FromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
         {
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentException("Filename cannot be empty", "filename");
@@ -129,62 +141,71 @@ namespace Manina.Windows.Forms
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException("Thumbnail size cannot be empty.", "size");
 
+            if (useWIC)
+            {
 #if USEWIC
-            // File can be read and an image is recognized.
-            FileStream stream = null;
-            BitmapFrame frameWpf = null;
-            try
-            {
-                stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                if (stream != null)
+                // File can be read and an image is recognized.
+                FileStream stream = null;
+                BitmapFrame frameWpf = null;
+                try
                 {
-                    // Performance vs image quality settings.
-                    // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
-                    // if the file contains no embedded thumbnail. The image quality is only slightly worse.
-                    frameWpf = BitmapFrame.Create(stream,
-                        BitmapCreateOptions.IgnoreColorProfile,
-                        BitmapCacheOption.None);
+                    stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    if (stream != null)
+                    {
+                        // Performance vs image quality settings.
+                        // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
+                        // if the file contains no embedded thumbnail. The image quality is only slightly worse.
+                        frameWpf = BitmapFrame.Create(stream,
+                            BitmapCreateOptions.IgnoreColorProfile,
+                            BitmapCacheOption.None);
+                    }
                 }
-            }
-            catch
-            {
-                if (stream != null)
+                catch
                 {
-                    stream.Dispose();
-                    stream = null;
-                }
-                frameWpf = null;
-            }
-
-            if (stream == null || frameWpf == null)
-            {
-                if (stream != null)
-                {
-                    stream.Dispose();
-                    stream = null;
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                        stream = null;
+                    }
+                    frameWpf = null;
                 }
 
-                // .Net 2.0 fallback
-                Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
-                return img;
-            }
+                if (stream == null || frameWpf == null)
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                        stream = null;
+                    }
+
+                    // .Net 2.0 fallback
+                    Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
+                    return img;
+                }
 
 
-            int rotate = 0;
-            if (useExifOrientation)
-            {
-                rotate = GetRotation(frameWpf);
-            }
+                int rotate = 0;
+                if (useExifOrientation)
+                {
+                    rotate = GetRotation(frameWpf);
+                }
 
-            Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
+                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, rotate);
 
-            stream.Dispose();
-            return thumb;
+                stream.Dispose();
+                return thumb;
 #else
             // .Net 2.0 fallback
             Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
             return img;
 #endif
+            }
+            else
+            {
+                // .Net 2.0 fallback
+                Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
+                return img;
+            }
         }
         #endregion
 

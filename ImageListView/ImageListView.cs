@@ -93,6 +93,7 @@ namespace Manina.Windows.Forms
         private Size mCheckBoxPadding;
         private Size mThumbnailSize;
         private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
+        private bool mUseWIC;
         private View mView;
         private Point mViewOffset;
 
@@ -177,6 +178,10 @@ namespace Manina.Windows.Forms
                 if (mCacheMode != value)
                 {
                     mCacheMode = value;
+
+                    if (thumbnailCache != null)
+                        thumbnailCache.CacheMode = mCacheMode;
+
                     if (mCacheMode == CacheMode.Continuous)
                     {
                         mCacheLimitAsItemCount = 0;
@@ -186,13 +191,9 @@ namespace Manina.Windows.Forms
                             thumbnailCache.CacheLimitAsItemCount = 0;
                             thumbnailCache.CacheLimitAsMemory = 0;
                         }
+                        // Rebuild the cache
+                        ClearThumbnailCache();
                     }
-
-                    if (thumbnailCache != null)
-                        thumbnailCache.CacheMode = mCacheMode;
-
-                    // Rebuild the cache
-                    ClearThumbnailCache();
                 }
             }
         }
@@ -608,7 +609,25 @@ namespace Manina.Windows.Forms
                 if (mUseEmbeddedThumbnails != value)
                 {
                     mUseEmbeddedThumbnails = value;
-                    thumbnailCache.Rebuild();
+                    Refresh();
+                }
+            }
+        }
+        /// <summary>
+        /// Gets or sets whether Windows Imaging Compomnent will be used.
+        /// </summary>
+        [Browsable(false), Category("Behavior"), Description("Gets or sets whether Windows Imaging Compomnent will be used."), DefaultValue(true)]
+        public bool UseWIC
+        {
+            get
+            {
+                return mUseWIC;
+            }
+            set
+            {
+                if (mUseWIC != value)
+                {
+                    mUseWIC = value;
                     Refresh();
                 }
             }
@@ -828,6 +847,7 @@ namespace Manina.Windows.Forms
             Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
+            mUseWIC = true;
             mView = View.Thumbnails;
             mViewOffset = new Point(0, 0);
 
@@ -869,10 +889,10 @@ namespace Manina.Windows.Forms
                     {
                         if (item.isVirtualItem)
                             thumbnailCache.Add(item.Guid, item.VirtualItemKey,
-                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
+                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails, UseWIC);
                         else
                             thumbnailCache.Add(item.Guid, item.FileName,
-                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
+                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails, UseWIC);
                     }
                 }
                 Refresh();

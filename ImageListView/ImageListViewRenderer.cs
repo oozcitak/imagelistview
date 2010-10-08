@@ -307,10 +307,10 @@ namespace Manina.Windows.Forms
                 {
                     if (item.isVirtualItem)
                         ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.VirtualItemKey,
-                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails, ImageListView.UseWIC);
                     else
                         ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.FileName, size,
-                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails, ImageListView.UseWIC);
                 }
 
                 return img;
@@ -724,10 +724,10 @@ namespace Manina.Windows.Forms
                 {
                     if (item.isVirtualItem)
                         ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.VirtualItemKey,
-                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails, ImageListView.UseWIC);
                     else
                         ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.FileName, size,
-                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails, ImageListView.UseWIC);
                 }
 
                 return img;
