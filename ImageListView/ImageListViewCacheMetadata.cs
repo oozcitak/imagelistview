@@ -61,6 +61,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public object VirtualItemKey { get; private set; }
             /// <summary>
+            /// Whether to use the Windows Imaging Component.
+            /// </summary>
+            public bool UseWIC { get; private set; }
+            /// <summary>
             /// Gets whether this item is a virtual item.
             /// </summary>
             public bool IsVirtualItem { get; private set; }
@@ -70,24 +74,28 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="guid">The guid of the item.</param>
             /// <param name="filename">The file name.</param>
-            public CacheItem(Guid guid, string filename)
+            /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+            public CacheItem(Guid guid, string filename, bool useWIC)
             {
                 Guid = guid;
                 FileName = filename;
                 IsVirtualItem = false;
                 VirtualItemKey = null;
+                UseWIC = useWIC;
             }
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheItem"/> class.
             /// </summary>
             /// <param name="guid">The guid of the item.</param>
             /// <param name="virtualItemKey">The virtual item key.</param>
-            public CacheItem(Guid guid, object virtualItemKey)
+            /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+            public CacheItem(Guid guid, object virtualItemKey, bool useWIC)
             {
                 Guid = guid;
                 FileName = null;
                 IsVirtualItem = true;
                 VirtualItemKey = virtualItemKey;
+                UseWIC = useWIC;
             }
         }
         #endregion
@@ -195,7 +203,7 @@ namespace Manina.Windows.Forms
             }
             else
             {
-                ShellImageFileInfo info = e.Result as ShellImageFileInfo;
+                ImageMetadata info = e.Result as ImageMetadata;
                 mImageListView.UpdateItemDetailsInternal(request.Guid, info);
             }
 
@@ -240,7 +248,7 @@ namespace Manina.Windows.Forms
             }
             else
             {
-                ShellImageFileInfo info = ShellImageFileInfo.FromFile(request.FileName);
+                ImageMetadata info = ImageMetadata.FromFile(request.FileName, request.UseWIC);
                 e.Result = info;
                 if (info.Error != null)
                     throw info.Error;
@@ -290,23 +298,25 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="guid">Item guid.</param>
         /// <param name="filename">File name.</param>
-        public void Add(Guid guid, string filename)
+        /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+        public void Add(Guid guid, string filename, bool useWIC)
         {
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentException("filename cannot be null", "extension");
 
             // Add to cache queue
-            RunWorker(new CacheItem(guid, filename));
+            RunWorker(new CacheItem(guid, filename, useWIC));
         }
         /// <summary>
         /// Adds the item to the cache queue.
         /// </summary>
         /// <param name="guid">Item guid.</param>
         /// <param name="virtualItemKey">The virtual item key.</param>
-        public void Add(Guid guid, object virtualItemKey)
+        /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+        public void Add(Guid guid, object virtualItemKey, bool useWIC)
         {
             // Add to cache queue
-            RunWorker(new CacheItem(guid, virtualItemKey));
+            RunWorker(new CacheItem(guid, virtualItemKey, useWIC));
         }
         #endregion
 
@@ -369,7 +379,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// A utility class for reading image details.
         /// </summary>
-        internal class ShellImageFileInfo
+        internal class ImageMetadata
         {
             public FileAttributes FileAttributes;
             public DateTime CreationTime;
@@ -402,9 +412,10 @@ namespace Manina.Windows.Forms
             /// Gets image details for the given file.
             /// </summary>
             /// <param name="path">The path to an image file.</param>
-            public static ShellImageFileInfo FromFile(string path)
+            /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+            public static ImageMetadata FromFile(string path, bool useWIC)
             {
-                ShellImageFileInfo imageInfo = new ShellImageFileInfo();
+                ImageMetadata imageInfo = new ImageMetadata();
 
                 if (string.IsNullOrEmpty(path))
                     return imageInfo;
@@ -423,7 +434,7 @@ namespace Manina.Windows.Forms
                     imageInfo.Extension = info.Extension;
 
                     // Get metadata
-                    MetadataExtractor metadata = MetadataExtractor.FromFile(path);
+                    MetadataExtractor metadata = MetadataExtractor.FromFile(path, useWIC);
                     imageInfo.Dimensions = new Size(metadata.Width, metadata.Height);
                     imageInfo.Resolution = new SizeF((float)metadata.DPIX, (float)metadata.DPIY);
                     imageInfo.ImageDescription = metadata.ImageDescription ?? "";

@@ -132,14 +132,16 @@ namespace Manina.Windows.Forms
                                     (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                             else
                                 mImageListView.thumbnailCache.Add(item.Guid, item.FileName,
-                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, 
+                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
                                     mImageListView.AutoRotateThumbnails,
                                     (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                         }
                         if (item.isVirtualItem)
-                            mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
+                            mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey,
+                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                         else
-                            mImageListView.itemCacheManager.Add(item.Guid, item.FileName);
+                            mImageListView.itemCacheManager.Add(item.Guid, item.FileName,
+                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                         if (item.Selected != oldSelected)
                             mImageListView.OnSelectionChanged(new EventArgs());
                     }
@@ -528,9 +530,11 @@ namespace Manina.Windows.Forms
 
                     // Add to details cache
                     if (item.isVirtualItem)
-                        mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey);
+                        mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                     else
-                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName);
+                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
 
                     // Add to shell info cache
                     if (!item.isVirtualItem)

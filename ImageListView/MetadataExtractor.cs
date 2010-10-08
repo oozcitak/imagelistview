@@ -595,7 +595,7 @@ namespace Manina.Windows.Forms
         /// If WIC lacks a metadata reader for this image type then fall back to .NET 2.0 method. 
         /// </summary>
         /// <param name="frameWpf">Opened WPF image</param>
-        public static MetadataExtractor FromBitmap2(BitmapFrame frameWpf)
+        public static MetadataExtractor FromBitmap(BitmapFrame frameWpf)
         {
             MetadataExtractor metadata = new MetadataExtractor();
             metadata.InitViaWpf(frameWpf);
