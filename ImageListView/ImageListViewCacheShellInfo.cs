@@ -29,8 +29,9 @@ namespace Manina.Windows.Forms
     internal class ImageListViewCacheShellInfo : IDisposable
     {
         #region Member Variables
-        QueuedBackgroundWorker bw;
+        private QueuedBackgroundWorker bw;
         private SynchronizationContext context;
+        private SendOrPostCallback checkProcessingCallback;
 
         private ImageListView mImageListView;
 
@@ -39,7 +40,7 @@ namespace Manina.Windows.Forms
         private bool disposed;
         #endregion
 
-        #region Private Classes
+        #region CacheItem Class
         /// <summary>
         /// Represents an item in the cache.
         /// </summary>
@@ -124,6 +125,33 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region CanContinueProcessingEventArgs
+        /// <summary>
+        /// Represents the event arguments for the <see cref="CanContinueProcessing"/> callback.
+        /// </summary>
+        private class CanContinueProcessingEventArgs : EventArgs
+        {
+            /// <summary>
+            /// Gets the file extension of the request.
+            /// </summary>
+            public string Extension { get; private set; }
+            /// <summary>
+            /// Gets whether this item should be processed.
+            /// </summary>
+            public bool ContinueProcessing { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CanContinueProcessingEventArgs"/> class.
+            /// </summary>
+            /// <param name="extension">The file extension of the request.</param>
+            public CanContinueProcessingEventArgs(string extension)
+            {
+                Extension = extension;
+                ContinueProcessing = true;
+            }
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Determines whether the cache manager retries loading items on errors.
@@ -140,11 +168,12 @@ namespace Manina.Windows.Forms
         {
             context = null;
             bw = new QueuedBackgroundWorker();
-            bw.SetApartmentState(ApartmentState.STA);
             bw.IsBackground = true;
             bw.DoWork += bw_DoWork;
             bw.RunWorkerCompleted += bw_RunWorkerCompleted;
             bw.WorkerFinished += bw_WorkerFinished;
+
+            checkProcessingCallback = new SendOrPostCallback(CanContinueProcessing);
 
             mImageListView = owner;
             RetryOnError = false;
@@ -157,19 +186,35 @@ namespace Manina.Windows.Forms
 
         #region Context Callbacks
         /// <summary>
-        /// Returns the item from the cache on the UI thread.
+        /// Determines if the item should be processed.
         /// </summary>
-        /// <param name="extension">The file extension of the cache item.</param>
-        /// <returns>The cache item; or null if the item was not found.</returns>
-        private CacheItem GetFromCacheCallback(string extension)
+        /// <param name="extension">The file extension to check.</param>
+        /// <returns>true if the item should be processed; otherwise false.</returns>
+        private bool OnCanContinueProcessing(string extension)
         {
-            CacheItem existing = null;
-            SendOrPostCallback callback = delegate
+            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(extension);
+            context.Send(checkProcessingCallback, arg);
+            return arg.ContinueProcessing;
+        }
+        /// <summary>
+        /// Determines if the item should be processed.
+        /// </summary>
+        /// <param name="argument">The event argument.</param>
+        /// <returns>true if the item should be processed; otherwise false.</returns>
+        private void CanContinueProcessing(object argument)
+        {
+            CanContinueProcessingEventArgs arg = argument as CanContinueProcessingEventArgs;
+            bool canProcess = true;
+
+            // Is it already cached?
+            CacheItem existing;
+            if (shellCache.TryGetValue(arg.Extension, out existing))
             {
-                shellCache.TryGetValue(extension, out existing);
-            };
-            context.Send(callback, extension);
-            return existing;
+                if (existing.SmallIcon != null && existing.LargeIcon != null)
+                    canProcess = false;
+            }
+
+            arg.ContinueProcessing = canProcess;
         }
         #endregion
 
@@ -193,6 +238,7 @@ namespace Manina.Windows.Forms
         {
             CacheItem result = e.Result as CacheItem;
 
+            // Add to cache
             if (result != null)
             {
                 CacheItem existing = null;
@@ -218,9 +264,9 @@ namespace Manina.Windows.Forms
         {
             string extension = e.Argument as string;
 
-            // Is it already cached?
-            CacheItem existing = GetFromCacheCallback(extension);
-            if (existing != null && existing.SmallIcon != null && existing.LargeIcon != null)
+            // Should we continue processing this item?
+            // The callback checks if the item is already cached.
+            if (!OnCanContinueProcessing(extension))
             {
                 e.Cancel = true;
                 return;

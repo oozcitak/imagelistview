@@ -29,9 +29,9 @@ namespace Manina.Windows.Forms
     internal class ImageListViewCacheThumbnail : IDisposable
     {
         #region Member Variables
-        QueuedBackgroundWorker bw;
+        private QueuedBackgroundWorker bw;
         private SynchronizationContext context;
-        SendOrPostCallback checkProcessingCallback;
+        private SendOrPostCallback checkProcessingCallback;
 
         private ImageListView mImageListView;
 
@@ -223,6 +223,9 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region CanContinueProcessingEventArgs
+        /// <summary>
+        /// Represents the event arguments for the <see cref="CanContinueProcessing"/> callback.
+        /// </summary>
         private class CanContinueProcessingEventArgs : EventArgs
         {
             /// <summary>
