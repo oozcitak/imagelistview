@@ -32,6 +32,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         QueuedBackgroundWorker bw;
         private SynchronizationContext context;
+        SendOrPostCallback checkProcessingCallback;
 
         private ImageListView mImageListView;
 
@@ -42,7 +43,7 @@ namespace Manina.Windows.Forms
         private bool disposed;
         #endregion
 
-        #region Private Classes
+        #region CacheItem Class
         /// <summary>
         /// Represents an item in the cache.
         /// </summary>
@@ -100,6 +101,30 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region CanContinueProcessingEventArgs
+        private class CanContinueProcessingEventArgs : EventArgs
+        {
+            /// <summary>
+            /// Gets the guid of the request.
+            /// </summary>
+            public Guid Guid { get; private set; }
+            /// <summary>
+            /// Gets whether this item should be processed.
+            /// </summary>
+            public bool ContinueProcessing { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CanContinueProcessingEventArgs"/> class.
+            /// </summary>
+            /// <param name="guid">The guid of the request.</param>
+            public CanContinueProcessingEventArgs(Guid guid)
+            {
+                Guid = guid;
+                ContinueProcessing = true;
+            }
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Determines whether the cache manager retries loading items on errors.
@@ -116,11 +141,12 @@ namespace Manina.Windows.Forms
         {
             context = null;
             bw = new QueuedBackgroundWorker();
-            bw.SetApartmentState(ApartmentState.STA);
             bw.IsBackground = true;
             bw.DoWork += bw_DoWork;
             bw.RunWorkerCompleted += bw_RunWorkerCompleted;
             bw.WorkerFinished += bw_WorkerFinished;
+
+            checkProcessingCallback = new SendOrPostCallback(CanContinueProcessing);
 
             mImageListView = owner;
             RetryOnError = false;
@@ -135,35 +161,42 @@ namespace Manina.Windows.Forms
 
         #region Context Callbacks
         /// <summary>
-        /// Determines if the item is in the edit cache on the UI thread.
+        /// Determines if the item should be processed.
         /// </summary>
-        /// <param name="guid">The guid of the cache item.</param>
-        /// <returns>true if item is in the edit cache; otherwise false.</returns>
-        private bool IsEditing(Guid guid)
+        /// <param name="item">The <see cref="CacheItem"/> to check.</param>
+        /// <returns>true if the item should be processed; otherwise false.</returns>
+        private bool OnCanContinueProcessing(CacheItem item)
         {
-            bool exists = false;
-            SendOrPostCallback callback = delegate
-            {
-                exists = editCache.ContainsKey(guid);
-            };
-            context.Send(callback, guid);
-            return exists;
+            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(
+                item.Guid);
+            context.Send(checkProcessingCallback, arg);
+            return arg.ContinueProcessing;
         }
         /// <summary>
-        /// Determines if the item was updated on the UI thread.
+        /// Determines if the item should be processed.
         /// </summary>
-        /// <param name="guid">The guid of the item.</param>
-        /// <returns>true if item is updated; otherwise false.</returns>
-        private bool IsUpdated(Guid guid)
+        /// <param name="argument">The event argument.</param>
+        /// <returns>true if the item should be processed; otherwise false.</returns>
+        private void CanContinueProcessing(object argument)
         {
-            bool dirty = false;
-            SendOrPostCallback callback = delegate
+            CanContinueProcessingEventArgs arg = argument as CanContinueProcessingEventArgs;
+            bool canProcess = true;
+
+            // Is it in the edit cache?
+            if (canProcess)
             {
-                if (mImageListView != null)
-                    dirty = mImageListView.IsItemDirty(guid);
-            };
-            context.Send(callback, guid);
-            return !dirty;
+                if (editCache.ContainsKey(arg.Guid))
+                    canProcess = false;
+            }
+
+            // Was the item was updated by the UI thread?
+            if (canProcess)
+            {
+                if (mImageListView != null && !mImageListView.IsItemDirty(arg.Guid))
+                    canProcess = false;
+            }
+
+            arg.ContinueProcessing = canProcess;
         }
         #endregion
 
@@ -225,15 +258,11 @@ namespace Manina.Windows.Forms
         {
             CacheItem request = e.Argument as CacheItem;
 
-            // Is it being edited?
-            if (IsEditing(request.Guid))
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            // Was it fetched by the UI thread in the meantime?
-            if (IsUpdated(request.Guid))
+            // Should we continue processing this item?
+            // The callback checks the following and returns false if
+            //   the item is in the edit cache -OR-
+            //   the item was fetched by the UI thread before.
+            if (!OnCanContinueProcessing(request))
             {
                 e.Cancel = true;
                 return;

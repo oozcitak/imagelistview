@@ -347,7 +347,6 @@ namespace Manina.Windows.Forms
             context.Send(checkProcessingCallback, arg);
             return arg.ContinueProcessing;
         }
-
         /// <summary>
         /// Determines if the item should be processed.
         /// </summary>
@@ -484,7 +483,7 @@ namespace Manina.Windows.Forms
             // The callback checks the following and returns false if
             //   the item is already cached -OR-
             //   the item is in the edit cache -OR-
-            //   the items is outside the visible area (only if the CacheMode is OnDemand).
+            //   the item is outside the visible area (only if the CacheMode is OnDemand).
             if (!OnCanContinueProcessing(request))
             {
                 e.Cancel = true;
