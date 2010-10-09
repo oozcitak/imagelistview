@@ -143,6 +143,15 @@
             // imageListView
             // 
             this.imageListView.AllowDuplicateFileNames = true;
+            this.imageListView.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 3, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 4, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 5, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 6, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 7, true)});
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
@@ -166,12 +175,12 @@
             this.ClearEventList});
             this.EventListContextMenu.Name = "EventListContextMenu";
             this.EventListContextMenu.ShowImageMargin = false;
-            this.EventListContextMenu.Size = new System.Drawing.Size(75, 26);
+            this.EventListContextMenu.Size = new System.Drawing.Size(86, 26);
             // 
             // ClearEventList
             // 
             this.ClearEventList.Name = "ClearEventList";
-            this.ClearEventList.Size = new System.Drawing.Size(74, 22);
+            this.ClearEventList.Size = new System.Drawing.Size(85, 22);
             this.ClearEventList.Text = "Clear";
             this.ClearEventList.Click += new System.EventHandler(this.ClearEventList_Click);
             // 
@@ -211,7 +220,7 @@
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 508);
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 489);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
             // 
@@ -344,28 +353,28 @@
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(127, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(138, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(127, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(138, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(127, 22);
+            this.ViewPane.Size = new System.Drawing.Size(138, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(127, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(138, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
             // 
