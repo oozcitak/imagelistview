@@ -10,7 +10,7 @@ namespace Manina.Windows.Forms
     /// A background worker with a work queue.
     /// </summary>
     [Description("A background worker with a work queue.")]
-    [ToolboxBitmap(typeof(ImageListView))]
+    [ToolboxBitmap(typeof(QueuedBackgroundWorker))]
     [DefaultEvent("DoWork")]
     public class QueuedBackgroundWorker : Component
     {
