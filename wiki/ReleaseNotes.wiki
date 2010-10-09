@@ -1,6 +1,21 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 9.1 (10 October 2010) =
+
+This release includes many performance tweaks. The new !ThemeRenderer is also introduced in this release. This new renderer matches the system visual style and falls back to the default renderer on older (Windows XP and earlier) systems.
+
+  * Accessing the rating property of an item by the renderer no longer issues a full item update.
+  * Zooming renderer zooms items in Gallery and Pane modes too.
+  * Added the !ThemeRenderer. (Issue 44)
+  * Added the UseWIC property to the control.
+  * .Net 2.0 thumbnail fallback now automatically rotates thumbnails depending on orientation metadata.
+  * Added toolbox bitmap to !QueuedBackgroundWorker.
+  * Decreased the number of content switches in the worker threads.
+  * The thumbnail thread now processes the last request first.
+  * Worker threads refresh the control only if the new thumbnails or metadata columns are visible on the screen.
+  * !QueuedBackgroundWorker now has a !ProcessingMode property for choosing between FIFO and LIFO processing.
+
 = 9.0 (06 October 2010) =
 
 This release introduces the !QueuedBackgroundWorker. This component is used internally by !ImageListView for its worker threads but it can also be used as a stand alone component. It is basically a multi-queued version of the .Net !BackgroundWorker with some additional features. This release is a major rewrite and it is quite possible that I introduced new bugs.
