@@ -281,5 +281,80 @@ namespace Manina.Windows.Forms
             DrawRoundedRectangle(graphics, pen, (int)rect.Left, (int)rect.Top, (int)rect.Width, (int)rect.Height, (int)radius);
         }
         #endregion
+
+        #region Tuples
+        /// <summary>
+        /// Represents a factory class for creating tuples.
+        /// </summary>
+        internal static class Tuple
+        {
+            /// <summary>
+            /// Creates a new 1-tuple.
+            /// </summary>
+            /// <typeparam name="T1">The type of the only component of the tuple.</typeparam>
+            /// <param name="item1">The value of the only component of the tuple.</param>
+            /// <returns>A 1-tuple whose value is (<paramref name="item1"/>).</returns>
+            public static Tuple<T1> Create<T1>(T1 item1)
+            {
+                return new Tuple<T1>(item1);
+            }
+            /// <summary>
+            /// Creates a new 2-tuple.
+            /// </summary>
+            /// <typeparam name="T1">The type of the first component of the tuple.</typeparam>
+            /// <typeparam name="T2">The type of the second component of the tuple.</typeparam>
+            /// <param name="item1">The value of the first component of the tuple.</param>
+            /// <param name="item2">The value of the second component of the tuple.</param>
+            /// <returns>A 2-tuple whose value is (<paramref name="item1"/>, <paramref name="item2"/>).</returns>
+            public static Tuple<T1, T2> Create<T1, T2>(T1 item1, T2 item2)
+            {
+                return new Tuple<T1, T2>(item1, item2);
+            }
+        }
+        /// <summary>
+        /// Represents a tuple with one element.
+        /// </summary>
+        internal class Tuple<T1>
+        {
+            private T1 mItem1;
+
+            /// <summary>
+            /// Gets the value of the first component.
+            /// </summary>
+            public T1 Item1 { get { return mItem1; } }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Tuple&lt;T1&gt;"/> class.
+            /// </summary>
+            /// <param name="item1">The value of the first component of the tuple.</param>
+            public Tuple(T1 item1)
+            {
+                mItem1 = item1;
+            }
+        }
+        /// <summary>
+        /// Represents a tuple with two elements.
+        /// </summary>
+        internal class Tuple<T1, T2> : Tuple<T1>
+        {
+            private T2 mItem2;
+
+            /// <summary>
+            /// Gets the value of the second component.
+            /// </summary>
+            public T2 Item2 { get { return mItem2; } }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Tuple&lt;T1, T2&gt;"/> class.
+            /// </summary>
+            /// <param name="item1">The value of the first component of the tuple.</param>
+            /// <param name="item2">The value of the second component of the tuple.</param>
+            public Tuple(T1 item1, T2 item2)
+                : base(item1)
+            {
+                mItem2 = item2;
+            }
+        }
+        #endregion
     }
 }

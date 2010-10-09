@@ -19,7 +19,24 @@ using System;
 
 namespace Manina.Windows.Forms
 {
-    #region Public Enums
+    #region QueuedBackgroundWorker Public Enums
+    /// <summary>
+    /// Represents the mode in which the work items of <see cref="QueuedBackgroundWorker"/> are processed.
+    /// </summary>
+    public enum ProcessingMode
+    {
+        /// <summary>
+        /// Items are processed in the order they are received.
+        /// </summary>
+        FIFO,
+        /// <summary>
+        /// Items are processed in reverse order.
+        /// </summary>
+        LIFO,
+    }
+    #endregion
+
+    #region ImageListView Public Enums
     /// <summary>
     /// Represents the cache mode.
     /// </summary>

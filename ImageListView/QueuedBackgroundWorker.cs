@@ -17,6 +17,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         private readonly object lockObject;
 
+        private ProcessingMode processingMode;
         private int priorityQueues;
         private Thread thread;
         private bool stopping;
@@ -24,7 +25,8 @@ namespace Manina.Windows.Forms
         private SynchronizationContext context;
         private bool disposed;
 
-        private Queue<object>[] items;
+        private Stack<object>[] stackItems;
+        private Queue<object>[] queueItems;
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback workCompletedCallback;
@@ -47,10 +49,9 @@ namespace Manina.Windows.Forms
             thread.IsBackground = true;
 
             // Work items
+            processingMode = ProcessingMode.FIFO;
             priorityQueues = 5;
-            items = new Queue<object>[priorityQueues];
-            for (int i = 0; i < priorityQueues; i++)
-                items[i] = new Queue<object>();
+            RebuildWorkQueue();
             cancelledItems = new Dictionary<object, bool>();
 
             // The loader complete callback
@@ -86,7 +87,7 @@ namespace Manina.Windows.Forms
 
             lock (lockObject)
             {
-                items[priority].Enqueue(argument);
+                AddWork(argument, priority);
                 Monitor.Pulse(lockObject);
             }
         }
@@ -107,7 +108,149 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region Work Queue Access
+        /// <summary>
+        /// Determines if the work queue is empty.
+        /// </summary>
+        /// <returns>true if the work queue is empty; otherwise false.</returns>
+        private bool IsWorkQueueEmpty()
+        {
+            if (processingMode == ProcessingMode.FIFO)
+            {
+                foreach (Queue<object> queue in queueItems)
+                {
+                    if (queue.Count > 0)
+                        return false;
+                }
+            }
+            else
+            {
+                foreach (Stack<object> stack in stackItems)
+                {
+                    if (stack.Count > 0)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+        /// <summary>
+        /// Adds the operation to the work queue.
+        /// </summary>
+        /// <param name="argument">The argument of an asynchronous operation.</param>
+        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> indicating the priority of this item.
+        /// An item with a higher priority will be processed before items with lower priority.</param>
+        private void AddWork(object argument, int priority)
+        {
+            if (processingMode == ProcessingMode.FIFO)
+                queueItems[priority].Enqueue(argument);
+            else
+                stackItems[priority].Push(argument);
+        }
+        /// <summary>
+        /// Gets a pending operation from the work queue.
+        /// </summary>
+        /// <returns>A 2-tuple whose first component is the the pending operation with 
+        /// the highest priority from the qork queue and the second component is the
+        /// priority.</returns>
+        private Utility.Tuple<object, int> GetWork()
+        {
+            object request = null;
+            int priority = 0;
+            if (processingMode == ProcessingMode.FIFO)
+            {
+                for (int i = priorityQueues - 1; i >= 0; i--)
+                {
+                    if (queueItems[i].Count > 0)
+                    {
+                        priority = i;
+                        request = queueItems[i].Dequeue();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = priorityQueues - 1; i >= 0; i--)
+                {
+                    if (stackItems[i].Count > 0)
+                    {
+                        priority = i;
+                        request = stackItems[i].Pop();
+                        break;
+                    }
+                }
+            }
+            return Utility.Tuple.Create(request, priority);
+        }
+        /// <summary>
+        /// Rebuilds the work queue.
+        /// </summary>
+        private void RebuildWorkQueue()
+        {
+            if (processingMode == ProcessingMode.FIFO)
+            {
+                stackItems = null;
+                queueItems = new Queue<object>[priorityQueues];
+                for (int i = 0; i < priorityQueues; i++)
+                    queueItems[i] = new Queue<object>();
+            }
+            else
+            {
+                queueItems = null;
+                stackItems = new Stack<object>[priorityQueues];
+                for (int i = 0; i < priorityQueues; i++)
+                    stackItems[i] = new Stack<object>();
+            }
+        }
+        /// <summary>
+        /// Clears the work queue.
+        /// </summary>
+        private void ClearWorkQueue()
+        {
+            if (processingMode == ProcessingMode.FIFO)
+            {
+                foreach (Queue<object> queue in queueItems)
+                    queue.Clear();
+            }
+            else
+            {
+                foreach (Stack<object> stack in stackItems)
+                    stack.Clear();
+            }
+        }
+        /// <summary>
+        /// Clears the work queue with the given priority.
+        /// </summary>
+        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> 
+        /// indicating the priority queue to cancel.</param>
+        private void ClearWorkQueue(int priority)
+        {
+            if (processingMode == ProcessingMode.FIFO)
+                queueItems[priority].Clear();
+            else
+                stackItems[priority].Clear();
+        }
+        #endregion
+
         #region Properties
+        /// <summary>
+        /// Represents the mode in which the work items are processed.
+        /// Processing mode cannot be changed after any work is added to the work queue.
+        /// </summary>
+        [Browsable(true), Category("Behaviour"), DefaultValue(typeof(ProcessingMode), "FIFO")]
+        public ProcessingMode ProcessingMode
+        {
+            get { return processingMode; }
+            set
+            {
+                if (started)
+                    throw new System.Threading.ThreadStateException("The thread has already been started.");
+
+                processingMode = value;
+                RebuildWorkQueue();
+            }
+        }
         /// <summary>
         /// Gets or sets the number of priority queues. Number of queues
         /// cannot be changed after any work is added to the work queue.
@@ -122,15 +265,19 @@ namespace Manina.Windows.Forms
                     throw new System.Threading.ThreadStateException("The thread has already been started.");
 
                 priorityQueues = value;
-                items = new Queue<object>[priorityQueues];
-                for (int i = 0; i < priorityQueues; i++)
-                    items[i] = new Queue<object>();
+                RebuildWorkQueue();
             }
         }
         /// <summary>
         /// Determines whether the <see cref="QueuedBackgroundWorker"/> started working.
         /// </summary>
+        [Browsable(false), Description("Determines whether the QueuedBackgroundWorker started working."), Category("Behavior")]
         public bool Started { get { return started; } }
+        /// <summary>
+        /// Gets or sets a value indicating whether or not the worker thread is a background thread.
+        /// </summary>
+        [Browsable(true), Description("Gets or sets a value indicating whether or not the worker thread is a background thread."), Category("Behavior")]
+        public bool IsBackground { get { return thread.IsBackground; } set { thread.IsBackground = value; } }
         /// <summary>
         /// Determines whether the <see cref="QueuedBackgroundWorker"/> is being stopped.
         /// </summary>
@@ -145,9 +292,7 @@ namespace Manina.Windows.Forms
         {
             lock (lockObject)
             {
-                foreach (Queue<object> queue in items)
-                    queue.Clear();
-
+                ClearWorkQueue();
                 Monitor.Pulse(lockObject);
             }
         }
@@ -163,8 +308,7 @@ namespace Manina.Windows.Forms
 
             lock (lockObject)
             {
-                items[priority].Clear();
-
+                ClearWorkQueue(priority);
                 Monitor.Pulse(lockObject);
             }
         }
@@ -250,11 +394,6 @@ namespace Manina.Windows.Forms
         {
             thread.SetApartmentState(state);
         }
-        /// <summary>
-        /// Gets or sets a value indicating whether or not the worker thread is a background thread.
-        /// </summary>
-        [Browsable(true), Description("Gets or sets a value indicating whether or not the worker thread is a background thread."), Category("Behavior")]
-        public bool IsBackground { get { return thread.IsBackground; } set { thread.IsBackground = value; } }
         #endregion
 
         #region Public Events
@@ -287,17 +426,7 @@ namespace Manina.Windows.Forms
                 lock (lockObject)
                 {
                     // Wait until we have pending work items
-                    bool hasItems = false;
-                    foreach (Queue<object> queue in items)
-                    {
-                        if (queue.Count > 0)
-                        {
-                            hasItems = true;
-                            break;
-                        }
-                    }
-
-                    if (!hasItems)
+                    if (IsWorkQueueEmpty())
                         Monitor.Wait(lockObject);
                 }
 
@@ -311,15 +440,9 @@ namespace Manina.Windows.Forms
                     lock (lockObject)
                     {
                         // Check queues
-                        for (int i = priorityQueues - 1; i >= 0; i--)
-                        {
-                            if (items[i].Count > 0)
-                            {
-                                priority = i;
-                                request = items[i].Dequeue();
-                                break;
-                            }
-                        }
+                        Utility.Tuple<object, int> work = GetWork();
+                        request = work.Item1;
+                        priority = work.Item2;
 
                         // Check if the item was removed
                         if (request != null && cancelledItems.ContainsKey(request))
@@ -350,15 +473,7 @@ namespace Manina.Windows.Forms
                     // Check if the cache is exhausted
                     lock (lockObject)
                     {
-                        queueFull = false;
-                        foreach (Queue<object> queue in items)
-                        {
-                            if (queue.Count > 0)
-                            {
-                                queueFull = true;
-                                break;
-                            }
-                        }
+                        queueFull = !IsWorkQueueEmpty();
                     }
                 }
                 // Done processing queue
@@ -386,6 +501,7 @@ namespace Manina.Windows.Forms
                 if (!stopping)
                 {
                     stopping = true;
+                    ClearWorkQueue();
                     Monitor.Pulse(lockObject);
                 }
             }
