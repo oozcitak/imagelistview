@@ -31,6 +31,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         QueuedBackgroundWorker bw;
         private SynchronizationContext context;
+        SendOrPostCallback checkProcessingCallback;
 
         private ImageListView mImageListView;
 
@@ -47,7 +48,7 @@ namespace Manina.Windows.Forms
         private bool disposed;
         #endregion
 
-        #region Private Classes
+        #region CacheItem Class
         /// <summary>
         /// Represents an item in the thumbnail cache.
         /// </summary>
@@ -95,6 +96,14 @@ namespace Manina.Windows.Forms
             /// Gets the public key for the virtual item.
             /// </summary>
             public object VirtualItemKey { get; private set; }
+            /// <summary>
+            /// Gets or sets whether this is a renderer request.
+            /// </summary>
+            public bool IsRendererRequest { get; set; }
+            /// <summary>
+            /// Gets or sets whether this is a gallery request.
+            /// </summary>
+            public bool IsGalleryRequest { get; set; }
 
             /// <summary>
             /// Initializes a new instance of the CacheItem class
@@ -135,6 +144,9 @@ namespace Manina.Windows.Forms
                 UseWIC = useWIC;
                 IsVirtualItem = true;
                 disposed = false;
+
+                IsRendererRequest = false;
+                IsGalleryRequest = false;
             }
             /// <summary>
             /// Initializes a new instance of the CacheItem class.
@@ -172,6 +184,9 @@ namespace Manina.Windows.Forms
                 UseWIC = useWIC;
                 IsVirtualItem = false;
                 disposed = false;
+
+                IsRendererRequest = false;
+                IsGalleryRequest = false;
             }
 
             /// <summary>
@@ -204,6 +219,42 @@ namespace Manina.Windows.Forms
                 Dispose();
             }
 #endif
+        }
+        #endregion
+
+        #region CanContinueProcessingEventArgs
+        private class CanContinueProcessingEventArgs : EventArgs
+        {
+            /// <summary>
+            /// Gets the guid of the request.
+            /// </summary>
+            public Guid Guid { get; private set; }
+            /// <summary>
+            /// Gets whether this is a renderer request.
+            /// </summary>
+            public bool IsRendererRequest { get; private set; }
+            /// <summary>
+            /// Gets whether this is a gallery request.
+            /// </summary>
+            public bool IsGalleryRequest { get; private set; }
+            /// <summary>
+            /// Gets whether this item should be processed.
+            /// </summary>
+            public bool ContinueProcessing { get; set; }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CanContinueProcessingEventArgs"/> class.
+            /// </summary>
+            /// <param name="guid">The guid of the request.</param>
+            /// <param name="isRendererRequest">true if is a renderer request; otherwise false.</param>
+            /// <param name="isGalleryRequest">true if is a gallery request; otherwise false.</param>
+            public CanContinueProcessingEventArgs(Guid guid, bool isRendererRequest, bool isGalleryRequest)
+            {
+                Guid = guid;
+                IsRendererRequest = isRendererRequest;
+                IsGalleryRequest = isGalleryRequest;
+                ContinueProcessing = true;
+            }
         }
         #endregion
 
@@ -252,10 +303,13 @@ namespace Manina.Windows.Forms
         {
             context = null;
             bw = new QueuedBackgroundWorker();
+            bw.ProcessingMode = ProcessingMode.LIFO;
             bw.IsBackground = true;
             bw.DoWork += bw_DoWork;
             bw.RunWorkerCompleted += bw_RunWorkerCompleted;
             bw.WorkerFinished += bw_WorkerFinished;
+
+            checkProcessingCallback = new SendOrPostCallback(CanContinueProcessing);
 
             mImageListView = owner;
             CacheMode = CacheMode.OnDemand;
@@ -282,50 +336,52 @@ namespace Manina.Windows.Forms
 
         #region Context Callbacks
         /// <summary>
-        /// Returns the item from the cache on the UI thread.
+        /// Determines if the item should be processed.
         /// </summary>
-        /// <param name="guid">The guid of the cache item.</param>
-        /// <returns>The cache item; or null if the item was not found.</returns>
-        private CacheItem GetFromCacheCallback(Guid guid)
+        /// <param name="item">The <see cref="CacheItem"/> to check.</param>
+        /// <returns>true if the item should be processed; otherwise false.</returns>
+        private bool OnCanContinueProcessing(CacheItem item)
         {
-            CacheItem existing = null;
-            SendOrPostCallback callback = delegate
-            {
-                thumbCache.TryGetValue(guid, out existing);
-            };
-            context.Send(callback, guid);
-            return existing;
+            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(
+                item.Guid, item.IsRendererRequest, item.IsGalleryRequest);
+            context.Send(checkProcessingCallback, arg);
+            return arg.ContinueProcessing;
         }
+
         /// <summary>
-        /// Returns the item from the edit cache on the UI thread.
+        /// Determines if the item should be processed.
         /// </summary>
-        /// <param name="guid">The guid of the cache item.</param>
-        /// <returns>true if item is in the edit cache; otherwise false.</returns>
-        private bool IsEditing(Guid guid)
+        /// <param name="argument">The event argument.</param>
+        /// <returns>true if the item should be processed; otherwise false.</returns>
+        private void CanContinueProcessing(object argument)
         {
-            bool exists = false;
-            SendOrPostCallback callback = delegate
+            CanContinueProcessingEventArgs arg = argument as CanContinueProcessingEventArgs;
+            bool canProcess = true;
+
+            // Is it already cached?
+            if (canProcess && !arg.IsRendererRequest && !arg.IsGalleryRequest)
             {
-                exists = editCache.ContainsKey(guid);
-            };
-            context.Send(callback, guid);
-            return exists;
-        }
-        /// <summary>
-        /// Determines if the <see cref="ImageListViewItem"/> with the given guid is visible.
-        /// </summary>
-        /// <param name="guid">The guid of the item.</param>
-        /// <returns>true if item is in visible; otherwise false.</returns>
-        private bool IsItemVisibleCallback(Guid guid)
-        {
-            bool visible = false;
-            SendOrPostCallback callback = delegate
+                CacheItem existing = null;
+                thumbCache.TryGetValue(arg.Guid, out existing);
+                if (existing != null && existing.Size == CurrentThumbnailSize)
+                    canProcess = false;
+            }
+
+            // Is it in the edit cache?
+            if (canProcess)
             {
-                if (mImageListView != null)
-                    visible = mImageListView.IsItemVisible(guid);
-            };
-            context.Send(callback, guid);
-            return visible;
+                if (editCache.ContainsKey(arg.Guid))
+                    canProcess = false;
+            }
+
+            // Is it outside the visible area?
+            if (canProcess && !arg.IsRendererRequest && !arg.IsGalleryRequest && (CacheMode == CacheMode.OnDemand))
+            {
+                if (mImageListView != null && !mImageListView.IsItemVisible(arg.Guid))
+                    canProcess = false;
+            }
+
+            arg.ContinueProcessing = canProcess;
         }
         #endregion
 
@@ -349,13 +405,11 @@ namespace Manina.Windows.Forms
         {
             CacheItem request = e.UserState as CacheItem;
             CacheItem result = e.Result as CacheItem;
-            bool rendererRequest = (e.Priority == 1);
-            bool galleryRequest = (e.Priority == 2);
 
             // We are done processing
-            if (rendererRequest)
+            if (request.IsRendererRequest)
                 processingRendererItem = Guid.Empty;
-            else if (galleryRequest)
+            else if (request.IsGalleryRequest)
                 processingGalleryItem = Guid.Empty;
             else
                 processing.Remove(request.Guid);
@@ -365,18 +419,15 @@ namespace Manina.Windows.Forms
             if (e.Cancelled)
                 return;
 
-            // Items with high priority are renderer items, ie. large
-            // images in gallery and pane views and images requested with
-            // the ImageListViewRenderer.GetImageAsync method.
-            // Items with 0 priority are regular thumbnails.
-            if (e.Priority == 1)
+            // Dispose old item and add to cache
+            if (request.IsRendererRequest)
             {
                 if (rendererItem != null)
                     rendererItem.Dispose();
 
                 rendererItem = result;
             }
-            else if (e.Priority == 2)
+            else if (request.IsGalleryRequest)
             {
                 if (galleryItem != null)
                     galleryItem.Dispose();
@@ -428,36 +479,19 @@ namespace Manina.Windows.Forms
         void bw_DoWork(object sender, QueuedWorkerDoWorkEventArgs e)
         {
             CacheItem request = e.Argument as CacheItem;
-            Guid guid = request.Guid;
-            bool rendererRequest = (e.Priority == 1);
-            bool galleryRequest = (e.Priority == 2);
 
-            // Is it already cached?
-            if (!rendererRequest && !galleryRequest)
-            {
-                CacheItem existing = GetFromCacheCallback(guid);
-                if (existing != null && existing.Size == CurrentThumbnailSize)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-            }
-
-            // Is it in the edit cache?
-            if (IsEditing(guid))
+            // Should we continue processing this item?
+            // The callback checks the following and returns false if
+            //   the item is already cached -OR-
+            //   the item is in the edit cache -OR-
+            //   the items is outside the visible area (only if the CacheMode is OnDemand).
+            if (!OnCanContinueProcessing(request))
             {
                 e.Cancel = true;
                 return;
             }
 
-            // Is it outside the visible area?
-            if (!rendererRequest && !galleryRequest && (CacheMode == CacheMode.OnDemand) && !IsItemVisibleCallback(guid))
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            // Read thumbnail image
+            // Read the thumbnail image
             Image thumb = null;
             if (request.IsVirtualItem)
             {
@@ -485,9 +519,11 @@ namespace Manina.Windows.Forms
                     request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
             }
             else
-                result = new CacheItem(guid, request.FileName,
+            {
+                result = new CacheItem(request.Guid, request.FileName,
                     request.Size, thumb, CacheState.Cached,
                     request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
+            }
 
             e.Result = result;
         }
@@ -954,7 +990,9 @@ namespace Manina.Windows.Forms
 
         #region RunWorker
         /// <summary>
-        /// Pushes the given item to the worker queue.
+        /// Pushes the given item to the worker queue. Items with high priority are renderer 
+        /// or gallery items, ie. large images in gallery and pane views and images requested 
+        /// by custom renderers. Items with 0 priority are regular thumbnails.
         /// </summary>
         /// <param name="item">The item to add to the worker queue.</param>
         /// <param name="priority">Priority of the item in the queue.</param>
@@ -972,7 +1010,7 @@ namespace Manina.Windows.Forms
                 else
                     processing.Add(item.Guid, false);
             }
-            else if (priority > 0)
+            else if (priority == 1)
             {
                 if (processingRendererItem == item.Guid)
                     return;
@@ -980,6 +1018,18 @@ namespace Manina.Windows.Forms
                 {
                     bw.CancelAsync(priority);
                     processingRendererItem = item.Guid;
+                    item.IsRendererRequest = true;
+                }
+            }
+            else if (priority == 2)
+            {
+                if (processingGalleryItem == item.Guid)
+                    return;
+                else
+                {
+                    bw.CancelAsync(priority);
+                    processingGalleryItem = item.Guid;
+                    item.IsGalleryRequest = true;
                 }
             }
 
