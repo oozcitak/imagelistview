@@ -99,9 +99,10 @@ namespace Manina.Windows.Forms
 
         // Renderer variables
         internal ImageListViewRenderer mRenderer;
-        private bool suspended;
-        private int suspendCount;
-        private bool needsPaint;
+        private bool controlSuspended;
+        private int rendererSuspendCount;
+        private bool rendererNeedsPaint;
+        private Timer lazyRefreshTimer;
 
         // Layout variables
         internal HScrollBar hScrollBar;
@@ -799,9 +800,9 @@ namespace Manina.Windows.Forms
         public ImageListView()
         {
             // Renderer parameters
-            suspended = false;
-            suspendCount = 0;
-            needsPaint = true;
+            controlSuspended = false;
+            rendererSuspendCount = 0;
+            rendererNeedsPaint = true;
 
             mColors = ImageListViewColor.Default;
             SetRenderer(new ImageListViewRenderer());
@@ -861,6 +862,12 @@ namespace Manina.Windows.Forms
             Controls.Add(hScrollBar);
             Controls.Add(vScrollBar);
 
+            // Lazy refresh timer
+            lazyRefreshTimer = new Timer();
+            lazyRefreshTimer.Interval = (int)ImageListViewRenderer.LazyRefreshInterval.TotalMilliseconds;
+            lazyRefreshTimer.Enabled = false;
+            lazyRefreshTimer.Tick += lazyRefreshTimer_Tick;
+
             // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
             navigationManager = new ImageListViewNavigationManager(this);
@@ -905,8 +912,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         public new void SuspendLayout()
         {
+            if (controlSuspended) return;
+
+            controlSuspended = true;
             base.SuspendLayout();
-            SuspendPaint(true);
+            SuspendPaint();
         }
         /// <summary>
         /// Resumes usual layout logic.
@@ -921,9 +931,12 @@ namespace Manina.Windows.Forms
         /// <param name="performLayout">true to execute pending layout requests; otherwise, false.</param>
         public new void ResumeLayout(bool performLayout)
         {
+            if (!controlSuspended) return;
+
+            controlSuspended = false;
             base.ResumeLayout(performLayout);
             if (performLayout) Refresh();
-            ResumePaint(true);
+            ResumePaint();
         }
         /// <summary>
         /// Sets the renderer for this instance.
@@ -1159,12 +1172,15 @@ namespace Manina.Windows.Forms
                 if (mRenderer.LazyRefreshIntervalExceeded)
                     base.Refresh();
                 else
-                    needsPaint = true;
+                {
+                    lazyRefreshTimer.Enabled = true;
+                    rendererNeedsPaint = true;
+                }
             }
             else if (CanPaint())
                 base.Refresh();
             else
-                needsPaint = true;
+                rendererNeedsPaint = true;
         }
         /// <summary>
         /// Redraws the owner control.
@@ -1184,36 +1200,11 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Suspends painting until a matching ResumePaint call is made.
-        /// Used by the parent control as part of SuspendLayout.
-        /// </summary>
-        private void SuspendPaint(bool ispublic)
-        {
-            if (ispublic)
-                suspended = true;
-            else
-                SuspendPaint();
-        }
-        /// <summary>
-        /// Resumes painting. This call must be matched by a prior SuspendPaint call.
-        /// Used by the parent control as part of ResumeLayout.
-        /// </summary>
-        private void ResumePaint(bool ispublic)
-        {
-            if (ispublic)
-            {
-                suspended = false;
-                if (needsPaint) Refresh();
-            }
-            else
-                ResumePaint();
-        }
-        /// <summary>
-        /// Suspends painting until a matching ResumePaint call is made.
         /// </summary>
         private void SuspendPaint()
         {
-            if (suspendCount == 0) needsPaint = false;
-            suspendCount++;
+            if (rendererSuspendCount == 0) rendererNeedsPaint = false;
+            rendererSuspendCount++;
         }
         /// <summary>
         /// Resumes painting. This call must be matched by a prior SuspendPaint call.
@@ -1221,13 +1212,13 @@ namespace Manina.Windows.Forms
         private void ResumePaint()
         {
             System.Diagnostics.Debug.Assert(
-                suspendCount > 0,
+                rendererSuspendCount > 0,
                 "Suspend count does not match resume count.",
                 "ResumePaint() must be matched by a prior SuspendPaint() call."
                 );
 
-            suspendCount--;
-            if (needsPaint)
+            rendererSuspendCount--;
+            if (rendererNeedsPaint)
                 Refresh();
         }
         /// <summary>
@@ -1237,7 +1228,7 @@ namespace Manina.Windows.Forms
         {
             if (mRenderer == null)
                 return false;
-            if (suspended || suspendCount != 0)
+            if (controlSuspended || rendererSuspendCount != 0)
                 return false;
             else
                 return true;
@@ -1360,6 +1351,17 @@ namespace Manina.Windows.Forms
             Refresh();
         }
         /// <summary>
+        /// Handles the Tick event of the lazyRefreshTimer control.
+        /// </summary>
+        void lazyRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            if (mRenderer.LazyRefreshIntervalExceeded && rendererNeedsPaint)
+            {
+                lazyRefreshTimer.Enabled = false;
+                base.Refresh();
+            }
+        }
+        /// <summary>
         /// Handles the Resize event.
         /// </summary>
         protected override void OnResize(EventArgs e)
@@ -1379,6 +1381,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
+            rendererNeedsPaint = false;
             if (!disposed && mRenderer != null)
                 mRenderer.Render(e.Graphics);
         }
@@ -1526,6 +1529,7 @@ namespace Manina.Windows.Forms
                     // Events
                     hScrollBar.Scroll -= hScrollBar_Scroll;
                     vScrollBar.Scroll -= vScrollBar_Scroll;
+                    lazyRefreshTimer.Tick -= lazyRefreshTimer_Tick;
 
                     // Resources
                     if (mDefaultImage != null)
@@ -1542,6 +1546,8 @@ namespace Manina.Windows.Forms
                         hScrollBar.Dispose();
                     if (vScrollBar != null && vScrollBar.IsHandleCreated && !vScrollBar.IsDisposed)
                         vScrollBar.Dispose();
+                    if (lazyRefreshTimer != null)
+                        lazyRefreshTimer.Dispose();
 
                     // internal classes
                     thumbnailCache.Dispose();

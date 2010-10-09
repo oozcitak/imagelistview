@@ -310,7 +310,6 @@ namespace Manina.Windows.Forms
             bw.IsBackground = true;
             bw.DoWork += bw_DoWork;
             bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-            bw.WorkerFinished += bw_WorkerFinished;
 
             checkProcessingCallback = new SendOrPostCallback(CanContinueProcessing);
 
@@ -389,15 +388,6 @@ namespace Manina.Windows.Forms
 
         #region QueuedBackgroundWorker Events
         /// <summary>
-        /// Handles the WorkerFinished event of the queued background worker.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void bw_WorkerFinished(object sender, EventArgs e)
-        {
-            mImageListView.Refresh();
-        }
-        /// <summary>
         /// Handles the RunWorkerCompleted event of the queued background worker.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -461,7 +451,7 @@ namespace Manina.Windows.Forms
             }
 
             // Refresh the control lazily
-            if (result != null && result.Image != null && mImageListView != null)
+            if (result != null && result.Image != null && mImageListView != null && mImageListView.IsItemVisible(request.Guid))
                 mImageListView.Refresh(false, true);
 
             // Raise the ThumbnailCached event
@@ -1061,9 +1051,8 @@ namespace Manina.Windows.Forms
         {
             if (!disposed)
             {
-                bw.DoWork += bw_DoWork;
-                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
-                bw.WorkerFinished += bw_WorkerFinished;
+                bw.DoWork -= bw_DoWork;
+                bw.RunWorkerCompleted -= bw_RunWorkerCompleted;
 
                 Clear();
                 bw.Dispose();

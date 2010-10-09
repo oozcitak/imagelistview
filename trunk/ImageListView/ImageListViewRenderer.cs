@@ -36,7 +36,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Represents the time span after which the control deems to be needing a refresh.
             /// </summary>
-            private static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 100);
+            internal static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 100);
             #endregion
 
             #region Member Variables
@@ -671,7 +671,7 @@ namespace Manina.Windows.Forms
 
                 // Update the layout
                 ImageListView.layoutManager.Update();
-
+               
                 // Set drawing area
                 Graphics g = bufferGraphics.Graphics;
                 g.ResetClip();
