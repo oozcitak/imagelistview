@@ -320,7 +320,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the color of labels in pane view.
         /// </summary>
         [Category("Appearance Pane View"), Description("Gets or sets the color of labels in pane view.")]
-        [DefaultValue(typeof(Color), "GrayText")]
+        [DefaultValue(typeof(Color), "196, 0, 0, 0")]
         public Color PaneLabelColor
         {
             get { return mPaneLabelColor; }
@@ -407,7 +407,7 @@ namespace Manina.Windows.Forms
 
             mInsertionCaretColor = SystemColors.Highlight;
 
-            // thumbnails & pane
+            // thumbnails
             mImageInnerBorderColor = Color.FromArgb(128, Color.White);
             mImageOuterBorderColor = Color.FromArgb(128, Color.Gray);
 
@@ -424,7 +424,7 @@ namespace Manina.Windows.Forms
             // image pane
             mPaneBackColor = Color.FromArgb(16, SystemColors.GrayText);
             mPaneSeparatorColor = Color.FromArgb(128, SystemColors.GrayText);
-            mPaneLabelColor = SystemColors.GrayText;
+            mPaneLabelColor = Color.FromArgb(196, Color.Black);
 
             // selection rectangle
             mSelectionRectangleColor1 = Color.FromArgb(128, SystemColors.Highlight);
