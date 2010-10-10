@@ -881,6 +881,91 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
+        #region Select/Check
+        /// <summary>
+        /// Marks all items as selected.
+        /// </summary>
+        public void SelectAll()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+                item.mSelected = true;
+
+            OnSelectionChangedInternal();
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items as unselected.
+        /// </summary>
+        public void ClearSelection()
+        {
+            SuspendPaint();
+            mSelectedItems.Clear();
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Reverses the selection state of all items.
+        /// </summary>
+        public void InvertSelection()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+                item.mSelected = !item.mSelected;
+            
+            OnSelectionChangedInternal();
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items as checked.
+        /// </summary>
+        public void CheckAll()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+            {
+                item.mChecked = true;
+                OnItemCheckBoxClickInternal(item);
+            }
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items as unchecked.
+        /// </summary>
+        public void UnCheckAll()
+        {
+            SuspendPaint();
+            mCheckedItems.Clear();
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Reverses the checked state of all items.
+        /// </summary>
+        public void InvertCheckedState()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+            {
+                item.mChecked = !item.mChecked;
+                OnItemCheckBoxClickInternal(item);
+            }
+
+            Refresh();
+            ResumePaint();
+        }
+        #endregion
+
         #region Instance Methods
         /// <summary>
         /// Clears the thumbnail cache.
@@ -963,46 +1048,6 @@ namespace Manina.Windows.Forms
         {
             mItems.Sort();
             Refresh();
-        }
-        /// <summary>
-        /// Marks all items as selected.
-        /// </summary>
-        public void SelectAll()
-        {
-            SuspendPaint();
-
-            foreach (ImageListViewItem item in Items)
-                item.mSelected = true;
-
-            OnSelectionChangedInternal();
-
-            Refresh();
-            ResumePaint();
-        }
-        /// <summary>
-        /// Marks all items as unselected.
-        /// </summary>
-        public void ClearSelection()
-        {
-            SuspendPaint();
-            mSelectedItems.Clear();
-            Refresh();
-            ResumePaint();
-        }
-        /// <summary>
-        /// Reverses the selection state of all items.
-        /// </summary>
-        public void InvertSelection()
-        {
-            SuspendPaint();
-
-            foreach (ImageListViewItem item in Items)
-                item.mSelected = !item.mSelected;
-
-            OnSelectionChangedInternal();
-
-            Refresh();
-            ResumePaint();
         }
         /// <summary>
         /// Determines the image list view element under the specified coordinates.
