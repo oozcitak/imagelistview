@@ -296,12 +296,17 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Select all items on Ctrl+A
+        #region Change Selection
         private void imageListView1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control && ((e.KeyCode & Keys.A) == Keys.A))
+            if (e.Control)
             {
-                imageListView1.SelectAll();
+                if (e.KeyCode == Keys.A )
+                    imageListView1.SelectAll();
+                else if (e.KeyCode== Keys.U)
+                    imageListView1.ClearSelection();
+                else if (e.KeyCode== Keys.I)
+                    imageListView1.InvertSelection();
             }
         }
         #endregion
