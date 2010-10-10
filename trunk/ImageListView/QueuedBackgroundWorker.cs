@@ -19,13 +19,13 @@ namespace Manina.Windows.Forms
 
         private ProcessingMode processingMode;
         private int threadCount;
-        private int priorityQueues;
         private Thread[] threads;
         private bool stopping;
         private bool started;
         private SynchronizationContext context;
         private bool disposed;
 
+        private int priorityQueues;
         private LinkedList<object>[] items;
         private Dictionary<object, bool> cancelledItems;
 

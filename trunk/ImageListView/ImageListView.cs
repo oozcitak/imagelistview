@@ -990,6 +990,21 @@ namespace Manina.Windows.Forms
             ResumePaint();
         }
         /// <summary>
+        /// Reverses the selection state of all items.
+        /// </summary>
+        public void InvertSelection()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+                item.mSelected = !item.mSelected;
+
+            OnSelectionChangedInternal();
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
         /// Determines the image list view element under the specified coordinates.
         /// </summary>
         /// <param name="pt">The client coordinates of the point to be tested.</param>
