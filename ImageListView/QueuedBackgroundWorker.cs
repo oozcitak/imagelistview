@@ -26,8 +26,7 @@ namespace Manina.Windows.Forms
         private SynchronizationContext context;
         private bool disposed;
 
-        private Stack<object>[] stackItems;
-        private Queue<object>[] queueItems;
+        private LinkedList<object>[] items;
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback workCompletedCallback;
@@ -120,21 +119,10 @@ namespace Manina.Windows.Forms
         /// <returns>true if the work queue is empty; otherwise false.</returns>
         private bool IsWorkQueueEmpty()
         {
-            if (processingMode == ProcessingMode.FIFO)
+            foreach (LinkedList<object> queue in items)
             {
-                foreach (Queue<object> queue in queueItems)
-                {
-                    if (queue.Count > 0)
-                        return false;
-                }
-            }
-            else
-            {
-                foreach (Stack<object> stack in stackItems)
-                {
-                    if (stack.Count > 0)
-                        return false;
-                }
+                if (queue.Count > 0)
+                    return false;
             }
 
             return true;
@@ -148,9 +136,9 @@ namespace Manina.Windows.Forms
         private void AddWork(object argument, int priority)
         {
             if (processingMode == ProcessingMode.FIFO)
-                queueItems[priority].Enqueue(argument);
+                items[priority].AddLast(argument);
             else
-                stackItems[priority].Push(argument);
+                items[priority].AddFirst(argument);
         }
         /// <summary>
         /// Gets a pending operation from the work queue.
@@ -162,32 +150,49 @@ namespace Manina.Windows.Forms
         {
             object request = null;
             int priority = 0;
-            if (processingMode == ProcessingMode.FIFO)
+
+            for (int i = priorityQueues - 1; i >= 0; i--)
             {
-                for (int i = priorityQueues - 1; i >= 0; i--)
+                if (items[i].Count > 0)
                 {
-                    if (queueItems[i].Count > 0)
-                    {
-                        priority = i;
-                        request = queueItems[i].Dequeue();
-                        break;
-                    }
+                    priority = i;
+                    request = items[i].First.Value;
+                    items[i].RemoveFirst();
+                    break;
                 }
             }
-            else
-            {
-                for (int i = priorityQueues - 1; i >= 0; i--)
-                {
-                    if (stackItems[i].Count > 0)
-                    {
-                        priority = i;
-                        request = stackItems[i].Pop();
-                        break;
-                    }
-                }
-            }
+
             return Utility.Tuple.Create(request, priority);
         }
+        /// <summary>
+        /// Rebuilds the work queue.
+        /// </summary>
+        private void BuildWorkQueue()
+        {
+            items = new LinkedList<object>[priorityQueues];
+            for (int i = 0; i < priorityQueues; i++)
+                items[i] = new LinkedList<object>();
+        }
+        /// <summary>
+        /// Clears the work queue.
+        /// </summary>
+        private void ClearWorkQueue()
+        {
+            foreach (LinkedList<object> queue in items)
+                queue.Clear();
+        }
+        /// <summary>
+        /// Clears the work queue with the given priority.
+        /// </summary>
+        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> 
+        /// indicating the priority queue to cancel.</param>
+        private void ClearWorkQueue(int priority)
+        {
+            items[priority].Clear();
+        }
+        #endregion
+
+        #region Worker Threads
         /// <summary>
         /// Creates the thread array.
         /// </summary>
@@ -199,54 +204,6 @@ namespace Manina.Windows.Forms
                 threads[i] = new Thread(new ThreadStart(Run));
                 threads[i].IsBackground = true;
             }
-        }
-        /// <summary>
-        /// Rebuilds the work queue.
-        /// </summary>
-        private void BuildWorkQueue()
-        {
-            if (processingMode == ProcessingMode.FIFO)
-            {
-                stackItems = null;
-                queueItems = new Queue<object>[priorityQueues];
-                for (int i = 0; i < priorityQueues; i++)
-                    queueItems[i] = new Queue<object>();
-            }
-            else
-            {
-                queueItems = null;
-                stackItems = new Stack<object>[priorityQueues];
-                for (int i = 0; i < priorityQueues; i++)
-                    stackItems[i] = new Stack<object>();
-            }
-        }
-        /// <summary>
-        /// Clears the work queue.
-        /// </summary>
-        private void ClearWorkQueue()
-        {
-            if (processingMode == ProcessingMode.FIFO)
-            {
-                foreach (Queue<object> queue in queueItems)
-                    queue.Clear();
-            }
-            else
-            {
-                foreach (Stack<object> stack in stackItems)
-                    stack.Clear();
-            }
-        }
-        /// <summary>
-        /// Clears the work queue with the given priority.
-        /// </summary>
-        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> 
-        /// indicating the priority queue to cancel.</param>
-        private void ClearWorkQueue(int priority)
-        {
-            if (processingMode == ProcessingMode.FIFO)
-                queueItems[priority].Clear();
-            else
-                stackItems[priority].Clear();
         }
         #endregion
 
