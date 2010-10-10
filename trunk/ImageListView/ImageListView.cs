@@ -1171,7 +1171,7 @@ namespace Manina.Windows.Forms
             {
                 if (mRenderer.LazyRefreshIntervalExceeded)
                     base.Refresh();
-                else
+                else if (!lazyRefreshTimer.Enabled)
                 {
                     lazyRefreshTimer.Enabled = true;
                     rendererNeedsPaint = true;

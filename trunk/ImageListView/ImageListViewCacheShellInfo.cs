@@ -36,6 +36,7 @@ namespace Manina.Windows.Forms
         private ImageListView mImageListView;
 
         private Dictionary<string, CacheItem> shellCache;
+        private Dictionary<string, bool> processing;
 
         private bool disposed;
         #endregion
@@ -178,6 +179,7 @@ namespace Manina.Windows.Forms
             RetryOnError = false;
 
             shellCache = new Dictionary<string, CacheItem>();
+            processing = new Dictionary<string, bool>();
 
             disposed = false;
         }
@@ -227,6 +229,9 @@ namespace Manina.Windows.Forms
         void bw_RunWorkerCompleted(object sender, QueuedWorkerCompletedEventArgs e)
         {
             CacheItem result = e.Result as CacheItem;
+
+            // We are done processing
+            processing.Remove(result.Extension);
 
             // Add to cache
             if (result != null)
@@ -310,6 +315,7 @@ namespace Manina.Windows.Forms
             foreach (CacheItem item in shellCache.Values)
                 item.Dispose();
             shellCache.Clear();
+            processing.Clear();
         }
         /// <summary>
         /// Removes the given item from the cache.
@@ -332,7 +338,7 @@ namespace Manina.Windows.Forms
         {
             if (string.IsNullOrEmpty(extension))
                 throw new ArgumentException("extension cannot be null", "extension");
-
+            
             // Already cached?
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
@@ -402,6 +408,12 @@ namespace Manina.Windows.Forms
             if (context == null)
                 context = SynchronizationContext.Current;
 
+            // Already being processed?
+            if (processing.ContainsKey(extension))
+                return;
+            else
+                processing.Add(extension, false);
+            
             // Add the item to the queue for processing
             bw.RunWorkerAsync(extension);
         }
