@@ -296,7 +296,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region Change Selection
+        #region Change Selection/Checkboxes
         private void imageListView1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control)
@@ -307,6 +307,15 @@ namespace Manina.Windows.Forms
                     imageListView1.ClearSelection();
                 else if (e.KeyCode== Keys.I)
                     imageListView1.InvertSelection();
+            }
+            else if (e.Alt)
+            {
+                if (e.KeyCode == Keys.A)
+                    imageListView1.CheckAll();
+                else if (e.KeyCode == Keys.U)
+                    imageListView1.UnCheckAll();
+                else if (e.KeyCode == Keys.I)
+                    imageListView1.InvertCheckedState();
             }
         }
         #endregion
