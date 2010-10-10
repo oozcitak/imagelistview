@@ -313,12 +313,12 @@ namespace Manina.Windows.Forms
             {
                 if (info.IsReady)
                 {
-                    string rootPath = info.RootDirectory.FullName;
+                    DirectoryInfo rootPath = info.RootDirectory;
                     TreeNode rootNode = new TreeNode(info.VolumeLabel + " (" + info.Name + ")", 0, 0);
-                    rootNode.Tag = new KeyValuePair<string, bool>(rootPath, false);
+                    rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(rootPath, false);
                     treeView1.Nodes.Add(rootNode);
                     List<TreeNode> nodes = GetNodes(rootNode);
-                    rootNode.Tag = new KeyValuePair<string, bool>(rootPath, true);
+                    rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(rootPath, true);
                     rootNode.Nodes.Clear();
                     foreach (TreeNode node in nodes)
                         rootNode.Nodes.Add(node);
@@ -326,27 +326,27 @@ namespace Manina.Windows.Forms
                     rootNode.Expand();
                 }
             }
-            KeyValuePair<string, bool> ktag = (KeyValuePair<string, bool>)treeView1.Nodes[0].Tag;
+            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)treeView1.Nodes[0].Tag;
             PopulateListView(ktag.Key);
         }
 
-        private void PopulateListView(string path)
+        private void PopulateListView(DirectoryInfo path)
         {
             imageListView1.Items.Clear();
             imageListView1.SuspendLayout();
-            foreach (string p in Directory.GetFiles(path, "*.*"))
+            foreach (FileInfo p in path.GetFiles("*.*"))
             {
-                if (p.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".cur", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".emf", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".wmf", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase) ||
-                    p.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
-                    imageListView1.Items.Add(p);
+                if (p.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".cur", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".emf", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".wmf", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+                    imageListView1.Items.Add(p.FullName);
             }
             imageListView1.ResumeLayout();
         }
@@ -354,7 +354,7 @@ namespace Manina.Windows.Forms
         private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             TreeNode node = e.Node;
-            KeyValuePair<string, bool> ktag = (KeyValuePair<string, bool>)node.Tag;
+            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)node.Tag;
             if (ktag.Value == true)
                 return;
             node.Nodes.Clear();
@@ -367,8 +367,8 @@ namespace Manina.Windows.Forms
         {
             KeyValuePair<TreeNode, List<TreeNode>> kv = (KeyValuePair<TreeNode, List<TreeNode>>)e.Result;
             TreeNode rootNode = kv.Key;
-            KeyValuePair<string, bool> ktag = (KeyValuePair<string, bool>)rootNode.Tag;
-            rootNode.Tag = new KeyValuePair<string, bool>(ktag.Key, true);
+            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)rootNode.Tag;
+            rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(ktag.Key, true);
             List<TreeNode> nodes = kv.Value;
             rootNode.Nodes.Clear();
             foreach (TreeNode node in nodes)
@@ -386,30 +386,29 @@ namespace Manina.Windows.Forms
 
         private static List<TreeNode> GetNodes(TreeNode rootNode)
         {
-            KeyValuePair<string, bool> kv = (KeyValuePair<string, bool>)rootNode.Tag;
+            KeyValuePair<DirectoryInfo, bool> kv = (KeyValuePair<DirectoryInfo, bool>)rootNode.Tag;
             bool done = kv.Value;
             if (done)
                 return new List<TreeNode>();
 
-            string rootPath = kv.Key;
+            DirectoryInfo rootPath = kv.Key;
             List<TreeNode> nodes = new List<TreeNode>();
 
-            string[] dirs = new string[0];
+            DirectoryInfo[] dirs = new DirectoryInfo[0];
             try
             {
-                dirs = Directory.GetDirectories(rootPath);
+                dirs = rootPath.GetDirectories();
             }
             catch
             {
                 return new List<TreeNode>();
             }
-            foreach (string dir in dirs)
+            foreach (DirectoryInfo info in dirs)
             {
-                DirectoryInfo info = new DirectoryInfo(dir);
                 if ((info.Attributes & FileAttributes.System) != FileAttributes.System)
                 {
-                    TreeNode aNode = new TreeNode(Path.GetFileName(dir), 1, 2);
-                    aNode.Tag = new KeyValuePair<string, bool>(dir, false);
+                    TreeNode aNode = new TreeNode(info.Name, 1, 2);
+                    aNode.Tag = new KeyValuePair<DirectoryInfo, bool>(info, false);
                     GetDirectories(aNode);
                     nodes.Add(aNode);
                 }
@@ -419,41 +418,40 @@ namespace Manina.Windows.Forms
 
         private static void GetDirectories(TreeNode node)
         {
-            KeyValuePair<string, bool> ktag = (KeyValuePair<string, bool>)node.Tag;
-            string rootPath = ktag.Key;
+            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)node.Tag;
+            DirectoryInfo rootPath = ktag.Key;
 
-            string[] dirs = new string[0];
+            DirectoryInfo[] dirs = new DirectoryInfo[0];
             try
             {
-                dirs = Directory.GetDirectories(rootPath);
+                dirs = rootPath.GetDirectories();
             }
             catch
             {
                 return;
             }
-            foreach (string dir in dirs)
+            foreach (DirectoryInfo info in dirs)
             {
-                DirectoryInfo info = new DirectoryInfo(dir);
                 if ((info.Attributes & FileAttributes.System) != FileAttributes.System)
                 {
-                    TreeNode aNode = new TreeNode(Path.GetFileName(dir), 1, 2);
-                    aNode.Tag = new KeyValuePair<string, bool>(dir, false);
-                    if (GetDirCount(dir) != 0)
+                    TreeNode aNode = new TreeNode(info.Name, 1, 2);
+                    aNode.Tag = new KeyValuePair<DirectoryInfo, bool>(info, false);
+                    if (GetDirCount(info) != 0)
                     {
                         aNode.Nodes.Add("Dummy1");
                     }
                     node.Nodes.Add(aNode);
                 }
             }
-            node.Tag = new KeyValuePair<string, bool>(ktag.Key, true);
+            node.Tag = new KeyValuePair<DirectoryInfo, bool>(ktag.Key, true);
         }
 
-        private static int GetDirCount(string rootPath)
+        private static int GetDirCount(DirectoryInfo rootPath)
         {
-            string[] dirs = new string[0];
+            DirectoryInfo[] dirs = new DirectoryInfo[0];
             try
             {
-                dirs = Directory.GetDirectories(rootPath);
+                dirs = rootPath.GetDirectories();
             }
             catch
             {
@@ -465,7 +463,7 @@ namespace Manina.Windows.Forms
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            KeyValuePair<string, bool> ktag = (KeyValuePair<string, bool>)e.Node.Tag;
+            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)e.Node.Tag;
             PopulateListView(ktag.Key);
         }
         #endregion

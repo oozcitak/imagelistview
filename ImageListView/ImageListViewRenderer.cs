@@ -36,7 +36,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Represents the time span after which the control deems to be needing a refresh.
             /// </summary>
-            internal static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 100);
+            internal static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 200);
             #endregion
 
             #region Member Variables

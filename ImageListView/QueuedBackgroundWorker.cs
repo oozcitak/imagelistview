@@ -18,8 +18,9 @@ namespace Manina.Windows.Forms
         private readonly object lockObject;
 
         private ProcessingMode processingMode;
+        private int threadCount;
         private int priorityQueues;
-        private Thread thread;
+        private Thread[] threads;
         private bool stopping;
         private bool started;
         private SynchronizationContext context;
@@ -45,13 +46,14 @@ namespace Manina.Windows.Forms
             context = null;
             disposed = false;
 
-            thread = new Thread(new ThreadStart(Run));
-            thread.IsBackground = true;
+            // Threads
+            threadCount = 5;
+            CreateThreads();
 
             // Work items
             processingMode = ProcessingMode.FIFO;
             priorityQueues = 5;
-            RebuildWorkQueue();
+            BuildWorkQueue();
             cancelledItems = new Dictionary<object, bool>();
 
             // The loader complete callback
@@ -79,8 +81,11 @@ namespace Manina.Windows.Forms
                 context = SynchronizationContext.Current;
 
                 // Start the thread
-                thread.Start();
-                while (!thread.IsAlive) ;
+                for (int i = 0; i < threadCount; i++)
+                {
+                    threads[i].Start();
+                    while (!threads[i].IsAlive) ;
+                }
 
                 started = true;
             }
@@ -184,9 +189,21 @@ namespace Manina.Windows.Forms
             return Utility.Tuple.Create(request, priority);
         }
         /// <summary>
+        /// Creates the thread array.
+        /// </summary>
+        private void CreateThreads()
+        {
+            threads = new Thread[threadCount];
+            for (int i = 0; i < threadCount; i++)
+            {
+                threads[i] = new Thread(new ThreadStart(Run));
+                threads[i].IsBackground = true;
+            }
+        }
+        /// <summary>
         /// Rebuilds the work queue.
         /// </summary>
-        private void RebuildWorkQueue()
+        private void BuildWorkQueue()
         {
             if (processingMode == ProcessingMode.FIFO)
             {
@@ -248,7 +265,7 @@ namespace Manina.Windows.Forms
                     throw new System.Threading.ThreadStateException("The thread has already been started.");
 
                 processingMode = value;
-                RebuildWorkQueue();
+                BuildWorkQueue();
             }
         }
         /// <summary>
@@ -265,7 +282,7 @@ namespace Manina.Windows.Forms
                     throw new System.Threading.ThreadStateException("The thread has already been started.");
 
                 priorityQueues = value;
-                RebuildWorkQueue();
+                BuildWorkQueue();
             }
         }
         /// <summary>
@@ -277,11 +294,36 @@ namespace Manina.Windows.Forms
         /// Gets or sets a value indicating whether or not the worker thread is a background thread.
         /// </summary>
         [Browsable(true), Description("Gets or sets a value indicating whether or not the worker thread is a background thread."), Category("Behavior")]
-        public bool IsBackground { get { return thread.IsBackground; } set { thread.IsBackground = value; } }
+        public bool IsBackground
+        {
+            get { return threads[0].IsBackground; }
+            set
+            {
+                for (int i = 0; i < threadCount; i++)
+                    threads[i].IsBackground = value;
+            }
+        }
         /// <summary>
         /// Determines whether the <see cref="QueuedBackgroundWorker"/> is being stopped.
         /// </summary>
         private bool Stopping { get { lock (lockObject) { return stopping; } } }
+        /// <summary>
+        /// Gets or sets the number of worker threads. Number of threads
+        /// cannot be changed after any work is added to the work queue.
+        /// </summary>
+        [Browsable(true), Category("Behaviour"), DefaultValue(5)]
+        public int Threads
+        {
+            get { return threadCount; }
+            set
+            {
+                if (started)
+                    throw new System.Threading.ThreadStateException("The thread has already been started.");
+
+                threadCount = value;
+                CreateThreads();
+            }
+        }
         #endregion
 
         #region Cancel
@@ -384,7 +426,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public ApartmentState GetApartmentState()
         {
-            return thread.GetApartmentState();
+            return threads[0].GetApartmentState();
         }
         /// <summary>
         /// Sets the apartment state of the worker thread. The apartment state
@@ -392,7 +434,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void SetApartmentState(ApartmentState state)
         {
-            thread.SetApartmentState(state);
+            for (int i = 0; i < threadCount; i++)
+                threads[i].SetApartmentState(state);
         }
         #endregion
 
