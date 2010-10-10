@@ -106,7 +106,12 @@ namespace Manina.Windows.Forms
             imageListView1.AllowDuplicateFileNames = true;
             imageListView1.SetRenderer(new ImageListViewRenderers.DefaultRenderer());
 
-            PopulateTreeView();
+            TreeNode node = new TreeNode("Loading...", 3, 3);
+            node.Tag = null;
+            treeView1.Nodes.Clear();
+            treeView1.Nodes.Add(node);
+            while (bw.IsBusy) ;
+            bw.RunWorkerAsync(node);
         }
 
         #endregion
@@ -301,11 +306,11 @@ namespace Manina.Windows.Forms
         {
             if (e.Control)
             {
-                if (e.KeyCode == Keys.A )
+                if (e.KeyCode == Keys.A)
                     imageListView1.SelectAll();
-                else if (e.KeyCode== Keys.U)
+                else if (e.KeyCode == Keys.U)
                     imageListView1.ClearSelection();
-                else if (e.KeyCode== Keys.I)
+                else if (e.KeyCode == Keys.I)
                     imageListView1.InvertSelection();
             }
             else if (e.Alt)
@@ -321,29 +326,6 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Update folder list asynchronously
-        private void PopulateTreeView()
-        {
-            foreach (DriveInfo info in System.IO.DriveInfo.GetDrives())
-            {
-                if (info.IsReady)
-                {
-                    DirectoryInfo rootPath = info.RootDirectory;
-                    TreeNode rootNode = new TreeNode(info.VolumeLabel + " (" + info.Name + ")", 0, 0);
-                    rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(rootPath, false);
-                    treeView1.Nodes.Add(rootNode);
-                    List<TreeNode> nodes = GetNodes(rootNode);
-                    rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(rootPath, true);
-                    rootNode.Nodes.Clear();
-                    foreach (TreeNode node in nodes)
-                        rootNode.Nodes.Add(node);
-
-                    rootNode.Expand();
-                }
-            }
-            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)treeView1.Nodes[0].Tag;
-            PopulateListView(ktag.Key);
-        }
-
         private void PopulateListView(DirectoryInfo path)
         {
             imageListView1.Items.Clear();
@@ -377,16 +359,32 @@ namespace Manina.Windows.Forms
             bw.RunWorkerAsync(node);
         }
 
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node.Tag == null) return;
+            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)e.Node.Tag;
+            PopulateListView(ktag.Key);
+        }
+
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             KeyValuePair<TreeNode, List<TreeNode>> kv = (KeyValuePair<TreeNode, List<TreeNode>>)e.Result;
             TreeNode rootNode = kv.Key;
-            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)rootNode.Tag;
-            rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(ktag.Key, true);
             List<TreeNode> nodes = kv.Value;
-            rootNode.Nodes.Clear();
-            foreach (TreeNode node in nodes)
-                rootNode.Nodes.Add(node);
+            if (rootNode.Tag == null)
+            {
+                treeView1.Nodes.Clear();
+                foreach (TreeNode node in nodes)
+                    treeView1.Nodes.Add(node);
+            }
+            else
+            {
+                KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)rootNode.Tag;
+                rootNode.Tag = new KeyValuePair<DirectoryInfo, bool>(ktag.Key, true);
+                rootNode.Nodes.Clear();
+                foreach (TreeNode node in nodes)
+                    rootNode.Nodes.Add(node);
+            }
         }
 
         private static void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -400,34 +398,60 @@ namespace Manina.Windows.Forms
 
         private static List<TreeNode> GetNodes(TreeNode rootNode)
         {
-            KeyValuePair<DirectoryInfo, bool> kv = (KeyValuePair<DirectoryInfo, bool>)rootNode.Tag;
-            bool done = kv.Value;
-            if (done)
-                return new List<TreeNode>();
-
-            DirectoryInfo rootPath = kv.Key;
-            List<TreeNode> nodes = new List<TreeNode>();
-
-            DirectoryInfo[] dirs = new DirectoryInfo[0];
-            try
+            if (rootNode.Tag == null)
             {
-                dirs = rootPath.GetDirectories();
-            }
-            catch
-            {
-                return new List<TreeNode>();
-            }
-            foreach (DirectoryInfo info in dirs)
-            {
-                if ((info.Attributes & FileAttributes.System) != FileAttributes.System)
+                List<TreeNode> volNodes = new List<TreeNode>();
+                foreach (DriveInfo info in System.IO.DriveInfo.GetDrives())
                 {
-                    TreeNode aNode = new TreeNode(info.Name, 1, 2);
-                    aNode.Tag = new KeyValuePair<DirectoryInfo, bool>(info, false);
-                    GetDirectories(aNode);
-                    nodes.Add(aNode);
+                    if (info.IsReady)
+                    {
+                        DirectoryInfo rootPath = info.RootDirectory;
+                        TreeNode volNode = new TreeNode(info.VolumeLabel + " (" + info.Name + ")", 0, 0);
+                        volNode.Tag = new KeyValuePair<DirectoryInfo, bool>(rootPath, false);
+                        List<TreeNode> nodes = GetNodes(volNode);
+                        volNode.Tag = new KeyValuePair<DirectoryInfo, bool>(rootPath, true);
+                        volNode.Nodes.Clear();
+                        foreach (TreeNode node in nodes)
+                            volNode.Nodes.Add(node);
+
+                        volNode.Expand();
+                        volNodes.Add(volNode);
+                    }
                 }
+
+                return volNodes;
             }
-            return nodes;
+            else
+            {
+                KeyValuePair<DirectoryInfo, bool> kv = (KeyValuePair<DirectoryInfo, bool>)rootNode.Tag;
+                bool done = kv.Value;
+                if (done)
+                    return new List<TreeNode>();
+
+                DirectoryInfo rootPath = kv.Key;
+                List<TreeNode> nodes = new List<TreeNode>();
+
+                DirectoryInfo[] dirs = new DirectoryInfo[0];
+                try
+                {
+                    dirs = rootPath.GetDirectories();
+                }
+                catch
+                {
+                    return new List<TreeNode>();
+                }
+                foreach (DirectoryInfo info in dirs)
+                {
+                    if ((info.Attributes & FileAttributes.System) != FileAttributes.System)
+                    {
+                        TreeNode aNode = new TreeNode(info.Name, 1, 2);
+                        aNode.Tag = new KeyValuePair<DirectoryInfo, bool>(info, false);
+                        GetDirectories(aNode);
+                        nodes.Add(aNode);
+                    }
+                }
+                return nodes;
+            }
         }
 
         private static void GetDirectories(TreeNode node)
@@ -473,12 +497,6 @@ namespace Manina.Windows.Forms
             }
 
             return dirs.Length;
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            KeyValuePair<DirectoryInfo, bool> ktag = (KeyValuePair<DirectoryInfo, bool>)e.Node.Tag;
-            PopulateListView(ktag.Key);
         }
         #endregion
     }
