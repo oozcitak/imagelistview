@@ -1,6 +1,18 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 9.2 (10 October 2010) =
+
+This release includes a further performance tweak over the previous release. There are also a few cosmetic changes and new methods for handling selected and checked item collections.
+
+  * Background workers now use multiple threads while extracting thumbnails and reading image metadata.
+  * Added the !InvertSelection method to the control.
+  * Added !CheckAll, !UncheckAll and !InvertCheckState methods to the control.
+  * Added the !ClientBounds property to ImageListViewRenderer.
+  * Zoomed items of zooming renderer do not flow out of the control.
+  * Fixed a bug where the first column was always drawn in hovered state.
+  * Pane label color is now a darker gray.
+
 = 9.1 (10 October 2010) =
 
 This release includes many performance tweaks. The new !ThemeRenderer is also introduced in this release. This new renderer matches the system visual style and falls back to the default renderer on older (Windows XP and earlier) systems.
