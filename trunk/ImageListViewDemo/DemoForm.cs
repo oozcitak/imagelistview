@@ -318,9 +318,9 @@ namespace Manina.Windows.Forms
                 if (e.KeyCode == Keys.A)
                     imageListView1.CheckAll();
                 else if (e.KeyCode == Keys.U)
-                    imageListView1.UnCheckAll();
+                    imageListView1.UncheckAll();
                 else if (e.KeyCode == Keys.I)
-                    imageListView1.InvertCheckedState();
+                    imageListView1.InvertCheckState();
             }
         }
         #endregion

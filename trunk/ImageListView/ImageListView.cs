@@ -941,7 +941,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Marks all items as unchecked.
         /// </summary>
-        public void UnCheckAll()
+        public void UncheckAll()
         {
             SuspendPaint();
             mCheckedItems.Clear();
@@ -949,9 +949,9 @@ namespace Manina.Windows.Forms
             ResumePaint();
         }
         /// <summary>
-        /// Reverses the checked state of all items.
+        /// Reverses the check state of all items.
         /// </summary>
-        public void InvertCheckedState()
+        public void InvertCheckState()
         {
             SuspendPaint();
 
