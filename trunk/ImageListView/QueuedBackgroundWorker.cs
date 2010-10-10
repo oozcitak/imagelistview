@@ -467,7 +467,8 @@ namespace Manina.Windows.Forms
                         // Raise the work complete event
                         QueuedWorkerCompletedEventArgs arg2 = new QueuedWorkerCompletedEventArgs(request,
                             arg.Result, priority, error, arg.Cancel);
-                        context.Post(workCompletedCallback, arg2);
+                        if (!Stopping)
+                            context.Post(workCompletedCallback, arg2);
                     }
 
                     // Check if the cache is exhausted
@@ -477,7 +478,8 @@ namespace Manina.Windows.Forms
                     }
                 }
                 // Done processing queue
-                context.Post(queueEmptyCallback, new EventArgs());
+                if (!Stopping)
+                    context.Post(queueEmptyCallback, new EventArgs());
             }
         }
         #endregion

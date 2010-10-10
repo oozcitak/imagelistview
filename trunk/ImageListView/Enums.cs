@@ -109,7 +109,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// The column is the sort column.
         /// </summary>
-        SortColumn,
+        SortColumn = 8,
     }
     /// <summary>
     /// Represents the type of information displayed in an image list view column.
