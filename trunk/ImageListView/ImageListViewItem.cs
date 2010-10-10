@@ -433,7 +433,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets focal length of the lens in millimeters.
         /// </summary>
-        [Category("Image Properties"), Browsable(true), Description("Gets focal length of the lens in millimeters.")]
+        [Category("Camera Properties"), Browsable(true), Description("Gets focal length of the lens in millimeters.")]
         public float FocalLength { get { UpdateFileInfo(); return mFocalLength; } }
         #endregion
 
