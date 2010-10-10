@@ -65,6 +65,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public bool ItemsDrawnFirst { get; set; }
             /// <summary>
+            /// Gets the rectangle bounding the client area of the control without the scroll bars.
+            /// </summary>
+            public Rectangle ClientBounds { get { return ImageListView.layoutManager.ClientArea; } }
+            /// <summary>
             /// Gets the rectangle bounding the item display area.
             /// </summary>
             public Rectangle ItemAreaBounds { get { return ImageListView.layoutManager.ItemAreaBounds; } }
