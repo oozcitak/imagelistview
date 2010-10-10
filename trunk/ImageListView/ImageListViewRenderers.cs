@@ -1374,11 +1374,12 @@ namespace Manina.Windows.Forms
 
                 if (ImageListView.View != Manina.Windows.Forms.View.Details)
                 {
+                    Rectangle controlBounds = ClientBounds;
+
                     // Zoom on mouse over
                     if ((state & ItemState.Hovered) != ItemState.None)
                     {
                         bounds.Inflate((int)(bounds.Width * mZoomRatio), (int)(bounds.Height * mZoomRatio));
-                        Rectangle controlBounds = ImageListView.ClientRectangle;
                         if (bounds.Bottom > controlBounds.Bottom)
                             bounds.Y = controlBounds.Bottom - bounds.Height;
                         if (bounds.Top < controlBounds.Top)
@@ -1413,6 +1414,15 @@ namespace Manina.Windows.Forms
                             int delta = (ImageListView.Font.Height + 8) - (bounds.Height - imageHeight) / 2;
                             bounds.Height += 2 * delta;
                             imageY += delta;
+
+                            delta = 0;
+                            if (bounds.Bottom > controlBounds.Bottom)
+                                delta = bounds.Y - (controlBounds.Bottom - bounds.Height);
+                            if (bounds.Top < controlBounds.Top)
+                                delta = bounds.Y - controlBounds.Top;
+
+                            bounds.Y -= delta;
+                            imageY -= delta;
                         }
 
                         // Paint background
