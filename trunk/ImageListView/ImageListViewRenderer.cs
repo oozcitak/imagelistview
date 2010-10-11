@@ -34,9 +34,9 @@ namespace Manina.Windows.Forms
         {
             #region Constants
             /// <summary>
-            /// Represents the time span after which the control deems to be needing a refresh.
+            /// Represents the time in milliseconds after which the control deems to be needing a refresh.
             /// </summary>
-            internal static readonly TimeSpan LazyRefreshInterval = new TimeSpan(0, 0, 0, 0, 200);
+            internal const int LazyRefreshInterval = 100;
             #endregion
 
             #region Member Variables
@@ -83,7 +83,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets whether the lazy refresh interval is exceeded.
             /// </summary>
-            internal bool LazyRefreshIntervalExceeded { get { return ((DateTime.Now - lastRenderTime) > LazyRefreshInterval); } }
+            internal bool LazyRefreshIntervalExceeded { get { return ((int)(DateTime.Now - lastRenderTime).TotalMilliseconds > LazyRefreshInterval); } }
             #endregion
 
             #region Constructor
@@ -672,6 +672,9 @@ namespace Manina.Windows.Forms
                 {
                     if (!RecreateBuffer(graphics)) return;
                 }
+
+                // Save the timne of this render for lazy refreshes
+                lastRenderTime = DateTime.Now;
 
                 // Update the layout
                 ImageListView.layoutManager.Update();

@@ -35,6 +35,7 @@
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.imageListView = new Manina.Windows.Forms.ImageListView();
+            this.logEventsCheckbox = new System.Windows.Forms.CheckBox();
             this.EventsListBox = new System.Windows.Forms.ListBox();
             this.EventListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ClearEventList = new System.Windows.Forms.ToolStripMenuItem();
@@ -135,6 +136,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.logEventsCheckbox);
             this.splitContainer1.Panel2.Controls.Add(this.EventsListBox);
             this.splitContainer1.Size = new System.Drawing.Size(619, 574);
             this.splitContainer1.SplitterDistance = 425;
@@ -158,15 +160,26 @@
             this.imageListView.Size = new System.Drawing.Size(425, 574);
             this.imageListView.TabIndex = 0;
             // 
+            // logEventsCheckbox
+            // 
+            this.logEventsCheckbox.AutoSize = true;
+            this.logEventsCheckbox.Checked = true;
+            this.logEventsCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.logEventsCheckbox.Location = new System.Drawing.Point(4, 4);
+            this.logEventsCheckbox.Name = "logEventsCheckbox";
+            this.logEventsCheckbox.Size = new System.Drawing.Size(80, 17);
+            this.logEventsCheckbox.TabIndex = 1;
+            this.logEventsCheckbox.Text = "Log Events";
+            this.logEventsCheckbox.UseVisualStyleBackColor = true;
+            // 
             // EventsListBox
             // 
             this.EventsListBox.ContextMenuStrip = this.EventListContextMenu;
-            this.EventsListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.EventsListBox.FormattingEnabled = true;
             this.EventsListBox.IntegralHeight = false;
-            this.EventsListBox.Location = new System.Drawing.Point(0, 0);
+            this.EventsListBox.Location = new System.Drawing.Point(0, 26);
             this.EventsListBox.Name = "EventsListBox";
-            this.EventsListBox.Size = new System.Drawing.Size(190, 574);
+            this.EventsListBox.Size = new System.Drawing.Size(190, 548);
             this.EventsListBox.TabIndex = 0;
             // 
             // EventListContextMenu
@@ -175,12 +188,12 @@
             this.ClearEventList});
             this.EventListContextMenu.Name = "EventListContextMenu";
             this.EventListContextMenu.ShowImageMargin = false;
-            this.EventListContextMenu.Size = new System.Drawing.Size(86, 26);
+            this.EventListContextMenu.Size = new System.Drawing.Size(75, 26);
             // 
             // ClearEventList
             // 
             this.ClearEventList.Name = "ClearEventList";
-            this.ClearEventList.Size = new System.Drawing.Size(85, 22);
+            this.ClearEventList.Size = new System.Drawing.Size(74, 22);
             this.ClearEventList.Text = "Clear";
             this.ClearEventList.Click += new System.EventHandler(this.ClearEventList_Click);
             // 
@@ -353,28 +366,28 @@
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(138, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(127, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(138, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(127, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(138, 22);
+            this.ViewPane.Size = new System.Drawing.Size(127, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(138, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(127, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
             // 
@@ -555,6 +568,7 @@
             this.StatusStrip.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             this.splitContainer1.ResumeLayout(false);
             this.EventListContextMenu.ResumeLayout(false);
             this.TestToolStrip.ResumeLayout(false);
@@ -608,6 +622,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripLabel toolStripLabel5;
         private System.Windows.Forms.ToolStripButton StartBenchmark;
+        private System.Windows.Forms.CheckBox logEventsCheckbox;
     }
 }
 

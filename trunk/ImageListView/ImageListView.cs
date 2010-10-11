@@ -864,7 +864,7 @@ namespace Manina.Windows.Forms
 
             // Lazy refresh timer
             lazyRefreshTimer = new Timer();
-            lazyRefreshTimer.Interval = (int)ImageListViewRenderer.LazyRefreshInterval.TotalMilliseconds;
+            lazyRefreshTimer.Interval = ImageListViewRenderer.LazyRefreshInterval;
             lazyRefreshTimer.Enabled = false;
             lazyRefreshTimer.Tick += lazyRefreshTimer_Tick;
 
@@ -916,7 +916,7 @@ namespace Manina.Windows.Forms
 
             foreach (ImageListViewItem item in Items)
                 item.mSelected = !item.mSelected;
-            
+
             OnSelectionChangedInternal();
 
             Refresh();
@@ -1231,10 +1231,11 @@ namespace Manina.Windows.Forms
             {
                 if (mRenderer.LazyRefreshIntervalExceeded)
                     base.Refresh();
-                else if (!lazyRefreshTimer.Enabled)
+                else
                 {
-                    lazyRefreshTimer.Enabled = true;
                     rendererNeedsPaint = true;
+                    if (!lazyRefreshTimer.Enabled)
+                        lazyRefreshTimer.Enabled = true;
                 }
             }
             else if (CanPaint())
