@@ -400,17 +400,17 @@
   <data name="StartBenchmark.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAidJREFUOE+tkt9L
-        U2EYx/0Duu+mLuIgI6cziVLX5uyHJCOQoCLoLroOibqJSMGIWiVFQSkEsdkwGxY0hpXSGNa0zSk6p/Ns
-        O5tzP87O5s52dvKdVN/eLbrbcELv9fP5/niet67uf760p9MouHVIuTrAz2rAO48hOa1GwtGGuP0oYlNH
-        sPH5MCI2VaSib3Ra92s7M4yiMIRi8jlI7Bm21p/gBzcImX0AwXkBnLVFqggL7o6BnP8KtoVhFFa7IS2d
-        Qs6jgzijhhx4iIzrMtiJhp9VG/MObbHIP8VW5BokbxfynuMQaQ05YEB2oZdG19LoSqaiAD+jOZf1XkIx
-        NYSC7zTyCycgurSQlq9CWulDwq4H9+GQvrr71/aCHOkHiQ9CWjyJ3JwOWWd7OXrq20WErarrVeGEU9Oa
-        nutBkX9BHfXIzXdB/N6JTbr5gv8+/BbV7/CbRsKZlSQ0cpAETArCmuqJz8TwZdHkFzWfX7tB3Wn/KN14
-        +FG5t8waUFi5h/zSHSraB9F9C9nZm4hau7FqYuS1V/v/7iPmaBPpjQm9MaE3JtGJFrI+3kyklbsQbM1I
-        T9JUnn7EP55FcLQRfiPzcse/F37fZN909yK/OEDh29iw6cG+3pcLmg/s3REuDXDvlOXoianzCI2pwI4w
-        j2sCS0MBi3I+MdmD+KczYI1MpmbXEuwda9jDjTch9FYJ1swYanb9Nxi0KJZ9owq+JLRruAT4zfWtuwX/
-        AFMach1fvWcaAAAAAElFTkSuQmCC
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAidJREFUOE+tkt1L
+        U2Ecx/0Duu8iuoiDjJzOJEpdm7MXSUYgQUXQXXQdEnUTkYIRtUqKglIIYrMlNipoDCulMappm1N0bs6z
+        7WzOvZy9uLOdnXyOVN+eLbrbcELP9e/zffn9noaG//mynm5jxq1D2tUFflYD3nkEqS9qJB0dSNgPIz59
+        COufDiJqU0Wr+kYdul9buVHImRHIqacg8SfYXHuEH9wwJPYeMs5z4KxtYlU44+4aKgQuYSszitJKL8Sl
+        Eyh4dBBm1JCC95FzXURgsulnzca8XSvL/GNsRq9A9Pag6DkKgdaQggbkF/ppdC2NrmSqCvAzmjN57wXI
+        6RGUfCdRXDgGwaWFuHwZon8ASbse3PsD+truXztLUnQQJDEMcfE4CnM65J2dlejpb+cRsaqu1oSTTk17
+        dq4PMv+MOupRmO+B8L0bG3TzpcBd+CdUvyOvmgk3piRh034SNCkIa2okPhPDV0RTn9V8cfUadaf9Y3Tj
+        kQeV3hJrQMl/B8WlW1R0AIL7BvKz1xGz9mLFxEirL/b+3Ufc0SHQGxN6Y0JvTGKTbWTN0kpE/21kbK3I
+        TtFUnkEkPpxGaLwZASPzfNu/F3nXYt9w96O4OEThm1i36cG+3FMImfft3hYuD3BvlZXoyemzCE+owI4x
+        D+sCy0NBi3I+OdWHxMdTYI1Mrm7XMuydaNrFvWlB+LUSrJkx1O36bzBkUSz7xhV8WWjHcBkImBvbdwr+
+        ASDacglQ6psIAAAAAElFTkSuQmCC
 </value>
   </data>
   <metadata name="ChooseBenchmarkPath.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

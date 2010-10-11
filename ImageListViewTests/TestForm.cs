@@ -48,7 +48,7 @@ namespace ImageListViewTests
         // Cache error
         void imageListView1_CacheError(object sender, Manina.Windows.Forms.CacheErrorEventArgs e)
         {
-            if (!benchMarking)
+            if (!benchMarking && logEventsCheckbox.Checked)
                 LogEvent(string.Format("!!! {0} -> {1}", (e.CacheThread == Manina.Windows.Forms.CacheThread.Thumbnail ? "Thumbnail" : "Details"), e.Error.Message));
         }
         // Thumbnail cached
@@ -59,7 +59,7 @@ namespace ImageListViewTests
                 lastThumbnailTime = benchmarkSW.ElapsedMilliseconds;
                 cachedThumbnailCount++;
             }
-            else
+            else if(logEventsCheckbox.Checked)
             {
                 int index = -1;
                 if (e.Item != null)
@@ -73,7 +73,7 @@ namespace ImageListViewTests
         // Thumbnail caching
         void imageListView1_ThumbnailCaching(object sender, Manina.Windows.Forms.ThumbnailCachingEventArgs e)
         {
-            if (!benchMarking)
+            if (!benchMarking && logEventsCheckbox.Checked)
             {
                 int index = -1;
                 if (e.Item != null)
