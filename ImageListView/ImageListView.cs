@@ -1357,7 +1357,6 @@ namespace Manina.Windows.Forms
             }
             return visible;
         }
-
         #endregion
 
         #region Event Handlers

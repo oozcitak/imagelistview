@@ -837,7 +837,7 @@ namespace Manina.Windows.Forms
                 }
             }
             else
-            {
+            {               
                 Image img = null;
                 CacheState state = ThumbnailCacheState;
 
@@ -854,9 +854,9 @@ namespace Manina.Windows.Forms
                         img = mImageListView.ErrorImage;
                     return img;
                 }
-
+                
                 img = mImageListView.thumbnailCache.GetImage(Guid);
-
+                
                 if (state == CacheState.Cached)
                     return img;
 
@@ -868,7 +868,7 @@ namespace Manina.Windows.Forms
                     mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
                         mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, 
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-
+                
                 if (img == null && string.IsNullOrEmpty(extension))
                     return mImageListView.DefaultImage;
 
@@ -878,7 +878,7 @@ namespace Manina.Windows.Forms
                     img = mImageListView.shellInfoCache.GetSmallIcon(extension);
                 if (img == null)
                     img = mImageListView.DefaultImage;
-
+                
                 return img;
             }
         }

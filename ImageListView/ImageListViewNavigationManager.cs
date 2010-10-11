@@ -472,7 +472,7 @@ namespace Manina.Windows.Forms
                 mImageListView.ResumePaint();
 
                 // Change to size cursor if mouse is over a column separator or pane border
-                if (mImageListView.Cursor != Cursors.VSplit && mImageListView.Focused && !MouseSelecting)
+                if (mImageListView.Cursor != Cursors.VSplit && !MouseSelecting)
                 {
                     if ((mImageListView.AllowColumnResize && HoveredSeparator != null) ||
                         (mImageListView.AllowPaneResize && HoveredPaneBorder != false))
