@@ -96,7 +96,9 @@ namespace Manina.Windows.Forms
             /// <param name="inItemArea">if set to true the mouse is in the item area.</param>
             /// <param name="inHeaderArea">if set to true the mouse cursor is in the column header area.</param>
             /// <param name="inPaneArea">if set to true the mouse cursor is in the left-pane area.</param>
-            private HitInfo(int itemIndex, bool checkBoxHit, ImageListViewColumnHeader columnIndex, ImageListViewColumnHeader columnSeparator, int subItemIndex, bool paneBorder, bool inItemArea, bool inHeaderArea, bool inPaneArea)
+            private HitInfo(int itemIndex, bool checkBoxHit, ImageListViewColumnHeader columnIndex,
+                ImageListViewColumnHeader columnSeparator, int subItemIndex, 
+                bool paneBorder, bool inItemArea, bool inHeaderArea, bool inPaneArea)
             {
                 ItemIndex = itemIndex;
                 CheckBoxHit = checkBoxHit;

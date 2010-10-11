@@ -1205,7 +1205,7 @@ namespace Manina.Windows.Forms
             public virtual void DrawColumnHeader(Graphics g, ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
             {
                 // Paint background
-                if (ImageListView.Focused && ((state & ColumnState.Hovered) == ColumnState.Hovered))
+                if ((state & ColumnState.Hovered) != ColumnState.None)
                 {
                     using (Brush bHovered = new LinearGradientBrush(bounds, ImageListView.Colors.ColumnHeaderHoverColor1, ImageListView.Colors.ColumnHeaderHoverColor2, LinearGradientMode.Vertical))
                     {
