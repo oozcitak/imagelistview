@@ -534,16 +534,75 @@ namespace Manina.Windows.Forms
         /// Represents the noir color theme.
         /// </summary>
         public static ImageListViewColor Noir { get { return ImageListViewColor.GetNoirTheme(); } }
+        /// <summary>
+        /// Represents the mandarin color theme.
+        /// </summary>
+        public static ImageListViewColor Mandarin { get { return ImageListViewColor.GetMandarinTheme(); } }
 
         /// <summary>
-        /// Sets the controls color palette to default colors.
+        /// Sets the color palette to default colors.
         /// </summary>
         private static ImageListViewColor GetDefaultTheme()
         {
             return new ImageListViewColor();
         }
         /// <summary>
-        /// Sets the controls color palette to noir colors.
+        /// Sets the color palette to mandarin colors.
+        /// </summary>
+        private static ImageListViewColor GetMandarinTheme()
+        {
+            ImageListViewColor c = new ImageListViewColor();
+
+            // control
+            c.ControlBackColor = Color.White;
+
+            // item
+            c.BackColor = Color.White;
+            c.ForeColor = Color.FromArgb(60, 60, 60);
+            c.BorderColor = Color.FromArgb(187, 190, 183);
+
+            c.UnFocusedColor1 = Color.FromArgb(229, 227, 225);
+            c.UnFocusedColor2 = Color.FromArgb(229, 227, 225);
+            c.UnFocusedBorderColor = Color.FromArgb(168, 169, 161);
+
+            c.HoverColor1 = Color.Transparent;
+            c.HoverColor2 = Color.Transparent;
+            c.HoverBorderColor = Color.Transparent;
+
+            c.SelectedColor1 = Color.FromArgb(240, 119, 70);
+            c.SelectedColor2 = Color.FromArgb(240, 119, 70);
+            c.SelectedBorderColor = Color.FromArgb(240, 119, 70);
+
+            c.InsertionCaretColor = Color.FromArgb(240, 119, 70);
+
+            // thumbnails & pane
+            c.ImageInnerBorderColor = Color.Transparent;
+            c.ImageOuterBorderColor = Color.White;
+
+            // details view
+            c.CellForeColor = Color.FromArgb(60, 60, 60);
+            c.ColumnHeaderBackColor1 = Color.FromArgb(247, 247, 247);
+            c.ColumnHeaderBackColor2 = Color.FromArgb(235, 235, 235);
+            c.ColumnHeaderHoverColor1 = Color.White;
+            c.ColumnHeaderHoverColor2 = Color.FromArgb(245, 245, 245);
+            c.ColumnHeaderForeColor = Color.FromArgb(60, 60, 60);
+            c.ColumnSelectColor = Color.FromArgb(238, 238, 238);
+            c.ColumnSeparatorColor = Color.FromArgb(216, 216, 216);
+
+            // image pane
+            c.PaneBackColor = Color.White;
+            c.PaneSeparatorColor = Color.FromArgb(216, 216, 216);
+            c.PaneLabelColor = Color.FromArgb(156, 156, 156);
+
+            // selection rectangke
+            c.SelectionRectangleColor1 = Color.FromArgb(64, 240, 116, 68);
+            c.SelectionRectangleColor2 = Color.FromArgb(64, 240, 116, 68);
+            c.SelectionRectangleBorderColor = Color.FromArgb(240, 119, 70);
+
+            return c;
+        }
+        /// <summary>
+        /// Sets the color palette to noir colors.
         /// </summary>
         private static ImageListViewColor GetNoirTheme()
         {
@@ -585,6 +644,8 @@ namespace Manina.Windows.Forms
             c.ColumnHeaderForeColor = Color.White;
             c.ColumnSelectColor = Color.FromArgb(96, 128, 128, 128);
             c.ColumnSeparatorColor = Color.Gold;
+            c.AlternateBackColor = Color.FromArgb(0x31, 0x31, 0x31);
+            c.AlternateCellForeColor = Color.WhiteSmoke;
 
             // image pane
             c.PaneBackColor = Color.FromArgb(0x31, 0x31, 0x31);
