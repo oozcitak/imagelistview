@@ -1028,7 +1028,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Sets the renderer for this instance.
         /// </summary>
-        public void SetRenderer(ImageListViewRenderer renderer)
+        /// <param name="renderer">An <see cref="ImageListViewRenderer"/> to assign to the control.</param>
+        /// <param name="keepColors">true to keep current colors; otherwise false.</param>
+        public void SetRenderer(ImageListViewRenderer renderer, bool keepColors)
         {
             if (renderer == null)
                 throw new ArgumentNullException("renderer");
@@ -1037,9 +1039,12 @@ namespace Manina.Windows.Forms
 
             mRenderer = renderer;
             mRenderer.ImageListView = this;
-            ImageListViewColor[] preferredColors = mRenderer.PreferredColors;
-            if (preferredColors != null)
-                mColors = preferredColors[0];
+            if (!keepColors)
+            {
+                ImageListViewColor[] preferredColors = mRenderer.PreferredColors;
+                if (preferredColors != null)
+                    mColors = preferredColors[0];
+            }
 
             if (oldRenderer != null)
                 oldRenderer.Dispose();
@@ -1048,6 +1053,14 @@ namespace Manina.Windows.Forms
                 layoutManager.Update(true);
 
             Refresh();
+        }
+        /// <summary>
+        /// Sets the renderer for this instance.
+        /// </summary>
+        /// <param name="renderer">An <see cref="ImageListViewRenderer"/> to assign to the control.</param>
+        public void SetRenderer(ImageListViewRenderer renderer)
+        {
+            SetRenderer(renderer, false);
         }
         /// <summary>
         /// Sorts the items.

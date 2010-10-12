@@ -41,6 +41,7 @@ namespace Manina.Windows.Forms
         Color mUnFocusedColor1;
         Color mUnFocusedColor2;
         Color mUnFocusedBorderColor;
+        Color mUnFocusedForeColor;
         Color mForeColor;
         Color mHoverColor1;
         Color mHoverColor2;
@@ -49,6 +50,7 @@ namespace Manina.Windows.Forms
         Color mSelectedColor1;
         Color mSelectedColor2;
         Color mSelectedBorderColor;
+        Color mSelectedForeColor;
 
         // thumbnail & pane
         Color mImageInnerBorderColor;
@@ -159,6 +161,16 @@ namespace Manina.Windows.Forms
             set { mUnFocusedBorderColor = value; }
         }
         /// <summary>
+        /// Gets or sets the fore color of the ImageListViewItem if the control is not focused.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the fore color of the ImageListViewItem if the control is not focused.")]
+        [DefaultValue(typeof(Color), "ControlText")]
+        public Color UnFocusedForeColor
+        {
+            get { return mUnFocusedBorderColor; }
+            set { mUnFocusedBorderColor = value; }
+        }
+        /// <summary>
         /// Gets or sets the background gradient color1 if the ImageListViewItem is hovered.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color1 if the ImageListViewItem is hovered.")]
@@ -224,6 +236,16 @@ namespace Manina.Windows.Forms
         [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is selected.")]
         [DefaultValue(typeof(Color), "128, 10, 36, 106")]
         public Color SelectedBorderColor
+        {
+            get { return mSelectedBorderColor; }
+            set { mSelectedBorderColor = value; }
+        }
+        /// <summary>
+        /// Gets or sets the fore color of the ImageListViewItem if the item is selected.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the fore color of the ImageListViewItem if the item is selected.")]
+        [DefaultValue(typeof(Color), "ControlText")]
+        public Color SelectedForeColor
         {
             get { return mSelectedBorderColor; }
             set { mSelectedBorderColor = value; }
@@ -418,6 +440,7 @@ namespace Manina.Windows.Forms
             mUnFocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
             mUnFocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
             mUnFocusedBorderColor = Color.FromArgb(128, SystemColors.GrayText);
+            mUnFocusedForeColor = SystemColors.ControlText;
 
             mHoverColor1 = Color.FromArgb(8, SystemColors.Highlight);
             mHoverColor2 = Color.FromArgb(64, SystemColors.Highlight);
@@ -426,6 +449,7 @@ namespace Manina.Windows.Forms
             mSelectedColor1 = Color.FromArgb(16, SystemColors.Highlight);
             mSelectedColor2 = Color.FromArgb(128, SystemColors.Highlight);
             mSelectedBorderColor = Color.FromArgb(128, SystemColors.Highlight);
+            mSelectedForeColor = SystemColors.ControlText;
 
             mInsertionCaretColor = SystemColors.Highlight;
 
@@ -557,13 +581,14 @@ namespace Manina.Windows.Forms
             c.ControlBackColor = Color.White;
 
             // item
-            c.BackColor = Color.White;
+            c.BackColor = Color.FromArgb(64, Color.White);
             c.ForeColor = Color.FromArgb(60, 60, 60);
             c.BorderColor = Color.FromArgb(187, 190, 183);
 
             c.UnFocusedColor1 = Color.FromArgb(229, 227, 225);
             c.UnFocusedColor2 = Color.FromArgb(229, 227, 225);
             c.UnFocusedBorderColor = Color.FromArgb(168, 169, 161);
+            c.UnFocusedForeColor = Color.FromArgb(40, 40, 40);
 
             c.HoverColor1 = Color.Transparent;
             c.HoverColor2 = Color.Transparent;
@@ -572,6 +597,7 @@ namespace Manina.Windows.Forms
             c.SelectedColor1 = Color.FromArgb(240, 119, 70);
             c.SelectedColor2 = Color.FromArgb(240, 119, 70);
             c.SelectedBorderColor = Color.FromArgb(240, 119, 70);
+            c.SelectedForeColor = Color.White;
 
             c.InsertionCaretColor = Color.FromArgb(240, 119, 70);
 
@@ -588,13 +614,15 @@ namespace Manina.Windows.Forms
             c.ColumnHeaderForeColor = Color.FromArgb(60, 60, 60);
             c.ColumnSelectColor = Color.FromArgb(238, 238, 238);
             c.ColumnSeparatorColor = Color.FromArgb(216, 216, 216);
+            c.mAlternateBackColor = Color.FromArgb(234, 234, 234);
+            c.mAlternateCellForeColor = Color.FromArgb(40, 40, 40);
 
             // image pane
             c.PaneBackColor = Color.White;
             c.PaneSeparatorColor = Color.FromArgb(216, 216, 216);
             c.PaneLabelColor = Color.FromArgb(156, 156, 156);
 
-            // selection rectangke
+            // selection rectangle
             c.SelectionRectangleColor1 = Color.FromArgb(64, 240, 116, 68);
             c.SelectionRectangleColor2 = Color.FromArgb(64, 240, 116, 68);
             c.SelectionRectangleBorderColor = Color.FromArgb(240, 119, 70);
@@ -620,6 +648,7 @@ namespace Manina.Windows.Forms
             c.UnFocusedColor1 = Color.FromArgb(16, SystemColors.GrayText);
             c.UnFocusedColor2 = Color.FromArgb(64, SystemColors.GrayText);
             c.UnFocusedBorderColor = Color.FromArgb(128, SystemColors.GrayText);
+            c.UnFocusedForeColor = Color.LightGray;
 
             c.HoverColor1 = Color.FromArgb(64, Color.White);
             c.HoverColor2 = Color.FromArgb(16, Color.White);
@@ -628,6 +657,7 @@ namespace Manina.Windows.Forms
             c.SelectedColor1 = Color.FromArgb(64, 96, 160);
             c.SelectedColor2 = Color.FromArgb(64, 64, 96, 160);
             c.SelectedBorderColor = Color.FromArgb(128, SystemColors.Highlight);
+            c.SelectedForeColor = Color.LightGray;
 
             c.InsertionCaretColor = Color.FromArgb(96, 144, 240);
 

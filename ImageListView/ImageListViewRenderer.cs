@@ -1010,9 +1010,17 @@ namespace Manina.Windows.Forms
                     }
 
                     // Draw item text
+                    Color foreColor = ImageListView.Colors.ForeColor;
+                    if ((state & ItemState.Selected) != ItemState.None)
+                    {
+                        if (ImageListView.Focused)
+                            foreColor = ImageListView.Colors.SelectedForeColor;
+                        else
+                            foreColor = ImageListView.Colors.UnFocusedForeColor;
+                    }
                     Size szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
                     Rectangle rt = new Rectangle(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height, ImageListView.ThumbnailSize.Width, szt.Height);
-                    TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, SystemColors.ControlText,
+                    TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, foreColor,
                         TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
                 }
                 else // if (ImageListView.View == View.Details)
@@ -1068,8 +1076,17 @@ namespace Manina.Windows.Forms
                         foreach (ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
-                            using (Brush bItemFore = new SolidBrush(
-                                alternate ? ImageListView.Colors.AlternateCellForeColor : ImageListView.Colors.CellForeColor))
+                            Color foreColor = ImageListView.Colors.CellForeColor;
+                            if ((state & ItemState.Selected) != ItemState.None)
+                            {
+                                if (ImageListView.Focused)
+                                    foreColor = ImageListView.Colors.SelectedForeColor;
+                                else
+                                    foreColor = ImageListView.Colors.UnFocusedForeColor;
+                            }
+                            else if (alternate)
+                                foreColor = ImageListView.Colors.AlternateCellForeColor;
+                            using (Brush bItemFore = new SolidBrush(foreColor))
                             {
                                 int iconOffset = 0;
                                 if (column.Type == ColumnType.Name)
