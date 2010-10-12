@@ -102,7 +102,8 @@ namespace Manina.Windows.Forms
         private bool controlSuspended;
         private int rendererSuspendCount;
         private bool rendererNeedsPaint;
-        private Timer lazyRefreshTimer;
+        private System.Timers.Timer lazyRefreshTimer;
+        private RefreshDelegateInternal lazyRefreshCallback;
 
         // Layout variables
         internal HScrollBar hScrollBar;
@@ -863,10 +864,11 @@ namespace Manina.Windows.Forms
             Controls.Add(vScrollBar);
 
             // Lazy refresh timer
-            lazyRefreshTimer = new Timer();
+            lazyRefreshTimer = new System.Timers.Timer();
             lazyRefreshTimer.Interval = ImageListViewRenderer.LazyRefreshInterval;
             lazyRefreshTimer.Enabled = false;
-            lazyRefreshTimer.Tick += lazyRefreshTimer_Tick;
+            lazyRefreshTimer.Elapsed += lazyRefreshTimer_Tick;
+            lazyRefreshCallback = new RefreshDelegateInternal(Refresh);
 
             // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
@@ -1229,14 +1231,9 @@ namespace Manina.Windows.Forms
                 base.Refresh();
             else if (lazy && CanPaint())
             {
-                if (mRenderer.LazyRefreshIntervalExceeded)
-                    base.Refresh();
-                else
-                {
-                    rendererNeedsPaint = true;
-                    if (!lazyRefreshTimer.Enabled)
-                        lazyRefreshTimer.Enabled = true;
-                }
+                rendererNeedsPaint = true;
+                if (!lazyRefreshTimer.Enabled)
+                    lazyRefreshTimer.Enabled = true;
             }
             else if (CanPaint())
                 base.Refresh();
@@ -1415,10 +1412,15 @@ namespace Manina.Windows.Forms
         /// </summary>
         void lazyRefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (mRenderer.LazyRefreshIntervalExceeded && rendererNeedsPaint)
+            if (rendererNeedsPaint)
             {
-                lazyRefreshTimer.Enabled = false;
-                base.Refresh();
+                lazyRefreshTimer.Stop();
+                try
+                {
+                    if (IsHandleCreated && !IsDisposed)
+                        BeginInvoke(lazyRefreshCallback);
+                }
+                finally { ; }
             }
         }
         /// <summary>
@@ -1589,7 +1591,7 @@ namespace Manina.Windows.Forms
                     // Events
                     hScrollBar.Scroll -= hScrollBar_Scroll;
                     vScrollBar.Scroll -= vScrollBar_Scroll;
-                    lazyRefreshTimer.Tick -= lazyRefreshTimer_Tick;
+                    lazyRefreshTimer.Elapsed -= lazyRefreshTimer_Tick;
 
                     // Resources
                     if (mDefaultImage != null)
@@ -1788,14 +1790,6 @@ namespace Manina.Windows.Forms
             ImageListViewItem item = null;
             if (mItems.TryGetValue(guid, out item))
                 OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size, error));
-        }
-        /// <summary>
-        /// Raises the refresh event.
-        /// This method is invoked from the thumbnail thread.
-        /// </summary>
-        internal void OnRefreshInternal()
-        {
-            Refresh();
         }
         /// <summary>
         /// Updates item details.

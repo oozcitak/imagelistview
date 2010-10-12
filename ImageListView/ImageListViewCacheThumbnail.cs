@@ -779,7 +779,7 @@ namespace Manina.Windows.Forms
             if (mImageListView != null)
             {
                 mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize, false);
-                mImageListView.OnRefreshInternal();
+                mImageListView.Refresh();
             }
         }
         /// <summary>
@@ -836,7 +836,7 @@ namespace Manina.Windows.Forms
             if (mImageListView != null)
             {
                 mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize, false);
-                mImageListView.OnRefreshInternal();
+                mImageListView.Refresh();
             }
         }
         /// <summary>

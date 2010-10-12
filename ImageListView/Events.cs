@@ -124,6 +124,11 @@ namespace Manina.Windows.Forms
     /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void RetrieveVirtualItemDetailsEventHandler(object sender, VirtualItemDetailsEventArgs e);
+    /// <summary>
+    /// Refreshes the owner control.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal delegate void RefreshDelegateInternal();
     #endregion
 
     #region Event Arguments
