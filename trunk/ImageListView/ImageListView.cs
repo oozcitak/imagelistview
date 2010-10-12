@@ -1033,11 +1033,17 @@ namespace Manina.Windows.Forms
             if (renderer == null)
                 throw new ArgumentNullException("renderer");
 
-            if (mRenderer != null)
-                mRenderer.Dispose();
+            ImageListViewRenderer oldRenderer = mRenderer;
 
             mRenderer = renderer;
             mRenderer.ImageListView = this;
+            ImageListViewColor[] preferredColors = mRenderer.PreferredColors;
+            if (preferredColors != null)
+                mColors = preferredColors[0];
+
+            if (oldRenderer != null)
+                oldRenderer.Dispose();
+
             if (layoutManager != null)
                 layoutManager.Update(true);
 

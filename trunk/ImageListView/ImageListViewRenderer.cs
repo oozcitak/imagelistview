@@ -84,6 +84,10 @@ namespace Manina.Windows.Forms
             /// Gets whether the lazy refresh interval is exceeded.
             /// </summary>
             internal bool LazyRefreshIntervalExceeded { get { return ((int)(DateTime.Now - lastRenderTime).TotalMilliseconds > LazyRefreshInterval); } }
+            /// <summary>
+            /// Gets a list of color themes preferred by this renderer.
+            /// </summary>
+            public virtual ImageListViewColor[] PreferredColors { get { return null; } }
             #endregion
 
             #region Constructor
