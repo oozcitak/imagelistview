@@ -12,13 +12,6 @@ namespace Manina.Windows.Forms
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void RunQueuedWorkerCompletedEventHandler(object sender, QueuedWorkerCompletedEventArgs e);
     /// <summary>
-    /// Represents the method that will handle the WorkerFinished event.
-    /// </summary>
-    /// <param name="sender">The object that is the source of the event.</param>
-    /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public delegate void QueuedWorkerFinishedEventHandler(object sender, EventArgs e);
-    /// <summary>
     /// Represents the method that will handle the DoWork event.
     /// </summary>
     /// <param name="sender">The object that is the source of the event.</param>

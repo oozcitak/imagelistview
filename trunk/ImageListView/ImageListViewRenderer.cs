@@ -678,7 +678,7 @@ namespace Manina.Windows.Forms
 
                 // Update the layout
                 ImageListView.layoutManager.Update();
-               
+
                 // Set drawing area
                 Graphics g = bufferGraphics.Graphics;
                 g.ResetClip();

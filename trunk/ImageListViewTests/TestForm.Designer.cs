@@ -174,6 +174,9 @@
             // 
             // EventsListBox
             // 
+            this.EventsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.EventsListBox.ContextMenuStrip = this.EventListContextMenu;
             this.EventsListBox.FormattingEnabled = true;
             this.EventsListBox.IntegralHeight = false;

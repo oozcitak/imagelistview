@@ -22,15 +22,13 @@ namespace Manina.Windows.Forms
         private Thread[] threads;
         private bool stopping;
         private bool started;
-        private SynchronizationContext context;
         private bool disposed;
 
         private int priorityQueues;
-        private LinkedList<object>[] items;
+        private LinkedList<AsyncOperation>[] items;
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback workCompletedCallback;
-        private readonly SendOrPostCallback queueEmptyCallback;
         #endregion
 
         #region Constructor
@@ -42,7 +40,6 @@ namespace Manina.Windows.Forms
             lockObject = new object();
             stopping = false;
             started = false;
-            context = null;
             disposed = false;
 
             // Threads
@@ -57,7 +54,6 @@ namespace Manina.Windows.Forms
 
             // The loader complete callback
             workCompletedCallback = new SendOrPostCallback(this.RunWorkerCompletedCallback);
-            queueEmptyCallback = new SendOrPostCallback(this.QueueEmptyCallback);
         }
         #endregion
 
@@ -73,12 +69,9 @@ namespace Manina.Windows.Forms
             if (priority < 0 || priority >= priorityQueues)
                 throw new ArgumentException("priority must be between 0 and " + (priorityQueues - 1).ToString() + "  inclusive.", "priority");
 
-            // Start the worker thread
+            // Start the worker threads
             if (!started)
             {
-                // Get the current synchronization context
-                context = SynchronizationContext.Current;
-
                 // Start the thread
                 for (int i = 0; i < threadCount; i++)
                 {
@@ -119,7 +112,7 @@ namespace Manina.Windows.Forms
         /// <returns>true if the work queue is empty; otherwise false.</returns>
         private bool IsWorkQueueEmpty()
         {
-            foreach (LinkedList<object> queue in items)
+            foreach (LinkedList<AsyncOperation> queue in items)
             {
                 if (queue.Count > 0)
                     return false;
@@ -135,10 +128,13 @@ namespace Manina.Windows.Forms
         /// An item with a higher priority will be processed before items with lower priority.</param>
         private void AddWork(object argument, int priority)
         {
+            // Create an async operation for this work item
+            AsyncOperation asyncOp = AsyncOperationManager.CreateOperation(argument);
+
             if (processingMode == ProcessingMode.FIFO)
-                items[priority].AddLast(argument);
+                items[priority].AddLast(asyncOp);
             else
-                items[priority].AddFirst(argument);
+                items[priority].AddFirst(asyncOp);
         }
         /// <summary>
         /// Gets a pending operation from the work queue.
@@ -146,9 +142,9 @@ namespace Manina.Windows.Forms
         /// <returns>A 2-tuple whose first component is the the pending operation with 
         /// the highest priority from the qork queue and the second component is the
         /// priority.</returns>
-        private Utility.Tuple<object, int> GetWork()
+        private Utility.Tuple<AsyncOperation, int> GetWork()
         {
-            object request = null;
+            AsyncOperation request = null;
             int priority = 0;
 
             for (int i = priorityQueues - 1; i >= 0; i--)
@@ -169,17 +165,17 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void BuildWorkQueue()
         {
-            items = new LinkedList<object>[priorityQueues];
+            items = new LinkedList<AsyncOperation>[priorityQueues];
             for (int i = 0; i < priorityQueues; i++)
-                items[i] = new LinkedList<object>();
+                items[i] = new LinkedList<AsyncOperation>();
         }
         /// <summary>
         /// Clears the work queue.
         /// </summary>
         private void ClearWorkQueue()
         {
-            foreach (LinkedList<object> queue in items)
-                queue.Clear();
+            for (int i = 0; i < priorityQueues; i++)
+                ClearWorkQueue(i);
         }
         /// <summary>
         /// Clears the work queue with the given priority.
@@ -188,7 +184,12 @@ namespace Manina.Windows.Forms
         /// indicating the priority queue to cancel.</param>
         private void ClearWorkQueue(int priority)
         {
-            items[priority].Clear();
+            while (items[priority].Count > 0)
+            {
+                AsyncOperation asyncOp = items[priority].First.Value;
+                asyncOp.OperationCompleted();
+                items[priority].RemoveFirst();
+            }
         }
         #endregion
 
@@ -337,14 +338,6 @@ namespace Manina.Windows.Forms
         {
             OnRunWorkerCompleted((QueuedWorkerCompletedEventArgs)arg);
         }
-        /// <summary>
-        /// Used to call <see cref="OnWorkerFinished"/> by the synchronization context.
-        /// </summary>
-        /// <param name="arg">The argument.</param>
-        private void QueueEmptyCallback(object arg)
-        {
-            OnWorkerFinished((EventArgs)arg);
-        }
         #endregion
 
         #region Virtual Methods
@@ -365,15 +358,6 @@ namespace Manina.Windows.Forms
         {
             if (DoWork != null)
                 DoWork(this, e);
-        }
-        /// <summary>
-        /// Raises the WorkerFinished event.
-        /// </summary>
-        /// <param name="e">An <see cref="EventArgs"/> that contains event data.</param>
-        protected virtual void OnWorkerFinished(EventArgs e)
-        {
-            if (WorkerFinished != null)
-                WorkerFinished(this, e);
         }
         #endregion
 
@@ -408,11 +392,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs when RunWorkerAsync is called.")]
         public event QueuedWorkerDoWorkEventHandler DoWork;
-        /// <summary>
-        /// Occurs after all items in the queue is processed.
-        /// </summary>
-        [Category("Behavior"), Browsable(true), Description("Occurs after all items in the queue is processed.")]
-        public event QueuedWorkerFinishedEventHandler WorkerFinished;
         #endregion
 
         #region Worker Method
@@ -435,14 +414,17 @@ namespace Manina.Windows.Forms
                 while (queueFull && !Stopping)
                 {
                     // Get an item from the queue
+                    AsyncOperation asyncOp = null;
                     object request = null;
                     int priority = 0;
                     lock (lockObject)
                     {
                         // Check queues
-                        Utility.Tuple<object, int> work = GetWork();
-                        request = work.Item1;
+                        Utility.Tuple<AsyncOperation, int> work = GetWork();
+                        asyncOp = work.Item1;
                         priority = work.Item2;
+                        if (asyncOp != null)
+                            request = asyncOp.UserSuppliedState;
 
                         // Check if the item was removed
                         if (request != null && cancelledItems.ContainsKey(request))
@@ -468,8 +450,10 @@ namespace Manina.Windows.Forms
                         QueuedWorkerCompletedEventArgs arg2 = new QueuedWorkerCompletedEventArgs(request,
                             arg.Result, priority, error, arg.Cancel);
                         if (!Stopping)
-                            context.Post(workCompletedCallback, arg2);
+                            asyncOp.PostOperationCompleted(workCompletedCallback, arg2);
                     }
+                    else if (asyncOp != null)
+                        asyncOp.OperationCompleted();
 
                     // Check if the cache is exhausted
                     lock (lockObject)
@@ -477,9 +461,6 @@ namespace Manina.Windows.Forms
                         queueFull = !IsWorkQueueEmpty();
                     }
                 }
-                // Done processing queue
-                if (!Stopping)
-                    context.Post(queueEmptyCallback, new EventArgs());
             }
         }
         #endregion
@@ -504,6 +485,7 @@ namespace Manina.Windows.Forms
                 {
                     stopping = true;
                     ClearWorkQueue();
+                    cancelledItems.Clear();
                     Monitor.Pulse(lockObject);
                 }
             }
