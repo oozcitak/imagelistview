@@ -28,8 +28,6 @@ namespace ImageListViewTests
             imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
             imageListView.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
             imageListView.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
-
-            imageListView.Colors = Manina.Windows.Forms.ImageListViewColor.Mandarin;
         }
         #endregion
 
