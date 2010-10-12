@@ -63,6 +63,8 @@ namespace Manina.Windows.Forms
         Color mColumnHeaderHoverColor2;
         Color mColumnSelectColor;
         Color mColumnSeparatorColor;
+        Color mAlternateBackColor;
+        Color mAlternateCellForeColor;
 
         // pane
         Color mPaneBackColor;
@@ -95,6 +97,16 @@ namespace Manina.Windows.Forms
         {
             get { return mBackColor; }
             set { mBackColor = value; }
+        }
+        /// <summary>
+        /// Gets or sets the background color of alternating cells in Details View.
+        /// </summary>
+        [Category("Appearance Details View"), Description("Gets or sets the background color of alternating cells in Details View.")]
+        [DefaultValue(typeof(Color), "Window")]
+        public Color AlternateBackColor
+        {
+            get { return mAlternateBackColor; }
+            set { mAlternateBackColor = value; }
         }
         /// <summary>
         /// Gets or sets the border color of the ImageListViewItem.
@@ -297,6 +309,16 @@ namespace Manina.Windows.Forms
             set { mCellForeColor = value; }
         }
         /// <summary>
+        /// Gets or sets the foreground color of alternating cells text in Details View.
+        /// </summary>
+        [Category("Appearance Details View"), Description("Gets or sets the foreground color of alternating cells text in Details View.")]
+        [DefaultValue(typeof(Color), "ControlText")]
+        public Color AlternateCellForeColor
+        {
+            get { return mAlternateCellForeColor; }
+            set { mAlternateCellForeColor = value; }
+        }
+        /// <summary>
         /// Gets or sets the background color of the image pane.
         /// </summary>
         [Category("Appearance Pane View"), Description("Gets or sets the background color of the image pane.")]
@@ -420,6 +442,8 @@ namespace Manina.Windows.Forms
             mColumnSelectColor = Color.FromArgb(16, SystemColors.GrayText);
             mColumnSeparatorColor = Color.FromArgb(32, SystemColors.GrayText);
             mCellForeColor = SystemColors.ControlText;
+            mAlternateBackColor = SystemColors.Window;
+            mAlternateCellForeColor = SystemColors.ControlText;
 
             // image pane
             mPaneBackColor = Color.FromArgb(16, SystemColors.GrayText);

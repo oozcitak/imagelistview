@@ -943,9 +943,11 @@ namespace Manina.Windows.Forms
             public virtual void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
                 Size itemPadding = new Size(4, 4);
+                bool alternate = (item.Index % 2 == 1);
 
                 // Paint background
-                using (Brush bItemBack = new SolidBrush(ImageListView.Colors.BackColor))
+                using (Brush bItemBack = new SolidBrush(alternate && ImageListView.View == View.Details ?
+                    ImageListView.Colors.AlternateBackColor : ImageListView.Colors.BackColor))
                 {
                     g.FillRectangle(bItemBack, bounds);
                 }
@@ -1062,7 +1064,8 @@ namespace Manina.Windows.Forms
                         foreach (ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
-                            using (Brush bItemFore = new SolidBrush(ImageListView.Colors.CellForeColor))
+                            using (Brush bItemFore = new SolidBrush(
+                                alternate ? ImageListView.Colors.AlternateCellForeColor : ImageListView.Colors.CellForeColor))
                             {
                                 int iconOffset = 0;
                                 if (column.Type == ColumnType.Name)
