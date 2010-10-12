@@ -79,9 +79,7 @@ namespace Manina.Windows.Forms
         /// <param name="value">Exif data as a byte array.</param>
         private static DateTime ExifDateTime(byte[] value)
         {
-            return DateTime.ParseExact(ExifAscii(value),
-                "yyyy:MM:dd HH:mm:ss",
-                System.Globalization.CultureInfo.InvariantCulture);
+            return ExifDateTime(ExifAscii(value));
         }
         /// <summary>
         /// Converts the given Exif data to DateTime.
@@ -89,9 +87,9 @@ namespace Manina.Windows.Forms
         /// <param name="value">Exif data as a string.</param>
         private static DateTime ExifDateTime(string value)
         {
-            DateTime result = DateTime.MinValue;
-            DateTime.TryParse(value, out result);
-            return result;
+            return DateTime.ParseExact(value,
+                "yyyy:MM:dd HH:mm:ss",
+                System.Globalization.CultureInfo.InvariantCulture);
         }
         /// <summary>
         /// Converts the given Exif data to an 16-bit unsigned integer.
@@ -449,37 +447,79 @@ namespace Manina.Windows.Forms
         /// <param name="data">metadata</param>
         private void InitViaWpf(BitmapMetadata data)
         {
-            ImageDescription = data.Subject;
-            EquipmentManufacturer = data.CameraManufacturer;
-            EquipmentModel = data.CameraModel;
-            var authors = data.Author;
-            if (authors != null && authors.Count > 0)
-            {
-                string[] authorsArray = new string[authors.Count];
-                authors.CopyTo(authorsArray, 0);
-                Artist = string.Join(";", authorsArray).Trim();
-            }
-            if (data.DateTaken != null)
-            {
-                DateTaken = DateTime.Parse(data.DateTaken);
-            }
-            Copyright = data.Copyright;
-            Comment = data.Comment;
-            Software = data.ApplicationName;
-            int simpleRating = data.Rating;
-            if (simpleRating == 1)
-                Rating = 1;
-            else if (simpleRating == 2)
-                Rating = 25;
-            else if (simpleRating == 3)
-                Rating = 50;
-            else if (simpleRating == 4)
-                Rating = 75;
-            else if (simpleRating == 5)
-                Rating = 99;
-
             Object val;
 
+            // Subject
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=40095}", "/app1/ifd/{ushort=270}");
+            if (val != null)
+                ImageDescription = val as string;
+            // Copyright
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=33432}", "/app13/irb/8bimiptc/iptc/copyright notice", "/xmp/<xmpalt>dc:rights", "/xmp/dc:rights");
+            if (val != null)
+                Copyright = val as string;
+            // Comment
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=40092}", "/app1/ifd/{ushort=37510}", "/xmp/<xmpalt>exif:UserComment");
+            if (val != null)
+                Comment = val as string;
+            // Software
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=305}", "/xmp/xmp:CreatorTool", "/xmp/xmp:creatortool", "/xmp/tiff:Software", "/xmp/tiff:software", "/app13/irb/8bimiptc/iptc/Originating Program");
+            if (val != null)
+                Software = val as string;
+            // Simple rating
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=18246}", "/xmp/xmp:Rating");
+            if (val != null)
+            {
+                ushort simpleRating = (ushort)val;
+
+                if (simpleRating == 1)
+                    Rating = 1;
+                else if (simpleRating == 2)
+                    Rating = 25;
+                else if (simpleRating == 3)
+                    Rating = 50;
+                else if (simpleRating == 4)
+                    Rating = 75;
+                else if (simpleRating == 5)
+                    Rating = 99;
+            }
+            // Rating
+            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed");
+            if (val != null)
+                Rating = (int)((ushort)val);
+            // Authors
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=315}", "/app13/irb/8bimiptc/iptc/by-line", "/app1/ifd/{ushort=40093}", "/xmp/tiff:artist");
+            if (val != null)
+            {
+                if (val is string)
+                    Artist = (string)val;
+                else if (val is System.Collections.Generic.IEnumerable<string>)
+                {
+                    int i = 0;
+                    StringBuilder authors = new StringBuilder();
+                    foreach (string author in (System.Collections.Generic.IEnumerable<string>)val)
+                    {
+                        if (i != 0)
+                            authors.Append(";");
+                        authors.Append(authors);
+                        i++;
+                    }
+                    Artist = authors.ToString();
+                }
+            }
+
+            // Camera manufacturer
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=271}", "/xmp/tiff:Make", "/xmp/tiff:make");
+            if (val != null)
+                EquipmentManufacturer = val as string;
+            // Camera model
+            val = GetMetadataObject(data, "/app1/ifd/{ushort=272}", "/xmp/tiff:Model", "/xmp/tiff:model");
+            if (val != null)
+                EquipmentModel = val as string;
+
+            // Date taken
+            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=36867}", "/app13/irb/8bimiptc/iptc/date created", "/xmp/xmp:CreateDate", "/app1/ifd/exif/{ushort=36868}", "/app13/irb/8bimiptc/iptc/date created", "/xmp/exif:DateTimeOriginal");
+            if (val != null)
+                DateTaken = ExifDateTime((string)val);
             // Exposure time
             val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=33434}", "/xmp/exif:ExposureTime");
             if (val != null)
@@ -496,6 +536,9 @@ namespace Manina.Windows.Forms
             val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=37386}", "/xmp/exif:FocalLength");
             if (val != null)
                 FocalLength = ExifDouble(BitConverter.GetBytes((ulong)val));
+
+
+
         }
         /// <summary>
         /// Returns the metadata for the given query.
