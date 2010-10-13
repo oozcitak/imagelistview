@@ -148,7 +148,7 @@ namespace Manina.Windows.Forms
         public Color UnFocusedColor2
         {
             get { return mUnFocusedColor2; }
-            set { mUnFocusedColor1 = value; }
+            set { mUnFocusedColor2 = value; }
         }
         /// <summary>
         /// Gets or sets the border color of the ImageListViewItem if the control is not focused.
@@ -167,8 +167,8 @@ namespace Manina.Windows.Forms
         [DefaultValue(typeof(Color), "ControlText")]
         public Color UnFocusedForeColor
         {
-            get { return mUnFocusedBorderColor; }
-            set { mUnFocusedBorderColor = value; }
+            get { return mUnFocusedForeColor; }
+            set { mUnFocusedForeColor = value; }
         }
         /// <summary>
         /// Gets or sets the background gradient color1 if the ImageListViewItem is hovered.
@@ -247,8 +247,8 @@ namespace Manina.Windows.Forms
         [DefaultValue(typeof(Color), "ControlText")]
         public Color SelectedForeColor
         {
-            get { return mSelectedBorderColor; }
-            set { mSelectedBorderColor = value; }
+            get { return mSelectedForeColor; }
+            set { mSelectedForeColor = value; }
         }
         /// <summary>
         /// Gets or sets the background gradient color1 of the column header.
@@ -581,7 +581,7 @@ namespace Manina.Windows.Forms
             c.ControlBackColor = Color.White;
 
             // item
-            c.BackColor = Color.FromArgb(64, Color.White);
+            c.BackColor = Color.White;
             c.ForeColor = Color.FromArgb(60, 60, 60);
             c.BorderColor = Color.FromArgb(187, 190, 183);
 
