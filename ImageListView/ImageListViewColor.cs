@@ -585,8 +585,8 @@ namespace Manina.Windows.Forms
             c.ForeColor = Color.FromArgb(60, 60, 60);
             c.BorderColor = Color.FromArgb(187, 190, 183);
 
-            c.UnFocusedColor1 = Color.FromArgb(229, 227, 225);
-            c.UnFocusedColor2 = Color.FromArgb(229, 227, 225);
+            c.UnFocusedColor1 = Color.FromArgb(235, 235, 235);
+            c.UnFocusedColor2 = Color.FromArgb(217, 217, 217);
             c.UnFocusedBorderColor = Color.FromArgb(168, 169, 161);
             c.UnFocusedForeColor = Color.FromArgb(40, 40, 40);
 
@@ -594,8 +594,8 @@ namespace Manina.Windows.Forms
             c.HoverColor2 = Color.Transparent;
             c.HoverBorderColor = Color.Transparent;
 
-            c.SelectedColor1 = Color.FromArgb(240, 119, 70);
-            c.SelectedColor2 = Color.FromArgb(240, 119, 70);
+            c.SelectedColor1 = Color.FromArgb(244, 125, 77);
+            c.SelectedColor2 = Color.FromArgb(235, 110, 60);
             c.SelectedBorderColor = Color.FromArgb(240, 119, 70);
             c.SelectedForeColor = Color.White;
 
@@ -612,8 +612,8 @@ namespace Manina.Windows.Forms
             c.ColumnHeaderHoverColor1 = Color.White;
             c.ColumnHeaderHoverColor2 = Color.FromArgb(245, 245, 245);
             c.ColumnHeaderForeColor = Color.FromArgb(60, 60, 60);
-            c.ColumnSelectColor = Color.FromArgb(238, 238, 238);
-            c.ColumnSeparatorColor = Color.FromArgb(216, 216, 216);
+            c.ColumnSelectColor = Color.FromArgb(34, 128, 128, 128);
+            c.ColumnSeparatorColor = Color.FromArgb(106, 128, 128, 128);
             c.mAlternateBackColor = Color.FromArgb(234, 234, 234);
             c.mAlternateCellForeColor = Color.FromArgb(40, 40, 40);
 
