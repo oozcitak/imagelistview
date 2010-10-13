@@ -35,22 +35,38 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal class MetadataExtractor
     {
-
         #region Exif Tag IDs
-        const int TagImageDescription = 0x010E;
-        const int TagEquipmentModel = 0x0110;
-        const int TagDateTimeOriginal = 0x9003;
-        const int TagArtist = 0x013B;
-        const int TagCopyright = 0x8298;
-        const int TagExposureTime = 0x829A;
-        const int TagFNumber = 0x829D;
-        const int TagISOSpeed = 0x8827;
-        const int TagUserComment = 0x9286;
-        const int TagRating = 0x4746;
-        const int TagRatingPercent = 0x4749;
-        const int TagEquipmentManufacturer = 0x010F;
-        const int TagFocalLength = 0x920A;
-        const int TagSoftware = 0x0131;
+        private const int TagImageDescription = 0x010E;
+        private const int TagEquipmentModel = 0x0110;
+        private const int TagDateTimeOriginal = 0x9003;
+        private const int TagArtist = 0x013B;
+        private const int TagCopyright = 0x8298;
+        private const int TagExposureTime = 0x829A;
+        private const int TagFNumber = 0x829D;
+        private const int TagISOSpeed = 0x8827;
+        private const int TagUserComment = 0x9286;
+        private const int TagRating = 0x4746;
+        private const int TagRatingPercent = 0x4749;
+        private const int TagEquipmentManufacturer = 0x010F;
+        private const int TagFocalLength = 0x920A;
+        private const int TagSoftware = 0x0131;
+        #endregion
+
+        #region WIC Metadata Paths
+        private static readonly string[] WICPathImageDescription = new string[] { "/app1/ifd/{ushort=40095}", "/app1/ifd/{ushort=270}" };
+        private static readonly string[] WICPathCopyright = new string[] { "/app1/ifd/{ushort=33432}", "/app13/irb/8bimiptc/iptc/copyright notice", "/xmp/<xmpalt>dc:rights", "/xmp/dc:rights" };
+        private static readonly string[] WICPathComment = new string[] { "/app1/ifd/{ushort=40092}", "/app1/ifd/{ushort=37510}", "/xmp/<xmpalt>exif:UserComment" };
+        private static readonly string[] WICPathSoftware = new string[] { "/app1/ifd/{ushort=305}", "/xmp/xmp:CreatorTool", "/xmp/xmp:creatortool", "/xmp/tiff:Software", "/xmp/tiff:software", "/app13/irb/8bimiptc/iptc/Originating Program" };
+        private static readonly string[] WICPathSimpleRating = new string[] { "/app1/ifd/{ushort=18246}", "/xmp/xmp:Rating" };
+        private static readonly string[] WICPathRating = new string[] { "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed" };
+        private static readonly string[] WICPathArtist = new string[] { "/app1/ifd/{ushort=315}", "/app13/irb/8bimiptc/iptc/by-line", "/app1/ifd/{ushort=40093}", "/xmp/tiff:artist" };
+        private static readonly string[] WICPathEquipmentManufacturer = new string[] { "/app1/ifd/{ushort=271}", "/xmp/tiff:Make", "/xmp/tiff:make" };
+        private static readonly string[] WICPathEquipmentModel = new string[] { "/app1/ifd/{ushort=272}", "/xmp/tiff:Model", "/xmp/tiff:model" };
+        private static readonly string[] WICPathDateTaken = new string[] { "/app1/ifd/exif/{ushort=36867}", "/app13/irb/8bimiptc/iptc/date created", "/xmp/xmp:CreateDate", "/app1/ifd/exif/{ushort=36868}", "/app13/irb/8bimiptc/iptc/date created", "/xmp/exif:DateTimeOriginal" };
+        private static readonly string[] WICPathExposureTime = new string[] { "/app1/ifd/exif/{ushort=33434}", "/xmp/exif:ExposureTime" };
+        private static readonly string[] WICPathFNumber = new string[] { "/app1/ifd/exif/{ushort=33437}", "/xmp/exif:FNumber" };
+        private static readonly string[] WICPathISOSpeed = new string[] { "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed" };
+        private static readonly string[] WICPathFocalLength = new string[] { "/app1/ifd/exif/{ushort=37386}", "/xmp/exif:FocalLength" };
         #endregion
 
         #region Exif Format Conversion
@@ -450,23 +466,23 @@ namespace Manina.Windows.Forms
             Object val;
 
             // Subject
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=40095}", "/app1/ifd/{ushort=270}");
+            val = GetMetadataObject(data, WICPathImageDescription);
             if (val != null)
                 ImageDescription = val as string;
             // Copyright
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=33432}", "/app13/irb/8bimiptc/iptc/copyright notice", "/xmp/<xmpalt>dc:rights", "/xmp/dc:rights");
+            val = GetMetadataObject(data, WICPathCopyright);
             if (val != null)
                 Copyright = val as string;
             // Comment
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=40092}", "/app1/ifd/{ushort=37510}", "/xmp/<xmpalt>exif:UserComment");
+            val = GetMetadataObject(data, WICPathComment);
             if (val != null)
                 Comment = val as string;
             // Software
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=305}", "/xmp/xmp:CreatorTool", "/xmp/xmp:creatortool", "/xmp/tiff:Software", "/xmp/tiff:software", "/app13/irb/8bimiptc/iptc/Originating Program");
+            val = GetMetadataObject(data, WICPathSoftware);
             if (val != null)
                 Software = val as string;
             // Simple rating
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=18246}", "/xmp/xmp:Rating");
+            val = GetMetadataObject(data, WICPathSimpleRating);
             if (val != null)
             {
                 ushort simpleRating = (ushort)val;
@@ -483,11 +499,11 @@ namespace Manina.Windows.Forms
                     Rating = 99;
             }
             // Rating
-            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed");
+            val = GetMetadataObject(data, WICPathRating);
             if (val != null)
                 Rating = (int)((ushort)val);
             // Authors
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=315}", "/app13/irb/8bimiptc/iptc/by-line", "/app1/ifd/{ushort=40093}", "/xmp/tiff:artist");
+            val = GetMetadataObject(data, WICPathArtist);
             if (val != null)
             {
                 if (val is string)
@@ -508,44 +524,41 @@ namespace Manina.Windows.Forms
             }
 
             // Camera manufacturer
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=271}", "/xmp/tiff:Make", "/xmp/tiff:make");
+            val = GetMetadataObject(data, WICPathEquipmentManufacturer);
             if (val != null)
                 EquipmentManufacturer = val as string;
             // Camera model
-            val = GetMetadataObject(data, "/app1/ifd/{ushort=272}", "/xmp/tiff:Model", "/xmp/tiff:model");
+            val = GetMetadataObject(data, WICPathEquipmentModel);
             if (val != null)
                 EquipmentModel = val as string;
 
             // Date taken
-            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=36867}", "/app13/irb/8bimiptc/iptc/date created", "/xmp/xmp:CreateDate", "/app1/ifd/exif/{ushort=36868}", "/app13/irb/8bimiptc/iptc/date created", "/xmp/exif:DateTimeOriginal");
+            val = GetMetadataObject(data, WICPathDateTaken);
             if (val != null)
                 DateTaken = ExifDateTime((string)val);
             // Exposure time
-            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=33434}", "/xmp/exif:ExposureTime");
+            val = GetMetadataObject(data, WICPathExposureTime);
             if (val != null)
                 ExposureTime = ExifDouble(BitConverter.GetBytes((ulong)val));
             // FNumber
-            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=33437}", "/xmp/exif:FNumber");
+            val = GetMetadataObject(data, WICPathFNumber);
             if (val != null)
                 FNumber = ExifDouble(BitConverter.GetBytes((ulong)val));
             // ISOSpeed
-            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed");
+            val = GetMetadataObject(data, WICPathISOSpeed);
             if (val != null)
                 ISOSpeed = (ushort)val;
             // FocalLength
-            val = GetMetadataObject(data, "/app1/ifd/exif/{ushort=37386}", "/xmp/exif:FocalLength");
+            val = GetMetadataObject(data, WICPathFocalLength);
             if (val != null)
                 FocalLength = ExifDouble(BitConverter.GetBytes((ulong)val));
-
-
-
         }
         /// <summary>
         /// Returns the metadata for the given query.
         /// </summary>
         /// <param name="metadata">The image metadata.</param>
         /// <param name="query">A list of query strings.</param>
-        /// <returns>Metadata object or null if the metadata as not found.</returns>
+        /// <returns>Metadata object or null if the metadata is not found.</returns>
         private object GetMetadataObject(BitmapMetadata metadata, params string[] query)
         {
             foreach (string q in query)
