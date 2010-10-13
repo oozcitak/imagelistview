@@ -449,18 +449,19 @@ namespace Manina.Windows.Forms
                         PurgeInvisible(true);
                 }
             }
-            
+
             // Refresh the control lazily
-            if (result != null && result.Image != null && mImageListView != null && mImageListView.IsItemVisible(request.Guid))
+            if (result != null && result.Image != null && mImageListView != null &&
+                (request.IsGalleryRequest || request.IsRendererRequest || mImageListView.IsItemVisible(request.Guid)))
                 mImageListView.Refresh(false, true);
-            
+
             // Raise the ThumbnailCached event
             if (mImageListView != null)
                 mImageListView.OnThumbnailCachedInternal(request.Guid, result.Image, request.Size, e.Error != null);
-            
+
             // Raise the CacheError event
             if (e.Error != null && mImageListView != null)
-                mImageListView.OnCacheErrorInternal(request.Guid, e.Error, CacheThread.Thumbnail);            
+                mImageListView.OnCacheErrorInternal(request.Guid, e.Error, CacheThread.Thumbnail);
         }
         /// <summary>
         /// Handles the DoWork event of the queued background worker.
