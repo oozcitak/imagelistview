@@ -74,6 +74,7 @@
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
+            this.SelectRenderer = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -191,12 +192,12 @@
             this.ClearEventList});
             this.EventListContextMenu.Name = "EventListContextMenu";
             this.EventListContextMenu.ShowImageMargin = false;
-            this.EventListContextMenu.Size = new System.Drawing.Size(75, 26);
+            this.EventListContextMenu.Size = new System.Drawing.Size(86, 26);
             // 
             // ClearEventList
             // 
             this.ClearEventList.Name = "ClearEventList";
-            this.ClearEventList.Size = new System.Drawing.Size(74, 22);
+            this.ClearEventList.Size = new System.Drawing.Size(85, 22);
             this.ClearEventList.Text = "Clear";
             this.ClearEventList.Click += new System.EventHandler(this.ClearEventList_Click);
             // 
@@ -218,6 +219,7 @@
             this.toolStripSeparator2,
             this.toolStripLabel1,
             this.ViewMode,
+            this.SelectRenderer,
             this.ShowFileIcons,
             this.ShowCheckboxes,
             this.ShowScrollbars,
@@ -236,7 +238,7 @@
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 489);
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 509);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
             // 
@@ -369,28 +371,28 @@
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(127, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(152, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(127, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(152, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(127, 22);
+            this.ViewPane.Size = new System.Drawing.Size(152, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(127, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(152, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
             // 
@@ -552,6 +554,16 @@
             this.CheckBenchmarkEndTimer.Interval = 2000;
             this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
             // 
+            // SelectRenderer
+            // 
+            this.SelectRenderer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.SelectRenderer.Image = ((System.Drawing.Image)(resources.GetObject("SelectRenderer.Image")));
+            this.SelectRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SelectRenderer.Name = "SelectRenderer";
+            this.SelectRenderer.Size = new System.Drawing.Size(137, 17);
+            this.SelectRenderer.Text = "Renderer";
+            this.SelectRenderer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -626,6 +638,7 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel5;
         private System.Windows.Forms.ToolStripButton StartBenchmark;
         private System.Windows.Forms.CheckBox logEventsCheckbox;
+        private System.Windows.Forms.ToolStripDropDownButton SelectRenderer;
     }
 }
 

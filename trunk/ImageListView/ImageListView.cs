@@ -1044,6 +1044,8 @@ namespace Manina.Windows.Forms
                 ImageListViewColor[] preferredColors = mRenderer.PreferredColors;
                 if (preferredColors != null)
                     mColors = preferredColors[0];
+                else
+                    mColors = ImageListViewColor.Default;
             }
 
             if (oldRenderer != null)
