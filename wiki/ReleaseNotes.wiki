@@ -1,6 +1,17 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 9.3 (13 October 2010) =
+
+This release includes a further performance tweak by delaying and consolidating refresh requests of thumbnail and metadata threads. The result is a smoother display especially while scrolling the control. !MeerkatRenderer is a new addition to the built-in renderers to celebrate the release of Ubuntu 10.10. There are also new properties for alternating row colors. These colors can be set using the Colors property of the control.
+
+  * Cache threads refresh the control lazily.
+  * Added the new !MeerkatRenderer.
+  * Fixed a bug where the cache thread would not refresh the control after loading gallery thumbnails.
+  * Renderers can now declare a preferred color theme.
+  * Added !AlternateBackColor and !AlternateCellForeColor properties to !ImageListViewColor.
+  * !MetadataExtractor uses raw property paths instead of metadata policies.
+
 = 9.2 (10 October 2010) =
 
 This release includes a further performance tweak over the previous release. There are also a few cosmetic changes and new methods for handling selected and checked item collections.
