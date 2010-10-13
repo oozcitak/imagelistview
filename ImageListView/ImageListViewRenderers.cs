@@ -2270,6 +2270,15 @@ namespace Manina.Windows.Forms
                         Utility.DrawRoundedRectangle(g, pBorder, imgOutline.Left, imgOutline.Top, imgOutline.Width - 1, imgOutline.Height - 1, 3);
                     }
 
+                    // Hovered state
+                    if ((state & ItemState.Hovered) != ItemState.None)
+                    {
+                        using (Brush bGlow = new SolidBrush(Color.FromArgb(24, Color.White)))
+                        {
+                            Utility.FillRoundedRectangle(g, bGlow, imgOutline, 4);
+                        }
+                    }
+
                     // Item text
                     Color foreColor = ImageListView.Colors.ForeColor;
                     if (ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)

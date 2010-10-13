@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Reflection;
+using Manina.Windows.Forms;
 
 namespace ImageListViewTests
 {
@@ -28,6 +30,21 @@ namespace ImageListViewTests
             imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
             imageListView.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
             imageListView.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
+
+            // Find and add built-in renderers
+            Assembly assembly = Assembly.GetAssembly(typeof(ImageListView));
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.BaseType == typeof(ImageListView.ImageListViewRenderer))
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem(type.Name);
+                    ImageListView.ImageListViewRenderer renderer =
+                        (ImageListView.ImageListViewRenderer)assembly.CreateInstance(type.FullName);
+                    item.Tag = renderer;
+                    item.Click += SelectRenderer_Click;
+                    SelectRenderer.DropDownItems.Add(item);
+                }
+            }
         }
         #endregion
 
@@ -59,7 +76,7 @@ namespace ImageListViewTests
                 lastThumbnailTime = benchmarkSW.ElapsedMilliseconds;
                 cachedThumbnailCount++;
             }
-            else if(logEventsCheckbox.Checked)
+            else if (logEventsCheckbox.Checked)
             {
                 int index = -1;
                 if (e.Item != null)
@@ -138,6 +155,12 @@ namespace ImageListViewTests
         #endregion
 
         #region Appearance Settings
+        // Select renderer
+        private void SelectRenderer_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            imageListView.SetRenderer((ImageListView.ImageListViewRenderer)item.Tag);
+        }
         // View modes
         private void ViewThumbnails_Click(object sender, EventArgs e)
         {
