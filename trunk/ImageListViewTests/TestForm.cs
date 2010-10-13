@@ -296,6 +296,14 @@ namespace ImageListViewTests
         // StartBenchmark
         private void StartBenchmark_Click(object sender, EventArgs e)
         {
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                if (MessageBox.Show(
+                    "Benchmarks should be run outside the IDE. Do you want to continue?",
+                    "ImageListView Tests", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.No)
+                    return;
+            }
+
             benchMarking = true;
 
             if (ChooseBenchmarkPath.ShowDialog() == DialogResult.OK)

@@ -57,6 +57,7 @@
             this.ViewGallery = new System.Windows.Forms.ToolStripMenuItem();
             this.ViewPane = new System.Windows.Forms.ToolStripMenuItem();
             this.ViewDetails = new System.Windows.Forms.ToolStripMenuItem();
+            this.SelectRenderer = new System.Windows.Forms.ToolStripDropDownButton();
             this.ShowFileIcons = new System.Windows.Forms.ToolStripButton();
             this.ShowCheckboxes = new System.Windows.Forms.ToolStripButton();
             this.ShowScrollbars = new System.Windows.Forms.ToolStripButton();
@@ -74,7 +75,6 @@
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
-            this.SelectRenderer = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -150,11 +150,12 @@
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 3, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 4, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 5, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 6, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 7, true)});
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateModified, "", 100, 3, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 4, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 5, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 6, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 7, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
@@ -371,30 +372,40 @@
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(152, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(138, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(152, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(138, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(152, 22);
+            this.ViewPane.Size = new System.Drawing.Size(138, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(152, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(138, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
+            // 
+            // SelectRenderer
+            // 
+            this.SelectRenderer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.SelectRenderer.Image = ((System.Drawing.Image)(resources.GetObject("SelectRenderer.Image")));
+            this.SelectRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SelectRenderer.Name = "SelectRenderer";
+            this.SelectRenderer.Size = new System.Drawing.Size(137, 17);
+            this.SelectRenderer.Text = "Renderer";
+            this.SelectRenderer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ShowFileIcons
             // 
@@ -554,22 +565,13 @@
             this.CheckBenchmarkEndTimer.Interval = 2000;
             this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
             // 
-            // SelectRenderer
-            // 
-            this.SelectRenderer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.SelectRenderer.Image = ((System.Drawing.Image)(resources.GetObject("SelectRenderer.Image")));
-            this.SelectRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.SelectRenderer.Name = "SelectRenderer";
-            this.SelectRenderer.Size = new System.Drawing.Size(137, 17);
-            this.SelectRenderer.Text = "Renderer";
-            this.SelectRenderer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(758, 621);
             this.Controls.Add(this.toolStripContainer1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "TestForm";
             this.Text = "ImageListView Tests";
             this.toolStripContainer1.BottomToolStripPanel.ResumeLayout(false);
