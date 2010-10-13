@@ -36,11 +36,12 @@ namespace Manina.Windows.Forms
     internal static class ThumbnailExtractor
     {
         #region Exif Tag IDs
-        /// <summary>
-        /// Represents the Exif tag for thumbnail data.
-        /// </summary>
         private const int TagThumbnailData = 0x501B;
         private const int TagOrientation = 0x0112;
+        #endregion
+
+        #region WIC Metadata Paths
+        private static readonly string[] WICPathOrientation = new string[] { "/app1/ifd/{ushort=274}", "/xmp/tiff:Orientation" };
         #endregion
 
         #region Public Methods
@@ -430,11 +431,8 @@ namespace Manina.Windows.Forms
             {
                 try
                 {
-                    // Look at Exif IFD
-                    object obj = data.GetQuery("/app1/ifd/{ushort=274}");
-                    // Try the XMP metadata
-                    if (obj == null)
-                        obj = data.GetQuery("/xmp/tiff:Orientation");
+                    // read orientation metadata
+                    object obj = GetMetadataObject(data, WICPathOrientation);
                     if (obj == null)
                         return 0;
                     ushort orientationFlag = (ushort)obj;
@@ -462,6 +460,22 @@ namespace Manina.Windows.Forms
             }
 
             return 0;
+        }
+        /// <summary>
+        /// Returns the metadata for the given query.
+        /// </summary>
+        /// <param name="metadata">The image metadata.</param>
+        /// <param name="query">A list of query strings.</param>
+        /// <returns>Metadata object or null if the metadata is not found.</returns>
+        private static object GetMetadataObject(BitmapMetadata metadata, params string[] query)
+        {
+            foreach (string q in query)
+            {
+                object val = metadata.GetQuery(q);
+                if (val != null)
+                    return val;
+            }
+            return null;
         }
         /// <summary>
         /// Creates a  thumbnail from the given bitmap.
