@@ -590,7 +590,6 @@ namespace Manina.Windows.Forms
                 if (mThumbnailSize != value)
                 {
                     mThumbnailSize = value;
-                    thumbnailCache.CurrentThumbnailSize = mThumbnailSize;
                     thumbnailCache.Rebuild();
                     Refresh();
                 }
@@ -873,9 +872,7 @@ namespace Manina.Windows.Forms
             // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
             navigationManager = new ImageListViewNavigationManager(this);
-
             thumbnailCache = new ImageListViewCacheThumbnail(this);
-            thumbnailCache.CurrentThumbnailSize = mThumbnailSize;
             shellInfoCache = new ImageListViewCacheShellInfo(this);
             itemCacheManager = new ImageListViewCacheMetadata(this);
 
@@ -1805,12 +1802,11 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
         /// <param name="thumbnail">The cached image.</param>
         /// <param name="size">Requested thumbnail size.</param>
-        /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
-        internal void OnThumbnailCachedInternal(Guid guid, Image thumbnail, Size size, bool error)
+        internal void OnThumbnailCachedInternal(Guid guid, Image thumbnail, Size size)
         {
             ImageListViewItem item = null;
             if (mItems.TryGetValue(guid, out item))
-                OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size, error));
+                OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size));
         }
         /// <summary>
         /// Updates item details.

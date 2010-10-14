@@ -81,10 +81,7 @@ namespace ImageListViewTests
                 int index = -1;
                 if (e.Item != null)
                     index = e.Item.Index;
-                if (e.Error)
-                    LogEvent(string.Format("<-- {0} !!!", index));
-                else
-                    LogEvent(string.Format("<-- {0} ({1})", index, e.Size));
+                LogEvent(string.Format("<-- {0} ({1})", index, e.Size));
             }
         }
         // Thumbnail caching

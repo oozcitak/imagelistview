@@ -259,13 +259,9 @@ namespace Manina.Windows.Forms
         private class CanContinueProcessingEventArgs : EventArgs
         {
             /// <summary>
-            /// Gets the guid of the request.
+            /// Gets the request.
             /// </summary>
-            public Guid Guid { get; private set; }
-            /// <summary>
-            /// Gets the type of the request.
-            /// </summary>
-            public RequestType RequestType { get; private set; }
+            public CacheRequest Request { get; private set; }
             /// <summary>
             /// Gets whether this item should be processed.
             /// </summary>
@@ -274,12 +270,10 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Initializes a new instance of the <see cref="CanContinueProcessingEventArgs"/> class.
             /// </summary>
-            /// <param name="guid">The guid of the request.</param>
-            /// <param name="requestType">Type of the request.</param>
-            public CanContinueProcessingEventArgs(Guid guid, RequestType requestType)
+            /// <param name="request">The cache request.</param>
+            public CanContinueProcessingEventArgs(CacheRequest request)
             {
-                Guid = guid;
-                RequestType = requestType;
+                Request = request;
                 ContinueProcessing = true;
             }
         }
@@ -315,10 +309,6 @@ namespace Manina.Windows.Forms
         /// Returns the count of items in the cache.
         /// </summary>
         public long CacheSize { get { return thumbCache.Count; } }
-        /// <summary>
-        /// Gets or sets the current thumbnail size.
-        /// </summary>
-        public Size CurrentThumbnailSize { get; set; }
         #endregion
 
         #region Constructor
@@ -368,8 +358,7 @@ namespace Manina.Windows.Forms
         /// <returns>true if the item should be processed; otherwise false.</returns>
         private bool OnCanContinueProcessing(CacheRequest item)
         {
-            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(
-                item.Guid, item.RequestType);
+            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(item);
             context.Send(checkProcessingCallback, arg);
             return arg.ContinueProcessing;
         }
@@ -381,28 +370,31 @@ namespace Manina.Windows.Forms
         private void CanContinueProcessing(object argument)
         {
             CanContinueProcessingEventArgs arg = argument as CanContinueProcessingEventArgs;
+            CacheRequest request = arg.Request;
             bool canProcess = true;
 
             // Is it already cached?
-            if (canProcess && (arg.RequestType == RequestType.Thumbnail))
+            if (canProcess && (request.RequestType == RequestType.Thumbnail))
             {
                 CacheItem existing = null;
-                thumbCache.TryGetValue(arg.Guid, out existing);
-                if (existing != null && existing.Size == CurrentThumbnailSize)
+                thumbCache.TryGetValue(request.Guid, out existing);
+                if (existing != null && existing.Size == request.Size &&
+                    existing.UseEmbeddedThumbnails == request.UseEmbeddedThumbnails &&
+                    existing.AutoRotate == request.AutoRotate && existing.UseWIC == request.UseWIC)
                     canProcess = false;
             }
 
             // Is it in the edit cache?
             if (canProcess)
             {
-                if (editCache.ContainsKey(arg.Guid))
+                if (editCache.ContainsKey(request.Guid))
                     canProcess = false;
             }
 
             // Is it outside the visible area?
-            if (canProcess && (arg.RequestType == RequestType.Thumbnail) && (CacheMode == CacheMode.OnDemand))
+            if (canProcess && (request.RequestType == RequestType.Thumbnail) && (CacheMode == CacheMode.OnDemand))
             {
-                if (mImageListView != null && !mImageListView.IsItemVisible(arg.Guid))
+                if (mImageListView != null && !mImageListView.IsItemVisible(request.Guid))
                     canProcess = false;
             }
 
@@ -464,10 +456,10 @@ namespace Manina.Windows.Forms
                 {
                     // Did the thumbnail size change while we were
                     // creating the thumbnail?                                    
-                    if (result.Size != CurrentThumbnailSize)
+                    if (result.Size != mImageListView.ThumbnailSize)
                         result.State = CacheState.Unknown;
 
-                    // Purge invisible items if we exceeded the cache limit?
+                    // Purge invisible items if we exceeded the cache limit
                     MemoryUsed += GetImageMemorySize(result.Image);
                     if (IsCacheLimitExceeded())
                         PurgeInvisible(true);
@@ -479,17 +471,17 @@ namespace Manina.Windows.Forms
             {
                 if (request.RequestType != RequestType.Thumbnail)
                     mImageListView.Refresh(false, true);
-                else if (mImageListView.IsItemVisible(request.Guid))
+                else if (mImageListView.IsItemVisible(result.Guid))
                     mImageListView.Refresh(false, true);
             }
 
             // Raise the ThumbnailCached event
             if (mImageListView != null)
-                mImageListView.OnThumbnailCachedInternal(request.Guid, result.Image, request.Size, e.Error != null);
+                mImageListView.OnThumbnailCachedInternal(result.Guid, result.Image, result.Size);
 
             // Raise the CacheError event
             if (e.Error != null && mImageListView != null)
-                mImageListView.OnCacheErrorInternal(request.Guid, e.Error, CacheThread.Thumbnail);
+                mImageListView.OnCacheErrorInternal(result.Guid, e.Error, CacheThread.Thumbnail);
         }
         /// <summary>
         /// Handles the DoWork event of the queued background worker.
@@ -792,7 +784,7 @@ namespace Manina.Windows.Forms
 
             if (mImageListView != null)
             {
-                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize, false);
+                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize);
                 mImageListView.Refresh();
             }
         }
@@ -849,7 +841,7 @@ namespace Manina.Windows.Forms
             // Raise the cache events
             if (mImageListView != null)
             {
-                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize, false);
+                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize);
                 mImageListView.Refresh();
             }
         }
