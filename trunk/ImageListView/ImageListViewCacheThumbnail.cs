@@ -48,6 +48,24 @@ namespace Manina.Windows.Forms
         private bool disposed;
         #endregion
 
+        #region RequestType Enum
+        private enum RequestType
+        {
+            /// <summary>
+            /// This is a thumbnail request.
+            /// </summary>
+            Thumbnail,
+            /// <summary>
+            /// This is a large image request for use in Gallery or Pane view modes.
+            /// </summary>
+            Gallery,
+            /// <summary>
+            /// This is a renderer request.
+            /// </summary>
+            Renderer,
+        }
+        #endregion
+
         #region CacheRequest Class
         /// <summary>
         /// Represents a cache request.
@@ -87,13 +105,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public bool IsVirtualItem { get; private set; }
             /// <summary>
-            /// Gets or sets whether this is a renderer request.
+            /// Gets the type of this request.
             /// </summary>
-            public bool IsRendererRequest { get; set; }
-            /// <summary>
-            /// Gets or sets whether this is a gallery request.
-            /// </summary>
-            public bool IsGalleryRequest { get; set; }
+            public RequestType RequestType { get; private set; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheRequest"/> class
@@ -105,8 +119,9 @@ namespace Manina.Windows.Forms
             /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
             /// <param name="useWIC">Whether to use WIC.</param>
-            public CacheRequest(Guid guid, object key, Size size, 
-                UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
+            /// <param name="requestType">Type of this request.</param>
+            public CacheRequest(Guid guid, object key, Size size,
+                UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC, RequestType requestType)
             {
                 Guid = guid;
                 VirtualItemKey = key;
@@ -116,9 +131,7 @@ namespace Manina.Windows.Forms
                 AutoRotate = autoRotate;
                 UseWIC = useWIC;
                 IsVirtualItem = true;
-
-                IsRendererRequest = false;
-                IsGalleryRequest = false;
+                RequestType = requestType;
             }
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheRequest"/> class.
@@ -129,8 +142,9 @@ namespace Manina.Windows.Forms
             /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
             /// <param name="useWIC">Whether to use WIC.</param>
+            /// <param name="requestType">Type of this request.</param>
             public CacheRequest(Guid guid, string filename, Size size,
-                UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
+                UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC, RequestType requestType)
             {
                 Guid = guid;
                 FileName = filename;
@@ -139,9 +153,7 @@ namespace Manina.Windows.Forms
                 AutoRotate = autoRotate;
                 UseWIC = useWIC;
                 IsVirtualItem = false;
-
-                IsRendererRequest = false;
-                IsGalleryRequest = false;
+                RequestType = requestType;
             }
         }
         #endregion
@@ -194,7 +206,7 @@ namespace Manina.Windows.Forms
             /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
             /// <param name="autoRotate">AutoRotate property of the owner control.</param>
             /// <param name="useWIC">Whether to use WIC.</param>
-            public CacheItem(Guid guid, Size size, Image image, CacheState state, 
+            public CacheItem(Guid guid, Size size, Image image, CacheState state,
                 UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
             {
                 Guid = guid;
@@ -251,13 +263,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Guid Guid { get; private set; }
             /// <summary>
-            /// Gets whether this is a renderer request.
+            /// Gets the type of the request.
             /// </summary>
-            public bool IsRendererRequest { get; private set; }
-            /// <summary>
-            /// Gets whether this is a gallery request.
-            /// </summary>
-            public bool IsGalleryRequest { get; private set; }
+            public RequestType RequestType { get; private set; }
             /// <summary>
             /// Gets whether this item should be processed.
             /// </summary>
@@ -267,13 +275,11 @@ namespace Manina.Windows.Forms
             /// Initializes a new instance of the <see cref="CanContinueProcessingEventArgs"/> class.
             /// </summary>
             /// <param name="guid">The guid of the request.</param>
-            /// <param name="isRendererRequest">true if is a renderer request; otherwise false.</param>
-            /// <param name="isGalleryRequest">true if is a gallery request; otherwise false.</param>
-            public CanContinueProcessingEventArgs(Guid guid, bool isRendererRequest, bool isGalleryRequest)
+            /// <param name="requestType">Type of the request.</param>
+            public CanContinueProcessingEventArgs(Guid guid, RequestType requestType)
             {
                 Guid = guid;
-                IsRendererRequest = isRendererRequest;
-                IsGalleryRequest = isGalleryRequest;
+                RequestType = requestType;
                 ContinueProcessing = true;
             }
         }
@@ -363,7 +369,7 @@ namespace Manina.Windows.Forms
         private bool OnCanContinueProcessing(CacheRequest item)
         {
             CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(
-                item.Guid, item.IsRendererRequest, item.IsGalleryRequest);
+                item.Guid, item.RequestType);
             context.Send(checkProcessingCallback, arg);
             return arg.ContinueProcessing;
         }
@@ -378,7 +384,7 @@ namespace Manina.Windows.Forms
             bool canProcess = true;
 
             // Is it already cached?
-            if (canProcess && !arg.IsRendererRequest && !arg.IsGalleryRequest)
+            if (canProcess && (arg.RequestType == RequestType.Thumbnail))
             {
                 CacheItem existing = null;
                 thumbCache.TryGetValue(arg.Guid, out existing);
@@ -394,7 +400,7 @@ namespace Manina.Windows.Forms
             }
 
             // Is it outside the visible area?
-            if (canProcess && !arg.IsRendererRequest && !arg.IsGalleryRequest && (CacheMode == CacheMode.OnDemand))
+            if (canProcess && (arg.RequestType == RequestType.Thumbnail) && (CacheMode == CacheMode.OnDemand))
             {
                 if (mImageListView != null && !mImageListView.IsItemVisible(arg.Guid))
                     canProcess = false;
@@ -417,9 +423,9 @@ namespace Manina.Windows.Forms
             CacheItem result = e.Result as CacheItem;
 
             // We are done processing
-            if (request.IsRendererRequest)
+            if (request.RequestType == RequestType.Renderer)
                 processingRendererItem = Guid.Empty;
-            else if (request.IsGalleryRequest)
+            else if (request.RequestType == RequestType.Gallery)
                 processingGalleryItem = Guid.Empty;
             else
                 processing.Remove(request.Guid);
@@ -430,14 +436,14 @@ namespace Manina.Windows.Forms
                 return;
 
             // Dispose old item and add to cache
-            if (request.IsRendererRequest)
+            if (request.RequestType == RequestType.Renderer)
             {
                 if (rendererItem != null)
                     rendererItem.Dispose();
 
                 rendererItem = result;
             }
-            else if (request.IsGalleryRequest)
+            else if (request.RequestType == RequestType.Gallery)
             {
                 if (galleryItem != null)
                     galleryItem.Dispose();
@@ -471,7 +477,7 @@ namespace Manina.Windows.Forms
             // Refresh the control
             if (result != null && result.Image != null && mImageListView != null)
             {
-                if (request.IsGalleryRequest || request.IsRendererRequest)
+                if (request.RequestType != RequestType.Thumbnail)
                     mImageListView.Refresh(false, true);
                 else if (mImageListView.IsItemVisible(request.Guid))
                     mImageListView.Refresh(false, true);
@@ -757,7 +763,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheRequest(guid, filename, thumbSize,
-                useEmbeddedThumbnails, autoRotate, useWIC));
+                useEmbeddedThumbnails, autoRotate, useWIC, RequestType.Thumbnail));
         }
         /// <summary>
         /// Adds the image to the cache queue.
@@ -812,7 +818,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheRequest(guid, key, thumbSize,
-                useEmbeddedThumbnails, autoRotate, useWIC));
+                useEmbeddedThumbnails, autoRotate, useWIC, RequestType.Thumbnail));
         }
         /// <summary>
         /// Adds a virtual item to the cache.
@@ -869,7 +875,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheRequest(guid, filename, thumbSize,
-                useEmbeddedThumbnails, autoRotate, useWIC), 2);
+                useEmbeddedThumbnails, autoRotate, useWIC, RequestType.Gallery), 2);
         }
         /// <summary>
         /// Adds the virtual item image to the gallery cache queue.
@@ -893,7 +899,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheRequest(guid, key, thumbSize,
-                useEmbeddedThumbnails, autoRotate, useWIC), 2);
+                useEmbeddedThumbnails, autoRotate, useWIC, RequestType.Gallery), 2);
         }
         /// <summary>
         /// Adds the image to the renderer cache queue.
@@ -917,7 +923,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheRequest(guid, filename, thumbSize,
-                useEmbeddedThumbnails, autoRotate, useWIC), 1);
+                useEmbeddedThumbnails, autoRotate, useWIC, RequestType.Renderer), 1);
         }
         /// <summary>
         /// Adds the virtual item image to the renderer cache queue.
@@ -941,7 +947,7 @@ namespace Manina.Windows.Forms
 
             // Add to cache queue
             RunWorker(new CacheRequest(guid, key, thumbSize,
-                useEmbeddedThumbnails, autoRotate, useWIC), 1);
+                useEmbeddedThumbnails, autoRotate, useWIC, RequestType.Renderer), 1);
         }
         /// <summary>
         /// Gets the image from the renderer cache. If the image is not cached,
@@ -1045,14 +1051,14 @@ namespace Manina.Windows.Forms
                 context = SynchronizationContext.Current;
 
             // Already being processed?
-            if (priority == 0)
+            if (item.RequestType == RequestType.Thumbnail)
             {
                 if (processing.ContainsKey(item.Guid))
                     return;
                 else
                     processing.Add(item.Guid, false);
             }
-            else if (priority == 1)
+            else if (item.RequestType == RequestType.Renderer)
             {
                 if (processingRendererItem == item.Guid)
                     return;
@@ -1060,10 +1066,9 @@ namespace Manina.Windows.Forms
                 {
                     bw.CancelAsync(priority);
                     processingRendererItem = item.Guid;
-                    item.IsRendererRequest = true;
                 }
             }
-            else if (priority == 2)
+            else if (item.RequestType == RequestType.Gallery)
             {
                 if (processingGalleryItem == item.Guid)
                     return;
@@ -1071,7 +1076,6 @@ namespace Manina.Windows.Forms
                 {
                     bw.CancelAsync(priority);
                     processingGalleryItem = item.Guid;
-                    item.IsGalleryRequest = true;
                 }
             }
 
