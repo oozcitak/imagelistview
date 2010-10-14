@@ -45,7 +45,7 @@ namespace Manina.Windows.Forms
 
         #region CacheRequest Class
         /// <summary>
-        /// Represents an item in the cache.
+        /// Represents a cache request.
         /// </summary>
         private class CacheRequest
         {
@@ -108,9 +108,9 @@ namespace Manina.Windows.Forms
         private class CanContinueProcessingEventArgs : EventArgs
         {
             /// <summary>
-            /// Gets the guid of the request.
+            /// Gets the cache request.
             /// </summary>
-            public Guid Guid { get; private set; }
+            public CacheRequest Request { get; private set; }
             /// <summary>
             /// Gets whether this item should be processed.
             /// </summary>
@@ -119,10 +119,10 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Initializes a new instance of the <see cref="CanContinueProcessingEventArgs"/> class.
             /// </summary>
-            /// <param name="guid">The guid of the request.</param>
-            public CanContinueProcessingEventArgs(Guid guid)
+            /// <param name="request">The cache request.</param>
+            public CanContinueProcessingEventArgs(CacheRequest request)
             {
-                Guid = guid;
+                Request = request;
                 ContinueProcessing = true;
             }
         }
@@ -169,8 +169,7 @@ namespace Manina.Windows.Forms
         /// <returns>true if the item should be processed; otherwise false.</returns>
         private bool OnCanContinueProcessing(CacheRequest item)
         {
-            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(
-                item.Guid);
+            CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(item);
             context.Send(checkProcessingCallback, arg);
             return arg.ContinueProcessing;
         }
@@ -182,19 +181,20 @@ namespace Manina.Windows.Forms
         private void CanContinueProcessing(object argument)
         {
             CanContinueProcessingEventArgs arg = argument as CanContinueProcessingEventArgs;
+            CacheRequest request = arg.Request;
             bool canProcess = true;
 
             // Is it in the edit cache?
             if (canProcess)
             {
-                if (editCache.ContainsKey(arg.Guid))
+                if (editCache.ContainsKey(request.Guid))
                     canProcess = false;
             }
 
             // Was the item was updated by the UI thread?
             if (canProcess)
             {
-                if (mImageListView != null && !mImageListView.IsItemDirty(arg.Guid))
+                if (mImageListView != null && !mImageListView.IsItemDirty(request.Guid))
                     canProcess = false;
             }
 

@@ -473,10 +473,6 @@ namespace Manina.Windows.Forms
         /// Gets the cached thumbnail image.
         /// </summary>
         public Image Thumbnail { get; private set; }
-        /// <summary>
-        /// Gets whether an error occurred during thumbnail extraction.
-        /// </summary>
-        public bool Error { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the ItemEventArgs class.
@@ -484,13 +480,11 @@ namespace Manina.Windows.Forms
         /// <param name="item">The item that is the target of this event.</param>
         /// <param name="thumbnail">The cached thumbnail image.</param>
         /// <param name="size">The size of the thumbnail request.</param>
-        /// <param name="error">Determines whether an error occurred during thumbnail extraction.</param>
-        public ThumbnailCachedEventArgs(ImageListViewItem item, Image thumbnail, Size size, bool error)
+        public ThumbnailCachedEventArgs(ImageListViewItem item, Image thumbnail, Size size)
         {
             Item = item;
             Thumbnail = thumbnail;
             Size = size;
-            Error = error;
         }
     }
     /// <summary>
