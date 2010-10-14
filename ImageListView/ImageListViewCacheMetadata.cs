@@ -43,11 +43,11 @@ namespace Manina.Windows.Forms
         private bool disposed;
         #endregion
 
-        #region CacheItem Class
+        #region CacheRequest Class
         /// <summary>
         /// Represents an item in the cache.
         /// </summary>
-        private class CacheItem
+        private class CacheRequest
         {
             /// <summary>
             /// Gets the item guid.
@@ -71,12 +71,12 @@ namespace Manina.Windows.Forms
             public bool IsVirtualItem { get; private set; }
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="CacheItem"/> class.
+            /// Initializes a new instance of the <see cref="CacheRequest"/> class.
             /// </summary>
             /// <param name="guid">The guid of the item.</param>
             /// <param name="filename">The file name.</param>
             /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
-            public CacheItem(Guid guid, string filename, bool useWIC)
+            public CacheRequest(Guid guid, string filename, bool useWIC)
             {
                 Guid = guid;
                 FileName = filename;
@@ -85,12 +85,12 @@ namespace Manina.Windows.Forms
                 UseWIC = useWIC;
             }
             /// <summary>
-            /// Initializes a new instance of the <see cref="CacheItem"/> class.
+            /// Initializes a new instance of the <see cref="CacheRequest"/> class.
             /// </summary>
             /// <param name="guid">The guid of the item.</param>
             /// <param name="virtualItemKey">The virtual item key.</param>
             /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
-            public CacheItem(Guid guid, object virtualItemKey, bool useWIC)
+            public CacheRequest(Guid guid, object virtualItemKey, bool useWIC)
             {
                 Guid = guid;
                 FileName = null;
@@ -165,9 +165,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Determines if the item should be processed.
         /// </summary>
-        /// <param name="item">The <see cref="CacheItem"/> to check.</param>
+        /// <param name="item">The <see cref="CacheRequest"/> to check.</param>
         /// <returns>true if the item should be processed; otherwise false.</returns>
-        private bool OnCanContinueProcessing(CacheItem item)
+        private bool OnCanContinueProcessing(CacheRequest item)
         {
             CanContinueProcessingEventArgs arg = new CanContinueProcessingEventArgs(
                 item.Guid);
@@ -211,7 +211,7 @@ namespace Manina.Windows.Forms
         /// instance containing the event data.</param>
         void bw_RunWorkerCompleted(object sender, QueuedWorkerCompletedEventArgs e)
         {
-            CacheItem request = e.UserState as CacheItem;
+            CacheRequest request = e.UserState as CacheRequest;
 
             // We are done processing
             processing.Remove(request.Guid);
@@ -249,7 +249,7 @@ namespace Manina.Windows.Forms
         /// containing the event data.</param>
         void bw_DoWork(object sender, QueuedWorkerDoWorkEventArgs e)
         {
-            CacheItem request = e.Argument as CacheItem;
+            CacheRequest request = e.Argument as CacheRequest;
 
             // Should we continue processing this item?
             // The callback checks the following and returns false if
@@ -327,7 +327,7 @@ namespace Manina.Windows.Forms
                 throw new ArgumentException("filename cannot be null", "extension");
 
             // Add to cache queue
-            RunWorker(new CacheItem(guid, filename, useWIC));
+            RunWorker(new CacheRequest(guid, filename, useWIC));
         }
         /// <summary>
         /// Adds the item to the cache queue.
@@ -338,7 +338,7 @@ namespace Manina.Windows.Forms
         public void Add(Guid guid, object virtualItemKey, bool useWIC)
         {
             // Add to cache queue
-            RunWorker(new CacheItem(guid, virtualItemKey, useWIC));
+            RunWorker(new CacheRequest(guid, virtualItemKey, useWIC));
         }
         #endregion
 
@@ -347,7 +347,7 @@ namespace Manina.Windows.Forms
         /// Pushes the given item to the worker queue.
         /// </summary>
         /// <param name="item">The cache item.</param>
-        private void RunWorker(CacheItem item)
+        private void RunWorker(CacheRequest item)
         {
             // Get the current synchronization context
             if (context == null)

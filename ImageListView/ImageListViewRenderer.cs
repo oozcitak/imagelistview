@@ -309,7 +309,8 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Image GetImageAsync(ImageListViewItem item, Size size)
             {
-                Image img = ImageListView.thumbnailCache.GetRendererImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails);
+                Image img = ImageListView.thumbnailCache.GetRendererImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails,
+                    ImageListView.AutoRotateThumbnails, ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly);
 
                 if (img == null)
                 {
@@ -731,7 +732,8 @@ namespace Manina.Windows.Forms
             /// </summary>
             private Image GetGalleryImageAsync(ImageListViewItem item, Size size)
             {
-                Image img = ImageListView.thumbnailCache.GetGalleryImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails);
+                Image img = ImageListView.thumbnailCache.GetGalleryImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails,
+                    ImageListView.AutoRotateThumbnails, ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly);
 
                 if (img == null)
                 {

@@ -80,7 +80,14 @@ namespace Manina.Windows.Forms
         /// Gets the cache state of the item thumbnail.
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the cache state of the item thumbnail.")]
-        public CacheState ThumbnailCacheState { get { return mImageListView.thumbnailCache.GetCacheState(mGuid); } }
+        public CacheState ThumbnailCacheState
+        {
+            get
+            {
+                return mImageListView.thumbnailCache.GetCacheState(mGuid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
+                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly);
+            }
+        }
         /// <summary>
         /// Gets a value determining if the item is focused.
         /// </summary>
@@ -250,7 +257,8 @@ namespace Manina.Windows.Forms
                             (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
-                return mImageListView.thumbnailCache.GetImage(Guid);
+                return mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
+                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly);
             }
         }
         /// <summary>
@@ -583,7 +591,7 @@ namespace Manina.Windows.Forms
                     mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey,
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                 else
-                    mImageListView.itemCacheManager.Add(mGuid, mFileName, 
+                    mImageListView.itemCacheManager.Add(mGuid, mFileName,
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                 mImageListView.Refresh();
             }
@@ -837,7 +845,7 @@ namespace Manina.Windows.Forms
                 }
             }
             else
-            {               
+            {
                 Image img = null;
                 CacheState state = ThumbnailCacheState;
 
@@ -854,9 +862,10 @@ namespace Manina.Windows.Forms
                         img = mImageListView.ErrorImage;
                     return img;
                 }
-                
-                img = mImageListView.thumbnailCache.GetImage(Guid);
-                
+
+                img = mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
+                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly);
+
                 if (state == CacheState.Cached)
                     return img;
 
@@ -866,9 +875,9 @@ namespace Manina.Windows.Forms
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 else
                     mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
-                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, 
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                
+
                 if (img == null && string.IsNullOrEmpty(extension))
                     return mImageListView.DefaultImage;
 
@@ -878,7 +887,7 @@ namespace Manina.Windows.Forms
                     img = mImageListView.shellInfoCache.GetSmallIcon(extension);
                 if (img == null)
                     img = mImageListView.DefaultImage;
-                
+
                 return img;
             }
         }
