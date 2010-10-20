@@ -992,8 +992,9 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
         /// <param name="useWIC">Whether to use WIC.</param>
+        /// <param name="clone">true to return a clone of the cached image; otherwise false.</param>
         public Image GetImage(Guid guid, Size thumbSize,
-            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
+            UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC, bool clone)
         {
             CacheItem item = null;
             if (thumbCache.TryGetValue(guid, out item) && item != null &&
@@ -1001,7 +1002,7 @@ namespace Manina.Windows.Forms
                 item.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 item.AutoRotate == autoRotate &&
                 item.UseWIC == useWIC)
-                return item.Image;
+                return clone ? (Image)item.Image.Clone() : item.Image;
             else
                 return null;
         }
