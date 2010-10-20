@@ -179,6 +179,16 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to add to the <see cref="ImageListViewItemCollection"/>.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            public void Add(ImageListViewItem item, Image initialThumbnail)
+            {
+                item.clonedThumbnail = initialThumbnail;
+                Add(item);
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
             /// <param name="filename">The name of the image file.</param>
             public void Add(string filename)
             {
@@ -192,12 +202,7 @@ namespace Manina.Windows.Forms
             public void Add(string filename, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(filename);
-                if (mImageListView != null && initialThumbnail != null)
-                {
-                    mImageListView.thumbnailCache.Add(item.Guid, filename, mImageListView.ThumbnailSize,
-                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                }
+                item.clonedThumbnail = initialThumbnail;
                 Add(item);
             }
             /// <summary>
@@ -218,12 +223,7 @@ namespace Manina.Windows.Forms
             public void Add(object key, string text, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(key, text);
-                if (mImageListView != null && initialThumbnail != null)
-                {
-                    mImageListView.thumbnailCache.Add(item.Guid, key, mImageListView.ThumbnailSize,
-                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                }
+                item.clonedThumbnail = initialThumbnail;
                 Add(item);
             }
             /// <summary>
@@ -345,12 +345,7 @@ namespace Manina.Windows.Forms
             public void Insert(int index, string filename, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(filename);
-                if (mImageListView != null && initialThumbnail != null)
-                {
-                    mImageListView.thumbnailCache.Add(item.Guid, filename, mImageListView.ThumbnailSize,
-                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                }
+                item.clonedThumbnail = initialThumbnail;
                 Insert(index, item);
             }
             /// <summary>
@@ -373,12 +368,7 @@ namespace Manina.Windows.Forms
             public void Insert(int index, object key, string text, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(key, text);
-                if (mImageListView != null && initialThumbnail != null)
-                {
-                    mImageListView.thumbnailCache.Add(item.Guid, key, mImageListView.ThumbnailSize,
-                        initialThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                }
+                item.clonedThumbnail = initialThumbnail;
                 Insert(index, item);
             }
 
@@ -514,6 +504,20 @@ namespace Manina.Windows.Forms
                     foreach (ImageListViewColumnHeader header in mImageListView.Columns)
                         if (header.Type == ColumnType.Custom)
                             item.AddSubItemText(header.columnID);
+
+                    // Add current thumbnail to cache
+                    if (item.clonedThumbnail != null)
+                    {
+                        if (item.isVirtualItem)
+                            mImageListView.thumbnailCache.Add(item.Guid, item.VirtualItemKey, mImageListView.ThumbnailSize,
+                                item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                        else
+                            mImageListView.thumbnailCache.Add(item.Guid, item.FileName, mImageListView.ThumbnailSize,
+                                item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                        item.clonedThumbnail = null;
+                    }
 
                     // Add to thumbnail cache
                     if (mImageListView.CacheMode == CacheMode.Continuous)
