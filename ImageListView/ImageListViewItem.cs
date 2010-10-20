@@ -687,23 +687,27 @@ namespace Manina.Windows.Forms
                         return mFileType;
                     if (mImageListView != null)
                     {
-                        CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
-                        if (state == CacheState.Cached)
+                        if (!string.IsNullOrEmpty(extension))
                         {
-                            mFileType = mImageListView.shellInfoCache.GetFileType(extension);
-                            return mFileType;
+                            CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
+                            if (state == CacheState.Cached)
+                            {
+                                mFileType = mImageListView.shellInfoCache.GetFileType(extension);
+                                return mFileType;
+                            }
+                            else if (state == CacheState.Error)
+                            {
+                                mImageListView.shellInfoCache.Remove(extension);
+                                mImageListView.shellInfoCache.Add(extension);
+                                return "";
+                            }
+                            else
+                            {
+                                mImageListView.shellInfoCache.Add(extension);
+                                return "";
+                            }
                         }
-                        else if (state == CacheState.Error)
-                        {
-                            mImageListView.shellInfoCache.Remove(extension);
-                            mImageListView.shellInfoCache.Add(extension);
-                            return "";
-                        }
-                        else
-                        {
-                            mImageListView.shellInfoCache.Add(extension);
-                            return "";
-                        }
+                        return "";
                     }
                     else
                         return "";

@@ -324,6 +324,9 @@ namespace Manina.Windows.Forms
         /// <param name="extension">File extension.</param>
         public void Remove(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("extension cannot be null", "extension");
+
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
             {
@@ -389,6 +392,9 @@ namespace Manina.Windows.Forms
         /// <param name="extension">File extension.</param>
         public string GetFileType(string extension)
         {
+            if (string.IsNullOrEmpty(extension))
+                throw new ArgumentException("extension cannot be null", "extension");
+
             CacheItem item = null;
             if (shellCache.TryGetValue(extension, out item))
             {
