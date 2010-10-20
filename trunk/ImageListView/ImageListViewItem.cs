@@ -69,6 +69,8 @@ namespace Manina.Windows.Forms
         internal object mVirtualItemKey;
         // Used for custom columns
         private Dictionary<Guid, string> subItems;
+        // Used for cloned items
+        internal Image clonedThumbnail;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
@@ -1046,10 +1048,11 @@ namespace Manina.Windows.Forms
         public object Clone()
         {
             ImageListViewItem item = new ImageListViewItem();
-
+            
             item.mText = mText;
 
             // File info
+            item.extension = extension;
             item.mDateAccessed = mDateAccessed;
             item.mDateCreated = mDateCreated;
             item.mDateModified = mDateModified;
@@ -1084,6 +1087,14 @@ namespace Manina.Windows.Forms
             // Sub items
             foreach (KeyValuePair<Guid, string> kv in subItems)
                 item.subItems.Add(kv.Key, kv.Value);
+
+            // Current thumbnail
+            if (mImageListView != null)
+            {
+                item.clonedThumbnail = mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize,
+                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, 
+                    mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
+            }
 
             return item;
         }

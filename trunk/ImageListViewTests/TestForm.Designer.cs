@@ -75,6 +75,9 @@
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
+            this.ItemContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -85,6 +88,7 @@
             this.splitContainer1.SuspendLayout();
             this.EventListContextMenu.SuspendLayout();
             this.TestToolStrip.SuspendLayout();
+            this.ItemContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -156,6 +160,7 @@
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 6, true),
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 7, true),
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
+            this.imageListView.ContextMenuStrip = this.ItemContextMenu;
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
@@ -193,12 +198,12 @@
             this.ClearEventList});
             this.EventListContextMenu.Name = "EventListContextMenu";
             this.EventListContextMenu.ShowImageMargin = false;
-            this.EventListContextMenu.Size = new System.Drawing.Size(86, 26);
+            this.EventListContextMenu.Size = new System.Drawing.Size(75, 26);
             // 
             // ClearEventList
             // 
             this.ClearEventList.Name = "ClearEventList";
-            this.ClearEventList.Size = new System.Drawing.Size(85, 22);
+            this.ClearEventList.Size = new System.Drawing.Size(74, 22);
             this.ClearEventList.Text = "Clear";
             this.ClearEventList.Click += new System.EventHandler(this.ClearEventList_Click);
             // 
@@ -372,28 +377,28 @@
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(138, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(127, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(138, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(127, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(138, 22);
+            this.ViewPane.Size = new System.Drawing.Size(127, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(138, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(127, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
             // 
@@ -565,6 +570,29 @@
             this.CheckBenchmarkEndTimer.Interval = 2000;
             this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
             // 
+            // ItemContextMenu
+            // 
+            this.ItemContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cloneToolStripMenuItem,
+            this.deleteToolStripMenuItem});
+            this.ItemContextMenu.Name = "ItemContextMenu";
+            this.ItemContextMenu.Size = new System.Drawing.Size(106, 48);
+            this.ItemContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ItemContextMenu_Opening);
+            // 
+            // cloneToolStripMenuItem
+            // 
+            this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.cloneToolStripMenuItem.Text = "Clone";
+            this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -590,6 +618,7 @@
             this.EventListContextMenu.ResumeLayout(false);
             this.TestToolStrip.ResumeLayout(false);
             this.TestToolStrip.PerformLayout();
+            this.ItemContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -641,6 +670,9 @@
         private System.Windows.Forms.ToolStripButton StartBenchmark;
         private System.Windows.Forms.CheckBox logEventsCheckbox;
         private System.Windows.Forms.ToolStripDropDownButton SelectRenderer;
+        private System.Windows.Forms.ContextMenuStrip ItemContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem cloneToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
     }
 }
 

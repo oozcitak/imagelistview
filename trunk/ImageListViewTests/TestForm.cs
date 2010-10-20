@@ -275,11 +275,32 @@ namespace ImageListViewTests
         }
         #endregion
 
-        #region Context Menus
+        #region Event Context Menu
         // Event list
         private void ClearEventList_Click(object sender, EventArgs e)
         {
             EventsListBox.Items.Clear();
+        }
+        #endregion
+
+        #region Item Context Menu
+        // Update
+        private void ItemContextMenu_Opening(object sender, CancelEventArgs e)
+        {
+            cloneToolStripMenuItem.Enabled = (imageListView.SelectedItems.Count > 0);
+            deleteToolStripMenuItem.Enabled = (imageListView.SelectedItems.Count > 0);
+        }
+        // Clone
+        private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ImageListViewItem item in imageListView.SelectedItems)
+                imageListView.Items.Add((ImageListViewItem)item.Clone());
+        }
+        // Delete
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ImageListViewItem item in imageListView.SelectedItems)
+                imageListView.Items.Remove(item);
         }
         #endregion
 
