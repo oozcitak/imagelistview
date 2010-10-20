@@ -143,51 +143,26 @@ namespace Manina.Windows.Forms
             if (useWIC)
             {
 #if USEWIC
-                // File can be read and an image is recognized.
-                FileStream stream = null;
-                BitmapFrame frameWpf = null;
                 try
                 {
-                    stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    if (stream != null)
+                    using (FileStream stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         // Performance vs image quality settings.
                         // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
                         // if the file contains no embedded thumbnail. The image quality is only slightly worse.
-                        frameWpf = BitmapFrame.Create(stream,
+                        BitmapFrame frameWpf = BitmapFrame.Create(stream,
                             BitmapCreateOptions.IgnoreColorProfile,
                             BitmapCacheOption.None);
+                        return GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
+                            useExifOrientation ? GetRotation(frameWpf) : 0);
                     }
                 }
                 catch
                 {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                        stream = null;
-                    }
-                    frameWpf = null;
-                }
-
-                if (stream == null || frameWpf == null)
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                        stream = null;
-                    }
-
                     // .Net 2.0 fallback
-                    Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
+                    return GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
                         useExifOrientation ? GetRotation(filename) : 0);
-                    return img;
                 }
-
-                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
-                    useExifOrientation ? GetRotation(frameWpf) : 0);
-
-                stream.Dispose();
-                return thumb;
 #else
             // .Net 2.0 fallback
             Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
@@ -197,9 +172,8 @@ namespace Manina.Windows.Forms
             else
             {
                 // .Net 2.0 fallback
-                Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
+                return GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
                     useExifOrientation ? GetRotation(filename) : 0);
-                return img;
             }
         }
         #endregion
@@ -781,7 +755,7 @@ namespace Manina.Windows.Forms
 
             int sourceWidth = source.Width;
             int sourceHeight = source.Height;
-
+            
             // Scale
             double xScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceWidth, scale));
             double yScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceHeight, scale));

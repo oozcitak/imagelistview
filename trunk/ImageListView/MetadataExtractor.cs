@@ -297,16 +297,7 @@ namespace Manina.Windows.Forms
 
             BitmapMetadata data = frameWpf.Metadata as BitmapMetadata;
             if (data != null)
-            {
-                try
-                {
-                    InitViaWpf(data);
-                }
-                catch (Exception eWpf)
-                {
-                    Error = eWpf;
-                }
-            }
+                InitViaWpf(data);
         }
 #endif
         /// <summary>
@@ -601,7 +592,7 @@ namespace Manina.Windows.Forms
         /// <param name="path">Filepath of image</param>
         public static MetadataExtractor FromFile(string path)
         {
-            return MetadataExtractor.FromFile(path, false);
+            return MetadataExtractor.FromFile(path, true);
         }
         /// <summary>
         /// Creates an instance of the MetadataExtractor class.
@@ -613,10 +604,14 @@ namespace Manina.Windows.Forms
         public static MetadataExtractor FromFile(string path, bool useWic)
         {
             MetadataExtractor metadata = new MetadataExtractor();
+#if USEWIC
             if (useWic)
                 metadata.InitViaWpf(path);
             else
                 metadata.InitViaBmp(path);
+#else
+            metadata.InitViaBmp(path);
+#endif
             return metadata;
         }
 #if USEWIC
