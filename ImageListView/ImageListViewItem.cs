@@ -235,7 +235,8 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Gets the thumbnail image. If the thumbnail image is not cached, it will be 
-        /// added to the cache queue and null will be returned.
+        /// added to the cache queue and null will be returned. The returned image needs
+        /// to be disposed by the caller.
         /// </summary>
         [Category("Appearance"), Browsable(false), Description("Gets the thumbnail image.")]
         public Image ThumbnailImage
@@ -258,7 +259,7 @@ namespace Manina.Windows.Forms
                 }
 
                 return mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly);
+                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
             }
         }
         /// <summary>
@@ -864,7 +865,7 @@ namespace Manina.Windows.Forms
                 }
 
                 img = mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly);
+                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, false);
 
                 if (state == CacheState.Cached)
                     return img;
