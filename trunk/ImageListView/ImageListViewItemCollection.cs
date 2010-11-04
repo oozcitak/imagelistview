@@ -192,7 +192,7 @@ namespace Manina.Windows.Forms
             /// <param name="filename">The name of the image file.</param>
             public void Add(string filename)
             {
-                Add(new ImageListViewItem(filename));
+                Add(filename, null);
             }
             /// <summary>
             /// Adds an item to the <see cref="ImageListViewItemCollection"/>.

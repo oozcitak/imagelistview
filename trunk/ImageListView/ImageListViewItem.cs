@@ -479,8 +479,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="filename">The image filename representing the item.</param>
         /// <param name="text">Item text</param>
-        /// <param name="tag">The tag of the item.</param>
-        public ImageListViewItem(string filename, string text, object tag)
+        public ImageListViewItem(string filename, string text)
             : this()
         {
             mFileName = filename;
@@ -488,40 +487,13 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(text))
                 text = Path.GetFileName(filename);
             mText = text;
-            Tag = tag;
         }
         /// <summary>
         /// Initializes a new instance of the ImageListViewItem class.
         /// </summary>
         /// <param name="filename">The image filename representing the item.</param>
         public ImageListViewItem(string filename)
-            : this()
-        {
-            mFileName = filename;
-            extension = Path.GetExtension(filename);
-            mText = Path.GetFileName(filename);
-        }
-        /// <summary>
-        /// Initializes a new instance of a virtual ImageListViewItem class.
-        /// </summary>
-        /// <param name="key">The key identifying this item.</param>
-        /// <param name="text">Text of this item.</param>
-        /// <param name="dimensions">Pixel dimensions of the source image.</param>
-        public ImageListViewItem(object key, string text, Size dimensions)
-            : this()
-        {
-            isVirtualItem = true;
-            mVirtualItemKey = key;
-            mText = text;
-            mDimensions = dimensions;
-        }
-        /// <summary>
-        /// Initializes a new instance of a virtual ImageListViewItem class.
-        /// </summary>
-        /// <param name="key">The key identifying this item.</param>
-        /// <param name="text">Text of this item.</param>
-        public ImageListViewItem(object key, string text)
-            : this(key, text, Size.Empty)
+            : this(filename, string.Empty)
         {
             ;
         }
@@ -529,8 +501,19 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of a virtual ImageListViewItem class.
         /// </summary>
         /// <param name="key">The key identifying this item.</param>
+        /// <param name="text">Text of this item.</param>
+        public ImageListViewItem(object key, string text)
+        {
+            isVirtualItem = true;
+            mVirtualItemKey = key;
+            mText = text;
+        }
+        /// <summary>
+        /// Initializes a new instance of a virtual ImageListViewItem class.
+        /// </summary>
+        /// <param name="key">The key identifying this item.</param>
         public ImageListViewItem(object key)
-            : this(key, string.Empty, Size.Empty)
+            : this(key, string.Empty)
         {
             ;
         }
@@ -1052,7 +1035,7 @@ namespace Manina.Windows.Forms
         public object Clone()
         {
             ImageListViewItem item = new ImageListViewItem();
-            
+
             item.mText = mText;
 
             // File info
@@ -1096,7 +1079,7 @@ namespace Manina.Windows.Forms
             if (mImageListView != null)
             {
                 item.clonedThumbnail = mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize,
-                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, 
+                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
                     mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
             }
 
