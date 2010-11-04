@@ -627,11 +627,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the shutter speed.
         /// </summary>
         public string ShutterSpeed { get; set; }
-        /// <summary>
-        /// Gets or sets the lens aperture value.
-        /// </summary>
-        public string Aperture { get; set; }
-        /// <summary>
+         /// <summary>
         /// Gets or sets user comments.
         /// </summary>
         public string UserComment { get; set; }
