@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using System.IO;
 
 namespace Manina.Windows.Forms
 {
@@ -51,7 +52,35 @@ namespace Manina.Windows.Forms
             public override ItemDetails GetDetails(object key, bool useWIC)
             {
                 string filename = (string)key;
-                throw new NotImplementedException();
+                MetadataExtractor extractor = MetadataExtractor.FromFile(filename);
+                ItemDetails imageInfo = new ItemDetails();
+
+                // Get file info
+                FileInfo info = new FileInfo(filename);
+                imageInfo.DateCreated = info.CreationTime;
+                imageInfo.DateAccessed = info.LastAccessTime;
+                imageInfo.DateModified = info.LastWriteTime;
+                imageInfo.FileSize = info.Length;
+                imageInfo.FilePath = info.DirectoryName;
+
+                // Get metadata
+                MetadataExtractor metadata = MetadataExtractor.FromFile(filename, useWIC);
+                imageInfo.Dimensions = new Size(metadata.Width, metadata.Height);
+                imageInfo.Resolution = new SizeF((float)metadata.DPIX, (float)metadata.DPIY);
+                imageInfo.ImageDescription = metadata.ImageDescription ?? "";
+                imageInfo.EquipmentModel = metadata.EquipmentModel ?? "";
+                imageInfo.DateTaken = metadata.DateTaken;
+                imageInfo.Artist = metadata.Artist ?? "";
+                imageInfo.Copyright = metadata.Copyright ?? "";
+                imageInfo.ExposureTime = (float)metadata.ExposureTime;
+                imageInfo.FNumber = (float)metadata.FNumber;
+                imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
+                imageInfo.UserComment = metadata.Comment ?? "";
+                imageInfo.Rating = (ushort)(metadata.Rating);
+                imageInfo.Software = metadata.Software ?? "";
+                imageInfo.FocalLength = (float)metadata.FocalLength;
+
+                return imageInfo;
             }
             /// <summary>
             /// Performs application-defined tasks associated with freeing,
