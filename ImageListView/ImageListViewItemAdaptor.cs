@@ -33,8 +33,8 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="key">Item key.</param>
             /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
-            /// <returns>An <see cref="ItemDetails"/> containing item details or null if an error occurs.</returns>
-            public abstract ItemDetails GetDetails(object key, bool useWIC);
+            /// <returns>An array of 2-tuples containing item details or null if an error occurs.</returns>
+            public abstract Utility.Tuple<ColumnType, object>[] GetDetails(object key, bool useWIC);
             /// <summary>
             /// Performs application-defined tasks associated with freeing,
             /// releasing, or resetting unmanaged resources.

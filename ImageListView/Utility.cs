@@ -286,7 +286,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a factory class for creating tuples.
         /// </summary>
-        internal static class Tuple
+        public static class Tuple
         {
             /// <summary>
             /// Creates a new 1-tuple.
@@ -314,7 +314,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a tuple with one element.
         /// </summary>
-        internal class Tuple<T1>
+        public class Tuple<T1>
         {
             private T1 mItem1;
 
@@ -335,7 +335,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a tuple with two elements.
         /// </summary>
-        internal class Tuple<T1, T2> : Tuple<T1>
+        public class Tuple<T1, T2> : Tuple<T1>
         {
             private T2 mItem2;
 

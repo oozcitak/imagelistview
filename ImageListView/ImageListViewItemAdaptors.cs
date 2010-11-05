@@ -49,38 +49,37 @@ namespace Manina.Windows.Forms
             /// An <see cref="ImageListView.ImageListViewItemAdaptor.ItemDetails"/> containing item details or 
             /// null if an error occurs.
             /// </returns>
-            public override ItemDetails GetDetails(object key, bool useWIC)
+            public override Utility.Tuple<ColumnType, object>[] GetDetails(object key, bool useWIC)
             {
                 string filename = (string)key;
-                MetadataExtractor extractor = MetadataExtractor.FromFile(filename);
-                ItemDetails imageInfo = new ItemDetails();
+                List<Utility.Tuple<ColumnType, object>> details = new List<Utility.Tuple<ColumnType, object>>();
 
                 // Get file info
                 FileInfo info = new FileInfo(filename);
-                imageInfo.DateCreated = info.CreationTime;
-                imageInfo.DateAccessed = info.LastAccessTime;
-                imageInfo.DateModified = info.LastWriteTime;
-                imageInfo.FileSize = info.Length;
-                imageInfo.FilePath = info.DirectoryName;
+                details.Add(Utility.Tuple.Create(ColumnType.DateCreated, (object)info.CreationTime));
+                details.Add(Utility.Tuple.Create(ColumnType.DateAccessed, (object)info.LastAccessTime));
+                details.Add(Utility.Tuple.Create(ColumnType.DateModified, (object)info.LastWriteTime));
+                details.Add(Utility.Tuple.Create(ColumnType.FileSize, (object)info.Length));
+                details.Add(Utility.Tuple.Create(ColumnType.FilePath, (object)info.DirectoryName));
 
                 // Get metadata
                 MetadataExtractor metadata = MetadataExtractor.FromFile(filename, useWIC);
-                imageInfo.Dimensions = new Size(metadata.Width, metadata.Height);
-                imageInfo.Resolution = new SizeF((float)metadata.DPIX, (float)metadata.DPIY);
-                imageInfo.ImageDescription = metadata.ImageDescription ?? "";
-                imageInfo.EquipmentModel = metadata.EquipmentModel ?? "";
-                imageInfo.DateTaken = metadata.DateTaken;
-                imageInfo.Artist = metadata.Artist ?? "";
-                imageInfo.Copyright = metadata.Copyright ?? "";
-                imageInfo.ExposureTime = (float)metadata.ExposureTime;
-                imageInfo.FNumber = (float)metadata.FNumber;
-                imageInfo.ISOSpeed = (ushort)metadata.ISOSpeed;
-                imageInfo.UserComment = metadata.Comment ?? "";
-                imageInfo.Rating = (ushort)(metadata.Rating);
-                imageInfo.Software = metadata.Software ?? "";
-                imageInfo.FocalLength = (float)metadata.FocalLength;
+                details.Add(Utility.Tuple.Create(ColumnType.Dimensions, (object)(new Size(metadata.Width, metadata.Height))));
+                details.Add(Utility.Tuple.Create(ColumnType.Resolution, (object)(new SizeF((float)metadata.DPIX, (float)metadata.DPIY))));
+                details.Add(Utility.Tuple.Create(ColumnType.ImageDescription, (object)metadata.ImageDescription ?? ""));
+                details.Add(Utility.Tuple.Create(ColumnType.EquipmentModel, (object)(metadata.EquipmentModel ?? "")));
+                details.Add(Utility.Tuple.Create(ColumnType.DateTaken, (object)metadata.DateTaken));
+                details.Add(Utility.Tuple.Create(ColumnType.Artist, (object)(metadata.Artist ?? "")));
+                details.Add(Utility.Tuple.Create(ColumnType.Copyright, (object)(metadata.Copyright ?? "")));
+                details.Add(Utility.Tuple.Create(ColumnType.ExposureTime, (object)(float)metadata.ExposureTime));
+                details.Add(Utility.Tuple.Create(ColumnType.FNumber, (object)(float)metadata.FNumber));
+                details.Add(Utility.Tuple.Create(ColumnType.ISOSpeed, (object)(ushort)metadata.ISOSpeed));
+                details.Add(Utility.Tuple.Create(ColumnType.UserComment, (object)(metadata.Comment ?? "")));
+                details.Add(Utility.Tuple.Create(ColumnType.Rating, (object)(ushort)metadata.Rating));
+                details.Add(Utility.Tuple.Create(ColumnType.Software, (object)(metadata.Software ?? "")));
+                details.Add(Utility.Tuple.Create(ColumnType.FocalLength, (object)(float)metadata.FocalLength));
 
-                return imageInfo;
+                return details.ToArray();
             }
             /// <summary>
             /// Performs application-defined tasks associated with freeing,
