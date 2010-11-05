@@ -1,6 +1,21 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 9.4 (05 November 2010) =
+
+This release introduces a new approach to virtual items. Instead of handling the virtual item events of the control, you now provide an adaptor (!ImageListViewItemAdaptor) while adding items. The nice thing about the adaptor approach is that they can be written once and used everywhere. There are currently two built-in adaptors: !FileSystemAdaptor (for loading image thumbnails from the file system) and URIAdaptor (for loading images from the web). You can write your own adaptors too. It is quite straight forward.
+
+
+  * Added the !ImageListViewItemAdaptor class and built-in !FileSystemAdaptor and URIAdaptor adaptors. Virtual item events are removed. *This is a breaking change.*
+  * Removed the Error property from !ThumbnailCachedEventArgs, since we already have the !CacheError event. *This is a breaking change.*
+  * !ImageListViewItem.!ThumbnailImage returns a clone of the cached thumbnail.
+  * !ImageListViewItem.Clone() now clones the current thumbnail (Issue 109).
+  * Metadata fall-back to .net 2.0 now works (hopefully :)) (Issue 107).
+  * Added one-shot async work option to !QueuedBackgroundWorker. This can be used to quickly run a background operation bypassing the queued items. !ImageListView uses this to load large images in gallery view mode.
+  * Added the !IsThumbnail property to the !ThumbnailCached event.
+  * Fixed a bug where the control sometimes failed to refresh itself after loading large images in gallery view mode (Issue 108). 
+  * Fixed a bug where control resources could not be loaded if it was subclassed (Issue 111).
+
 = 9.3 (13 October 2010) =
 
 This release includes a further performance tweak by delaying and consolidating refresh requests of thumbnail and metadata threads. The result is a smoother display especially while scrolling the control. !MeerkatRenderer is a new addition to the built-in renderers to celebrate the release of Ubuntu 10.10. There are also new properties for alternating row colors. These colors can be set using the Colors property of the control.
