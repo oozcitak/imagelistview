@@ -1428,15 +1428,13 @@ namespace Manina.Windows.Forms
         /// </summary>
         void lazyRefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (rendererNeedsPaint)
+            try
             {
-                try
-                {
-                    if (IsHandleCreated && !IsDisposed)
-                        BeginInvoke(lazyRefreshCallback);
-                }
-                finally { ; }
+                if (IsHandleCreated && !IsDisposed)
+                    BeginInvoke(lazyRefreshCallback);
+                lazyRefreshTimer.Stop();
             }
+            finally { ; }
         }
         /// <summary>
         /// Handles the Resize event.
