@@ -310,6 +310,20 @@ namespace Manina.Windows.Forms
             {
                 return new Tuple<T1, T2>(item1, item2);
             }
+            /// <summary>
+            /// Creates a new 3-tuple.
+            /// </summary>
+            /// <typeparam name="T1">The type of the first component of the tuple.</typeparam>
+            /// <typeparam name="T2">The type of the second component of the tuple.</typeparam>
+            /// <typeparam name="T3">The type of the third component of the tuple.</typeparam>
+            /// <param name="item1">The value of the first component of the tuple.</param>
+            /// <param name="item2">The value of the second component of the tuple.</param>
+            /// <param name="item3">The value of the third component of the tuple.</param>
+            /// <returns>A 3-tuple whose value is (<paramref name="item1"/>, <paramref name="item2"/>, <paramref name="item3"/>).</returns>
+            public static Tuple<T1, T2, T3> Create<T1, T2, T3>(T1 item1, T2 item2, T3 item3)
+            {
+                return new Tuple<T1, T2, T3>(item1, item2, item3);
+            }
         }
         /// <summary>
         /// Represents a tuple with one element.
@@ -353,6 +367,30 @@ namespace Manina.Windows.Forms
                 : base(item1)
             {
                 mItem2 = item2;
+            }
+        }
+        /// <summary>
+        /// Represents a tuple with three elements.
+        /// </summary>
+        public class Tuple<T1, T2, T3> : Tuple<T1, T2>
+        {
+            private T3 mItem3;
+
+            /// <summary>
+            /// Gets the value of the third component.
+            /// </summary>
+            public T3 Item3 { get { return mItem3; } }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Tuple&lt;T1, T2, T3&gt;"/> class.
+            /// </summary>
+            /// <param name="item1">The value of the first component of the tuple.</param>
+            /// <param name="item2">The value of the second component of the tuple.</param>
+            /// <param name="item3">The value of the third component of the tuple.</param>
+            public Tuple(T1 item1, T2 item2, T3 item3)
+                : base(item1, item2)
+            {
+                mItem3 = item3;
             }
         }
         #endregion
