@@ -326,16 +326,9 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Represents an empty tuple (one with no elements).
-        /// All n-tuples are based on <see cref="TupleBase"/>.
-        /// </summary>
-        public class TupleBase
-        {
-        }
-        /// <summary>
         /// Represents a tuple with one element.
         /// </summary>
-        public class Tuple<T1> : TupleBase
+        public class Tuple<T1> 
         {
             private T1 mItem1;
 
