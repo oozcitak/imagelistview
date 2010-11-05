@@ -65,11 +65,7 @@ namespace Manina.Windows.Forms
                 /// </summary>
                 public string FileType { get; set; }
                 /// <summary>
-                /// Gets or sets the name of the image fie represented by this item.
-                /// </summary>        
-                public string FileName { get; set; }
-                /// <summary>
-                /// Gets or sets the path of the image fie represented by this item.
+                /// Gets or sets the path of the image file represented by this item.
                 /// </summary>        
                 public string FilePath { get; set; }
                 /// <summary>
