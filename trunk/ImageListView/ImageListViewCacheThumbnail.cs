@@ -155,6 +155,17 @@ namespace Manina.Windows.Forms
                 IsVirtualItem = false;
                 RequestType = requestType;
             }
+
+            /// <summary>
+            /// Returns a <see cref="System.String"/> that represents this instance.
+            /// </summary>
+            public override string ToString()
+            {
+                if (IsVirtualItem)
+                    return "CacheRequest (" + VirtualItemKey.ToString() + ")";
+                else
+                    return "CacheRequest (" + FileName + ")";
+            }
         }
         #endregion
 
@@ -385,18 +396,13 @@ namespace Manina.Windows.Forms
             }
 
             // Is it in the edit cache?
-            if (canProcess)
-            {
-                if (editCache.ContainsKey(request.Guid))
-                    canProcess = false;
-            }
+            if (canProcess && editCache.ContainsKey(request.Guid))
+                canProcess = false;
 
             // Is it outside the visible area?
-            if (canProcess && (request.RequestType == RequestType.Thumbnail) && (CacheMode == CacheMode.OnDemand))
-            {
-                if (mImageListView != null && !mImageListView.IsItemVisible(request.Guid))
-                    canProcess = false;
-            }
+            if (canProcess && (request.RequestType == RequestType.Thumbnail) && (CacheMode == CacheMode.OnDemand) &&
+                mImageListView != null && !mImageListView.IsItemVisible(request.Guid))
+                canProcess = false;
 
             arg.ContinueProcessing = canProcess;
         }
@@ -1077,7 +1083,7 @@ namespace Manina.Windows.Forms
                 mImageListView.OnThumbnailCachingInternal(item.Guid, item.Size);
 
             // Add the item to the queue for processing
-            bw.RunWorkerAsync(item, priority);
+            bw.RunWorkerAsync(item, priority, item.RequestType != RequestType.Thumbnail);
         }
         /// <summary>
         /// Pushes the given item to the worker queue.
