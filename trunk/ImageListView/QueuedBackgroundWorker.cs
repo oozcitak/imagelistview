@@ -26,6 +26,7 @@ namespace Manina.Windows.Forms
 
         private int priorityQueues;
         private LinkedList<AsyncOperation>[] items;
+        private AsyncOperation[] singleItems;
         private Dictionary<object, bool> cancelledItems;
 
         private readonly SendOrPostCallback workCompletedCallback;
@@ -64,7 +65,9 @@ namespace Manina.Windows.Forms
         /// <param name="argument">The argument of an asynchronous operation.</param>
         /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> indicating the priority of this item.
         /// An item with a higher priority will be processed before items with lower priority.</param>
-        public void RunWorkerAsync(object argument, int priority)
+        /// <param name="single">true to run this operation without waiting for queued items; otherwise
+        /// false to add this operatino to th queue.</param>
+        public void RunWorkerAsync(object argument, int priority, bool single)
         {
             if (priority < 0 || priority >= priorityQueues)
                 throw new ArgumentException("priority must be between 0 and " + (priorityQueues - 1).ToString() + "  inclusive.", "priority");
@@ -84,7 +87,7 @@ namespace Manina.Windows.Forms
 
             lock (lockObject)
             {
-                AddWork(argument, priority);
+                AddWork(argument, priority, single);
                 Monitor.Pulse(lockObject);
             }
         }
@@ -92,26 +95,43 @@ namespace Manina.Windows.Forms
         /// Starts processing a new background operation.
         /// </summary>
         /// <param name="argument">The argument of an asynchronous operation.</param>
+        /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> indicating the priority of this item.
+        /// An item with a higher priority will be processed before items with lower priority.</param>
+        public void RunWorkerAsync(object argument, int priority)
+        {
+            RunWorkerAsync(argument, priority, false);
+        }
+        /// <summary>
+        /// Starts processing a new background operation.
+        /// </summary>
+        /// <param name="argument">The argument of an asynchronous operation.</param>
         public void RunWorkerAsync(object argument)
         {
-            RunWorkerAsync(argument, 0);
+            RunWorkerAsync(argument, 0, false);
         }
         /// <summary>
         /// Starts processing a new background operation.
         /// </summary>
         public void RunWorkerAsync()
         {
-            RunWorkerAsync(null, 0);
+            RunWorkerAsync(null, 0, false);
         }
         #endregion
 
         #region Work Queue Access
         /// <summary>
         /// Determines if the work queue is empty.
+        /// This method must be called from inside a lock.
         /// </summary>
         /// <returns>true if the work queue is empty; otherwise false.</returns>
         private bool IsWorkQueueEmpty()
         {
+            foreach (AsyncOperation asyncOp in singleItems)
+            {
+                if (asyncOp != null)
+                    return false;
+            }
+
             foreach (LinkedList<AsyncOperation> queue in items)
             {
                 if (queue.Count > 0)
@@ -122,25 +142,36 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Adds the operation to the work queue.
+        /// This method must be called from inside a lock.
         /// </summary>
         /// <param name="argument">The argument of an asynchronous operation.</param>
         /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> indicating the priority of this item.
         /// An item with a higher priority will be processed before items with lower priority.</param>
-        private void AddWork(object argument, int priority)
+        /// <param name="single">true to run this operation without waiting for queued items; otherwise
+        /// false to add this operatino to th queue.</param>
+        private void AddWork(object argument, int priority, bool single)
         {
             // Create an async operation for this work item
             AsyncOperation asyncOp = AsyncOperationManager.CreateOperation(argument);
 
-            if (processingMode == ProcessingMode.FIFO)
+            if (single)
+            {
+                AsyncOperation currentOp = singleItems[priority];
+                if (currentOp != null)
+                    currentOp.OperationCompleted();
+                singleItems[priority] = asyncOp;
+            }
+            else if (processingMode == ProcessingMode.FIFO)
                 items[priority].AddLast(asyncOp);
             else
                 items[priority].AddFirst(asyncOp);
         }
         /// <summary>
         /// Gets a pending operation from the work queue.
+        /// This method must be called from inside a lock.
         /// </summary>
         /// <returns>A 2-tuple whose first component is the the pending operation with 
-        /// the highest priority from the qork queue and the second component is the
+        /// the highest priority from the work queue and the second component is the
         /// priority.</returns>
         private Utility.Tuple<AsyncOperation, int> GetWork()
         {
@@ -149,12 +180,26 @@ namespace Manina.Windows.Forms
 
             for (int i = priorityQueues - 1; i >= 0; i--)
             {
-                if (items[i].Count > 0)
+                request = singleItems[i];
+                if (request != null)
                 {
+                    singleItems[i] = null;
                     priority = i;
-                    request = items[i].First.Value;
-                    items[i].RemoveFirst();
                     break;
+                }
+            }
+
+            if (request == null)
+            {
+                for (int i = priorityQueues - 1; i >= 0; i--)
+                {
+                    if (items[i].Count > 0)
+                    {
+                        priority = i;
+                        request = items[i].First.Value;
+                        items[i].RemoveFirst();
+                        break;
+                    }
                 }
             }
 
@@ -162,15 +207,18 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Rebuilds the work queue.
+        /// This method must be called from inside a lock.
         /// </summary>
         private void BuildWorkQueue()
         {
+            singleItems = new AsyncOperation[priorityQueues];
             items = new LinkedList<AsyncOperation>[priorityQueues];
             for (int i = 0; i < priorityQueues; i++)
                 items[i] = new LinkedList<AsyncOperation>();
         }
         /// <summary>
-        /// Clears the work queue.
+        /// Clears all work queues.
+        /// This method must be called from inside a lock.
         /// </summary>
         private void ClearWorkQueue()
         {
@@ -179,11 +227,19 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Clears the work queue with the given priority.
+        /// This method must be called from inside a lock.
         /// </summary>
         /// <param name="priority">A value between 0 and <see cref="PriorityQueues"/> 
         /// indicating the priority queue to cancel.</param>
         private void ClearWorkQueue(int priority)
         {
+            AsyncOperation singleOp = singleItems[priority];
+            if (singleOp != null)
+            {
+                singleOp.OperationCompleted();
+                singleItems[priority] = null;
+            }
+
             while (items[priority].Count > 0)
             {
                 AsyncOperation asyncOp = items[priority].First.Value;
@@ -435,11 +491,11 @@ namespace Manina.Windows.Forms
                     {
                         Exception error = null;
                         // Start the work
-                        QueuedWorkerDoWorkEventArgs arg = new QueuedWorkerDoWorkEventArgs(request, priority);
+                        QueuedWorkerDoWorkEventArgs doWorkArg = new QueuedWorkerDoWorkEventArgs(request, priority);
                         try
                         {
                             // Raise the do work event
-                            OnDoWork(arg);
+                            OnDoWork(doWorkArg);
                         }
                         catch (Exception e)
                         {
@@ -447,10 +503,10 @@ namespace Manina.Windows.Forms
                         }
 
                         // Raise the work complete event
-                        QueuedWorkerCompletedEventArgs arg2 = new QueuedWorkerCompletedEventArgs(request,
-                            arg.Result, priority, error, arg.Cancel);
+                        QueuedWorkerCompletedEventArgs workCompletedArg = new QueuedWorkerCompletedEventArgs(request,
+                            doWorkArg.Result, priority, error, doWorkArg.Cancel);
                         if (!Stopping)
-                            asyncOp.PostOperationCompleted(workCompletedCallback, arg2);
+                            asyncOp.PostOperationCompleted(workCompletedCallback, workCompletedArg);
                     }
                     else if (asyncOp != null)
                         asyncOp.OperationCompleted();
