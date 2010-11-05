@@ -820,7 +820,7 @@ namespace Manina.Windows.Forms
             mCacheLimitAsItemCount = 0;
             mCacheLimitAsMemory = 20 * 1024 * 1024;
             mColumns = new ImageListViewColumnHeaderCollection(this);
-            resources = new ResourceManager("Manina.Windows.Forms.ImageListViewResources", GetType().Assembly);
+            resources = new ResourceManager("Manina.Windows.Forms.ImageListViewResources", typeof(ImageListView).Assembly);
             mDefaultImage = resources.GetObject("DefaultImage") as Image;
             mErrorImage = resources.GetObject("ErrorImage") as Image;
             mRatingImage = resources.GetObject("RatingImage") as Image;
