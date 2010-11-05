@@ -1247,11 +1247,10 @@ namespace Manina.Windows.Forms
         {
             if (force)
                 base.Refresh();
-            else if (lazy && CanPaint())
+            else if (lazy)
             {
                 rendererNeedsPaint = true;
-                if (!lazyRefreshTimer.Enabled)
-                    lazyRefreshTimer.Enabled = true;
+                lazyRefreshTimer.Start();
             }
             else if (CanPaint())
                 base.Refresh();
@@ -1432,7 +1431,6 @@ namespace Manina.Windows.Forms
         {
             if (rendererNeedsPaint)
             {
-                lazyRefreshTimer.Stop();
                 try
                 {
                     if (IsHandleCreated && !IsDisposed)
@@ -1461,9 +1459,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-            rendererNeedsPaint = false;
             if (!disposed && mRenderer != null)
                 mRenderer.Render(e.Graphics);
+            rendererNeedsPaint = false;
         }
         /// <summary>
         /// Handles the MouseDown event.
@@ -1802,11 +1800,13 @@ namespace Manina.Windows.Forms
         /// <param name="guid">The guid of the item whose thumbnail is cached.</param>
         /// <param name="thumbnail">The cached image.</param>
         /// <param name="size">Requested thumbnail size.</param>
-        internal void OnThumbnailCachedInternal(Guid guid, Image thumbnail, Size size)
+        /// <param name="thumbnailImage">true if the cached image is a thumbnail image; otherwise false
+        /// if the image is a large image for gallery or pane views.</param>
+        internal void OnThumbnailCachedInternal(Guid guid, Image thumbnail, Size size, bool thumbnailImage)
         {
             ImageListViewItem item = null;
             if (mItems.TryGetValue(guid, out item))
-                OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size));
+                OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size, thumbnailImage));
         }
         /// <summary>
         /// Updates item details.

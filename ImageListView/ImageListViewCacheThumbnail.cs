@@ -384,6 +384,10 @@ namespace Manina.Windows.Forms
             CacheRequest request = arg.Request;
             bool canProcess = true;
 
+            // Is it in the edit cache?
+            if (canProcess && editCache.ContainsKey(request.Guid))
+                canProcess = false;
+
             // Is it already cached?
             if (canProcess && (request.RequestType == RequestType.Thumbnail))
             {
@@ -393,16 +397,28 @@ namespace Manina.Windows.Forms
                     existing.UseEmbeddedThumbnails == request.UseEmbeddedThumbnails &&
                     existing.AutoRotate == request.AutoRotate && existing.UseWIC == request.UseWIC)
                     canProcess = false;
+
+                // Is it outside the visible area?
+                if (canProcess && (CacheMode == CacheMode.OnDemand) &&
+                    mImageListView != null && !mImageListView.IsItemVisible(request.Guid))
+                    canProcess = false;
             }
-
-            // Is it in the edit cache?
-            if (canProcess && editCache.ContainsKey(request.Guid))
-                canProcess = false;
-
-            // Is it outside the visible area?
-            if (canProcess && (request.RequestType == RequestType.Thumbnail) && (CacheMode == CacheMode.OnDemand) &&
-                mImageListView != null && !mImageListView.IsItemVisible(request.Guid))
-                canProcess = false;
+            else if (canProcess && (request.RequestType == RequestType.Gallery))
+            {
+                CacheItem existing = galleryItem;
+                if (existing != null && existing.Guid == request.Guid && existing.Size == request.Size &&
+                    existing.UseEmbeddedThumbnails == request.UseEmbeddedThumbnails &&
+                    existing.AutoRotate == request.AutoRotate && existing.UseWIC == request.UseWIC)
+                    canProcess = false;
+            }
+            else if (canProcess && (request.RequestType == RequestType.Renderer))
+            {
+                CacheItem existing = rendererItem;
+                if (existing != null && existing.Guid == request.Guid && existing.Size == request.Size &&
+                    existing.UseEmbeddedThumbnails == request.UseEmbeddedThumbnails &&
+                    existing.AutoRotate == request.AutoRotate && existing.UseWIC == request.UseWIC)
+                    canProcess = false;
+            }
 
             arg.ContinueProcessing = canProcess;
         }
@@ -472,18 +488,17 @@ namespace Manina.Windows.Forms
                 }
             }
 
-            // Refresh the control
-            if (result != null && result.Image != null && mImageListView != null)
+            //Refresh the control
+            if (mImageListView != null)
             {
-                if (request.RequestType != RequestType.Thumbnail)
-                    mImageListView.Refresh(false, true);
-                else if (mImageListView.IsItemVisible(result.Guid))
+                if (request.RequestType != RequestType.Thumbnail || mImageListView.IsItemVisible(request.Guid))
                     mImageListView.Refresh(false, true);
             }
 
             // Raise the ThumbnailCached event
             if (mImageListView != null)
-                mImageListView.OnThumbnailCachedInternal(result.Guid, result.Image, result.Size);
+                mImageListView.OnThumbnailCachedInternal(result.Guid, result.Image,
+                    result.Size, request.RequestType == RequestType.Thumbnail);
 
             // Raise the CacheError event
             if (e.Error != null && mImageListView != null)
@@ -790,7 +805,7 @@ namespace Manina.Windows.Forms
 
             if (mImageListView != null)
             {
-                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize);
+                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize, true);
                 mImageListView.Refresh();
             }
         }
@@ -847,7 +862,7 @@ namespace Manina.Windows.Forms
             // Raise the cache events
             if (mImageListView != null)
             {
-                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize);
+                mImageListView.OnThumbnailCachedInternal(guid, thumb, thumbSize, true);
                 mImageListView.Refresh();
             }
         }
