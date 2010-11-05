@@ -473,6 +473,11 @@ namespace Manina.Windows.Forms
         /// Gets the cached thumbnail image.
         /// </summary>
         public Image Thumbnail { get; private set; }
+        /// <summary>
+        /// Gets whether the cached image is a thumbnail image or
+        /// a large image for gallery or pane views.
+        /// </summary>
+        public bool IsThumbnail { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the ItemEventArgs class.
@@ -480,11 +485,14 @@ namespace Manina.Windows.Forms
         /// <param name="item">The item that is the target of this event.</param>
         /// <param name="thumbnail">The cached thumbnail image.</param>
         /// <param name="size">The size of the thumbnail request.</param>
-        public ThumbnailCachedEventArgs(ImageListViewItem item, Image thumbnail, Size size)
+        /// <param name="thumbnailImage">true if the cached image is a thumbnail image; otherwise false
+        /// if the image is a large image for gallery or pane views.</param>
+        public ThumbnailCachedEventArgs(ImageListViewItem item, Image thumbnail, Size size, bool thumbnailImage)
         {
             Item = item;
             Thumbnail = thumbnail;
             Size = size;
+            IsThumbnail = thumbnailImage;
         }
     }
     /// <summary>
