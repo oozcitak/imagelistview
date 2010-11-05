@@ -125,23 +125,13 @@ namespace Manina.Windows.Forms
                         mImageListView.itemCacheManager.Remove(oldItem.Guid);
                         if (mImageListView.CacheMode == CacheMode.Continuous)
                         {
-                            if (item.isVirtualItem)
-                                mImageListView.thumbnailCache.Add(item.Guid, item.VirtualItemKey,
-                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                                    mImageListView.AutoRotateThumbnails,
-                                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                            else
-                                mImageListView.thumbnailCache.Add(item.Guid, item.FileName,
-                                    mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                                    mImageListView.AutoRotateThumbnails,
-                                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                            mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
+                                mImageListView.AutoRotateThumbnails,
+                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                         }
-                        if (item.isVirtualItem)
-                            mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
-                        else
-                            mImageListView.itemCacheManager.Add(item.Guid, item.FileName,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+                        mImageListView.itemCacheManager.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                         if (item.Selected != oldSelected)
                             mImageListView.OnSelectionChanged(new EventArgs());
                     }
@@ -165,9 +155,10 @@ namespace Manina.Windows.Forms
             /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="item">The <see cref="ImageListViewItem"/> to add to the <see cref="ImageListViewItemCollection"/>.</param>
-            public void Add(ImageListViewItem item)
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Add(ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
             {
-                AddInternal(item);
+                AddInternal(item, adaptor);
 
                 if (mImageListView != null)
                 {
@@ -180,11 +171,29 @@ namespace Manina.Windows.Forms
             /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
             /// </summary>
             /// <param name="item">The <see cref="ImageListViewItem"/> to add to the <see cref="ImageListViewItemCollection"/>.</param>
+            public void Add(ImageListViewItem item)
+            {
+                Add(item, mImageListView.defaultAdaptor);
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to add to the <see cref="ImageListViewItemCollection"/>.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Add(ImageListViewItem item, Image initialThumbnail, ImageListView.ImageListViewItemAdaptor adaptor)
+            {
+                item.clonedThumbnail = initialThumbnail;
+                Add(item, adaptor);
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to add to the <see cref="ImageListViewItemCollection"/>.</param>
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
             public void Add(ImageListViewItem item, Image initialThumbnail)
             {
-                item.clonedThumbnail = initialThumbnail;
-                Add(item);
+                Add(item, initialThumbnail, mImageListView.defaultAdaptor);
             }
             /// <summary>
             /// Adds an item to the <see cref="ImageListViewItemCollection"/>.
@@ -202,6 +211,7 @@ namespace Manina.Windows.Forms
             public void Add(string filename, Image initialThumbnail)
             {
                 ImageListViewItem item = new ImageListViewItem(filename);
+                item.mAdaptor = mImageListView.defaultAdaptor;
                 item.clonedThumbnail = initialThumbnail;
                 Add(item);
             }
@@ -210,9 +220,33 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Add(object key, string text, ImageListView.ImageListViewItemAdaptor adaptor)
+            {
+                Add(key, text, null, adaptor);
+            }
+            /// <summary>
+            /// Adds a virtual item to the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
             public void Add(object key, string text)
             {
-                Add(key, text, null);
+                Add(key, text, mImageListView.defaultAdaptor);
+            }
+            /// <summary>
+            /// Adds a virtual item to the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Add(object key, string text, Image initialThumbnail, ImageListView.ImageListViewItemAdaptor adaptor)
+            {
+                ImageListViewItem item = new ImageListViewItem(key, text);
+                item.mAdaptor = adaptor;
+                item.clonedThumbnail = initialThumbnail;
+                Add(item);
             }
             /// <summary>
             /// Adds a virtual item to the <see cref="ImageListViewItemCollection"/>.
@@ -222,9 +256,27 @@ namespace Manina.Windows.Forms
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
             public void Add(object key, string text, Image initialThumbnail)
             {
-                ImageListViewItem item = new ImageListViewItem(key, text);
-                item.clonedThumbnail = initialThumbnail;
-                Add(item);
+                Add(key, text, initialThumbnail, mImageListView.defaultAdaptor);
+            }
+            /// <summary>
+            /// Adds a range of items to the <see cref="ImageListViewItemCollection"/>.
+            /// </summary>
+            /// <param name="items">An array of <see cref="ImageListViewItem"/> 
+            /// to add to the <see cref="ImageListViewItemCollection"/>.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void AddRange(ImageListViewItem[] items, ImageListView.ImageListViewItemAdaptor adaptor)
+            {
+                if (mImageListView != null)
+                    mImageListView.SuspendPaint();
+
+                foreach (ImageListViewItem item in items)
+                    Add(item, adaptor);
+
+                if (mImageListView != null)
+                {
+                    mImageListView.Refresh();
+                    mImageListView.ResumePaint();
+                }
             }
             /// <summary>
             /// Adds a range of items to the <see cref="ImageListViewItemCollection"/>.
@@ -233,17 +285,7 @@ namespace Manina.Windows.Forms
             /// to add to the <see cref="ImageListViewItemCollection"/>.</param>
             public void AddRange(ImageListViewItem[] items)
             {
-                if (mImageListView != null)
-                    mImageListView.SuspendPaint();
-
-                foreach (ImageListViewItem item in items)
-                    Add(item);
-
-                if (mImageListView != null)
-                {
-                    mImageListView.Refresh();
-                    mImageListView.ResumePaint();
-                }
+                AddRange(items, mImageListView.defaultAdaptor);
             }
             /// <summary>
             /// Adds a range of items to the <see cref="ImageListViewItemCollection"/>.
@@ -316,9 +358,10 @@ namespace Manina.Windows.Forms
             /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
             /// <param name="item">The <see cref="ImageListViewItem"/> to 
             /// insert into the <see cref="ImageListViewItemCollection"/>.</param>
-            public void Insert(int index, ImageListViewItem item)
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Insert(int index, ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
             {
-                InsertInternal(index, item);
+                InsertInternal(index, item, adaptor);
 
                 if (mImageListView != null)
                 {
@@ -326,6 +369,16 @@ namespace Manina.Windows.Forms
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.Refresh();
                 }
+            }
+            /// <summary>
+            /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="item">The <see cref="ImageListViewItem"/> to 
+            /// insert into the <see cref="ImageListViewItemCollection"/>.</param>
+            public void Insert(int index, ImageListViewItem item)
+            {
+                Insert(index, item, mImageListView.defaultAdaptor);
             }
             /// <summary>
             /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
@@ -354,9 +407,35 @@ namespace Manina.Windows.Forms
             /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Insert(int index, object key, string text, ImageListView.ImageListViewItemAdaptor adaptor)
+            {
+                Insert(index, key, text, null, adaptor);
+            }
+            /// <summary>
+            /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
             public void Insert(int index, object key, string text)
             {
-                Insert(index, key, text, null);
+                Insert(index, key, text, mImageListView.defaultAdaptor);
+            }
+            /// <summary>
+            /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
+            /// </summary>
+            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="key">The key identifying the item.</param>
+            /// <param name="text">Text of the item.</param>
+            /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            public void Insert(int index, object key, string text, Image initialThumbnail, ImageListView.ImageListViewItemAdaptor adaptor)
+            {
+                ImageListViewItem item = new ImageListViewItem(key, text);
+                item.mAdaptor = adaptor;
+                item.clonedThumbnail = initialThumbnail;
+                Insert(index, item);
             }
             /// <summary>
             /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
@@ -367,11 +446,8 @@ namespace Manina.Windows.Forms
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
             public void Insert(int index, object key, string text, Image initialThumbnail)
             {
-                ImageListViewItem item = new ImageListViewItem(key, text);
-                item.clonedThumbnail = initialThumbnail;
-                Insert(index, item);
+                Insert(index, key, text, initialThumbnail, mImageListView.defaultAdaptor);
             }
-
             /// <summary>
             /// Removes the first occurrence of a specific object 
             /// from the <see cref="ImageListViewItemCollection"/>.
@@ -464,24 +540,28 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Adds the given item without raising a selection changed event.
             /// </summary>
-            internal void AddInternal(ImageListViewItem item)
+            /// <param name="item">The <see cref="ImageListViewItem"/> to add.</param>
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            internal void AddInternal(ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
             {
-                InsertInternal(-1, item);
+                InsertInternal(-1, item, adaptor);
             }
             /// <summary>
             /// Inserts the given item without raising a selection changed event.
             /// </summary>
             /// <param name="index">Insertion index. If index is -1 the item is added to the end of the list.</param>
             /// <param name="item">The <see cref="ImageListViewItem"/> to add.</param>
-            internal void InsertInternal(int index, ImageListViewItem item)
+            /// <param name="adaptor">The adaptor associated with this item.</param>
+            internal void InsertInternal(int index, ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
             {
                 // Check if the file already exists
-                if (mImageListView != null && !item.isVirtualItem && !mImageListView.AllowDuplicateFileNames)
+                if (mImageListView != null && !string.IsNullOrEmpty(item.FileName) && !mImageListView.AllowDuplicateFileNames)
                 {
                     if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
                         return;
                 }
                 item.owner = this;
+                item.mAdaptor = adaptor;
                 if (index == -1)
                 {
                     item.mIndex = mItems.Count;
@@ -503,47 +583,33 @@ namespace Manina.Windows.Forms
                     // Create sub item texts for custom columns
                     foreach (ImageListViewColumnHeader header in mImageListView.Columns)
                         if (header.Type == ColumnType.Custom)
-                            item.AddSubItemText(header.columnID);
+                            item.AddSubItemText(header.Guid);
 
                     // Add current thumbnail to cache
                     if (item.clonedThumbnail != null)
                     {
-                        if (item.isVirtualItem)
-                            mImageListView.thumbnailCache.Add(item.Guid, item.VirtualItemKey, mImageListView.ThumbnailSize,
-                                item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                        else
-                            mImageListView.thumbnailCache.Add(item.Guid, item.FileName, mImageListView.ThumbnailSize,
-                                item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                        mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey, mImageListView.ThumbnailSize,
+                            item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                         item.clonedThumbnail = null;
                     }
 
                     // Add to thumbnail cache
                     if (mImageListView.CacheMode == CacheMode.Continuous)
                     {
-                        if (item.isVirtualItem)
-                            mImageListView.thumbnailCache.Add(item.Guid, item.VirtualItemKey,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                        else
-                            mImageListView.thumbnailCache.Add(item.Guid, item.FileName,
-                                mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                        mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                            mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                     }
 
                     // Add to details cache
-                    if (item.isVirtualItem)
-                        mImageListView.itemCacheManager.Add(item.Guid, item.VirtualItemKey,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
-                    else
-                        mImageListView.itemCacheManager.Add(item.Guid, item.FileName,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+                    mImageListView.itemCacheManager.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
 
                     // Add to shell info cache
-                    if (!item.isVirtualItem)
+                    string extension = item.extension;
+                    if (!string.IsNullOrEmpty(extension))
                     {
-                        string extension = item.extension;
                         CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
                         if (state == CacheState.Error && mImageListView.RetryOnError == true)
                         {
@@ -720,7 +786,7 @@ namespace Manina.Windows.Forms
                             result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
                             break;
                         case ColumnType.Custom:
-                            result = string.Compare(x.GetSubItemText(mSortColumn.columnID), y.GetSubItemText(mSortColumn.columnID), StringComparison.InvariantCultureIgnoreCase);
+                            result = string.Compare(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), StringComparison.InvariantCultureIgnoreCase);
                             break;
                         default:
                             result = 0;

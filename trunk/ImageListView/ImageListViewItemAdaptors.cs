@@ -4,6 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using System.Net;
+using System.Data;
 
 namespace Manina.Windows.Forms
 {
@@ -63,38 +64,38 @@ namespace Manina.Windows.Forms
             /// <param name="key">Item key.</param>
             /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>An array of tuples containing item details or null if an error occurs.</returns>
-            public override Utility.TupleBase[] GetDetails(object key, bool useWIC)
+            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC)
             {
                 if (disposed)
                     return null;
 
                 string filename = (string)key;
-                List<Utility.TupleBase> details = new List<Utility.TupleBase>();
+                List<Utility.Tuple<ColumnType, string, object>> details = new List<Utility.Tuple<ColumnType, string, object>>();
 
                 // Get file info
                 FileInfo info = new FileInfo(filename);
-                details.Add(Utility.Tuple.Create(ColumnType.DateCreated, info.CreationTime));
-                details.Add(Utility.Tuple.Create(ColumnType.DateAccessed, info.LastAccessTime));
-                details.Add(Utility.Tuple.Create(ColumnType.DateModified, info.LastWriteTime));
-                details.Add(Utility.Tuple.Create(ColumnType.FileSize, info.Length));
-                details.Add(Utility.Tuple.Create(ColumnType.FilePath, info.DirectoryName));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateCreated, string.Empty, info.CreationTime));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateAccessed, string.Empty, info.LastAccessTime));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateModified, string.Empty, info.LastWriteTime));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FileSize, string.Empty, info.Length));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FilePath, string.Empty, info.DirectoryName));
 
                 // Get metadata
                 MetadataExtractor metadata = MetadataExtractor.FromFile(filename, useWIC);
-                details.Add(Utility.Tuple.Create(ColumnType.Dimensions, new Size(metadata.Width, metadata.Height)));
-                details.Add(Utility.Tuple.Create(ColumnType.Resolution, new SizeF((float)metadata.DPIX, (float)metadata.DPIY)));
-                details.Add(Utility.Tuple.Create(ColumnType.ImageDescription, metadata.ImageDescription ?? ""));
-                details.Add(Utility.Tuple.Create(ColumnType.EquipmentModel, metadata.EquipmentModel ?? ""));
-                details.Add(Utility.Tuple.Create(ColumnType.DateTaken, metadata.DateTaken));
-                details.Add(Utility.Tuple.Create(ColumnType.Artist, metadata.Artist ?? ""));
-                details.Add(Utility.Tuple.Create(ColumnType.Copyright, metadata.Copyright ?? ""));
-                details.Add(Utility.Tuple.Create(ColumnType.ExposureTime, (float)metadata.ExposureTime));
-                details.Add(Utility.Tuple.Create(ColumnType.FNumber, (float)metadata.FNumber));
-                details.Add(Utility.Tuple.Create(ColumnType.ISOSpeed, (ushort)metadata.ISOSpeed));
-                details.Add(Utility.Tuple.Create(ColumnType.UserComment, metadata.Comment ?? ""));
-                details.Add(Utility.Tuple.Create(ColumnType.Rating, (ushort)metadata.Rating));
-                details.Add(Utility.Tuple.Create(ColumnType.Software, metadata.Software ?? ""));
-                details.Add(Utility.Tuple.Create(ColumnType.FocalLength, (float)metadata.FocalLength));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Dimensions, string.Empty, new Size(metadata.Width, metadata.Height)));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Resolution, string.Empty, new SizeF((float)metadata.DPIX, (float)metadata.DPIY)));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.ImageDescription, string.Empty, metadata.ImageDescription ?? ""));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.EquipmentModel, string.Empty, metadata.EquipmentModel ?? ""));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.DateTaken, string.Empty, metadata.DateTaken));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Artist, string.Empty, metadata.Artist ?? ""));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Copyright, string.Empty, metadata.Copyright ?? ""));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.ExposureTime, string.Empty, (float)metadata.ExposureTime));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FNumber, string.Empty, (float)metadata.FNumber));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.ISOSpeed, string.Empty, (ushort)metadata.ISOSpeed));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.UserComment, string.Empty, metadata.Comment ?? ""));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Rating, string.Empty, (ushort)metadata.Rating));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Software, string.Empty, metadata.Software ?? ""));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FocalLength, string.Empty, (float)metadata.FocalLength));
 
                 return details.ToArray();
             }
@@ -175,7 +176,7 @@ namespace Manina.Windows.Forms
 
                 string uri = (string)key;
                 string filename = Path.GetTempFileName();
-                Client.DownloadFile(uri,filename);
+                Client.DownloadFile(uri, filename);
                 return filename;
             }
             /// <summary>
@@ -184,15 +185,15 @@ namespace Manina.Windows.Forms
             /// <param name="key">Item key.</param>
             /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>An array of 2-tuples containing item details or null if an error occurs.</returns>
-            public override Utility.TupleBase[] GetDetails(object key, bool useWIC)
+            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC)
             {
                 if (disposed)
                     return null;
 
                 string uri = (string)key;
-                List<Utility.TupleBase> details = new List<Utility.TupleBase>();
+                List<Utility.Tuple<ColumnType, string, object>> details = new List<Utility.Tuple<ColumnType, string, object>>();
 
-                details.Add(Utility.Tuple.Create(ColumnType.Custom, "URL", uri));
+                details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Custom, "URL", uri));
 
                 return details.ToArray();
             }
@@ -203,12 +204,11 @@ namespace Manina.Windows.Forms
             public override void Dispose()
             {
                 disposed = true;
-                if(client!=null)
+                if (client != null)
                     client.Dispose();
                 client = null;
             }
         }
         #endregion
-
     }
 }

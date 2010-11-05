@@ -64,9 +64,9 @@ namespace Manina.Windows.Forms
         private ushort mStarRating;
         private string mSoftware;
         private float mFocalLength;
-        // Used for virtual items
-        internal bool isVirtualItem;
+        // Adaptor
         internal object mVirtualItemKey;
+        internal ImageListView.ImageListViewItemAdaptor mAdaptor;
         // Used for custom columns
         private Dictionary<Guid, string> subItems;
         // Used for cloned items
@@ -112,6 +112,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(false), Description("Gets the unique identifier for this item.")]
         internal Guid Guid { get { return mGuid; } private set { mGuid = value; } }
+        /// <summary>
+        /// Gets the adaptor of this item.
+        /// </summary>
+        [Category("Behavior"), Browsable(false), Description("Gets the adaptor of this item.")]
+        public ImageListView.ImageListViewItemAdaptor Adaptor { get { return mAdaptor; } }
         /// <summary>
         /// Gets the virtual item key associated with this item.
         /// Returns null if the item is not a virtual item.
@@ -219,18 +224,15 @@ namespace Manina.Windows.Forms
                         mText = Path.GetFileName(mFileName);
                     extension = Path.GetExtension(mFileName);
 
-                    if (!isVirtualItem)
+                    isDirty = true;
+                    if (mImageListView != null)
                     {
-                        isDirty = true;
-                        if (mImageListView != null)
-                        {
-                            mImageListView.thumbnailCache.Remove(mGuid, true);
-                            mImageListView.itemCacheManager.Remove(mGuid);
-                            mImageListView.itemCacheManager.Add(mGuid, mFileName,
-                                (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
-                            if (mImageListView.IsItemVisible(mGuid))
-                                mImageListView.Refresh();
-                        }
+                        mImageListView.thumbnailCache.Remove(mGuid, true);
+                        mImageListView.itemCacheManager.Remove(mGuid);
+                        mImageListView.itemCacheManager.Add(mGuid, Adaptor, mFileName,
+                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+                        if (mImageListView.IsItemVisible(mGuid))
+                            mImageListView.Refresh();
                     }
                 }
             }
@@ -250,14 +252,9 @@ namespace Manina.Windows.Forms
 
                 if (ThumbnailCacheState != CacheState.Cached)
                 {
-                    if (isVirtualItem)
-                        mImageListView.thumbnailCache.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
-                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                    else
-                        mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
-                            mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                    mImageListView.thumbnailCache.Add(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize,
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
                 return mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
@@ -468,14 +465,13 @@ namespace Manina.Windows.Forms
             editing = false;
 
             mVirtualItemKey = null;
-            isVirtualItem = false;
 
             Tag = null;
 
             subItems = new Dictionary<Guid, string>();
         }
         /// <summary>
-        /// Initializes a new instance of the ImageListViewItem class.
+        /// Initializes a new instance of the <see cref="ImageListViewItem"/> class.
         /// </summary>
         /// <param name="filename">The image filename representing the item.</param>
         /// <param name="text">Item text</param>
@@ -487,9 +483,10 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(text))
                 text = Path.GetFileName(filename);
             mText = text;
+            mVirtualItemKey = mFileName;
         }
         /// <summary>
-        /// Initializes a new instance of the ImageListViewItem class.
+        /// Initializes a new instance of the <see cref="ImageListViewItem"/> class.
         /// </summary>
         /// <param name="filename">The image filename representing the item.</param>
         public ImageListViewItem(string filename)
@@ -498,18 +495,18 @@ namespace Manina.Windows.Forms
             ;
         }
         /// <summary>
-        /// Initializes a new instance of a virtual ImageListViewItem class.
+        /// Initializes a new instance of a virtual <see cref="ImageListViewItem"/> class.
         /// </summary>
         /// <param name="key">The key identifying this item.</param>
         /// <param name="text">Text of this item.</param>
         public ImageListViewItem(object key, string text)
+            : this()
         {
-            isVirtualItem = true;
             mVirtualItemKey = key;
             mText = text;
         }
         /// <summary>
-        /// Initializes a new instance of a virtual ImageListViewItem class.
+        /// Initializes a new instance of a virtual <see cref="ImageListViewItem"/> class.
         /// </summary>
         /// <param name="key">The key identifying this item.</param>
         public ImageListViewItem(object key)
@@ -573,12 +570,8 @@ namespace Manina.Windows.Forms
             {
                 mImageListView.thumbnailCache.Remove(mGuid, true);
                 mImageListView.itemCacheManager.Remove(mGuid);
-                if (isVirtualItem)
-                    mImageListView.itemCacheManager.Add(mGuid, mVirtualItemKey,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
-                else
-                    mImageListView.itemCacheManager.Add(mGuid, mFileName,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+                mImageListView.itemCacheManager.Add(mGuid, mAdaptor, mVirtualItemKey,
+                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                 mImageListView.Refresh();
             }
         }
@@ -859,14 +852,9 @@ namespace Manina.Windows.Forms
                 if (state == CacheState.Cached)
                     return img;
 
-                if (isVirtualItem)
-                    mImageListView.thumbnailCache.Add(Guid, mVirtualItemKey, mImageListView.ThumbnailSize,
-                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                else
-                    mImageListView.thumbnailCache.Add(Guid, FileName, mImageListView.ThumbnailSize,
-                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                mImageListView.thumbnailCache.Add(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize,
+                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
 
                 if (img == null && string.IsNullOrEmpty(extension))
                     return mImageListView.DefaultImage;
@@ -935,92 +923,103 @@ namespace Manina.Windows.Forms
 
             if (mImageListView != null)
             {
-                if (isVirtualItem)
-                {
-                    VirtualItemDetailsEventArgs e = new VirtualItemDetailsEventArgs(mVirtualItemKey);
-                    mImageListView.RetrieveVirtualItemDetailsInternal(e);
-                    UpdateDetailsInternal(e);
-
-                    isDirty = false;
-                }
-                else
-                {
-                    ImageListViewCacheMetadata.ImageMetadata info = ImageListViewCacheMetadata.ImageMetadata.FromFile(mFileName,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
-                    UpdateDetailsInternal(info);
-
-                    if (info.Error == null)
-                        isDirty = false;
-                    else
-                        isDirty = true;
-                }
+                UpdateDetailsInternal(Adaptor.GetDetails(mVirtualItemKey,
+                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly)));
             }
         }
         /// <summary>
         /// Invoked by the worker thread to update item details.
         /// </summary>
-        internal void UpdateDetailsInternal(ImageListViewCacheMetadata.ImageMetadata info)
+        /// <param name="info">Item details.</param>
+        internal void UpdateDetailsInternal(Utility.Tuple<ColumnType, string, object>[] info)
         {
             if (!isDirty) return;
 
             // File info
-            mDateAccessed = info.LastAccessTime;
-            mDateCreated = info.CreationTime;
-            mDateModified = info.LastWriteTime;
-            mFileSize = info.Size;
-            mFilePath = info.DirectoryName;
-            // Image info
-            mDimensions = info.Dimensions;
-            mResolution = info.Resolution;
-            // Exif tags
-            mImageDescription = info.ImageDescription;
-            mEquipmentModel = info.EquipmentModel;
-            mDateTaken = info.DateTaken;
-            mArtist = info.Artist;
-            mCopyright = info.Copyright;
-            mExposureTime = info.ExposureTime;
-            mFNumber = info.FNumber;
-            mISOSpeed = info.ISOSpeed;
-            mUserComment = info.UserComment;
-            mRating = info.Rating;
-            mSoftware = info.Software;
-            mFocalLength = info.FocalLength;
-
-            UpdateRating();
-
-            isDirty = false;
-        }
-        /// <summary>
-        /// Invoked by the worker thread to update item details.
-        /// </summary>
-        internal void UpdateDetailsInternal(VirtualItemDetailsEventArgs info)
-        {
-            if (!isDirty) return;
-
-            // File info
-            mDateAccessed = info.DateAccessed;
-            mDateCreated = info.DateCreated;
-            mDateModified = info.DateModified;
-            mFileName = info.FileName;
-            mFileSize = info.FileSize;
-            mFileType = info.FileType;
-            mFilePath = info.FilePath;
-            // Image info
-            mDimensions = info.Dimensions;
-            mResolution = info.Resolution;
-            // Exif tags
-            mImageDescription = info.ImageDescription;
-            mEquipmentModel = info.EquipmentModel;
-            mDateTaken = info.DateTaken;
-            mArtist = info.Artist;
-            mCopyright = info.Copyright;
-            mExposureTime = info.ExposureTime;
-            mFNumber = info.FNumber;
-            mISOSpeed = info.ISOSpeed;
-            mUserComment = info.UserComment;
-            mRating = info.Rating;
-            mSoftware = info.Software;
-            mFocalLength = info.FocalLength;
+            foreach (Utility.Tuple<ColumnType, string, object> item in info)
+            {
+                switch (item.Item1)
+                {
+                    case ColumnType.DateAccessed:
+                        mDateAccessed = (DateTime)item.Item3;
+                        break;
+                    case ColumnType.DateCreated:
+                        mDateCreated = (DateTime)item.Item3;
+                        break;
+                    case ColumnType.DateModified:
+                        mDateModified = (DateTime)item.Item3;
+                        break;
+                    case ColumnType.FileSize:
+                        mFileSize = (long)item.Item3;
+                        break;
+                    case ColumnType.FilePath:
+                        mFilePath = (string)item.Item3;
+                        break;
+                    case ColumnType.Dimensions:
+                        mDimensions = (Size)item.Item3;
+                        break;
+                    case ColumnType.Resolution:
+                        mResolution = (SizeF)item.Item3;
+                        break;
+                    case ColumnType.ImageDescription:
+                        mImageDescription = (string)item.Item3;
+                        break;
+                    case ColumnType.EquipmentModel:
+                        mEquipmentModel = (string)item.Item3;
+                        break;
+                    case ColumnType.DateTaken:
+                        mDateTaken = (DateTime)item.Item3;
+                        break;
+                    case ColumnType.Artist:
+                        mArtist = (string)item.Item3;
+                        break;
+                    case ColumnType.Copyright:
+                        mCopyright = (string)item.Item3;
+                        break;
+                    case ColumnType.ExposureTime:
+                        mExposureTime = (float)item.Item3;
+                        break;
+                    case ColumnType.FNumber:
+                        mFNumber = (float)item.Item3;
+                        break;
+                    case ColumnType.ISOSpeed:
+                        mISOSpeed = (ushort)item.Item3;
+                        break;
+                    case ColumnType.UserComment:
+                        mUserComment = (string)item.Item3;
+                        break;
+                    case ColumnType.Rating:
+                        mRating = (ushort)item.Item3;
+                        break;
+                    case ColumnType.Software:
+                        mSoftware = (string)item.Item3;
+                        break;
+                    case ColumnType.FocalLength:
+                        mFocalLength = (float)item.Item3;
+                        break;
+                    case ColumnType.Custom:
+                        string label = item.Item2;
+                        string value = (string)item.Item3;
+                        Guid columnID = Guid.Empty;
+                        foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
+                        {
+                            if (label == column.Text)
+                                columnID = column.Guid;
+                        }
+                        if (columnID == Guid.Empty)
+                        {
+                            ImageListView.ImageListViewColumnHeader column = new ImageListView.ImageListViewColumnHeader(ColumnType.Custom, label);
+                            columnID = column.Guid;
+                        }
+                        if (subItems.ContainsKey(columnID))
+                            subItems[columnID] = value;
+                        else
+                            subItems.Add(columnID, value);
+                        break;
+                    default:
+                        throw new Exception("Unknown column type.");
+                }
+            }
 
             UpdateRating();
 
@@ -1068,7 +1067,7 @@ namespace Manina.Windows.Forms
             item.mFocalLength = mFocalLength;
 
             // Virtual item properties
-            item.isVirtualItem = isVirtualItem;
+            item.mAdaptor = mAdaptor;
             item.mVirtualItemKey = mVirtualItemKey;
 
             // Sub items

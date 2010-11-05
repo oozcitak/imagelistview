@@ -118,6 +118,7 @@ namespace Manina.Windows.Forms
         internal ImageListViewCacheThumbnail thumbnailCache;
         internal ImageListViewCacheShellInfo shellInfoCache;
         internal ImageListViewCacheMetadata itemCacheManager;
+        internal ImageListViewItemAdaptors.FileSystemAdaptor defaultAdaptor;
 
         // Resource manager
         private ResourceManager resources;
@@ -872,6 +873,9 @@ namespace Manina.Windows.Forms
             // Helpers
             layoutManager = new ImageListViewLayoutManager(this);
             navigationManager = new ImageListViewNavigationManager(this);
+
+            // Cache nabagers
+            defaultAdaptor = new ImageListViewItemAdaptors.FileSystemAdaptor();
             thumbnailCache = new ImageListViewCacheThumbnail(this);
             shellInfoCache = new ImageListViewCacheShellInfo(this);
             itemCacheManager = new ImageListViewCacheMetadata(this);
@@ -978,14 +982,9 @@ namespace Manina.Windows.Forms
                 {
                     foreach (ImageListViewItem item in mItems)
                     {
-                        if (item.isVirtualItem)
-                            thumbnailCache.Add(item.Guid, item.VirtualItemKey,
-                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails,
-                                (mUseWIC == UseWIC.Auto || mUseWIC == UseWIC.ThumbnailsOnly));
-                        else
-                            thumbnailCache.Add(item.Guid, item.FileName,
-                                mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails,
-                                (mUseWIC == UseWIC.Auto || mUseWIC == UseWIC.ThumbnailsOnly));
+                        thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                            mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails,
+                            (mUseWIC == UseWIC.Auto || mUseWIC == UseWIC.ThumbnailsOnly));
                     }
                 }
                 Refresh();
@@ -1628,6 +1627,7 @@ namespace Manina.Windows.Forms
                         lazyRefreshTimer.Dispose();
 
                     // internal classes
+                    defaultAdaptor.Dispose();
                     thumbnailCache.Dispose();
                     shellInfoCache.Dispose();
                     itemCacheManager.Dispose();
@@ -1675,7 +1675,7 @@ namespace Manina.Windows.Forms
             {
                 ImageListViewItem item = new ImageListViewItem(filename);
                 item.mSelected = true;
-                mItems.InsertInternal(index, item);
+                mItems.InsertInternal(index, item, defaultAdaptor);
                 if (firstItemIndex == 0) firstItemIndex = item.Index;
                 index++;
             }
@@ -1812,21 +1812,13 @@ namespace Manina.Windows.Forms
         /// Updates item details.
         /// This method is invoked from the item cache thread.
         /// </summary>
-        internal void UpdateItemDetailsInternal(Guid guid, ImageListViewCacheMetadata.ImageMetadata info)
+        /// <param name="guid">Item guid.</param>
+        /// <param name="details">Array of item details.</param>
+        internal void UpdateItemDetailsInternal(Guid guid, Utility.Tuple<ColumnType, string, object>[] details)
         {
             ImageListViewItem item = null;
             if (mItems.TryGetValue(guid, out item))
-                item.UpdateDetailsInternal(info);
-        }
-        /// <summary>
-        /// Updates item details.
-        /// This method is invoked from the item cache thread.
-        /// </summary>
-        internal void UpdateItemDetailsInternal(Guid guid, VirtualItemDetailsEventArgs info)
-        {
-            ImageListViewItem item = null;
-            if (mItems.TryGetValue(guid, out item))
-                item.UpdateDetailsInternal(info);
+                item.UpdateDetailsInternal(details);
         }
         /// <summary>
         /// Raises the ThumbnailCaching event.
@@ -1848,60 +1840,6 @@ namespace Manina.Windows.Forms
         {
             if (ThumbnailCaching != null)
                 ThumbnailCaching(this, e);
-        }
-        /// <summary>
-        /// Raises the RetrieveVirtualItem event.
-        /// </summary>
-        /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
-        protected virtual void OnRetrieveVirtualItemThumbnail(VirtualItemThumbnailEventArgs e)
-        {
-            if (RetrieveVirtualItemThumbnail != null)
-                RetrieveVirtualItemThumbnail(this, e);
-        }
-        /// <summary>
-        /// Raises the RetrieveVirtualItemImage event.
-        /// </summary>
-        /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
-        protected virtual void OnRetrieveVirtualItemImage(VirtualItemImageEventArgs e)
-        {
-            if (RetrieveVirtualItemImage != null)
-                RetrieveVirtualItemImage(this, e);
-        }
-        /// <summary>
-        /// Raises the RetrieveVirtualItemDetails event.
-        /// </summary>
-        /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
-        protected virtual void OnRetrieveVirtualItemDetails(VirtualItemDetailsEventArgs e)
-        {
-            if (RetrieveVirtualItemDetails != null)
-                RetrieveVirtualItemDetails(this, e);
-        }
-        /// <summary>
-        /// Raises the RetrieveVirtualItem event.
-        /// This method is invoked from the thumbnail thread.
-        /// </summary>
-        /// <param name="e">A VirtualItemThumbnailEventArgs that contains event data.</param>
-        internal virtual void RetrieveVirtualItemThumbnailInternal(VirtualItemThumbnailEventArgs e)
-        {
-            OnRetrieveVirtualItemThumbnail(e);
-        }
-        /// <summary>
-        /// Raises the RetrieveVirtualItemImage event.
-        /// </summary>
-        /// <param name="e">A VirtualItemImageEventArgs that contains event data.</param>
-        internal virtual void RetrieveVirtualItemImageInternal(VirtualItemImageEventArgs e)
-        {
-            OnRetrieveVirtualItemImage(e);
-        }
-        /// <summary>
-        /// Raises the RetrieveVirtualItemDetails event.
-        /// This method is called from the thumbnail thread; and runs on the thumbnail
-        /// thread.
-        /// </summary>
-        /// <param name="e">A VirtualItemDetailsEventArgs that contains event data.</param>
-        internal virtual void RetrieveVirtualItemDetailsInternal(VirtualItemDetailsEventArgs e)
-        {
-            OnRetrieveVirtualItemDetails(e);
         }
         #endregion
 
@@ -1966,26 +1904,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs before an item thumbnail is cached.")]
         public event ThumbnailCachingEventHandler ThumbnailCaching;
-        /// <summary>
-        /// Occurs when thumbnail image for a virtual item is requested.
-        /// The lifetime of the image will be controlled by the control.
-        /// This event will be run in the worker thread context.
-        /// </summary>
-        [Category("Behavior"), Browsable(true), Description("Occurs when thumbnail image for a virtual item is requested.")]
-        public event RetrieveVirtualItemThumbnailEventHandler RetrieveVirtualItemThumbnail;
-        /// <summary>
-        /// Occurs when source image for a virtual item is requested.
-        /// The lifetime of the image will be controlled by the control.
-        /// This event will be run in the worker thread context.
-        /// </summary>
-        [Category("Behavior"), Browsable(true), Description("Occurs when source image for a virtual item is requested.")]
-        public event RetrieveVirtualItemImageEventHandler RetrieveVirtualItemImage;
-        /// <summary>
-        /// Occurs when details of a virtual item are requested.
-        /// This event will be run in the worker thread context.
-        /// </summary>
-        [Category("Behavior"), Browsable(true), Description("Occurs when details of a virtual item are requested.")]
-        public event RetrieveVirtualItemDetailsEventHandler RetrieveVirtualItemDetails;
         #endregion
     }
 }

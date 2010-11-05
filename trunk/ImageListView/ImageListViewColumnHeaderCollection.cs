@@ -68,7 +68,7 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView == null)
                             throw new InvalidOperationException("Owner control is null.");
-                        mImageListView.Items.RemoveCustomColumn(oldItem.columnID);
+                        mImageListView.Items.RemoveCustomColumn(oldItem.Guid);
                     }
 
                     ImageListViewColumnHeader newItem = value;
@@ -78,7 +78,7 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView == null)
                             throw new InvalidOperationException("Owner control is null.");
-                        mImageListView.Items.AddCustomColumn(newItem.columnID);
+                        mImageListView.Items.AddCustomColumn(newItem.Guid);
                     }
 
                     updateDisplayList = true;
@@ -141,7 +141,7 @@ namespace Manina.Windows.Forms
                 mItems.Add(item);
 
                 if (item.Type == ColumnType.Custom)
-                    mImageListView.Items.AddCustomColumn(item.columnID);
+                    mImageListView.Items.AddCustomColumn(item.Guid);
 
                 updateDisplayList = true;
             }
@@ -263,7 +263,7 @@ namespace Manina.Windows.Forms
 
                 mItems.Insert(index, item);
                 if (item.Type == ColumnType.Custom)
-                    mImageListView.Items.AddCustomColumn(item.columnID);
+                    mImageListView.Items.AddCustomColumn(item.Guid);
 
                 updateDisplayList = true;
             }
@@ -281,7 +281,7 @@ namespace Manina.Windows.Forms
                 {
                     if (mImageListView == null)
                         throw new InvalidOperationException("Owner control is null.");
-                    mImageListView.Items.RemoveCustomColumn(item.columnID);
+                    mImageListView.Items.RemoveCustomColumn(item.Guid);
                 }
                 updateDisplayList = true;
                 return exists;
@@ -298,7 +298,7 @@ namespace Manina.Windows.Forms
                 {
                     if (mImageListView == null)
                         throw new InvalidOperationException("Owner control is null.");
-                    mImageListView.Items.RemoveCustomColumn(item.columnID);
+                    mImageListView.Items.RemoveCustomColumn(item.Guid);
                 }
                 updateDisplayList = true;
             }
