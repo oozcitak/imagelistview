@@ -54,9 +54,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public Guid Guid { get; private set; }
             /// <summary>
-            /// Gets the file name.
+            /// Gets the adaptor of this item.
             /// </summary>
-            public string FileName { get; private set; }
+            public ImageListView.ImageListViewItemAdaptor Adaptor { get; private set; }
             /// <summary>
             /// Gets the virtual item key.
             /// </summary>
@@ -65,36 +65,18 @@ namespace Manina.Windows.Forms
             /// Whether to use the Windows Imaging Component.
             /// </summary>
             public bool UseWIC { get; private set; }
-            /// <summary>
-            /// Gets whether this item is a virtual item.
-            /// </summary>
-            public bool IsVirtualItem { get; private set; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheRequest"/> class.
             /// </summary>
             /// <param name="guid">The guid of the item.</param>
-            /// <param name="filename">The file name.</param>
+            /// <param name="adaptor">The adaptor of this item.</param>
+            /// <param name="virtualItemKey">The virtual item key of this item.</param>
             /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
-            public CacheRequest(Guid guid, string filename, bool useWIC)
+            public CacheRequest(Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object virtualItemKey, bool useWIC)
             {
                 Guid = guid;
-                FileName = filename;
-                IsVirtualItem = false;
-                VirtualItemKey = null;
-                UseWIC = useWIC;
-            }
-            /// <summary>
-            /// Initializes a new instance of the <see cref="CacheRequest"/> class.
-            /// </summary>
-            /// <param name="guid">The guid of the item.</param>
-            /// <param name="virtualItemKey">The virtual item key.</param>
-            /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
-            public CacheRequest(Guid guid, object virtualItemKey, bool useWIC)
-            {
-                Guid = guid;
-                FileName = null;
-                IsVirtualItem = true;
+                Adaptor = adaptor;
                 VirtualItemKey = virtualItemKey;
                 UseWIC = useWIC;
             }
@@ -222,16 +204,8 @@ namespace Manina.Windows.Forms
                 return;
 
             // Get result
-            if (request.IsVirtualItem)
-            {
-                VirtualItemDetailsEventArgs info = e.Result as VirtualItemDetailsEventArgs;
-                mImageListView.UpdateItemDetailsInternal(request.Guid, info);
-            }
-            else
-            {
-                ImageMetadata info = e.Result as ImageMetadata;
-                mImageListView.UpdateItemDetailsInternal(request.Guid, info);
-            }
+            Utility.Tuple<ColumnType, string, object>[] details = (Utility.Tuple<ColumnType, string, object>[])e.Result;
+            mImageListView.UpdateItemDetailsInternal(request.Guid, details);
 
             // Refresh the control lazily
             if (mImageListView != null && mImageListView.IsItemVisible(request.Guid))
@@ -262,19 +236,7 @@ namespace Manina.Windows.Forms
             }
 
             // Get item details
-            if (request.IsVirtualItem)
-            {
-                VirtualItemDetailsEventArgs info = new VirtualItemDetailsEventArgs(request.VirtualItemKey);
-                mImageListView.RetrieveVirtualItemDetailsInternal(info);
-                e.Result = info;
-            }
-            else
-            {
-                ImageMetadata info = ImageMetadata.FromFile(request.FileName, request.UseWIC);
-                e.Result = info;
-                if (info.Error != null)
-                    throw info.Error;
-            }
+            e.Result = request.Adaptor.GetDetails(request.VirtualItemKey, request.UseWIC);
         }
         #endregion
 
@@ -319,26 +281,13 @@ namespace Manina.Windows.Forms
         /// Adds the item to the cache queue.
         /// </summary>
         /// <param name="guid">Item guid.</param>
-        /// <param name="filename">File name.</param>
-        /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
-        public void Add(Guid guid, string filename, bool useWIC)
-        {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentException("filename cannot be null", "extension");
-
-            // Add to cache queue
-            RunWorker(new CacheRequest(guid, filename, useWIC));
-        }
-        /// <summary>
-        /// Adds the item to the cache queue.
-        /// </summary>
-        /// <param name="guid">Item guid.</param>
+        /// <param name="adaptor">The adaptor for this item.</param>
         /// <param name="virtualItemKey">The virtual item key.</param>
         /// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
-        public void Add(Guid guid, object virtualItemKey, bool useWIC)
+        public void Add(Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object virtualItemKey, bool useWIC)
         {
             // Add to cache queue
-            RunWorker(new CacheRequest(guid, virtualItemKey, useWIC));
+            RunWorker(new CacheRequest(guid, adaptor, virtualItemKey, useWIC));
         }
         #endregion
 

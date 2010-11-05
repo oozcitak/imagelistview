@@ -314,14 +314,9 @@ namespace Manina.Windows.Forms
 
                 if (img == null)
                 {
-                    if (item.isVirtualItem)
-                        ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.VirtualItemKey,
-                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
-                            (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                    else
-                        ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.FileName, size,
-                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
-                            (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                    ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.mAdaptor, item.VirtualItemKey,
+                        size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
+                        (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
                 return img;
@@ -361,7 +356,7 @@ namespace Manina.Windows.Forms
                     if (ReferenceEquals(ImageListView.navigationManager.SelectedSeparator, column))
                         state |= ColumnState.SeparatorSelected;
                     if (ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                        ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                        ImageListView.Columns[ImageListView.SortColumn].Guid == column.Guid)
                         state |= ColumnState.SortColumn;
 
                     Rectangle bounds = new Rectangle(x, y, column.Width, h);
@@ -737,14 +732,9 @@ namespace Manina.Windows.Forms
 
                 if (img == null)
                 {
-                    if (item.isVirtualItem)
-                        ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.VirtualItemKey,
-                            size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
-                            (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                    else
-                        ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.FileName, size,
-                            ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
-                            (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                    ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.mAdaptor, item.VirtualItemKey,
+                        size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
+                        (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
                 return img;
@@ -1036,7 +1026,7 @@ namespace Manina.Windows.Forms
                         if (ImageListView.SortOrder != SortOrder.None &&
                             ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
                             (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None &&
-                            ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                            ImageListView.Columns[ImageListView.SortColumn].Guid == column.Guid)
                         {
                             Rectangle subItemBounds = bounds;
                             subItemBounds.X = x;
@@ -1122,7 +1112,7 @@ namespace Manina.Windows.Forms
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.columnID), ImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
 

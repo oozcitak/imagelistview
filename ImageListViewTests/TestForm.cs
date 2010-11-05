@@ -14,8 +14,48 @@ namespace ImageListViewTests
 {
     public partial class TestForm : Form
     {
+        #region Custom Item Adaptor
+        /// <summary>
+        /// A custom item adaptor.
+        /// </summary>
+        private class CustomAdaptor : ImageListView.ImageListViewItemAdaptor
+        {
+            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
+            {
+                string file = key as string;
+                if (!string.IsNullOrEmpty(file))
+                {
+                    using (Image img = Image.FromFile(file))
+                    {
+                        Bitmap thumb = new Bitmap(img, size);
+                        return thumb;
+                    }
+                }
+
+                return null;
+            }
+
+            public override string GetSourceImage(object key)
+            {
+                string file = key as string;
+                return file;
+            }
+
+            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Dispose()
+            {
+                ;
+            }
+        }
+        #endregion
+
         #region Constructor
         string[] files;
+        CustomAdaptor adaptor;
 
         public TestForm()
         {
@@ -23,10 +63,10 @@ namespace ImageListViewTests
 
             Application.Idle += new EventHandler(Application_Idle);
 
+            adaptor = new CustomAdaptor();
             string picturePath = Path.GetDirectoryName(Path.GetDirectoryName(Application.StartupPath)) + Path.DirectorySeparatorChar + "Pictures";
             files = Directory.GetFiles(picturePath, "*.jpg");
 
-            imageListView.RetrieveVirtualItemThumbnail += new Manina.Windows.Forms.RetrieveVirtualItemThumbnailEventHandler(imageListView1_RetrieveVirtualItemThumbnail);
             imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
             imageListView.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
             imageListView.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
@@ -49,19 +89,6 @@ namespace ImageListViewTests
         #endregion
 
         #region Events
-        // Retrive virtual item thumbnail
-        void imageListView1_RetrieveVirtualItemThumbnail(object sender, Manina.Windows.Forms.VirtualItemThumbnailEventArgs e)
-        {
-            string file = e.Key as string;
-            if (!string.IsNullOrEmpty(file))
-            {
-                using (Image img = Image.FromFile(file))
-                {
-                    Bitmap thumb = new Bitmap(img, e.ThumbnailDimensions);
-                    e.ThumbnailImage = thumb;
-                }
-            }
-        }
         // Cache error
         void imageListView1_CacheError(object sender, Manina.Windows.Forms.CacheErrorEventArgs e)
         {
@@ -138,7 +165,7 @@ namespace ImageListViewTests
             imageListView.SuspendLayout();
             for (int i = 0; i < 1000 / files.Length; i++)
                 for (int j = 0; j < files.Length; j++)
-                    imageListView.Items.Add(files[j], files[j]);
+                    imageListView.Items.Add(files[j], files[j], adaptor);
             imageListView.ResumeLayout();
         }
         #endregion

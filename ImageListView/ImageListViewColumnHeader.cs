@@ -32,17 +32,23 @@ namespace Manina.Windows.Forms
         public class ImageListViewColumnHeader : ICloneable
         {
             #region Member Variables
+            private Guid mGuid;
             private int mDisplayIndex;
             internal ImageListView mImageListView;
             private string mText;
             private ColumnType mType;
             private bool mVisible;
             private int mWidth;
-            internal Guid columnID;
+
             internal ImageListViewColumnHeaderCollection owner;
             #endregion
 
             #region Properties
+            /// <summary>
+            /// Gets the unique identifier for this item.
+            /// </summary>
+            [Category("Behavior"), Browsable(false), Description("Gets the unique identifier for this item.")]
+            internal Guid Guid { get { return mGuid; } private set { mGuid = value; } }
             /// <summary>
             /// Gets the default header text for this column type.
             /// </summary>
@@ -121,7 +127,7 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView == null)
                             throw new InvalidOperationException("Owner control is null.");
-                        mImageListView.Items.RemoveCustomColumn(columnID);
+                        mImageListView.Items.RemoveCustomColumn(mGuid);
                     }
 
                     mType = value;
@@ -130,7 +136,7 @@ namespace Manina.Windows.Forms
                     {
                         if (mImageListView == null)
                             throw new InvalidOperationException("Owner control is null.");
-                        mImageListView.Items.AddCustomColumn(columnID);
+                        mImageListView.Items.AddCustomColumn(mGuid);
                     }
                 }
             }
@@ -206,7 +212,7 @@ namespace Manina.Windows.Forms
             {
                 mImageListView = null;
                 owner = null;
-                columnID = Guid.NewGuid();
+                mGuid = Guid.NewGuid();
                 mText = text;
                 mType = type;
                 mWidth = width;
@@ -305,7 +311,7 @@ namespace Manina.Windows.Forms
                 {
                     foreach (ImageListViewItem item in mImageListView.Items)
                     {
-                        int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(columnID), mImageListView.Font).Width;
+                        int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(mGuid), mImageListView.Font).Width;
                         width = System.Math.Max(width, itemwidth);
                     }
                 }

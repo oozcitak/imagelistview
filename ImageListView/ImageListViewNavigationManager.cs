@@ -409,18 +409,10 @@ namespace Manina.Windows.Forms
                         List<string> filenames = new List<string>();
                         foreach (ImageListViewItem item in mImageListView.SelectedItems)
                         {
-                            if (item.isVirtualItem)
-                            {
-                                // Get the virtual item source image
-                                VirtualItemImageEventArgs ve = new VirtualItemImageEventArgs(item.mVirtualItemKey);
-                                mImageListView.RetrieveVirtualItemImageInternal(ve);
-                                if (!string.IsNullOrEmpty(ve.FileName))
-                                    filenames.Add(ve.FileName);
-                            }
-                            else
-                            {
-                                filenames.Add(item.FileName);
-                            }
+                            // Get the source image
+                            string sourceFile = item.Adaptor.GetSourceImage(item.VirtualItemKey);
+                            if (!string.IsNullOrEmpty(sourceFile))
+                                filenames.Add(sourceFile);
                         }
                         DataObject data = new DataObject(DataFormats.FileDrop, filenames.ToArray());
                         DropTarget = null;
@@ -640,7 +632,7 @@ namespace Manina.Windows.Forms
                     if (!suppressClick)
                     {
                         // Change the sort column
-                        if (mImageListView.Columns[mImageListView.SortColumn].columnID == HoveredColumn.columnID)
+                        if (mImageListView.Columns[mImageListView.SortColumn].Guid == HoveredColumn.Guid)
                         {
                             if (mImageListView.SortOrder == SortOrder.Descending)
                                 mImageListView.SortOrder = SortOrder.Ascending;
@@ -806,7 +798,7 @@ namespace Manina.Windows.Forms
                     if (DropToRight) i++;
                     foreach (ImageListViewItem item in draggedItems)
                     {
-                        mImageListView.Items.InsertInternal(i, item);
+                        mImageListView.Items.InsertInternal(i, item, item.Adaptor);
                         i++;
                     }
                     mImageListView.OnSelectionChangedInternal();

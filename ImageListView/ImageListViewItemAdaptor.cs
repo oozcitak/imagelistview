@@ -34,105 +34,12 @@ namespace Manina.Windows.Forms
             /// <param name="key">Item key.</param>
             /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>An array of tuples containing item details or null if an error occurs.</returns>
-            public abstract Utility.TupleBase[] GetDetails(object key, bool useWIC);
+            public abstract Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC);
             /// <summary>
             /// Performs application-defined tasks associated with freeing,
             /// releasing, or resetting unmanaged resources.
             /// </summary>
             public abstract void Dispose();
-            #endregion
-
-            #region ItemDetails Class
-            /// <summary>
-            /// Represents item details.
-            /// </summary>
-            public class ItemDetails
-            {
-                /// <summary>
-                /// Gets or sets the last access date of the image file represented by this item.
-                /// </summary>
-                public DateTime DateAccessed { get; set; }
-                /// <summary>
-                /// Gets or sets the creation date of the image file represented by this item.
-                /// </summary>
-                public DateTime DateCreated { get; set; }
-                /// <summary>
-                /// Gets or sets the modification date of the image file represented by this item.
-                /// </summary>
-                public DateTime DateModified { get; set; }
-                /// <summary>
-                /// Gets or sets the shell type of the image file represented by this item.
-                /// </summary>
-                public string FileType { get; set; }
-                /// <summary>
-                /// Gets or sets the path of the image file represented by this item.
-                /// </summary>        
-                public string FilePath { get; set; }
-                /// <summary>
-                /// Gets or sets file size in bytes.
-                /// </summary>
-                public long FileSize { get; set; }
-                /// <summary>
-                /// Gets or sets image dimensions.
-                /// </summary>
-                public Size Dimensions { get; set; }
-                /// <summary>
-                /// Gets or sets image resolution in pixels per inch.
-                /// </summary>
-                public SizeF Resolution { get; set; }
-                /// <summary>
-                /// Gets or sets image deascription.
-                /// </summary>
-                public string ImageDescription { get; set; }
-                /// <summary>
-                /// Gets or sets the camera model.
-                /// </summary>
-                public string EquipmentModel { get; set; }
-                /// <summary>
-                /// Gets or sets the date and time the image was taken.
-                /// </summary>
-                public DateTime DateTaken { get; set; }
-                /// <summary>
-                /// Gets or sets the name of the artist.
-                /// </summary>
-                public string Artist { get; set; }
-                /// <summary>
-                /// Gets or sets image copyright information.
-                /// </summary>
-                public string Copyright { get; set; }
-                /// <summary>
-                /// Gets or sets the exposure time in seconds.
-                /// </summary>
-                public float ExposureTime { get; set; }
-                /// <summary>
-                /// Gets or sets the F number.
-                /// </summary>
-                public float FNumber { get; set; }
-                /// <summary>
-                /// Gets or sets the ISO speed.
-                /// </summary>
-                public ushort ISOSpeed { get; set; }
-                /// <summary>
-                /// Gets or sets the shutter speed.
-                /// </summary>
-                public string ShutterSpeed { get; set; }
-                /// <summary>
-                /// Gets or sets user comments.
-                /// </summary>
-                public string UserComment { get; set; }
-                /// <summary>
-                /// Gets or sets the rating between 0-100.
-                /// </summary>
-                public ushort Rating { get; set; }
-                /// <summary>
-                /// Gets the name of the application that created this file.
-                /// </summary>
-                public string Software { get; set; }
-                /// <summary>
-                /// Gets focal length of the lens in millimeters.
-                /// </summary>
-                public float FocalLength { get; set; }
-            }
             #endregion
         }
     }

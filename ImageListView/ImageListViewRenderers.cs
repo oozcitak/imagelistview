@@ -147,7 +147,7 @@ namespace Manina.Windows.Forms
                     foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                     {
                         if (ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                            ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID &&
+                            ImageListView.Columns[ImageListView.SortColumn].Guid == column.Guid &&
                             ImageListView.SortOrder != SortOrder.None &&
                             (state & ItemState.Hovered) == ItemState.None && (state & ItemState.Selected) == ItemState.None)
                         {
@@ -208,7 +208,7 @@ namespace Manina.Windows.Forms
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.columnID), ImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
                             }
@@ -1029,7 +1029,7 @@ namespace Manina.Windows.Forms
                                         g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.columnID), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? bItemFore : SystemBrushes.HighlightText), rt, sf);
 
@@ -1901,7 +1901,7 @@ namespace Manina.Windows.Forms
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    TextRenderer.DrawText(g, item.GetSubItemText(column.columnID), ImageListView.Font, rt, SystemColors.ControlText,
+                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Guid), ImageListView.Font, rt, SystemColors.ControlText,
                                         TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
                                 else
                                     TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, SystemColors.ControlText,
@@ -2118,7 +2118,7 @@ namespace Manina.Windows.Forms
                         {
                             if (ImageListView.SortOrder != SortOrder.None &&
                                 ImageListView.SortColumn >= 0 && ImageListView.SortColumn < ImageListView.Columns.Count &&
-                                ImageListView.Columns[ImageListView.SortColumn].columnID == column.columnID)
+                                ImageListView.Columns[ImageListView.SortColumn].Guid == column.Guid)
                             {
                                 Rectangle subItemBounds = bounds;
                                 subItemBounds.X = x;
@@ -2197,7 +2197,7 @@ namespace Manina.Windows.Forms
                             }
                         }
                         else if (column.Type == ColumnType.Custom)
-                            TextRenderer.DrawText(g, item.GetSubItemText(column.columnID), ImageListView.Font, rt, foreColor,
+                            TextRenderer.DrawText(g, item.GetSubItemText(column.Guid), ImageListView.Font, rt, foreColor,
                                 TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping);
                         else
                             TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, foreColor,
