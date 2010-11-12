@@ -3,6 +3,8 @@
 
 = 9.5 (12 November 2010) =
 
+This release fixes a few minor bugs.
+
   * Fixed a bug in URIAdaptor where it prevented its use with multiple threads.
   * !FileSystemAdaptor now checkes if the file exists. (Issue 113)
   * Fixed a bug in Items Add method where the user supplied adaptor was overwritten.
@@ -54,7 +56,7 @@ This release includes many performance tweaks. The new !ThemeRenderer is also in
   * Added the UseWIC property to the control.
   * .Net 2.0 thumbnail fallback now automatically rotates thumbnails depending on orientation metadata.
   * Added toolbox bitmap to !QueuedBackgroundWorker.
-  * Decreased the number of content switches in the worker threads.
+  * Decreased the number of context switches in the worker threads.
   * The thumbnail thread now processes the last request first.
   * Worker threads refresh the control only if the new thumbnails or metadata columns are visible on the screen.
   * !QueuedBackgroundWorker now has a !ProcessingMode property for choosing between FIFO and LIFO processing.
