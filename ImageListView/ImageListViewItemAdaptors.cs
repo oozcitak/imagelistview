@@ -123,20 +123,6 @@ namespace Manina.Windows.Forms
         public class URIAdaptor : ImageListView.ImageListViewItemAdaptor
         {
             private bool disposed;
-            private WebClient client;
-
-            /// <summary>
-            /// Returns the <see cref="WebClient"/>.
-            /// </summary>
-            private WebClient Client
-            {
-                get
-                {
-                    if (client == null)
-                        client = new WebClient();
-                    return client;
-                }
-            }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="URIAdaptor"/> class.
@@ -144,7 +130,6 @@ namespace Manina.Windows.Forms
             public URIAdaptor()
             {
                 disposed = false;
-                client = null;
             }
 
             /// <summary>
@@ -162,13 +147,23 @@ namespace Manina.Windows.Forms
                     return null;
 
                 string uri = (string)key;
-                byte[] imageData = Client.DownloadData(uri);
-                using (MemoryStream stream = new MemoryStream(imageData))
+                try
                 {
-                    using (Image sourceImage = Image.FromStream(stream))
+                    using (WebClient client = new WebClient())
                     {
-                        return ThumbnailExtractor.FromImage(sourceImage, size, useEmbeddedThumbnails, useExifOrientation, useWIC);
+                        byte[] imageData = client.DownloadData(uri);
+                        using (MemoryStream stream = new MemoryStream(imageData))
+                        {
+                            using (Image sourceImage = Image.FromStream(stream))
+                            {
+                                return ThumbnailExtractor.FromImage(sourceImage, size, useEmbeddedThumbnails, useExifOrientation, useWIC);
+                            }
+                        }
                     }
+                }
+                catch
+                {
+                    return null;
                 }
             }
             /// <summary>
@@ -181,9 +176,19 @@ namespace Manina.Windows.Forms
                     return null;
 
                 string uri = (string)key;
-                string filename = Path.GetTempFileName();
-                Client.DownloadFile(uri, filename);
-                return filename;
+                try
+                {
+                    string filename = Path.GetTempFileName();
+                    using (WebClient client = new WebClient())
+                    {
+                        client.DownloadFile(uri, filename);
+                        return filename;
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
             }
             /// <summary>
             /// Returns the details for the given item.
@@ -210,9 +215,6 @@ namespace Manina.Windows.Forms
             public override void Dispose()
             {
                 disposed = true;
-                if (client != null)
-                    client.Dispose();
-                client = null;
             }
         }
         #endregion
