@@ -177,7 +177,7 @@ namespace ImageListViewTests
         private void AddURIItems_Click(object sender, EventArgs e)
         {
             imageListView.SuspendLayout();
-            string query = "starry night";
+            string query = "lemur";
             string feedUrl = "http://search.yahooapis.com/ImageSearchService/rss/imageSearch.xml?appid=yahoosearchimagerss&query=" + query;
             using (XmlReader reader = XmlReader.Create(feedUrl))
             {
@@ -191,7 +191,7 @@ namespace ImageListViewTests
                         // Create a virtual item passing image URL as the item key.
                         string title = rssItem.Title.Text;
                         string link = rssItem.Links[0].Uri.ToString();
-                        imageListView.Items.Add(new ImageListViewItem((object)link, title), uriAdaptor);
+                        imageListView.Items.Add(link, title, uriAdaptor);
                     }
                 }
             }
