@@ -35,6 +35,9 @@
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.imageListView = new Manina.Windows.Forms.ImageListView();
+            this.ItemContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.logEventsCheckbox = new System.Windows.Forms.CheckBox();
             this.EventsListBox = new System.Windows.Forms.ListBox();
             this.EventListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -75,9 +78,7 @@
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
-            this.ItemContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AddURIItems = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -86,9 +87,9 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.ItemContextMenu.SuspendLayout();
             this.EventListContextMenu.SuspendLayout();
             this.TestToolStrip.SuspendLayout();
-            this.ItemContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -167,6 +168,29 @@
             this.imageListView.Size = new System.Drawing.Size(425, 574);
             this.imageListView.TabIndex = 0;
             // 
+            // ItemContextMenu
+            // 
+            this.ItemContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cloneToolStripMenuItem,
+            this.deleteToolStripMenuItem});
+            this.ItemContextMenu.Name = "ItemContextMenu";
+            this.ItemContextMenu.Size = new System.Drawing.Size(106, 48);
+            this.ItemContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ItemContextMenu_Opening);
+            // 
+            // cloneToolStripMenuItem
+            // 
+            this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
+            this.cloneToolStripMenuItem.Text = "Clone";
+            this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
+            this.deleteToolStripMenuItem.Text = "Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
             // logEventsCheckbox
             // 
             this.logEventsCheckbox.AutoSize = true;
@@ -216,6 +240,7 @@
             this.AddOneItem,
             this.AddItems,
             this.AddVirtualItems,
+            this.AddURIItems,
             this.InsertItemAtIndex0,
             this.RemoveItemAtIndex0,
             this.ClearItems,
@@ -244,7 +269,7 @@
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 509);
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 548);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
             // 
@@ -570,28 +595,16 @@
             this.CheckBenchmarkEndTimer.Interval = 2000;
             this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
             // 
-            // ItemContextMenu
+            // AddURIItems
             // 
-            this.ItemContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cloneToolStripMenuItem,
-            this.deleteToolStripMenuItem});
-            this.ItemContextMenu.Name = "ItemContextMenu";
-            this.ItemContextMenu.Size = new System.Drawing.Size(106, 48);
-            this.ItemContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ItemContextMenu_Opening);
-            // 
-            // cloneToolStripMenuItem
-            // 
-            this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.cloneToolStripMenuItem.Text = "Clone";
-            this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
-            // 
-            // deleteToolStripMenuItem
-            // 
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.deleteToolStripMenuItem.Text = "Delete";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            this.AddURIItems.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.AddURIItems.Image = ((System.Drawing.Image)(resources.GetObject("AddURIItems.Image")));
+            this.AddURIItems.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.AddURIItems.Name = "AddURIItems";
+            this.AddURIItems.Size = new System.Drawing.Size(137, 17);
+            this.AddURIItems.Text = "Add URI Items";
+            this.AddURIItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.AddURIItems.Click += new System.EventHandler(this.AddURIItems_Click);
             // 
             // TestForm
             // 
@@ -615,10 +628,10 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             this.splitContainer1.ResumeLayout(false);
+            this.ItemContextMenu.ResumeLayout(false);
             this.EventListContextMenu.ResumeLayout(false);
             this.TestToolStrip.ResumeLayout(false);
             this.TestToolStrip.PerformLayout();
-            this.ItemContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -673,6 +686,7 @@
         private System.Windows.Forms.ContextMenuStrip ItemContextMenu;
         private System.Windows.Forms.ToolStripMenuItem cloneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton AddURIItems;
     }
 }
 
