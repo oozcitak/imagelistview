@@ -244,9 +244,8 @@ namespace Manina.Windows.Forms
             public void Add(object key, string text, Image initialThumbnail, ImageListView.ImageListViewItemAdaptor adaptor)
             {
                 ImageListViewItem item = new ImageListViewItem(key, text);
-                item.mAdaptor = adaptor;
                 item.clonedThumbnail = initialThumbnail;
-                Add(item);
+                Add(item, adaptor);
             }
             /// <summary>
             /// Adds a virtual item to the <see cref="ImageListViewItemCollection"/>.
