@@ -3,9 +3,9 @@
 
 = 9.5 (12 November 2010) =
 
-* Fixed a bug in URIAdaptor where it prevented its use with multiple threads.
-* !FileSystemAdaptor now checkes if the file exists. (Issue 113)
-* Fixed a bug in Items Add method where the user supplied adaptor was overwritten.
+  * Fixed a bug in URIAdaptor where it prevented its use with multiple threads.
+  * !FileSystemAdaptor now checkes if the file exists. (Issue 113)
+  * Fixed a bug in Items Add method where the user supplied adaptor was overwritten.
 
 = 9.4 (05 November 2010) =
 
