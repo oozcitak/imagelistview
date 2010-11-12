@@ -68,10 +68,11 @@ namespace Manina.Windows.Forms
                 {
                     stream = new MemoryStream();
 
-                    image.Save(stream, ImageFormat.MemoryBmp);
+                    image.Save(stream, ImageFormat.Bmp);
                     // Performance vs image quality settings.
                     // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
                     // if the file contains no embedded thumbnail. The image quality is only slightly worse.
+                    stream.Seek(0, SeekOrigin.Begin);
                     frameWpf = BitmapFrame.Create(stream,
                         BitmapCreateOptions.IgnoreColorProfile,
                         BitmapCacheOption.None);
@@ -681,24 +682,29 @@ namespace Manina.Windows.Forms
         {
             try
             {
-                PropertyItem prop = img.GetPropertyItem(TagOrientation);
-                ushort orientationFlag = BitConverter.ToUInt16(prop.Value, 0);
-                if (orientationFlag == 1)
-                    return 0;
-                else if (orientationFlag == 2)
-                    return -360;
-                else if (orientationFlag == 3)
-                    return 180;
-                else if (orientationFlag == 4)
-                    return -180;
-                else if (orientationFlag == 5)
-                    return -90;
-                else if (orientationFlag == 6)
-                    return 90;
-                else if (orientationFlag == 7)
-                    return -270;
-                else if (orientationFlag == 8)
-                    return 270;
+                foreach (PropertyItem prop in img.PropertyItems)
+                {
+                    if (prop.Id == TagOrientation)
+                    {
+                        ushort orientationFlag = BitConverter.ToUInt16(prop.Value, 0);
+                        if (orientationFlag == 1)
+                            return 0;
+                        else if (orientationFlag == 2)
+                            return -360;
+                        else if (orientationFlag == 3)
+                            return 180;
+                        else if (orientationFlag == 4)
+                            return -180;
+                        else if (orientationFlag == 5)
+                            return -90;
+                        else if (orientationFlag == 6)
+                            return 90;
+                        else if (orientationFlag == 7)
+                            return -270;
+                        else if (orientationFlag == 8)
+                            return 270;
+                    }
+                }
             }
             catch
             {
