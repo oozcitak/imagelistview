@@ -9,6 +9,8 @@ using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
 using Manina.Windows.Forms;
+using System.Xml;
+using System.ServiceModel.Syndication;
 
 namespace ImageListViewTests
 {
@@ -56,6 +58,7 @@ namespace ImageListViewTests
         #region Constructor
         string[] files;
         CustomAdaptor adaptor;
+        ImageListView.ImageListViewItemAdaptor uriAdaptor;
 
         public TestForm()
         {
@@ -64,6 +67,8 @@ namespace ImageListViewTests
             Application.Idle += new EventHandler(Application_Idle);
 
             adaptor = new CustomAdaptor();
+            uriAdaptor = new ImageListViewItemAdaptors.URIAdaptor();
+
             string picturePath = Path.GetDirectoryName(Path.GetDirectoryName(Application.StartupPath)) + Path.DirectorySeparatorChar + "Pictures";
             files = Directory.GetFiles(picturePath, "*.jpg");
 
@@ -166,6 +171,30 @@ namespace ImageListViewTests
             for (int i = 0; i < 1000 / files.Length; i++)
                 for (int j = 0; j < files.Length; j++)
                     imageListView.Items.Add(files[j], files[j], adaptor);
+            imageListView.ResumeLayout();
+        }
+        // Add URI items
+        private void AddURIItems_Click(object sender, EventArgs e)
+        {
+            imageListView.SuspendLayout();
+            string query = "starry night";
+            string feedUrl = "http://search.yahooapis.com/ImageSearchService/rss/imageSearch.xml?appid=yahoosearchimagerss&query=" + query;
+            using (XmlReader reader = XmlReader.Create(feedUrl))
+            {
+                Rss20FeedFormatter rssFormatter = new Rss20FeedFormatter();
+                rssFormatter.ReadFrom(reader);
+
+                foreach (SyndicationItem rssItem in rssFormatter.Feed.Items)
+                {
+                    if (rssItem.Links.Count > 0)
+                    {
+                        // Create a virtual item passing image URL as the item key.
+                        string title = rssItem.Title.Text;
+                        string link = rssItem.Links[0].Uri.ToString();
+                        imageListView.Items.Add(new ImageListViewItem((object)link, title), uriAdaptor);
+                    }
+                }
+            }
             imageListView.ResumeLayout();
         }
         #endregion
