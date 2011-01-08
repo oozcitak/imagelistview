@@ -106,9 +106,9 @@ namespace Manina.Windows.Forms
                 stream.Dispose();
                 return thumb;
 #else
-            // .Net 2.0 fallback
-            Image img = GetThumbnailBmp(image, size);
-            return img;
+                // .Net 2.0 fallback
+                return GetThumbnailBmp(image, size,
+                     useExifOrientation ? GetRotation(image) : 0);
 #endif
             }
             else
@@ -165,9 +165,9 @@ namespace Manina.Windows.Forms
                         useExifOrientation ? GetRotation(filename) : 0);
                 }
 #else
-            // .Net 2.0 fallback
-            Image img = GetThumbnailBmp(filename, size, useEmbeddedThumbnails);
-            return img;
+                // .Net 2.0 fallback
+                return GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
+                    useExifOrientation ? GetRotation(filename) : 0);
 #endif
             }
             else
@@ -761,7 +761,7 @@ namespace Manina.Windows.Forms
 
             int sourceWidth = source.Width;
             int sourceHeight = source.Height;
-            
+
             // Scale
             double xScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceWidth, scale));
             double yScale = Math.Min(1.0, Math.Max(1.0 / (double)sourceHeight, scale));
