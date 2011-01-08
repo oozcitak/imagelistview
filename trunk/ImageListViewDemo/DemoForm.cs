@@ -133,6 +133,7 @@ namespace Manina.Windows.Forms
             x120ToolStripMenuItem.Checked = imageListView1.ThumbnailSize == new Size(120, 120);
             x200ToolStripMenuItem.Checked = imageListView1.ThumbnailSize == new Size(200, 200);
 
+            allowCheckBoxClickToolStripMenuItem.Checked = imageListView1.AllowCheckBoxClick;
             allowColumnClickToolStripMenuItem.Checked = imageListView1.AllowColumnClick;
             allowColumnResizeToolStripMenuItem.Checked = imageListView1.AllowColumnResize;
             allowPaneResizeToolStripMenuItem.Checked = imageListView1.AllowPaneResize;
