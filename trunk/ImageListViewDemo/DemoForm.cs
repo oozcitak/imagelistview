@@ -242,6 +242,11 @@ namespace Manina.Windows.Forms
             imageListView1.ShowFileIcons = !imageListView1.ShowFileIcons;
         }
 
+        private void allowCheckBoxClickToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.AllowCheckBoxClick = !imageListView1.AllowCheckBoxClick;
+        }
+
         private void allowColumnClickToolStripMenuItem_Click(object sender, EventArgs e)
         {
             imageListView1.AllowColumnClick = !imageListView1.AllowColumnClick;
