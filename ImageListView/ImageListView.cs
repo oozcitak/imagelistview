@@ -131,6 +131,11 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Description("Gets or sets whether thumbnail images are automatically rotated."), DefaultValue(true)]
         public bool AutoRotateThumbnails { get; set; }
         /// <summary>
+        /// Gets or sets whether checkboxes respond to mouse clicks.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether checkboxes respond to mouse clicks."), DefaultValue(true)]
+        public bool AllowCheckBoxClick { get; set; }
+        /// <summary>
         /// Gets or sets whether column headers respond to mouse clicks.
         /// </summary>
         [Category("Behavior"), Description("Gets or sets whether column headers respond to mouse clicks."), DefaultValue(true)]
@@ -810,6 +815,7 @@ namespace Manina.Windows.Forms
 
             // Property defaults
             AutoRotateThumbnails = true;
+            AllowCheckBoxClick = true;
             AllowColumnClick = true;
             AllowColumnResize = true;
             AllowDrag = false;

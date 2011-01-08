@@ -518,11 +518,8 @@ namespace Manina.Windows.Forms
 
                     mImageListView.Refresh();
                 }
-                else if (lastMouseDownInItemArea && lastMouseDownOverCheckBox && HoveredItem != null && overCheckBox && LeftButton)
+                else if (mImageListView.AllowCheckBoxClick && lastMouseDownInItemArea && lastMouseDownOverCheckBox && HoveredItem != null && overCheckBox && LeftButton)
                 {
-                    Rectangle bounds = mImageListView.layoutManager.GetItemBounds(HoveredItem.Index);
-                    Rectangle checkBoxRec = mImageListView.layoutManager.GetCheckBoxBounds(HoveredItem.Index);
-
                     if (HoveredItem.Selected)
                     {
                         // if multiple items selected and Hovered item among selected,
