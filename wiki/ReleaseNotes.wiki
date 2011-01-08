@@ -1,6 +1,12 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 9.6 (08 December 2011) =
+
+  * Fixed a bug in the .NET 2.0 source (Issue 116).
+  * The framework requirement is now .NET 3.5. An option to target 2.0 is still available. (If you are holding back on .NET 2.0 just for the size of the .NET 3.5 framework check the "Client-only Framework subset" in the project properties.)
+  * Added the !AllowCheckBoxClick property to the control (Issue 114 ).
+
 = 9.5 (12 November 2010) =
 
 This release fixes a few minor bugs.
