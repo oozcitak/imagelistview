@@ -47,6 +47,7 @@
             this.AddOneItem = new System.Windows.Forms.ToolStripButton();
             this.AddItems = new System.Windows.Forms.ToolStripButton();
             this.AddVirtualItems = new System.Windows.Forms.ToolStripButton();
+            this.AddURIItems = new System.Windows.Forms.ToolStripButton();
             this.InsertItemAtIndex0 = new System.Windows.Forms.ToolStripButton();
             this.RemoveItemAtIndex0 = new System.Windows.Forms.ToolStripButton();
             this.ClearItems = new System.Windows.Forms.ToolStripButton();
@@ -78,7 +79,9 @@
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
-            this.AddURIItems = new System.Windows.Forms.ToolStripButton();
+            this.ChooseImageSource = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.ChooseSourcePath = new System.Windows.Forms.FolderBrowserDialog();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -102,7 +105,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(619, 574);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(619, 599);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // toolStripContainer1.LeftToolStripPanel
@@ -144,7 +147,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.logEventsCheckbox);
             this.splitContainer1.Panel2.Controls.Add(this.EventsListBox);
-            this.splitContainer1.Size = new System.Drawing.Size(619, 574);
+            this.splitContainer1.Size = new System.Drawing.Size(619, 599);
             this.splitContainer1.SplitterDistance = 425;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -165,7 +168,7 @@
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
-            this.imageListView.Size = new System.Drawing.Size(425, 574);
+            this.imageListView.Size = new System.Drawing.Size(425, 599);
             this.imageListView.TabIndex = 0;
             // 
             // ItemContextMenu
@@ -213,7 +216,7 @@
             this.EventsListBox.IntegralHeight = false;
             this.EventsListBox.Location = new System.Drawing.Point(0, 26);
             this.EventsListBox.Name = "EventsListBox";
-            this.EventsListBox.Size = new System.Drawing.Size(190, 548);
+            this.EventsListBox.Size = new System.Drawing.Size(190, 573);
             this.EventsListBox.TabIndex = 0;
             // 
             // EventListContextMenu
@@ -236,6 +239,8 @@
             this.TestToolStrip.Dock = System.Windows.Forms.DockStyle.None;
             this.TestToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.TestToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ChooseImageSource,
+            this.toolStripSeparator5,
             this.toolStripLabel2,
             this.AddOneItem,
             this.AddItems,
@@ -269,7 +274,7 @@
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 548);
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 558);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
             // 
@@ -313,6 +318,17 @@
             this.AddVirtualItems.Text = "Add 1000 Virtual Items";
             this.AddVirtualItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AddVirtualItems.Click += new System.EventHandler(this.AddVirtualItems_Click);
+            // 
+            // AddURIItems
+            // 
+            this.AddURIItems.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.AddURIItems.Image = ((System.Drawing.Image)(resources.GetObject("AddURIItems.Image")));
+            this.AddURIItems.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.AddURIItems.Name = "AddURIItems";
+            this.AddURIItems.Size = new System.Drawing.Size(137, 17);
+            this.AddURIItems.Text = "Add URI Items";
+            this.AddURIItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.AddURIItems.Click += new System.EventHandler(this.AddURIItems_Click);
             // 
             // InsertItemAtIndex0
             // 
@@ -595,16 +611,23 @@
             this.CheckBenchmarkEndTimer.Interval = 2000;
             this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
             // 
-            // AddURIItems
+            // ChooseImageSource
             // 
-            this.AddURIItems.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.AddURIItems.Image = ((System.Drawing.Image)(resources.GetObject("AddURIItems.Image")));
-            this.AddURIItems.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.AddURIItems.Name = "AddURIItems";
-            this.AddURIItems.Size = new System.Drawing.Size(137, 17);
-            this.AddURIItems.Text = "Add URI Items";
-            this.AddURIItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.AddURIItems.Click += new System.EventHandler(this.AddURIItems_Click);
+            this.ChooseImageSource.Image = ((System.Drawing.Image)(resources.GetObject("ChooseImageSource.Image")));
+            this.ChooseImageSource.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ChooseImageSource.Name = "ChooseImageSource";
+            this.ChooseImageSource.Size = new System.Drawing.Size(137, 20);
+            this.ChooseImageSource.Text = "Choose Image Source";
+            this.ChooseImageSource.Click += new System.EventHandler(this.ChooseImageSource_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(137, 6);
+            // 
+            // ChooseSourcePath
+            // 
+            this.ChooseSourcePath.ShowNewFolderButton = false;
             // 
             // TestForm
             // 
@@ -687,6 +710,9 @@
         private System.Windows.Forms.ToolStripMenuItem cloneToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton AddURIItems;
+        private System.Windows.Forms.ToolStripButton ChooseImageSource;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.FolderBrowserDialog ChooseSourcePath;
     }
 }
 
