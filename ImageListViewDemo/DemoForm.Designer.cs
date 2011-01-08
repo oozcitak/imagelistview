@@ -73,6 +73,7 @@
             this.iconAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.continuousCacheModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allowCheckBoxClickToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -188,17 +189,6 @@
             this.imageListView1.AllowDrag = true;
             this.imageListView1.AllowDrop = true;
             this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
-            this.imageListView1.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateModified, "", 100, 3, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 4, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.EquipmentModel, "", 100, 5, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 6, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 7, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 8, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 9, true)});
             this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView1.Location = new System.Drawing.Point(0, 0);
             this.imageListView1.Name = "imageListView1";
@@ -235,7 +225,7 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(592, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(623, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // rendererToolStripLabel
@@ -361,6 +351,7 @@
             // 
             this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.allowCheckBoxClickToolStripMenuItem,
             this.allowColumnClickToolStripMenuItem,
             this.allowColumnResizeToolStripMenuItem,
             this.allowPaneResizeToolStripMenuItem,
@@ -493,6 +484,13 @@
             this.continuousCacheModeToolStripMenuItem.Text = "Continuous Cache Mode";
             this.continuousCacheModeToolStripMenuItem.Click += new System.EventHandler(this.continuousCacheModeToolStripMenuItem_Click);
             // 
+            // allowCheckBoxClickToolStripMenuItem
+            // 
+            this.allowCheckBoxClickToolStripMenuItem.Name = "allowCheckBoxClickToolStripMenuItem";
+            this.allowCheckBoxClickToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.allowCheckBoxClickToolStripMenuItem.Text = "Allow CheckBox Click";
+            this.allowCheckBoxClickToolStripMenuItem.Click += new System.EventHandler(this.allowCheckBoxClickToolStripMenuItem_Click);
+            // 
             // DemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -568,6 +566,7 @@
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.ToolStripMenuItem allowCheckBoxClickToolStripMenuItem;
 
     }
 }
