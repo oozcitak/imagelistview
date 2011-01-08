@@ -69,7 +69,7 @@ namespace ImageListViewTests
             adaptor = new CustomAdaptor();
             uriAdaptor = new ImageListViewItemAdaptors.URIAdaptor();
 
-            string picturePath = Path.GetDirectoryName(Path.GetDirectoryName(Application.StartupPath)) + Path.DirectorySeparatorChar + "Pictures";
+            string picturePath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             files = Directory.GetFiles(picturePath, "*.jpg");
 
             imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
@@ -89,6 +89,17 @@ namespace ImageListViewTests
                     item.Click += SelectRenderer_Click;
                     SelectRenderer.DropDownItems.Add(item);
                 }
+            }
+        }
+        #endregion
+
+        #region Choose Source
+        private void ChooseImageSource_Click(object sender, EventArgs e)
+        {
+            if (ChooseSourcePath.ShowDialog() == DialogResult.OK)
+            {
+                string picturePath = ChooseSourcePath.SelectedPath;
+                files = Directory.GetFiles(picturePath, "*.jpg");
             }
         }
         #endregion
