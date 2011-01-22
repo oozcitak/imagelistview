@@ -623,7 +623,7 @@ namespace Manina.Windows.Forms
                     mImageListView.SelectedItems.Clear();
                     mImageListView.Refresh();
                 }
-                else if (lastMouseDownInColumnHeaderArea && lastMouseDownOverColumn &&
+                else if (lastMouseDownInColumnHeaderArea && lastMouseDownOverColumn && LeftButton &&
                     mImageListView.AllowColumnClick && HoveredColumn != null && HoveredSeparator == null)
                 {
                     if (!suppressClick)
