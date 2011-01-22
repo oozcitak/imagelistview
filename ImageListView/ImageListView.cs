@@ -84,7 +84,9 @@ namespace Manina.Windows.Forms
         internal ImageListViewSelectedItemCollection mSelectedItems;
         internal ImageListViewCheckedItemCollection mCheckedItems;
         private int mSortColumn;
+        private int mGroupColumn;
         private SortOrder mSortOrder;
+        private SortOrder mGroupOrder;
         private bool mShowFileIcons;
         private bool mShowCheckBoxes;
         private ContentAlignment mIconAlignment;
@@ -577,6 +579,44 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets or sets the index of the group column.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(0), Description("Gets or sets the index of the group column.")]
+        public int GroupColumn
+        {
+            get
+            {
+                return mGroupColumn;
+            }
+            set
+            {
+                if (value != mGroupColumn)
+                {
+                    mGroupColumn = value;
+                    Sort();
+                }
+            }
+        }
+        /// <summary>
+        /// Gets or sets the group order.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(typeof(SortOrder), "None"), Description("Gets or sets the group order.")]
+        public SortOrder GroupOrder
+        {
+            get
+            {
+                return mGroupOrder;
+            }
+            set
+            {
+                if (value != mGroupOrder)
+                {
+                    mGroupOrder = value;
+                    Sort();
+                }
+            }
+        }
+        /// <summary>
         /// This property is not relevant for this class.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never), Browsable(false), Bindable(false), DefaultValue(null), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -840,7 +880,9 @@ namespace Manina.Windows.Forms
             mSelectedItems = new ImageListViewSelectedItemCollection(this);
             mCheckedItems = new ImageListViewCheckedItemCollection(this);
             mSortColumn = 0;
+            mGroupColumn = 0;
             mSortOrder = SortOrder.None;
+            mGroupOrder = SortOrder.None;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque |
                 ControlStyles.Selectable | ControlStyles.UserMouse, true);
             ScrollBars = true;
