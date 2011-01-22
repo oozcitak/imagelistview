@@ -56,6 +56,7 @@
             this.x200ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.allowCheckBoxClickToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allowColumnClickToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allowColumnResizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allowPaneResizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,7 +74,15 @@
             this.iconAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.continuousCacheModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.allowCheckBoxClickToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.groupByToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sortByToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
+            this.groupAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sortAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -86,6 +95,7 @@
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.columnContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripContainer1
@@ -189,12 +199,16 @@
             this.imageListView1.AllowDrag = true;
             this.imageListView1.AllowDrop = true;
             this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
+            this.imageListView1.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 1, true)});
             this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView1.Location = new System.Drawing.Point(0, 0);
             this.imageListView1.Name = "imageListView1";
             this.imageListView1.Size = new System.Drawing.Size(397, 389);
             this.imageListView1.TabIndex = 0;
             this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
+            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
             this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // propertyGrid1
@@ -225,7 +239,7 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(623, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(592, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // rendererToolStripLabel
@@ -375,6 +389,13 @@
             this.toolStripDropDownButton2.Size = new System.Drawing.Size(57, 22);
             this.toolStripDropDownButton2.Text = "Options";
             // 
+            // allowCheckBoxClickToolStripMenuItem
+            // 
+            this.allowCheckBoxClickToolStripMenuItem.Name = "allowCheckBoxClickToolStripMenuItem";
+            this.allowCheckBoxClickToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.allowCheckBoxClickToolStripMenuItem.Text = "Allow CheckBox Click";
+            this.allowCheckBoxClickToolStripMenuItem.Click += new System.EventHandler(this.allowCheckBoxClickToolStripMenuItem_Click);
+            // 
             // allowColumnClickToolStripMenuItem
             // 
             this.allowColumnClickToolStripMenuItem.Name = "allowColumnClickToolStripMenuItem";
@@ -484,12 +505,71 @@
             this.continuousCacheModeToolStripMenuItem.Text = "Continuous Cache Mode";
             this.continuousCacheModeToolStripMenuItem.Click += new System.EventHandler(this.continuousCacheModeToolStripMenuItem_Click);
             // 
-            // allowCheckBoxClickToolStripMenuItem
+            // columnContextMenu
             // 
-            this.allowCheckBoxClickToolStripMenuItem.Name = "allowCheckBoxClickToolStripMenuItem";
-            this.allowCheckBoxClickToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.allowCheckBoxClickToolStripMenuItem.Text = "Allow CheckBox Click";
-            this.allowCheckBoxClickToolStripMenuItem.Click += new System.EventHandler(this.allowCheckBoxClickToolStripMenuItem_Click);
+            this.columnContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.groupByToolStripMenuItem,
+            this.sortByToolStripMenuItem});
+            this.columnContextMenu.Name = "columnContextMenu";
+            this.columnContextMenu.Size = new System.Drawing.Size(119, 48);
+            // 
+            // groupByToolStripMenuItem
+            // 
+            this.groupByToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem5,
+            this.groupAscendingToolStripMenuItem,
+            this.groupDescendingToolStripMenuItem});
+            this.groupByToolStripMenuItem.Name = "groupByToolStripMenuItem";
+            this.groupByToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.groupByToolStripMenuItem.Text = "Group By";
+            // 
+            // sortByToolStripMenuItem
+            // 
+            this.sortByToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem6,
+            this.sortAscendingToolStripMenuItem,
+            this.sortDescendingToolStripMenuItem});
+            this.sortByToolStripMenuItem.Name = "sortByToolStripMenuItem";
+            this.sortByToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.sortByToolStripMenuItem.Text = "Sort By";
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(149, 6);
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(149, 6);
+            // 
+            // groupAscendingToolStripMenuItem
+            // 
+            this.groupAscendingToolStripMenuItem.Name = "groupAscendingToolStripMenuItem";
+            this.groupAscendingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.groupAscendingToolStripMenuItem.Text = "Ascending";
+            this.groupAscendingToolStripMenuItem.Click += new System.EventHandler(this.groupAscendingToolStripMenuItem_Click);
+            // 
+            // groupDescendingToolStripMenuItem
+            // 
+            this.groupDescendingToolStripMenuItem.Name = "groupDescendingToolStripMenuItem";
+            this.groupDescendingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.groupDescendingToolStripMenuItem.Text = "Descending";
+            this.groupDescendingToolStripMenuItem.Click += new System.EventHandler(this.groupDescendingToolStripMenuItem_Click);
+            // 
+            // sortAscendingToolStripMenuItem
+            // 
+            this.sortAscendingToolStripMenuItem.Name = "sortAscendingToolStripMenuItem";
+            this.sortAscendingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.sortAscendingToolStripMenuItem.Text = "Ascending";
+            this.sortAscendingToolStripMenuItem.Click += new System.EventHandler(this.sortAscendingToolStripMenuItem_Click);
+            // 
+            // sortDescendingToolStripMenuItem
+            // 
+            this.sortDescendingToolStripMenuItem.Name = "sortDescendingToolStripMenuItem";
+            this.sortDescendingToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.sortDescendingToolStripMenuItem.Text = "Descending";
+            this.sortDescendingToolStripMenuItem.Click += new System.EventHandler(this.sortDescendingToolStripMenuItem_Click);
             // 
             // DemoForm
             // 
@@ -517,6 +597,7 @@
             this.splitContainer3.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.columnContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -567,6 +648,15 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.ToolStripMenuItem allowCheckBoxClickToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip columnContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem groupByToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sortByToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
+        private System.Windows.Forms.ToolStripMenuItem groupAscendingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem groupDescendingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sortAscendingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sortDescendingToolStripMenuItem;
 
     }
 }

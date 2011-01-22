@@ -152,6 +152,11 @@ namespace Manina.Windows.Forms
 
             toolStripStatusLabel1.Text = string.Format("{0} Items: {1} Selected, {2} Checked",
                 imageListView1.Items.Count, imageListView1.SelectedItems.Count, imageListView1.CheckedItems.Count);
+
+            groupAscendingToolStripMenuItem.Checked = imageListView1.GroupOrder == SortOrder.Ascending;
+            groupDescendingToolStripMenuItem.Checked = imageListView1.GroupOrder == SortOrder.Descending;
+            sortAscendingToolStripMenuItem.Checked = imageListView1.SortOrder == SortOrder.Ascending;
+            sortDescendingToolStripMenuItem.Checked = imageListView1.SortOrder == SortOrder.Descending;
         }
         #endregion
 
@@ -294,6 +299,91 @@ namespace Manina.Windows.Forms
         private void integralScrollToolStripMenuItem_Click(object sender, EventArgs e)
         {
             imageListView1.IntegralScroll = !imageListView1.IntegralScroll;
+        }
+
+        private void imageListView1_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            if ((e.Buttons & MouseButtons.Right) != MouseButtons.None)
+            {
+                // Group menu
+                for (int j = groupByToolStripMenuItem.DropDownItems.Count - 1; j >= 0; j--)
+                {
+                    if (groupByToolStripMenuItem.DropDownItems[j].Tag != null)
+                        groupByToolStripMenuItem.DropDownItems.RemoveAt(j);
+                }
+                int i = 0;
+                foreach (ImageListView.ImageListViewColumnHeader col in imageListView1.Columns)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem(col.Text);
+                    item.Tag = i;
+                    item.Click += new EventHandler(groupColumnMenuItem_Click);
+                    groupByToolStripMenuItem.DropDownItems.Insert(i, item);
+                    i++;
+                }
+                if (i == 0)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem("None");
+                    item.Enabled = false;
+                    groupByToolStripMenuItem.DropDownItems.Insert(0, item);
+                }
+
+                // Sort menu
+                for (int j = sortByToolStripMenuItem.DropDownItems.Count - 1; j >= 0; j--)
+                {
+                    if (sortByToolStripMenuItem.DropDownItems[j].Tag != null)
+                        sortByToolStripMenuItem.DropDownItems.RemoveAt(j);
+                }
+                i = 0;
+                foreach (ImageListView.ImageListViewColumnHeader col in imageListView1.Columns)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem(col.Text);
+                    item.Tag = i;
+                    item.Click += new EventHandler(sortColumnMenuItem_Click);
+                    sortByToolStripMenuItem.DropDownItems.Insert(i, item);
+                    i++;
+                }
+                if (i == 0)
+                {
+                    ToolStripMenuItem item = new ToolStripMenuItem("None");
+                    item.Enabled = false;
+                    sortByToolStripMenuItem.DropDownItems.Insert(0, item);
+                }
+
+                // Show menu
+                columnContextMenu.Show(imageListView1, e.Location);
+            }
+        }
+
+        private void groupColumnMenuItem_Click(object sender, EventArgs e)
+        {
+            int i = (int)((ToolStripMenuItem)sender).Tag;
+            imageListView1.GroupColumn = i;
+        }
+
+        private void sortColumnMenuItem_Click(object sender, EventArgs e)
+        {
+            int i = (int)((ToolStripMenuItem)sender).Tag;
+            imageListView1.SortColumn = i;
+        }
+
+        private void groupAscendingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.GroupOrder = SortOrder.Ascending;
+        }
+
+        private void sortAscendingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.SortOrder = SortOrder.Ascending;
+        }
+
+        private void groupDescendingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.GroupOrder = SortOrder.Descending;
+        }
+
+        private void sortDescendingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.SortOrder = SortOrder.Descending;
         }
         #endregion
 
