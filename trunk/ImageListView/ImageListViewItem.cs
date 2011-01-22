@@ -75,6 +75,7 @@ namespace Manina.Windows.Forms
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
         private bool editing;
+        internal string group;
         #endregion
 
         #region Properties
