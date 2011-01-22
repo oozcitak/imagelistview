@@ -669,22 +669,30 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal void Sort()
             {
-                if (mImageListView == null || mImageListView.SortOrder == SortOrder.None ||
-                    mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count)
+                if (mImageListView == null)
+                    return;
+                if ((mImageListView.GroupOrder == SortOrder.None || mImageListView.GroupColumn < 0 || mImageListView.GroupColumn >= mImageListView.Columns.Count) &&
+                   (mImageListView.SortOrder == SortOrder.None || mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count))
                     return;
 
                 // Display wait cursor while sorting
                 Cursor cursor = mImageListView.Cursor;
                 mImageListView.Cursor = Cursors.WaitCursor;
 
-                // Sort items
-                mItems.Sort(new ImageListViewItemComparer(mImageListView.Columns[mImageListView.SortColumn], mImageListView.SortOrder));
+                // Sort and group items
+                ImageListViewColumnHeader sortColumn = null;
+                ImageListViewColumnHeader groupColumn = null;
+                if (mImageListView.GroupColumn < 0 || mImageListView.GroupColumn >= mImageListView.Columns.Count)
+                    groupColumn = mImageListView.Columns[mImageListView.GroupColumn];
+                if (mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count)
+                    sortColumn = mImageListView.Columns[mImageListView.SortColumn];
+                mItems.Sort(new ImageListViewItemComparer(groupColumn, mImageListView.GroupOrder, sortColumn, mImageListView.SortOrder));
 
                 // Update item indices
                 for (int i = 0; i < mItems.Count; i++)
                     mItems[i].mIndex = i;
 
-                // Restore previous cusrsor
+                // Restore previous cursor
                 mImageListView.Cursor = cursor;
                 collectionModified = true;
             }
@@ -696,13 +704,17 @@ namespace Manina.Windows.Forms
             /// </summary>
             private class ImageListViewItemComparer : IComparer<ImageListViewItem>
             {
+                private ImageListViewColumnHeader mGroupColumn;
                 private ImageListViewColumnHeader mSortColumn;
-                private SortOrder mOrder;
+                private SortOrder mGroupOrder;
+                private SortOrder mSortOrder;
 
-                public ImageListViewItemComparer(ImageListViewColumnHeader sortColumn, SortOrder order)
+                public ImageListViewItemComparer(ImageListViewColumnHeader groupColumn, SortOrder groupOrder, ImageListViewColumnHeader sortColumn, SortOrder sortOrder)
                 {
+                    mGroupColumn = groupColumn;
                     mSortColumn = sortColumn;
-                    mOrder = order;
+                    mGroupOrder = groupOrder;
+                    mSortOrder = sortOrder;
                 }
 
                 /// <summary>
@@ -710,88 +722,184 @@ namespace Manina.Windows.Forms
                 /// </summary>
                 public int Compare(ImageListViewItem x, ImageListViewItem y)
                 {
-                    int sign = (mOrder == SortOrder.Ascending ? 1 : -1);
                     int result = 0;
-                    switch (mSortColumn.Type)
+                    int sign = (mGroupOrder == SortOrder.Ascending ? 1 : -1);
+
+                    if (mGroupColumn != null)
+                    {
+                        Utility.Tuple<int, string> xg = GetItemGroup(mGroupColumn, x);
+                        Utility.Tuple<int, string> yg = GetItemGroup(mGroupColumn, y);
+                        x.group = xg.Item2;
+                        y.group = yg.Item2;
+                        result = (xg.Item1 < yg.Item1 ? -1 : (xg.Item1 > yg.Item1 ? 1 : 0));
+                        if (result != 0)
+                            return sign * result;
+                    }
+                    else
+                    {
+                        x.group = string.Empty;
+                        y.group = string.Empty;
+                    }
+
+                    result = 0;
+                    sign = (mSortOrder == SortOrder.Ascending ? 1 : -1);
+                    if (mSortColumn != null)
+                    {
+                        switch (mSortColumn.Type)
+                        {
+                            case ColumnType.DateAccessed:
+                                result = DateTime.Compare(x.DateAccessed, y.DateAccessed);
+                                break;
+                            case ColumnType.DateCreated:
+                                result = DateTime.Compare(x.DateCreated, y.DateCreated);
+                                break;
+                            case ColumnType.DateModified:
+                                result = DateTime.Compare(x.DateModified, y.DateModified);
+                                break;
+                            case ColumnType.Dimensions:
+                                long ax = x.Dimensions.Width * x.Dimensions.Height;
+                                long ay = y.Dimensions.Width * y.Dimensions.Height;
+                                result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
+                                break;
+                            case ColumnType.FileName:
+                                result = string.Compare(x.FileName, y.FileName, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.FilePath:
+                                result = string.Compare(x.FilePath, y.FilePath, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.FileSize:
+                                result = (x.FileSize < y.FileSize ? -1 : (x.FileSize > y.FileSize ? 1 : 0));
+                                break;
+                            case ColumnType.FileType:
+                                result = string.Compare(x.FileType, y.FileType, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.Name:
+                                result = string.Compare(x.Text, y.Text, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.Resolution:
+                                float rx = x.Resolution.Width * x.Resolution.Height;
+                                float ry = y.Resolution.Width * y.Resolution.Height;
+                                result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
+                                break;
+                            case ColumnType.ImageDescription:
+                                result = string.Compare(x.ImageDescription, y.ImageDescription, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.EquipmentModel:
+                                result = string.Compare(x.EquipmentModel, y.EquipmentModel, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.DateTaken:
+                                result = DateTime.Compare(x.DateTaken, y.DateTaken);
+                                break;
+                            case ColumnType.Artist:
+                                result = string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.Copyright:
+                                result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.ExposureTime:
+                                result = (x.ExposureTime < y.ExposureTime ? -1 : (x.ExposureTime > y.ExposureTime ? 1 : 0));
+                                break;
+                            case ColumnType.FNumber:
+                                result = (x.FNumber < y.FNumber ? -1 : (x.FNumber > y.FNumber ? 1 : 0));
+                                break;
+                            case ColumnType.ISOSpeed:
+                                result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
+                                break;
+                            case ColumnType.UserComment:
+                                result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.Rating:
+                                result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
+                                break;
+                            case ColumnType.Software:
+                                result = string.Compare(x.Software, y.Software, StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            case ColumnType.FocalLength:
+                                result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
+                                break;
+                            case ColumnType.Custom:
+                                result = string.Compare(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), StringComparison.InvariantCultureIgnoreCase);
+                                break;
+                            default:
+                                result = 0;
+                                break;
+                        }
+                    }
+
+                    return sign * result;
+                }
+
+                /// <summary>
+                /// Returns the group order and name for the given item.
+                /// </summary>
+                /// <param name="item">The item.</param>
+                private Utility.Tuple<int, string> GetItemGroup(ImageListViewColumnHeader column, ImageListViewItem item)
+                {
+                    switch (column.Type)
                     {
                         case ColumnType.DateAccessed:
-                            result = DateTime.Compare(x.DateAccessed, y.DateAccessed);
+                            return Utility.GroupTextDate(item.DateAccessed);
                             break;
                         case ColumnType.DateCreated:
-                            result = DateTime.Compare(x.DateCreated, y.DateCreated);
+                            return Utility.GroupTextDate(item.DateCreated);
                             break;
                         case ColumnType.DateModified:
-                            result = DateTime.Compare(x.DateModified, y.DateModified);
+                            return Utility.GroupTextDate(item.DateModified);
                             break;
                         case ColumnType.Dimensions:
-                            long ax = x.Dimensions.Width * x.Dimensions.Height;
-                            long ay = y.Dimensions.Width * y.Dimensions.Height;
-                            result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
+                            return Utility.GroupTextDimension(item.Dimensions);
                             break;
                         case ColumnType.FileName:
-                            result = string.Compare(x.FileName, y.FileName, StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.FileName);
                             break;
                         case ColumnType.FilePath:
-                            result = string.Compare(x.FilePath, y.FilePath, StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.FilePath);
                             break;
                         case ColumnType.FileSize:
-                            result = (x.FileSize < y.FileSize ? -1 : (x.FileSize > y.FileSize ? 1 : 0));
+                            return Utility.GroupTextFileSize(item.FileSize);
                             break;
                         case ColumnType.FileType:
-                            result = string.Compare(x.FileType, y.FileType, StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.FileType);
                             break;
                         case ColumnType.Name:
-                            result = string.Compare(x.Text, y.Text, StringComparison.InvariantCultureIgnoreCase);
-                            break;
-                        case ColumnType.Resolution:
-                            float rx = x.Resolution.Width * x.Resolution.Height;
-                            float ry = y.Resolution.Width * y.Resolution.Height;
-                            result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
+                            return Utility.GroupTextAlpha(item.Text);
                             break;
                         case ColumnType.ImageDescription:
-                            result = string.Compare(x.ImageDescription, y.ImageDescription, StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.ImageDescription);
                             break;
                         case ColumnType.EquipmentModel:
-                            result = string.Compare(x.EquipmentModel, y.EquipmentModel, StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.EquipmentModel);
                             break;
                         case ColumnType.DateTaken:
-                            result = DateTime.Compare(x.DateTaken, y.DateTaken);
+                            return Utility.GroupTextDate(item.DateTaken);
                             break;
                         case ColumnType.Artist:
-                            result = string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.Artist);
                             break;
                         case ColumnType.Copyright:
-                            result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
-                            break;
-                        case ColumnType.ExposureTime:
-                            result = (x.ExposureTime < y.ExposureTime ? -1 : (x.ExposureTime > y.ExposureTime ? 1 : 0));
-                            break;
-                        case ColumnType.FNumber:
-                            result = (x.FNumber < y.FNumber ? -1 : (x.FNumber > y.FNumber ? 1 : 0));
-                            break;
-                        case ColumnType.ISOSpeed:
-                            result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
+                            return Utility.GroupTextAlpha(item.Copyright);
                             break;
                         case ColumnType.UserComment:
-                            result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
-                            break;
-                        case ColumnType.Rating:
-                            result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
+                            return Utility.GroupTextAlpha(item.UserComment);
                             break;
                         case ColumnType.Software:
-                            result = string.Compare(x.Software, y.Software, StringComparison.InvariantCultureIgnoreCase);
-                            break;
-                        case ColumnType.FocalLength:
-                            result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
+                            return Utility.GroupTextAlpha(item.Software);
                             break;
                         case ColumnType.Custom:
-                            result = string.Compare(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), StringComparison.InvariantCultureIgnoreCase);
+                            return Utility.GroupTextAlpha(item.GetSubItemText(column.Guid));
                             break;
                         default:
-                            result = 0;
+                            return new Utility.Tuple<int, string>(0, "Unknown");
                             break;
+                        /*
+                        case ColumnType.Resolution:
+                        case ColumnType.ExposureTime:
+                        case ColumnType.FNumber:
+                        case ColumnType.ISOSpeed:
+                        case ColumnType.Rating:
+                        case ColumnType.FocalLength:
+                         * */
                     }
-                    return sign * result;
                 }
             }
             #endregion
