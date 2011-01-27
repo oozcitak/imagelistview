@@ -315,6 +315,7 @@ namespace Manina.Windows.Forms
                 foreach (ImageListView.ImageListViewColumnHeader col in imageListView1.Columns)
                 {
                     ToolStripMenuItem item = new ToolStripMenuItem(col.Text);
+                    item.Checked = (imageListView1.GroupColumn == i);
                     item.Tag = i;
                     item.Click += new EventHandler(groupColumnMenuItem_Click);
                     groupByToolStripMenuItem.DropDownItems.Insert(i, item);
@@ -337,6 +338,7 @@ namespace Manina.Windows.Forms
                 foreach (ImageListView.ImageListViewColumnHeader col in imageListView1.Columns)
                 {
                     ToolStripMenuItem item = new ToolStripMenuItem(col.Text);
+                    item.Checked = (imageListView1.SortColumn == i);
                     item.Tag = i;
                     item.Click += new EventHandler(sortColumnMenuItem_Click);
                     sortByToolStripMenuItem.DropDownItems.Insert(i, item);
