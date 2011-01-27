@@ -21,6 +21,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms.VisualStyles;
+using System.Diagnostics;
 
 namespace Manina.Windows.Forms
 {
@@ -43,6 +44,168 @@ namespace Manina.Windows.Forms
                 ;
             }
         }
+        #endregion
+
+        #region DefaultRenderer
+#if DEBUG
+        /// <summary>
+        /// Represents a renderer meant to be used for debugging purposes.
+        /// Included in the debug build only.
+        /// </summary>
+        public class DebugRenderer : ImageListView.ImageListViewRenderer
+        {
+            private long baseMem;
+
+            /// <summary>
+            /// Initializes a new instance of the DebugRenderer class.
+            /// </summary>
+            public DebugRenderer()
+            {
+                Process p = Process.GetCurrentProcess();
+                p.Refresh();
+                baseMem = p.PrivateMemorySize64;
+            }
+            /// <summary>
+            /// Draws the specified item on the given graphics.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="item">The ImageListViewItem to draw.</param>
+            /// <param name="state">The current view state of item.</param>
+            /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
+            public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
+            {
+                if (item.Index == ImageListView.layoutManager.FirstPartiallyVisible ||
+                    item.Index == ImageListView.layoutManager.LastPartiallyVisible)
+                {
+                    using (Brush b = new HatchBrush(HatchStyle.BackwardDiagonal, Color.Green, Color.Transparent))
+                    {
+                        g.FillRectangle(b, bounds);
+                    }
+                }
+                if (item.Index == ImageListView.layoutManager.FirstVisible ||
+                    item.Index == ImageListView.layoutManager.LastVisible)
+                {
+                    using (Brush b = new HatchBrush(HatchStyle.ForwardDiagonal, Color.Red, Color.Transparent))
+                    {
+                        g.FillRectangle(b, bounds);
+                    }
+                }
+
+                base.DrawItem(g, item, state, bounds);
+            }
+            /// <summary>
+            /// Draws an overlay image over the client area.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="bounds">The bounding rectangle of the client area.</param>
+            public override void DrawOverlay(Graphics g, Rectangle bounds)
+            {
+                // Refresh process info
+                Process p = Process.GetCurrentProcess();
+                p.Refresh();
+                long mem = Math.Max(0, p.PrivateMemorySize64 - baseMem);
+
+                // Display memory stats
+                string s = string.Format("Total: {0}\r\nCache: {1}\r\nCache*: {2}", Utility.FormatSize(baseMem), Utility.FormatSize(mem), Utility.FormatSize(ImageListView.thumbnailCache.MemoryUsed));
+                SizeF sz = g.MeasureString(s, ImageListView.Font);
+                Rectangle r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5, 115, (int)sz.Height);
+                using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))
+                {
+                    g.FillRectangle(b, r);
+                }
+                using (Pen pen = new Pen(Color.FromArgb(128, Color.Gray)))
+                {
+                    g.DrawRectangle(pen, r);
+                }
+                g.DrawString(s, ImageListView.Font, Brushes.Black, r.Location);
+
+                // Display navigation parameters
+                r = new Rectangle(ItemAreaBounds.Right - 120, ItemAreaBounds.Top + 5 + (int)sz.Height + 10, 115, 125);
+                using (Brush b = new SolidBrush(Color.FromArgb(220, Color.LightGray)))
+                {
+                    g.FillRectangle(b, r);
+                }
+                using (Pen pen = new Pen(Color.FromArgb(128, Color.Gray)))
+                {
+                    g.DrawRectangle(pen, r);
+                }
+
+                // Is left button down?
+                r = new Rectangle(r.Left + 5, r.Top + 5, 15, 15);
+                if (ImageListView.navigationManager.LeftButton)
+                {
+                    g.FillRectangle(Brushes.DarkGray, r);
+                }
+                g.DrawRectangle(Pens.Black, r);
+                r.Offset(15, 0);
+                r.Offset(15, 0);
+
+                // Is right button down?
+                if (ImageListView.navigationManager.RightButton)
+                {
+                    g.FillRectangle(Brushes.DarkGray, r);
+                }
+                g.DrawRectangle(Pens.Black, r);
+                r.Offset(-30, 22);
+
+                // Is shift key down?
+                Color tColor = Color.Gray;
+                if (ImageListView.navigationManager.ShiftKey)
+                    tColor = Color.Black;
+                using (Brush b = new SolidBrush(tColor))
+                {
+                    g.DrawString("Shift", ImageListView.Font, b, r.Location);
+                }
+                r.Offset(0, 12);
+
+                // Is control key down?
+                tColor = Color.Gray;
+                if (ImageListView.navigationManager.ControlKey)
+                    tColor = Color.Black;
+                using (Brush b = new SolidBrush(tColor))
+                {
+                    g.DrawString("Control", ImageListView.Font, b, r.Location);
+                }
+                r.Offset(0, 20);
+
+                // Display hit test details for item area
+                ImageListView.HitInfo h = null;
+                ImageListView.HitTest(ImageListView.PointToClient(Control.MousePosition), out h);
+
+                tColor = Color.Gray;
+                if (h.InItemArea)
+                    tColor = Color.Black;
+                using (Brush b = new SolidBrush(tColor))
+                {
+                    g.DrawString("InItemArea (" + h.ItemIndex.ToString() + ")", ImageListView.Font, b, r.Location);
+                }
+                r.Offset(0, 12);
+
+                // Display hit test details for column header area
+                tColor = Color.Gray;
+                if (h.InHeaderArea)
+                    tColor = Color.Black;
+                using (Brush b = new SolidBrush(tColor))
+                {
+                    if (h.Column != null)
+                    {
+                        g.DrawString("InHeaderArea (" + h.Column.ToString() + ")", ImageListView.Font, b, r.Location);
+                    }
+                }
+                r.Offset(0, 12);
+
+                // Display hit test details for pane area
+                tColor = Color.Gray;
+                if (h.InPaneArea)
+                    tColor = Color.Black;
+                using (Brush b = new SolidBrush(tColor))
+                {
+                    g.DrawString("InPaneArea " + (h.PaneBorder ? " (Border)" : ""), ImageListView.Font, b, r.Location);
+                }
+                r.Offset(0, 12);
+            }
+        }
+#endif
         #endregion
 
         #region NoirRenderer
