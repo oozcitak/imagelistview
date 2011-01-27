@@ -99,6 +99,9 @@ namespace Manina.Windows.Forms
         private View mView;
         private Point mViewOffset;
 
+        // Groups
+        internal Dictionary<string, List<ImageListViewItem>> groups;
+
         // Renderer variables
         internal ImageListViewRenderer mRenderer;
         private bool controlSuspended;
@@ -910,6 +913,8 @@ namespace Manina.Windows.Forms
             vScrollBar.Scroll += vScrollBar_Scroll;
             Controls.Add(hScrollBar);
             Controls.Add(vScrollBar);
+
+            groups = new Dictionary<string, List<ImageListViewItem>>();
 
             // Lazy refresh timer
             lazyRefreshTimer = new System.Timers.Timer();

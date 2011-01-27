@@ -90,7 +90,7 @@ namespace Manina.Windows.Forms
                         g.FillRectangle(b, bounds);
                     }
                 }
-
+                
                 base.DrawItem(g, item, state, bounds);
             }
             /// <summary>
