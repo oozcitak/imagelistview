@@ -68,7 +68,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BonusRenderers.cs" />
     <Compile Include="ImageListViewItemAdaptors.cs">
     </Compile>
     <Compile Include="ImageListViewCacheMetadata.cs" />
@@ -91,7 +90,6 @@
     <Compile Include="ImageListViewCheckedItemCollection.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DebugRenderer.cs" />
     <Compile Include="ImageListViewColor.cs" />
     <Compile Include="ImageListViewResources.de.Designer.cs">
       <AutoGen>True</AutoGen>
