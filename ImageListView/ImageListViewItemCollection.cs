@@ -682,15 +682,28 @@ namespace Manina.Windows.Forms
                 // Sort and group items
                 ImageListViewColumnHeader sortColumn = null;
                 ImageListViewColumnHeader groupColumn = null;
-                if (mImageListView.GroupColumn < 0 || mImageListView.GroupColumn >= mImageListView.Columns.Count)
+                if (mImageListView.GroupColumn >= 0 && mImageListView.GroupColumn < mImageListView.Columns.Count)
                     groupColumn = mImageListView.Columns[mImageListView.GroupColumn];
-                if (mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count)
+                if (mImageListView.SortColumn >= 0 || mImageListView.SortColumn < mImageListView.Columns.Count)
                     sortColumn = mImageListView.Columns[mImageListView.SortColumn];
                 mItems.Sort(new ImageListViewItemComparer(groupColumn, mImageListView.GroupOrder, sortColumn, mImageListView.SortOrder));
 
-                // Update item indices
+                // Update item indices and create groups
+                string lastGroup = string.Empty;
+                mImageListView.groups = new Dictionary<string, List<ImageListViewItem>>();
                 for (int i = 0; i < mItems.Count; i++)
-                    mItems[i].mIndex = i;
+                {
+                    ImageListViewItem item = mItems[i];
+                    item.mIndex = i;
+                    string group = item.group;
+                    if (string.Compare(lastGroup, group, StringComparison.InvariantCultureIgnoreCase) != 0)
+                    {
+                        lastGroup = group;
+                        mImageListView.groups.Add(group, new List<ImageListViewItem>() { item });
+                    }
+                    else
+                        mImageListView.groups[lastGroup].Add(item);
+                }
 
                 // Restore previous cursor
                 mImageListView.Cursor = cursor;
@@ -832,83 +845,60 @@ namespace Manina.Windows.Forms
                 /// <summary>
                 /// Returns the group order and name for the given item.
                 /// </summary>
-                /// <param name="item">The item.</param>
+                /// <param name="column">The group column.</param>
+                /// <param name="item">The item to create a group for.</param>
                 private Utility.Tuple<int, string> GetItemGroup(ImageListViewColumnHeader column, ImageListViewItem item)
                 {
                     switch (column.Type)
                     {
                         case ColumnType.DateAccessed:
                             return Utility.GroupTextDate(item.DateAccessed);
-                            break;
                         case ColumnType.DateCreated:
                             return Utility.GroupTextDate(item.DateCreated);
-                            break;
                         case ColumnType.DateModified:
                             return Utility.GroupTextDate(item.DateModified);
-                            break;
                         case ColumnType.Dimensions:
                             return Utility.GroupTextDimension(item.Dimensions);
-                            break;
                         case ColumnType.FileName:
                             return Utility.GroupTextAlpha(item.FileName);
-                            break;
                         case ColumnType.FilePath:
                             return Utility.GroupTextAlpha(item.FilePath);
-                            break;
                         case ColumnType.FileSize:
                             return Utility.GroupTextFileSize(item.FileSize);
-                            break;
                         case ColumnType.FileType:
                             return Utility.GroupTextAlpha(item.FileType);
-                            break;
                         case ColumnType.Name:
                             return Utility.GroupTextAlpha(item.Text);
-                            break;
                         case ColumnType.ImageDescription:
                             return Utility.GroupTextAlpha(item.ImageDescription);
-                            break;
                         case ColumnType.EquipmentModel:
                             return Utility.GroupTextAlpha(item.EquipmentModel);
-                            break;
                         case ColumnType.DateTaken:
                             return Utility.GroupTextDate(item.DateTaken);
-                            break;
                         case ColumnType.Artist:
                             return Utility.GroupTextAlpha(item.Artist);
-                            break;
                         case ColumnType.Copyright:
                             return Utility.GroupTextAlpha(item.Copyright);
-                            break;
                         case ColumnType.UserComment:
                             return Utility.GroupTextAlpha(item.UserComment);
-                            break;
                         case ColumnType.Software:
                             return Utility.GroupTextAlpha(item.Software);
-                            break;
                         case ColumnType.Custom:
                             return Utility.GroupTextAlpha(item.GetSubItemText(column.Guid));
-                            break;
                         case ColumnType.ISOSpeed:
                             return new Utility.Tuple<int, string>(item.ISOSpeed, item.ISOSpeed.ToString());
-                            break;
                         case ColumnType.Rating:
                             return new Utility.Tuple<int, string>(item.Rating / 5, (item.Rating / 5).ToString());
-                            break;
                         case ColumnType.FocalLength:
                             return new Utility.Tuple<int, string>((int)item.FocalLength, item.FocalLength.ToString());
-                            break;
                         case ColumnType.ExposureTime:
                             return new Utility.Tuple<int, string>((int)item.ExposureTime, item.ExposureTime.ToString());
-                            break;
                         case ColumnType.FNumber:
                             return new Utility.Tuple<int, string>((int)item.FNumber, item.FNumber.ToString());
-                            break;
                         case ColumnType.Resolution:
                             return new Utility.Tuple<int, string>((int)item.Resolution.Width, item.Resolution.Width.ToString());
-                            break;
                         default:
                             return new Utility.Tuple<int, string>(0, "Unknown");
-                            break;
                     }
                 }
             }
