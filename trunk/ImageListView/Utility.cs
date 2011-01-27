@@ -221,7 +221,7 @@ namespace Manina.Windows.Forms
         /// <param name="text">The text to format.</param>
         internal static Tuple<int, string> GroupTextAlpha(string text)
         {
-            string txt = text.Substring(0, 1);
+            string txt = text.Substring(0, 1).ToUpperInvariant();
             char order = txt[0];
             return Tuple.Create((int)order, txt);
         }
