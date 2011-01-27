@@ -888,17 +888,27 @@ namespace Manina.Windows.Forms
                         case ColumnType.Custom:
                             return Utility.GroupTextAlpha(item.GetSubItemText(column.Guid));
                             break;
+                        case ColumnType.ISOSpeed:
+                            return new Utility.Tuple<int, string>(item.ISOSpeed, item.ISOSpeed.ToString());
+                            break;
+                        case ColumnType.Rating:
+                            return new Utility.Tuple<int, string>(item.Rating / 5, (item.Rating / 5).ToString());
+                            break;
+                        case ColumnType.FocalLength:
+                            return new Utility.Tuple<int, string>((int)item.FocalLength, item.FocalLength.ToString());
+                            break;
+                        case ColumnType.ExposureTime:
+                            return new Utility.Tuple<int, string>((int)item.ExposureTime, item.ExposureTime.ToString());
+                            break;
+                        case ColumnType.FNumber:
+                            return new Utility.Tuple<int, string>((int)item.FNumber, item.FNumber.ToString());
+                            break;
+                        case ColumnType.Resolution:
+                            return new Utility.Tuple<int, string>((int)item.Resolution.Width, item.Resolution.Width.ToString());
+                            break;
                         default:
                             return new Utility.Tuple<int, string>(0, "Unknown");
                             break;
-                        /*
-                        case ColumnType.Resolution:
-                        case ColumnType.ExposureTime:
-                        case ColumnType.FNumber:
-                        case ColumnType.ISOSpeed:
-                        case ColumnType.Rating:
-                        case ColumnType.FocalLength:
-                         * */
                     }
                 }
             }
