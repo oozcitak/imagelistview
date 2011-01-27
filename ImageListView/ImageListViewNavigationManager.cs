@@ -518,7 +518,8 @@ namespace Manina.Windows.Forms
 
                     mImageListView.Refresh();
                 }
-                else if (mImageListView.AllowCheckBoxClick && lastMouseDownInItemArea && lastMouseDownOverCheckBox && HoveredItem != null && overCheckBox && LeftButton)
+                else if (mImageListView.AllowCheckBoxClick && lastMouseDownInItemArea &&
+                    lastMouseDownOverCheckBox && HoveredItem != null && overCheckBox && LeftButton)
                 {
                     if (HoveredItem.Selected)
                     {
@@ -623,25 +624,29 @@ namespace Manina.Windows.Forms
                     mImageListView.SelectedItems.Clear();
                     mImageListView.Refresh();
                 }
-                else if (lastMouseDownInColumnHeaderArea && lastMouseDownOverColumn && LeftButton &&
+                else if (lastMouseDownInColumnHeaderArea && lastMouseDownOverColumn &&
                     mImageListView.AllowColumnClick && HoveredColumn != null && HoveredSeparator == null)
                 {
                     if (!suppressClick)
                     {
-                        // Change the sort column
-                        if (mImageListView.Columns[mImageListView.SortColumn].Guid == HoveredColumn.Guid)
+                        if (LeftButton)
                         {
-                            if (mImageListView.SortOrder == SortOrder.Descending)
-                                mImageListView.SortOrder = SortOrder.Ascending;
+                            // Change the sort column
+                            if (mImageListView.Columns[mImageListView.SortColumn].Guid == HoveredColumn.Guid)
+                            {
+                                if (mImageListView.SortOrder == SortOrder.Descending)
+                                    mImageListView.SortOrder = SortOrder.Ascending;
+                                else
+                                    mImageListView.SortOrder = SortOrder.Descending;
+                            }
                             else
-                                mImageListView.SortOrder = SortOrder.Descending;
+                            {
+                                mImageListView.mSortColumn = mImageListView.Columns.IndexOf(HoveredColumn);
+                                mImageListView.mSortOrder = SortOrder.Ascending;
+                                mImageListView.Sort();
+                            }
                         }
-                        else
-                        {
-                            mImageListView.mSortColumn = mImageListView.Columns.IndexOf(HoveredColumn);
-                            mImageListView.mSortOrder = SortOrder.Ascending;
-                            mImageListView.Sort();
-                        }
+
                         mImageListView.OnColumnClick(new ColumnClickEventArgs(HoveredColumn, e.Location, e.Button));
                     }
                     else
