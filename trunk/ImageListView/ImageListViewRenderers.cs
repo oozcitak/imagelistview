@@ -2600,15 +2600,12 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of item in client coordinates.</param>
             public override void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
             {
-                Size itemPadding = new Size(4, 4);
-
                 if (ImageListView.View == View.Details)
                 {
                     bool alternate = (item.Index % 2 == 1);
                     List<ImageListView.ImageListViewColumnHeader> uicolumns = ImageListView.Columns.GetDisplayedColumns();
 
                     // Paint background
-                    Color backColor = ImageListView.Colors.BackColor;
                     if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         // Focused and selected
