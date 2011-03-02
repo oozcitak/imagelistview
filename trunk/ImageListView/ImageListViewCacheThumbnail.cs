@@ -779,12 +779,11 @@ namespace Manina.Windows.Forms
             UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
-            if (galleryItem.Guid == guid &&
-                galleryItem != null && galleryItem.Image != null &&
-                galleryItem.Size == thumbSize &&
+            if (galleryItem != null && galleryItem.Guid == guid &&
+                galleryItem.Image != null && galleryItem.Size == thumbSize &&
                 galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 galleryItem.AutoRotate == autoRotate &&
-                galleryItem.UseWIC == useWIC)
+			    galleryItem.UseWIC == useWIC)
                 return;
 
             // Add to cache queue
@@ -805,9 +804,8 @@ namespace Manina.Windows.Forms
             UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
             // Already cached?
-            if (rendererItem.Guid == guid &&
-                rendererItem != null && rendererItem.Image != null &&
-                rendererItem.Size == thumbSize &&
+            if (rendererItem != null && rendererItem.Guid == guid &&
+                rendererItem.Image != null && rendererItem.Size == thumbSize &&
                 rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 rendererItem.AutoRotate == autoRotate &&
                 rendererItem.UseWIC == useWIC)
@@ -829,9 +827,8 @@ namespace Manina.Windows.Forms
         public Image GetRendererImage(Guid guid, Size thumbSize,
             UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
-            if (rendererItem.Guid == guid &&
-                rendererItem != null && rendererItem.Image != null &&
-                rendererItem.Size == thumbSize &&
+            if (rendererItem != null && rendererItem.Guid == guid &&
+                rendererItem.Image != null && rendererItem.Size == thumbSize &&
                 rendererItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 rendererItem.AutoRotate == autoRotate &&
                 rendererItem.UseWIC == useWIC)
@@ -851,9 +848,8 @@ namespace Manina.Windows.Forms
         public Image GetGalleryImage(Guid guid, Size thumbSize,
             UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
         {
-            if (galleryItem.Guid == guid &&
-                galleryItem != null && galleryItem.Image != null &&
-                galleryItem.Size == thumbSize &&
+            if (galleryItem != null && galleryItem.Guid == guid &&
+                galleryItem.Image != null && galleryItem.Size == thumbSize &&
                 galleryItem.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 galleryItem.AutoRotate == autoRotate &&
                 galleryItem.UseWIC == useWIC)
@@ -876,8 +872,7 @@ namespace Manina.Windows.Forms
         {
             CacheItem item = null;
             if (thumbCache.TryGetValue(guid, out item) &&
-                item != null && item.Image != null &&
-                item.Size == thumbSize &&
+                item.Image != null && item.Size == thumbSize &&
                 item.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 item.AutoRotate == autoRotate &&
                 item.UseWIC == useWIC)
@@ -898,8 +893,7 @@ namespace Manina.Windows.Forms
         {
             CacheItem item = null;
             if (thumbCache.TryGetValue(guid, out item) && 
-                item != null &&
-                item.Size == thumbSize &&
+                item != null && item.Size == thumbSize &&
                 item.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 item.AutoRotate == autoRotate &&
                 item.UseWIC == useWIC)
