@@ -52,6 +52,7 @@ namespace Manina.Windows.Forms
         private const int TagSoftware = 0x0131;
         #endregion
 
+#if USEWIC
         #region WIC Metadata Paths
         private static readonly string[] WICPathImageDescription = new string[] { "/app1/ifd/{ushort=40095}", "/app1/ifd/{ushort=270}" };
         private static readonly string[] WICPathCopyright = new string[] { "/app1/ifd/{ushort=33432}", "/app13/irb/8bimiptc/iptc/copyright notice", "/xmp/<xmpalt>dc:rights", "/xmp/dc:rights" };
@@ -68,7 +69,8 @@ namespace Manina.Windows.Forms
         private static readonly string[] WICPathISOSpeed = new string[] { "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed" };
         private static readonly string[] WICPathFocalLength = new string[] { "/app1/ifd/exif/{ushort=37386}", "/xmp/exif:FocalLength" };
         #endregion
-
+#endif
+		
         #region Exif Format Conversion
         /// <summary>
         /// Converts the given Exif data to a byte.
