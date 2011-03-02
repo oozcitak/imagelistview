@@ -872,7 +872,7 @@ namespace Manina.Windows.Forms
         {
             CacheItem item = null;
             if (thumbCache.TryGetValue(guid, out item) &&
-                item.Image != null && item.Size == thumbSize &&
+                item != null && item.Image != null && item.Size == thumbSize &&
                 item.UseEmbeddedThumbnails == useEmbeddedThumbnails &&
                 item.AutoRotate == autoRotate &&
                 item.UseWIC == useWIC)
