@@ -40,10 +40,12 @@ namespace Manina.Windows.Forms
         private const int TagOrientation = 0x0112;
         #endregion
 
+#if USEWIC		
         #region WIC Metadata Paths
         private static readonly string[] WICPathOrientation = new string[] { "/app1/ifd/{ushort=274}", "/xmp/tiff:Orientation" };
         #endregion
-
+#endif
+		
         #region Public Methods
         /// <summary>
         /// Creates a thumbnail from the given image.
