@@ -45,7 +45,8 @@ namespace Manina.Windows.Forms
         private Size cachedSize;
         private int cachedItemCount;
         private Size cachedItemSize;
-        private int cachedHeaderHeight;
+        private int cachedGroupHeaderHeight;
+        private int cachedColumnHeaderHeight;
         private bool cachedIntegralScroll;
         private Size cachedItemMargin;
         private int cachedPaneWidth;
@@ -122,7 +123,9 @@ namespace Manina.Windows.Forms
                     return true;
                 else if (mImageListView.mRenderer.MeasureItem(mImageListView.View) != cachedItemSize)
                     return true;
-                else if (mImageListView.mRenderer.MeasureColumnHeaderHeight() != cachedHeaderHeight)
+                else if (mImageListView.mRenderer.MeasureGroupHeaderHeight() != cachedGroupHeaderHeight)
+                    return true;
+                else if (mImageListView.mRenderer.MeasureColumnHeaderHeight() != cachedColumnHeaderHeight)
                     return true;
                 else if (mImageListView.mRenderer.MeasureItemMargin(mImageListView.View) != cachedItemMargin)
                     return true;
@@ -178,12 +181,44 @@ namespace Manina.Windows.Forms
             if (mImageListView.View == View.Gallery)
             {
                 location.X += itemIndex * mItemSizeWithMargin.Width;
+
+                if (mImageListView.showGroups)
+                    location.Y += cachedGroupHeaderHeight;
             }
             else
             {
-                location.X += (itemIndex % mCols) * mItemSizeWithMargin.Width;
-                location.Y += (itemIndex / mCols) * mItemSizeWithMargin.Height;
+                if (mImageListView.showGroups)
+                {
+                    // Offset by the number of groups above the item
+                    int offset = 0;
+                    int count = 0;
+                    int firstIndex = 0;
+                    foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
+                    {
+                        count += pair.Value.Count;
+                        location.Y += cachedGroupHeaderHeight;
+                        offset++;
+                        if (count > itemIndex)
+                        {
+                            location.Y += ((itemIndex - firstIndex) / mCols) * mItemSizeWithMargin.Height;
+                            break;
+                        }
+                        else
+                        {
+                            location.Y += (int)System.Math.Ceiling((float)pair.Value.Count / (float)mCols) * mItemSizeWithMargin.Height;
+                            firstIndex = count;
+                        }
+                    }
+
+                    location.X += ((itemIndex - firstIndex) % mCols) * mItemSizeWithMargin.Width;
+                }
+                else
+                {
+                    location.X += (itemIndex % mCols) * mItemSizeWithMargin.Width;
+                    location.Y += (itemIndex / mCols) * mItemSizeWithMargin.Height;
+                }
             }
+
             return new Rectangle(location, mItemSize);
         }
         /// <summary>
@@ -301,7 +336,7 @@ namespace Manina.Windows.Forms
                 return;
             }
 
-            if (!forceUpdate && !UpdateRequired) 
+            if (!forceUpdate && !UpdateRequired)
                 return;
 
             // Get the item size from the renderer
@@ -316,13 +351,14 @@ namespace Manina.Windows.Forms
             cachedItemCount = mImageListView.Items.Count;
             cachedIntegralScroll = mImageListView.IntegralScroll;
             cachedItemSize = mItemSize;
-            cachedHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
+            cachedGroupHeaderHeight = mImageListView.mRenderer.MeasureGroupHeaderHeight();
+            cachedColumnHeaderHeight = mImageListView.mRenderer.MeasureColumnHeaderHeight();
             cachedPaneWidth = mImageListView.PaneWidth;
             cachedScrollBars = mImageListView.ScrollBars;
             mImageListView.Items.collectionModified = false;
 
             // Calculate item area bounds
-            if(!UpdateItemArea())
+            if (!UpdateItemArea())
                 return;
 
             // Let the calculated bounds modified by the renderer
@@ -355,8 +391,18 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void CalculateGrid()
         {
+            if (mImageListView.showGroups)
+            {
+                int h = mItemAreaBounds.Height;
+                foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
+                {
+                    h -= cachedGroupHeaderHeight;
+                }
+                mRows = (int)System.Math.Floor((float)h / (float)mItemSizeWithMargin.Height);
+            }
+            else
+                mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
             mCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
-            mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
             if (mImageListView.View == View.Details) mCols = 1;
             if (mImageListView.View == View.Gallery) mRows = 1;
             if (mCols < 1) mCols = 1;
@@ -389,7 +435,7 @@ namespace Manina.Windows.Forms
             // Allocate space for column headers
             if (mImageListView.View == View.Details)
             {
-                int headerHeight = cachedHeaderHeight;
+                int headerHeight = cachedColumnHeaderHeight;
 
                 // Location of the column headers
                 mColumnHeaderBounds.X = mClientArea.Left - mImageListView.ViewOffset.X;
@@ -409,6 +455,11 @@ namespace Manina.Windows.Forms
             {
                 mItemAreaBounds.Height = mItemSizeWithMargin.Height;
                 mItemAreaBounds.Y = mClientArea.Bottom - mItemSizeWithMargin.Height;
+                if (mImageListView.showGroups)
+                {
+                    mItemAreaBounds.Height += cachedGroupHeaderHeight;
+                    mItemAreaBounds.Y -= cachedGroupHeaderHeight;
+                }
             }
             // Modify item area for the pane view mode
             if (mImageListView.View == View.Pane)
@@ -417,7 +468,7 @@ namespace Manina.Windows.Forms
                 mItemAreaBounds.X += cachedPaneWidth;
             }
 
-            return (mItemAreaBounds.Width > 0 && mItemAreaBounds.Height > 0); 
+            return (mItemAreaBounds.Width > 0 && mItemAreaBounds.Height > 0);
         }
         /// <summary>
         /// Shows or hides the scroll bars.
@@ -452,7 +503,19 @@ namespace Manina.Windows.Forms
                 if (mImageListView.View == View.Gallery)
                     vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < mRows * mItemSizeWithMargin.Height);
                 else
-                    vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
+                {
+                    if (mImageListView.showGroups)
+                    {
+                        int totRows = 0;
+                        foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
+                        {
+                            totRows += (int)System.Math.Ceiling((float)pair.Value.Count / (float)mCols);
+                        }
+                        vScrollRequired = (mImageListView.Items.Count > 0) && (mRows < totRows);
+                    }
+                    else
+                        vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
+                }
             }
             if (vScrollRequired != vScrollVisible)
             {
@@ -507,7 +570,15 @@ namespace Manina.Windows.Forms
                 else
                 {
                     mImageListView.vScrollBar.Minimum = 0;
-                    mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
+                    if (mImageListView.showGroups)
+                    {
+                        int max = 0;
+                        foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
+                            max += (int)System.Math.Ceiling((float)pair.Value.Count / (float)mCols);
+                        mImageListView.vScrollBar.Maximum = Math.Max(0, max * mItemSizeWithMargin.Height + mImageListView.groups.Count * cachedColumnHeaderHeight - 1);
+                    }
+                    else
+                        mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
                     if (!mImageListView.IntegralScroll)
                         mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
                     else

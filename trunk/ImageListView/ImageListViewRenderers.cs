@@ -909,7 +909,7 @@ namespace Manina.Windows.Forms
                         using (Brush brush = new SolidBrush(Color.White))
                         {
                             g.DrawString(column.Text,
-                                (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont),
+                                (ImageListView.ColumnHeaderFont == null ? ImageListView.Font : ImageListView.ColumnHeaderFont),
                                 brush, bounds, sf);
                         }
                     }
@@ -1762,7 +1762,7 @@ namespace Manina.Windows.Forms
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (SolidBrush bText = new SolidBrush(SystemColors.WindowText))
                         {
-                            g.DrawString(column.Text, (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont), bText, bounds, sf);
+                            g.DrawString(column.Text, (ImageListView.ColumnHeaderFont == null ? ImageListView.Font : ImageListView.ColumnHeaderFont), bText, bounds, sf);
                         }
                     }
                 }
@@ -2564,7 +2564,7 @@ namespace Manina.Windows.Forms
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
                         {
-                            g.DrawString(column.Text, (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont), bText, bounds, sf);
+                            g.DrawString(column.Text, (ImageListView.ColumnHeaderFont == null ? ImageListView.Font : ImageListView.ColumnHeaderFont), bText, bounds, sf);
                         }
                     }
                 }

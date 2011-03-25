@@ -671,6 +671,10 @@ namespace Manina.Windows.Forms
             {
                 if (mImageListView == null)
                     return;
+
+                mImageListView.showGroups = false;
+                mImageListView.groups = new Dictionary<string, List<ImageListViewItem>>();
+
                 if ((mImageListView.GroupOrder == SortOrder.None || mImageListView.GroupColumn < 0 || mImageListView.GroupColumn >= mImageListView.Columns.Count) &&
                    (mImageListView.SortOrder == SortOrder.None || mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count))
                     return;
@@ -687,10 +691,11 @@ namespace Manina.Windows.Forms
                 if (mImageListView.SortColumn >= 0 || mImageListView.SortColumn < mImageListView.Columns.Count)
                     sortColumn = mImageListView.Columns[mImageListView.SortColumn];
                 mItems.Sort(new ImageListViewItemComparer(groupColumn, mImageListView.GroupOrder, sortColumn, mImageListView.SortOrder));
+                if (mImageListView.GroupOrder != SortOrder.None && groupColumn != null)
+                    mImageListView.showGroups = true;
 
                 // Update item indices and create groups
                 string lastGroup = string.Empty;
-                mImageListView.groups = new Dictionary<string, List<ImageListViewItem>>();
                 for (int i = 0; i < mItems.Count; i++)
                 {
                     ImageListViewItem item = mItems[i];
