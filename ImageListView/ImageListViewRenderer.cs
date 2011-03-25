@@ -334,6 +334,33 @@ namespace Manina.Windows.Forms
                 DrawBackground(g, ImageListView.layoutManager.ClientArea);
             }
             /// <summary>
+            /// Renders the group header.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderGroupHeaders(Graphics g)
+            {
+                if (!ImageListView.showGroups)
+                    return;
+
+                int first = ImageListView.layoutManager.FirstPartiallyVisible;
+                int last = ImageListView.layoutManager.LastPartiallyVisible;
+                int h = MeasureGroupHeaderHeight();
+                int i = 0;
+                foreach (KeyValuePair<string, List<ImageListViewItem>> pair in ImageListView.groups)
+                {
+                    if (i >= first)
+                    {
+                        Rectangle bounds = ImageListView.layoutManager.GetItemBounds(i);
+                        bounds.Width = ImageListView.layoutManager.ItemAreaBounds.Width;
+                        bounds.Height = h;
+                        bounds.Y -= h;
+                        DrawGroupHeader(g, pair.Key, bounds);
+                    }
+                    i += pair.Value.Count;
+                    if (i > last) break;
+                }
+            }
+            /// <summary>
             /// Renders the column header.
             /// </summary>
             /// <param name="g">The graphics to draw on.</param>
@@ -686,6 +713,9 @@ namespace Manina.Windows.Forms
                 // Draw background
                 RenderBackground(g);
 
+                // Draw group headers if visible
+                RenderGroupHeaders(g);
+
                 // Draw items if they should be drawn first
                 bool itemsDrawn = false;
                 if (ItemsDrawnFirst)
@@ -817,14 +847,24 @@ namespace Manina.Windows.Forms
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             }
             /// <summary>
+            /// Returns the height of group headers.
+            /// </summary>
+            public virtual int MeasureGroupHeaderHeight()
+            {
+                if (ImageListView.disposed || ImageListView.GroupHeaderFont == null)
+                    return 24;
+                else
+                    return System.Math.Max(ImageListView.GroupHeaderFont.Height + 8, 24);
+            }
+            /// <summary>
             /// Returns the height of column headers.
             /// </summary>
             public virtual int MeasureColumnHeaderHeight()
             {
-                if (ImageListView.disposed || ImageListView.HeaderFont == null)
+                if (ImageListView.disposed || ImageListView.ColumnHeaderFont == null)
                     return 24;
                 else
-                    return System.Math.Max(ImageListView.HeaderFont.Height + 4, 24);
+                    return System.Math.Max(ImageListView.ColumnHeaderFont.Height + 4, 24);
             }
             /// <summary>
             /// Returns the spacing between items for the given view mode.
@@ -1215,6 +1255,42 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
+            /// Draws the group headers.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="name">The name of the group to draw.</param>
+            /// <param name="bounds">The bounding rectangle of group in client coordinates.</param>
+            public virtual void DrawGroupHeader(Graphics g, string name, Rectangle bounds)
+            {
+                // Paint background
+                using (Brush bNormal = new SolidBrush(ImageListView.Colors.ControlBackColor))
+                {
+                    g.FillRectangle(bNormal, bounds);
+                }
+
+                bounds.Inflate(0, -4);
+                using (Pen pSpep = new Pen(new LinearGradientBrush(bounds, ImageListView.Colors.ColumnSeparatorColor, Color.Transparent, LinearGradientMode.Horizontal)))
+                {
+                    g.DrawLine(pSpep, bounds.Left + 1, bounds.Bottom - 1, bounds.Right - 1, bounds.Bottom - 1);
+                }
+
+                // Text
+                if (bounds.Width > 4)
+                {
+                    using (StringFormat sf = new StringFormat())
+                    {
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
+                        {
+                            g.DrawString(name, (ImageListView.GroupHeaderFont == null ? ImageListView.Font : ImageListView.GroupHeaderFont), bText, bounds, sf);
+                        }
+                    }
+                }
+            }
+            /// <summary>
             /// Draws the column headers.
             /// </summary>
             /// <param name="g">The System.Drawing.Graphics to draw on.</param>
@@ -1279,7 +1355,7 @@ namespace Manina.Windows.Forms
                         sf.Trimming = StringTrimming.EllipsisCharacter;
                         using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
                         {
-                            g.DrawString(column.Text, (ImageListView.HeaderFont == null ? ImageListView.Font : ImageListView.HeaderFont), bText, bounds, sf);
+                            g.DrawString(column.Text, (ImageListView.ColumnHeaderFont == null ? ImageListView.Font : ImageListView.ColumnHeaderFont), bText, bounds, sf);
                         }
                     }
                 }

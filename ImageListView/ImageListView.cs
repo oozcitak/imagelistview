@@ -76,7 +76,8 @@ namespace Manina.Windows.Forms
         private Image mErrorImage;
         private Image mRatingImage;
         private Image mEmptyRatingImage;
-        private Font mHeaderFont;
+        private Font mGroupHeaderFont;
+        private Font mColumnHeaderFont;
         private bool mIntegralScroll;
         private ImageListViewItemCollection mItems;
         private int mPaneWidth;
@@ -101,6 +102,7 @@ namespace Manina.Windows.Forms
 
         // Groups
         internal Dictionary<string, List<ImageListViewItem>> groups;
+        internal bool showGroups;
 
         // Renderer variables
         internal ImageListViewRenderer mRenderer;
@@ -336,23 +338,50 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Gets or sets the font of the column headers.
+        /// Gets or sets the font of the group headers.
         /// </summary>
-        [Category("Appearance"), Description("Gets or sets the font of the column headers.")]
-        public Font HeaderFont
+        [Category("Appearance"), Description("Gets or sets the font of the group headers.")]
+        public Font GroupHeaderFont
         {
             get
             {
-                if (mHeaderFont != null)
-                    return mHeaderFont;
-                else if (Font != null)
-                    return Font;
-                else
-                    return Control.DefaultFont;
+                if (mGroupHeaderFont == null)
+                {
+                    if (Font != null)
+                        mGroupHeaderFont = (Font)Font.Clone();
+                    else
+                        mGroupHeaderFont = (Font)Control.DefaultFont.Clone();
+                }
+
+                return mGroupHeaderFont;
             }
             set
             {
-                mHeaderFont = value;
+                mGroupHeaderFont = value;
+                Refresh();
+            }
+        }
+        /// <summary>
+        /// Gets or sets the font of the column headers.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the font of the column headers.")]
+        public Font ColumnHeaderFont
+        {
+            get
+            {
+                if (mColumnHeaderFont == null)
+                {
+                    if (Font != null)
+                        mColumnHeaderFont = (Font)Font.Clone();
+                    else
+                        mColumnHeaderFont = (Font)Control.DefaultFont.Clone();
+                }
+
+                return mColumnHeaderFont;
+            }
+            set
+            {
+                mColumnHeaderFont = value;
                 Refresh();
             }
         }
@@ -740,7 +769,7 @@ namespace Manina.Windows.Forms
         {
             using (Font font = new Font("Microsoft Sans Serif", 8.25f))
             {
-                return !mHeaderFont.Equals(font);
+                return !mColumnHeaderFont.Equals(font);
             }
         }
         /// <summary>
@@ -748,7 +777,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void ResetHeaderFont()
         {
-            HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
+            ColumnHeaderFont = new Font("Microsoft Sans Serif", 8.25f);
         }
 
         /// <summary>
@@ -874,7 +903,8 @@ namespace Manina.Windows.Forms
             mErrorImage = resources.GetObject("ErrorImage") as Image;
             mRatingImage = resources.GetObject("RatingImage") as Image;
             mEmptyRatingImage = resources.GetObject("EmptyRatingImage") as Image;
-            HeaderFont = new Font("Microsoft Sans Serif", 8.25f);
+            GroupHeaderFont = new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold);
+            ColumnHeaderFont = new Font("Microsoft Sans Serif", 8.25f);
             mIntegralScroll = false;
             mItems = new ImageListViewItemCollection(this);
             MultiSelect = true;
@@ -914,7 +944,9 @@ namespace Manina.Windows.Forms
             Controls.Add(hScrollBar);
             Controls.Add(vScrollBar);
 
+            // Groups
             groups = new Dictionary<string, List<ImageListViewItem>>();
+            showGroups = false;
 
             // Lazy refresh timer
             lazyRefreshTimer = new System.Timers.Timer();
