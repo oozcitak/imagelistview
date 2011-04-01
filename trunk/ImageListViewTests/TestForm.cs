@@ -365,12 +365,6 @@ namespace ImageListViewTests
         #endregion
 
         #region Item Context Menu
-        // Update
-        private void ItemContextMenu_Opening(object sender, CancelEventArgs e)
-        {
-            cloneToolStripMenuItem.Enabled = (imageListView.SelectedItems.Count > 0);
-            deleteToolStripMenuItem.Enabled = (imageListView.SelectedItems.Count > 0);
-        }
         // Clone
         private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
         {
