@@ -164,6 +164,12 @@ namespace ImageListViewTests
         // Add items
         private void AddItems_Click(object sender, EventArgs e)
         {
+            if(files.Length==0)
+            {
+                MessageBox.Show("There are no JPEG images in source folder.");
+                return;
+            }
+
             imageListView.SuspendLayout();
             for (int i = 0; i < 1000 / files.Length; i++)
                 imageListView.Items.AddRange(files);
