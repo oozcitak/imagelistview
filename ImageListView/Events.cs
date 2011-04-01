@@ -108,6 +108,13 @@ namespace Manina.Windows.Forms
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal delegate void RefreshDelegateInternal();
+    /// <summary>
+    /// Represents the method that will handle the ItemCollectionChanged event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A ItemCollectionChangedEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void ItemCollectionChangedEventHandler(object sender, ItemCollectionChangedEventArgs e);
     #endregion
 
     #region Event Arguments
@@ -473,5 +480,34 @@ namespace Manina.Windows.Forms
             IsThumbnail = thumbnailImage;
         }
     }
+    /// <summary>
+    /// Represents the event arguments for item collection related events.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class ItemCollectionChangedEventArgs
+    {
+        /// <summary>
+        /// Gets the type of action causing the change.
+        /// </summary>
+        public CollectionChangeAction Action { get; private set; }
+        /// <summary>
+        /// Gets the ImageListViewItem that is the target of the event.
+        /// </summary>
+        public ImageListViewItem Item { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the ItemCollectionChangedEventArgs class.
+        /// </summary>
+        /// <param name="action">The type of action causing the change.</param>
+        /// <param name="item">The item that is the target of this event. This parameter will be null
+        /// if the collection is cleared.</param>
+        public ItemCollectionChangedEventArgs(CollectionChangeAction action, ImageListViewItem item)
+        {
+            Action = action;
+            Item = item;
+        }
+    }
+
+
     #endregion
 }

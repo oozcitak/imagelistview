@@ -1924,6 +1924,15 @@ namespace Manina.Windows.Forms
             if (ThumbnailCaching != null)
                 ThumbnailCaching(this, e);
         }
+        /// <summary>
+        /// Raises the ItemCollectionChanged event.
+        /// </summary>
+        /// <param name="e">A ItemCollectionChangedEventArgs that contains event data.</param>
+        protected virtual void OnItemCollectionChanged(ItemCollectionChangedEventArgs e)
+        {
+            if (ItemCollectionChanged != null)
+                ItemCollectionChanged(this, e);
+        }
         #endregion
 
         #region Public Events
@@ -1987,6 +1996,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs before an item thumbnail is cached.")]
         public event ThumbnailCachingEventHandler ThumbnailCaching;
+        /// <summary>
+        /// Occurs after the item collection is changed.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs after the item collection is changed.")]
+        public event ItemCollectionChangedEventHandler ItemCollectionChanged;
         #endregion
     }
 }

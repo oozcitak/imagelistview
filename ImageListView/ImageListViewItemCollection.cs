@@ -325,6 +325,9 @@ namespace Manina.Windows.Forms
                     mImageListView.SelectedItems.Clear();
                     mImageListView.Refresh();
                 }
+
+                // Raise the clear event
+                mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Refresh, null));
             }
             /// <summary>
             /// Determines whether the <see cref="ImageListViewItemCollection"/> 
@@ -461,20 +464,15 @@ namespace Manina.Windows.Forms
             /// </returns>
             public bool Remove(ImageListViewItem item)
             {
-                for (int i = item.mIndex; i < mItems.Count; i++)
-                    mItems[i].mIndex--;
-                if (item == mFocused) mFocused = null;
-                bool ret = mItems.Remove(item);
-                lookUp.Remove(item.Guid);
-                collectionModified = true;
+                bool ret = RemoveInternal(item, true);
+
                 if (mImageListView != null)
                 {
-                    mImageListView.thumbnailCache.Remove(item.Guid);
-                    mImageListView.itemCacheManager.Remove(item.Guid);
                     if (item.Selected)
                         mImageListView.OnSelectionChangedInternal();
                     mImageListView.Refresh();
                 }
+
                 return ret;
             }
             /// <summary>
@@ -483,8 +481,7 @@ namespace Manina.Windows.Forms
             /// <param name="index">The zero-based index of the item to remove.</param>
             public void RemoveAt(int index)
             {
-                ImageListViewItem item = mItems[index];
-                Remove(item);
+                Remove(mItems[index]);
             }
             #endregion
 
@@ -618,6 +615,9 @@ namespace Manina.Windows.Forms
                         else if (state == CacheState.Unknown)
                             mImageListView.shellInfoCache.Add(extension);
                     }
+
+                    // Raise the add event
+                    mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Add, item));
                 }
             }
             /// <summary>
@@ -633,7 +633,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="item">The item to remove.</param>
             /// <param name="removeFromCache">true to remove item image from cache; otherwise false.</param>
-            internal void RemoveInternal(ImageListViewItem item, bool removeFromCache)
+            internal bool RemoveInternal(ImageListViewItem item, bool removeFromCache)
             {
                 for (int i = item.mIndex; i < mItems.Count; i++)
                     mItems[i].mIndex--;
@@ -643,9 +643,14 @@ namespace Manina.Windows.Forms
                     mImageListView.thumbnailCache.Remove(item.Guid);
                     mImageListView.itemCacheManager.Remove(item.Guid);
                 }
-                mItems.Remove(item);
+                bool ret = mItems.Remove(item);
                 lookUp.Remove(item.Guid);
                 collectionModified = true;
+
+                // Raise the remove event
+                mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Remove, item));
+
+                return ret;
             }
             /// <summary>
             /// Returns the index of the specified item.
