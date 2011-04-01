@@ -75,6 +75,7 @@ namespace ImageListViewTests
             imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
             imageListView.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
             imageListView.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
+            imageListView.ItemCollectionChanged += new ItemCollectionChangedEventHandler(imageListView_ItemCollectionChanged);
 
             // Find and add built-in renderers
             Assembly assembly = Assembly.GetAssembly(typeof(ImageListView));
@@ -136,6 +137,19 @@ namespace ImageListViewTests
                 if (e.Item != null)
                     index = e.Item.Index;
                 LogEvent(string.Format("--> {0} ({1})", index, e.Size));
+            }
+        }
+        // Collection changed
+        void imageListView_ItemCollectionChanged(object sender, ItemCollectionChangedEventArgs e)
+        {
+            if (!benchMarking && logEventsCheckbox.Checked)
+            {
+                if (e.Action == CollectionChangeAction.Add)
+                    LogEvent(string.Format("Item added at index {0}", e.Item.Index));
+                else if (e.Action == CollectionChangeAction.Remove)
+                    LogEvent(string.Format("Item removed from index {0}", e.Item.Index));
+                else if (e.Action == CollectionChangeAction.Refresh)
+                    LogEvent("Items cleared.");
             }
         }
         // Log event to list box
