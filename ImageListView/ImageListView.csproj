@@ -68,6 +68,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageListViewGroupCollection.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageListViewGroup.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ImageListViewItemAdaptors.cs">
     </Compile>
     <Compile Include="ImageListViewCacheMetadata.cs" />

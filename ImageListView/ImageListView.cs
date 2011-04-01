@@ -101,7 +101,7 @@ namespace Manina.Windows.Forms
         private Point mViewOffset;
 
         // Groups
-        internal Dictionary<string, List<ImageListViewItem>> groups;
+        internal ImageListViewGroupCollection groups;
         internal bool showGroups;
 
         // Renderer variables
@@ -945,7 +945,7 @@ namespace Manina.Windows.Forms
             Controls.Add(vScrollBar);
 
             // Groups
-            groups = new Dictionary<string, List<ImageListViewItem>>();
+            groups = new ImageListViewGroupCollection(this);
             showGroups = false;
 
             // Lazy refresh timer
