@@ -99,6 +99,7 @@ namespace Manina.Windows.Forms
         private UseWIC mUseWIC;
         private View mView;
         private Point mViewOffset;
+        private bool mShowScrollBars;
 
         // Groups
         internal ImageListViewGroupCollection groups;
@@ -500,7 +501,11 @@ namespace Manina.Windows.Forms
         /// Gets or sets whether the scrollbars should be shown.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets whether the scrollbars should be shown."), DefaultValue(true)]
-        public bool ScrollBars { get; set; }
+        public bool ScrollBars 
+        {
+            get { return mShowScrollBars; }
+            set { mShowScrollBars = value; Refresh(); }
+        }
         /// <summary>
         /// Gets the collection of selected items contained in the image list view.
         /// </summary>
@@ -933,6 +938,7 @@ namespace Manina.Windows.Forms
             mUseWIC = UseWIC.Auto;
             mView = View.Thumbnails;
             mViewOffset = new Point(0, 0);
+            mShowScrollBars = true;
 
             // Child controls
             hScrollBar = new HScrollBar();
