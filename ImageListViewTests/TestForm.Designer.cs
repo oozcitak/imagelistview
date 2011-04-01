@@ -178,7 +178,6 @@
             this.deleteToolStripMenuItem});
             this.ItemContextMenu.Name = "ItemContextMenu";
             this.ItemContextMenu.Size = new System.Drawing.Size(106, 48);
-            this.ItemContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.ItemContextMenu_Opening);
             // 
             // cloneToolStripMenuItem
             // 
