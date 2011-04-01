@@ -292,20 +292,14 @@ namespace Manina.Windows.Forms
             /// <param name="filenames">The names or the image files.</param>
             public void AddRange(string[] filenames)
             {
-                if (mImageListView != null)
-                    mImageListView.SuspendPaint();
+                ImageListViewItem[] items = new ImageListViewItem[filenames.Length];
 
                 for (int i = 0; i < filenames.Length; i++)
                 {
-                    Add(filenames[i]);
+                    items[i] = new ImageListViewItem(filenames[i]);
                 }
 
-                if (mImageListView != null)
-                {
-                    mImageListView.Refresh();
-                    mImageListView.ResumePaint();
-                }
-
+                AddRange(items);
             }
             /// <summary>
             /// Removes all items from the <see cref="ImageListViewItemCollection"/>.
