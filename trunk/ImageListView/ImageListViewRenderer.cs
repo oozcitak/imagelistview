@@ -346,7 +346,7 @@ namespace Manina.Windows.Forms
                 int last = ImageListView.layoutManager.LastPartiallyVisible;
                 int h = MeasureGroupHeaderHeight();
                 int i = 0;
-                foreach (KeyValuePair<string, List<ImageListViewItem>> pair in ImageListView.groups)
+                foreach (ImageListViewGroup group in ImageListView.groups)
                 {
                     if (i >= first)
                     {
@@ -354,9 +354,9 @@ namespace Manina.Windows.Forms
                         bounds.Width = ImageListView.layoutManager.ItemAreaBounds.Width;
                         bounds.Height = h;
                         bounds.Y -= h;
-                        DrawGroupHeader(g, pair.Key, bounds);
+                        DrawGroupHeader(g, group.Name, bounds);
                     }
-                    i += pair.Value.Count;
+                    i += group.ItemCount;
                     if (i > last) break;
                 }
             }

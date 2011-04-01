@@ -193,9 +193,9 @@ namespace Manina.Windows.Forms
                     int offset = 0;
                     int count = 0;
                     int firstIndex = 0;
-                    foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
+                    foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
                     {
-                        count += pair.Value.Count;
+                        count += group.ItemCount;
                         location.Y += cachedGroupHeaderHeight;
                         offset++;
                         if (count > itemIndex)
@@ -205,7 +205,7 @@ namespace Manina.Windows.Forms
                         }
                         else
                         {
-                            location.Y += (int)System.Math.Ceiling((float)pair.Value.Count / (float)mCols) * mItemSizeWithMargin.Height;
+                            location.Y += (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols) * mItemSizeWithMargin.Height;
                             firstIndex = count;
                         }
                     }
@@ -393,11 +393,7 @@ namespace Manina.Windows.Forms
         {
             if (mImageListView.showGroups)
             {
-                int h = mItemAreaBounds.Height;
-                foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
-                {
-                    h -= cachedGroupHeaderHeight;
-                }
+                int h = mItemAreaBounds.Height - cachedGroupHeaderHeight * mImageListView.groups.Count;
                 mRows = (int)System.Math.Floor((float)h / (float)mItemSizeWithMargin.Height);
             }
             else
@@ -507,9 +503,9 @@ namespace Manina.Windows.Forms
                     if (mImageListView.showGroups)
                     {
                         int totRows = 0;
-                        foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
+                        foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
                         {
-                            totRows += (int)System.Math.Ceiling((float)pair.Value.Count / (float)mCols);
+                            totRows += (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols);
                         }
                         vScrollRequired = (mImageListView.Items.Count > 0) && (mRows < totRows);
                     }
@@ -573,8 +569,8 @@ namespace Manina.Windows.Forms
                     if (mImageListView.showGroups)
                     {
                         int max = 0;
-                        foreach (KeyValuePair<string, List<ImageListViewItem>> pair in mImageListView.groups)
-                            max += (int)System.Math.Ceiling((float)pair.Value.Count / (float)mCols);
+                        foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
+                            max += (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols);
                         mImageListView.vScrollBar.Maximum = Math.Max(0, max * mItemSizeWithMargin.Height + mImageListView.groups.Count * cachedColumnHeaderHeight - 1);
                     }
                     else

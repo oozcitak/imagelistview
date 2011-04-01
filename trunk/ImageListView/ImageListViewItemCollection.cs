@@ -673,7 +673,7 @@ namespace Manina.Windows.Forms
                     return;
 
                 mImageListView.showGroups = false;
-                mImageListView.groups = new Dictionary<string, List<ImageListViewItem>>();
+                mImageListView.groups.Clear();
 
                 if ((mImageListView.GroupOrder == SortOrder.None || mImageListView.GroupColumn < 0 || mImageListView.GroupColumn >= mImageListView.Columns.Count) &&
                    (mImageListView.SortOrder == SortOrder.None || mImageListView.SortColumn < 0 || mImageListView.SortColumn >= mImageListView.Columns.Count))
@@ -704,10 +704,10 @@ namespace Manina.Windows.Forms
                     if (string.Compare(lastGroup, group, StringComparison.InvariantCultureIgnoreCase) != 0)
                     {
                         lastGroup = group;
-                        mImageListView.groups.Add(group, new List<ImageListViewItem>() { item });
+                        mImageListView.groups.Add(group, i, i);
                     }
                     else
-                        mImageListView.groups[lastGroup].Add(item);
+                        mImageListView.groups[lastGroup].LastItemIndex = i;
                 }
 
                 // Restore previous cursor
