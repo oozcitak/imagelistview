@@ -55,6 +55,10 @@ namespace Manina.Windows.Forms
 
         private bool vScrollVisible;
         private bool hScrollVisible;
+
+        // Size required to display all items (i.e. scroll range)
+        private int totalWidth;
+        private int totalHeight;
         #endregion
 
         #region Properties
@@ -136,6 +140,8 @@ namespace Manina.Windows.Forms
                 else if (mImageListView.IntegralScroll != cachedIntegralScroll)
                     return true;
                 else if (mImageListView.Items.collectionModified)
+                    return true;
+                else if (mImageListView.groups.collectionModified)
                     return true;
                 else
                     return false;
@@ -356,6 +362,7 @@ namespace Manina.Windows.Forms
             cachedPaneWidth = mImageListView.PaneWidth;
             cachedScrollBars = mImageListView.ScrollBars;
             mImageListView.Items.collectionModified = false;
+            mImageListView.groups.collectionModified = false;
 
             // Calculate item area bounds
             if (!UpdateItemArea())
@@ -370,6 +377,9 @@ namespace Manina.Windows.Forms
 
             // Calculate the number of rows and columns
             CalculateGrid();
+
+            // Update groups
+            UpdateGroups();
 
             // Check if we need the scroll bars.
             // Recalculate the layout if scroll bar visibility changes.
@@ -391,25 +401,21 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void CalculateGrid()
         {
-            if (mImageListView.showGroups)
-            {
-                int h = mItemAreaBounds.Height - cachedGroupHeaderHeight * mImageListView.groups.Count;
-                mRows = (int)System.Math.Floor((float)h / (float)mItemSizeWithMargin.Height);
-            }
-            else
-                mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
+            mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
             mCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
             if (mImageListView.View == View.Details) mCols = 1;
             if (mImageListView.View == View.Gallery) mRows = 1;
             if (mCols < 1) mCols = 1;
             if (mRows < 1) mRows = 1;
+
+            totalWidth = mRows * mItemSizeWithMargin.Width;
+            totalHeight = mCols * mItemSizeWithMargin.Height;
         }
         /// <summary>
         /// Calculates the item area.
-        /// Returns true if the item area is not empty (both width and height
-        /// greater than zero); otherwise false.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if the item area is not empty (both width and height
+        /// greater than zero); otherwise false.</returns>
         private bool UpdateItemArea()
         {
             // Calculate drawing area
@@ -451,11 +457,6 @@ namespace Manina.Windows.Forms
             {
                 mItemAreaBounds.Height = mItemSizeWithMargin.Height;
                 mItemAreaBounds.Y = mClientArea.Bottom - mItemSizeWithMargin.Height;
-                if (mImageListView.showGroups)
-                {
-                    mItemAreaBounds.Height += cachedGroupHeaderHeight;
-                    mItemAreaBounds.Y -= cachedGroupHeaderHeight;
-                }
             }
             // Modify item area for the pane view mode
             if (mImageListView.View == View.Pane)
@@ -502,12 +503,12 @@ namespace Manina.Windows.Forms
                 {
                     if (mImageListView.showGroups)
                     {
-                        int totRows = 0;
+                        int totalHeight = 0;
                         foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
                         {
-                            totRows += (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols);
+                            totalHeight += group.headerBounds.Height + group.itemBounds.Height;
                         }
-                        vScrollRequired = (mImageListView.Items.Count > 0) && (mRows < totRows);
+                        vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < totalHeight);
                     }
                     else
                         vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
@@ -570,8 +571,10 @@ namespace Manina.Windows.Forms
                     {
                         int max = 0;
                         foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
-                            max += (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols);
-                        mImageListView.vScrollBar.Maximum = Math.Max(0, max * mItemSizeWithMargin.Height + mImageListView.groups.Count * cachedColumnHeaderHeight - 1);
+                        {
+                            max += group.headerBounds.Height + group.itemBounds.Height;
+                        }
+                        mImageListView.vScrollBar.Maximum = Math.Max(0, max - 1);
                     }
                     else
                         mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
@@ -659,6 +662,67 @@ namespace Manina.Windows.Forms
 
             // Current item state processed
             mImageListView.Items.collectionModified = false;
+        }
+        /// <summary>
+        /// Updates the group display properties.
+        /// </summary>
+        private void UpdateGroups()
+        {
+            int x = mItemAreaBounds.Left - mImageListView.ViewOffset.X;
+            int y = mItemAreaBounds.Top - mImageListView.ViewOffset.Y;
+            if (mImageListView.View == View.Gallery)
+                totalWidth = 0;
+            else
+                totalHeight = 0;
+
+            foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
+            {
+                if (mImageListView.View == View.Gallery)
+                {
+                    // Number of rows and columns to enclose all items
+                    group.itemRows = mRows;
+                    group.itemCols = (int)System.Math.Ceiling((float)group.ItemCount / (float)mRows);
+
+                    // Header area
+                    group.headerBounds = new Rectangle(x, y, cachedGroupHeaderHeight, mItemSize.Height * mRows);
+                    x += cachedGroupHeaderHeight;
+
+                    // Item area
+                    group.itemBounds = new Rectangle(x, y, group.itemCols * mItemSizeWithMargin.Width, group.itemRows * mItemSizeWithMargin.Height);
+                    if (group.Collapsed)
+                        group.itemBounds.Width = 0;
+
+                    // Update total size
+                    totalWidth += group.headerBounds.Width + group.itemBounds.Width;
+
+                    // Offset to next group
+                    x += group.itemBounds.Width;
+                }
+                else
+                {
+                    // Number of rows and columns to enclose all items
+                    group.itemCols = mCols;
+                    group.itemRows = (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols);
+
+                    // Header area
+                    group.headerBounds = new Rectangle(x, y, mClientArea.Width + mImageListView.ViewOffset.X, cachedGroupHeaderHeight);
+                    y += cachedGroupHeaderHeight;
+
+                    // Item area
+                    group.itemBounds = new Rectangle(x, y, group.itemCols * mItemSizeWithMargin.Width, group.itemRows * mItemSizeWithMargin.Height);
+                    if (group.Collapsed)
+                        group.itemBounds.Height = 0;
+
+                    // Update total size
+                    totalHeight += group.headerBounds.Height + group.itemBounds.Height;
+
+                    // Offset to next group
+                    y += group.itemBounds.Height;
+                }
+            }
+
+            // Groups processed
+            mImageListView.groups.collectionModified = false;
         }
         #endregion
     }

@@ -22,6 +22,7 @@ using System.Collections;
 using System.Drawing.Design;
 using System.Resources;
 using System.Reflection;
+using System.Drawing;
 
 namespace Manina.Windows.Forms
 {
@@ -35,6 +36,12 @@ namespace Manina.Windows.Forms
             #region Member Variables
             internal ImageListView mImageListView;
             internal ImageListViewGroupCollection owner;
+            private bool mCollapsed;
+            // Layout variables
+            internal int itemCols;
+            internal int itemRows;
+            internal Rectangle itemBounds;
+            internal Rectangle headerBounds;
             #endregion
 
             #region Properties
@@ -53,7 +60,24 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets or sets whether the group is collapsed.
             /// </summary>
-            public bool Collapsed { get; set; }
+            public bool Collapsed
+            {
+                get
+                {
+                    return mCollapsed;
+                }
+                set
+                {
+                    if (value != mCollapsed)
+                    {
+                        mCollapsed = value;
+                        if (owner != null)
+                            owner.collectionModified = true;
+                        if (mImageListView != null)
+                            mImageListView.Refresh();
+                    }
+                }
+            }
             /// <summary>
             /// Gets the item count.
             /// </summary>
@@ -72,7 +96,7 @@ namespace Manina.Windows.Forms
                 mImageListView = null;
                 owner = null;
                 Name = name;
-                Collapsed = false;
+                mCollapsed = false;
                 FirstItemIndex = firstItemIndex;
                 LastItemIndex = lastItemIndex;
             }
