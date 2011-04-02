@@ -35,6 +35,7 @@ namespace Manina.Windows.Forms
             #region Member Variables
             private ImageListView mImageListView;
             private List<ImageListViewGroup> mItems;
+            internal bool collectionModified;
             #endregion
 
             #region Properties
@@ -61,6 +62,7 @@ namespace Manina.Windows.Forms
                 set
                 {
                     mItems[index] = value;
+                    collectionModified = true;
                 }
             }
             /// <summary>
@@ -95,6 +97,7 @@ namespace Manina.Windows.Forms
             {
                 mImageListView = owner;
                 mItems = new List<ImageListViewGroup>();
+                collectionModified = true;
             }
             #endregion
 
@@ -112,6 +115,8 @@ namespace Manina.Windows.Forms
                 item.owner = this;
 
                 mItems.Add(item);
+
+                collectionModified = true;
             }
             /// <summary>
             /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -130,6 +135,8 @@ namespace Manina.Windows.Forms
             public void Clear()
             {
                 mItems.Clear();
+
+                collectionModified = true;
             }
             /// <summary>
             /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
@@ -177,6 +184,8 @@ namespace Manina.Windows.Forms
                 item.owner = this;
 
                 mItems.Insert(index, item);
+
+                collectionModified = true;
             }
             /// <summary>
             /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -187,7 +196,9 @@ namespace Manina.Windows.Forms
             /// </returns>
             public bool Remove(ImageListViewGroup item)
             {
-                return mItems.Remove(item);
+                bool ret = mItems.Remove(item);
+                collectionModified = true;
+                return ret;
             }
             /// <summary>
             /// Removes the <see cref="T:System.Collections.Generic.IList`1"/> item at the specified index.
@@ -196,6 +207,7 @@ namespace Manina.Windows.Forms
             public void RemoveAt(int index)
             {
                 mItems.RemoveAt(index);
+                collectionModified = true;
             }
             #endregion
 
@@ -323,6 +335,7 @@ namespace Manina.Windows.Forms
                     if (!(value is ImageListViewGroup))
                         throw new ArgumentException("An object of type ImageListViewGroup is required.", "value");
                     this[index] = (ImageListViewGroup)value;
+                    collectionModified = true;
                 }
             }
             #endregion
