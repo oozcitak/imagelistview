@@ -342,22 +342,17 @@ namespace Manina.Windows.Forms
                 if (!ImageListView.showGroups)
                     return;
 
-                int first = ImageListView.layoutManager.FirstPartiallyVisible;
-                int last = ImageListView.layoutManager.LastPartiallyVisible;
-                int h = MeasureGroupHeaderHeight();
-                int i = 0;
-                foreach (ImageListViewGroup group in ImageListView.groups)
+                foreach (ImageListViewGroup group in ImageListView.groups.GetDisplayedGroups())
                 {
-                    if (i >= first)
+                    if (Clip)
                     {
-                        Rectangle bounds = ImageListView.layoutManager.GetItemBounds(i);
-                        bounds.Width = ImageListView.layoutManager.ItemAreaBounds.Width;
-                        bounds.Height = h;
-                        bounds.Y -= h;
-                        DrawGroupHeader(g, group.Name, bounds);
+                        Rectangle clip = Rectangle.Intersect(group.headerBounds, ImageListView.layoutManager.ItemAreaBounds);
+                        g.SetClip(clip);
                     }
-                    i += group.ItemCount;
-                    if (i > last) break;
+                    else
+                        g.SetClip(ImageListView.layoutManager.ClientArea);
+
+                    DrawGroupHeader(g, group.Name, group.headerBounds);
                 }
             }
             /// <summary>
