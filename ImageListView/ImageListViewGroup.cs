@@ -42,6 +42,7 @@ namespace Manina.Windows.Forms
             internal int itemRows;
             internal Rectangle itemBounds;
             internal Rectangle headerBounds;
+            internal bool isVisible;
             #endregion
 
             #region Properties
