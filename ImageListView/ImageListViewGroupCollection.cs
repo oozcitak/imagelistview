@@ -209,9 +209,6 @@ namespace Manina.Windows.Forms
                 mItems.RemoveAt(index);
                 collectionModified = true;
             }
-            #endregion
-
-            #region Helper Methods
             /// <summary>
             /// Determines whether the collection has the group with the given name.
             /// </summary>

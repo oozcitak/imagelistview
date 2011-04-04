@@ -501,7 +501,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets whether the scrollbars should be shown.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets whether the scrollbars should be shown."), DefaultValue(true)]
-        public bool ScrollBars 
+        public bool ScrollBars
         {
             get { return mShowScrollBars; }
             set { mShowScrollBars = value; Refresh(); }
@@ -1198,52 +1198,119 @@ namespace Manina.Windows.Forms
             }
             else
             {
+                if (showGroups)
+                {
+                    foreach (ImageListViewGroup group in groups)
+                    {
+                        if (group.headerBounds.Contains(pt))
+                        {
+                            hitInfo = new HitInfo(group);
+                            return;
+                        }
+                    }
+                }
+
                 int itemIndex = -1;
                 bool checkBoxHit = false;
                 int subItemIndex = -1;
 
-                // Normalize to item area coordinates
-                pt.X -= layoutManager.ItemAreaBounds.Left;
-                pt.Y -= layoutManager.ItemAreaBounds.Top;
-
-                if (pt.X > 0 && pt.Y > 0)
+                if (showGroups)
                 {
-                    int col = (pt.X + mViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
-                    int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
-
-                    if (ScrollOrientation == ScrollOrientation.HorizontalScroll ||
-                        (ScrollOrientation == ScrollOrientation.VerticalScroll && col <= layoutManager.Cols))
+                    foreach (ImageListViewGroup group in groups)
                     {
-                        int index = row * layoutManager.Cols + col;
-                        if (index >= 0 && index <= Items.Count - 1)
+                        if (group.itemBounds.Contains(pt))
                         {
-                            Rectangle bounds = layoutManager.GetItemBounds(index);
-                            if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
-                                itemIndex = index;
-                            if (ShowCheckBoxes)
+                            // Normalize to group item area coordinates
+                            pt.X -= group.itemBounds.Left;
+                            pt.Y -= group.itemBounds.Top;
+
+                            if (pt.X > 0 && pt.Y > 0)
                             {
-                                Rectangle checkBoxBounds = layoutManager.GetCheckBoxBounds(index);
-                                if (checkBoxBounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
-                                    checkBoxHit = true;
+                                int col = pt.X / layoutManager.ItemSizeWithMargin.Width;
+                                int row = pt.Y / layoutManager.ItemSizeWithMargin.Height;
+
+                                int index = group.FirstItemIndex + row * group.itemCols + col;
+                                if (index >= 0 && index <= Items.Count - 1)
+                                {
+                                    Rectangle bounds = layoutManager.GetItemBounds(index);
+                                    if (bounds.Contains(pt.X + group.itemBounds.Left, pt.Y + group.itemBounds.Top))
+                                        itemIndex = index;
+                                    if (ShowCheckBoxes)
+                                    {
+                                        Rectangle checkBoxBounds = layoutManager.GetCheckBoxBounds(index);
+                                        if (checkBoxBounds.Contains(pt.X + group.itemBounds.Left, pt.Y + group.itemBounds.Top))
+                                            checkBoxHit = true;
+                                    }
+                                }
+
+                                // Calculate sub item index
+                                if (itemIndex != -1 && View == View.Details)
+                                {
+                                    int xc1 = layoutManager.ColumnHeaderBounds.Left;
+                                    int colIndex = 0;
+                                    foreach (ImageListViewColumnHeader column in mColumns.GetDisplayedColumns())
+                                    {
+                                        int xc2 = xc1 + column.Width;
+                                        if (pt.X >= xc1 && pt.X < xc2)
+                                        {
+                                            subItemIndex = colIndex;
+                                            break;
+                                        }
+                                        colIndex++;
+                                        xc1 = xc2;
+                                    }
+                                }
                             }
+
+                            break;
                         }
                     }
+                }
+                else
+                {
+                    // Normalize to item area coordinates
+                    pt.X -= layoutManager.ItemAreaBounds.Left;
+                    pt.Y -= layoutManager.ItemAreaBounds.Top;
 
-                    // Calculate sub item index
-                    if (itemIndex != -1 && View == View.Details)
+                    if (pt.X > 0 && pt.Y > 0)
                     {
-                        int xc1 = layoutManager.ColumnHeaderBounds.Left;
-                        int colIndex = 0;
-                        foreach (ImageListViewColumnHeader column in mColumns.GetDisplayedColumns())
+                        int col = (pt.X + mViewOffset.X) / layoutManager.ItemSizeWithMargin.Width;
+                        int row = (pt.Y + mViewOffset.Y) / layoutManager.ItemSizeWithMargin.Height;
+
+                        if (ScrollOrientation == ScrollOrientation.HorizontalScroll ||
+                            (ScrollOrientation == ScrollOrientation.VerticalScroll && col <= layoutManager.Cols))
                         {
-                            int xc2 = xc1 + column.Width;
-                            if (pt.X >= xc1 && pt.X < xc2)
+                            int index = row * layoutManager.Cols + col;
+                            if (index >= 0 && index <= Items.Count - 1)
                             {
-                                subItemIndex = colIndex;
-                                break;
+                                Rectangle bounds = layoutManager.GetItemBounds(index);
+                                if (bounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                                    itemIndex = index;
+                                if (ShowCheckBoxes)
+                                {
+                                    Rectangle checkBoxBounds = layoutManager.GetCheckBoxBounds(index);
+                                    if (checkBoxBounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                                        checkBoxHit = true;
+                                }
                             }
-                            colIndex++;
-                            xc1 = xc2;
+                        }
+
+                        // Calculate sub item index
+                        if (itemIndex != -1 && View == View.Details)
+                        {
+                            int xc1 = layoutManager.ColumnHeaderBounds.Left;
+                            int colIndex = 0;
+                            foreach (ImageListViewColumnHeader column in mColumns.GetDisplayedColumns())
+                            {
+                                int xc2 = xc1 + column.Width;
+                                if (pt.X >= xc1 && pt.X < xc2)
+                                {
+                                    subItemIndex = colIndex;
+                                    break;
+                                }
+                                colIndex++;
+                                xc1 = xc2;
+                            }
                         }
                     }
                 }

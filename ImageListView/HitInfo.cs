@@ -48,6 +48,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             public int ItemIndex { get; private set; }
             /// <summary>
+            /// Gets the index of the group header under the hit point.
+            /// </summary>
+            public ImageListViewGroup Group { get; private set; }
+            /// <summary>
             /// Gets the index of the column under the hit point.
             /// </summary>
             public ImageListViewColumnHeader Column { get; private set; }
@@ -89,20 +93,22 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="itemIndex">Index of the item.</param>
             /// <param name="checkBoxHit">if set to true the mouse cursor is over a checkbox.</param>
-            /// <param name="columnIndex">Type of the column.</param>
+            /// <param name="group">The group header hit.</param>
+            /// <param name="column">The column header hit</param>
             /// <param name="columnSeparator">The column separator.</param>
             /// <param name="subItemIndex">Index of the sub item.</param>
             /// <param name="paneBorder">if set to true the mouse cursor is over the left-pane border.</param>
             /// <param name="inItemArea">if set to true the mouse is in the item area.</param>
             /// <param name="inHeaderArea">if set to true the mouse cursor is in the column header area.</param>
             /// <param name="inPaneArea">if set to true the mouse cursor is in the left-pane area.</param>
-            private HitInfo(int itemIndex, bool checkBoxHit, ImageListViewColumnHeader columnIndex,
-                ImageListViewColumnHeader columnSeparator, int subItemIndex, 
+            private HitInfo(int itemIndex, bool checkBoxHit, ImageListViewGroup group, ImageListViewColumnHeader column,
+                ImageListViewColumnHeader columnSeparator, int subItemIndex,
                 bool paneBorder, bool inItemArea, bool inHeaderArea, bool inPaneArea)
             {
                 ItemIndex = itemIndex;
                 CheckBoxHit = checkBoxHit;
-                Column = columnIndex;
+                Group = group;
+                Column = column;
                 ColumnSeparator = columnSeparator;
                 SubItemIndex = subItemIndex;
 
@@ -120,7 +126,7 @@ namespace Manina.Windows.Forms
             /// <param name="subItemIndex">Index of the sub item.</param>
             /// <param name="checkBoxHit">if set to true the mouse cursor is over a checkbox.</param>
             internal HitInfo(int itemIndex, int subItemIndex, bool checkBoxHit)
-                : this(itemIndex, checkBoxHit, null, null, subItemIndex, false, true, false, false)
+                : this(itemIndex, checkBoxHit, null, null, null, subItemIndex, false, true, false, false)
             {
                 ;
             }
@@ -128,10 +134,20 @@ namespace Manina.Windows.Forms
             /// Initializes a new instance of the HitInfo class.
             /// Used when the control registered a column hit.
             /// </summary>
-            /// <param name="columnIndex">Type of the column.</param>
+            /// <param name="group">The group header hit.</param>
+            internal HitInfo(ImageListViewGroup group)
+                : this(-1, false, group, null, null, -1, false, false, true, false)
+            {
+                ;
+            }
+            /// <summary>
+            /// Initializes a new instance of the HitInfo class.
+            /// Used when the control registered a column hit.
+            /// </summary>
+            /// <param name="column">Type column hit.</param>
             /// <param name="columnSeparator">The column separator.</param>
-            internal HitInfo(ImageListViewColumnHeader columnIndex, ImageListViewColumnHeader columnSeparator)
-                : this(-1, false, columnIndex, columnSeparator, -1, false, false, true, false)
+            internal HitInfo(ImageListViewColumnHeader column, ImageListViewColumnHeader columnSeparator)
+                : this(-1, false, null, column, columnSeparator, -1, false, false, true, false)
             {
                 ;
             }
@@ -142,7 +158,7 @@ namespace Manina.Windows.Forms
             /// <param name="paneBorder">True if the hit point is over the left-pane 
             /// border, false otherwise.</param>
             internal HitInfo(bool paneBorder)
-                : this(-1, false, null, null, -1, paneBorder, false, false, true)
+                : this(-1, false, null, null, null, -1, paneBorder, false, false, true)
             {
                 ;
             }
