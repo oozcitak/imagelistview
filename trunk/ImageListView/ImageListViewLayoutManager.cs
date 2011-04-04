@@ -338,6 +338,7 @@ namespace Manina.Windows.Forms
             // If only item order is changed, just update visible items.
             if (!forceUpdate && !UpdateRequired && mImageListView.Items.collectionModified)
             {
+                UpdateGroups();
                 UpdateVisibleItems();
                 return;
             }
@@ -478,12 +479,7 @@ namespace Manina.Windows.Forms
             bool hScrollRequired = false;
             bool hScrollChanged = false;
             if (mImageListView.ScrollBars)
-            {
-                if (mImageListView.View == View.Gallery)
-                    hScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
-                else
-                    hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < mCols * mItemSizeWithMargin.Width);
-            }
+                hScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Width < totalWidth);
 
             if (hScrollRequired != hScrollVisible)
             {
@@ -496,24 +492,8 @@ namespace Manina.Windows.Forms
             bool vScrollRequired = false;
             bool vScrollChanged = false;
             if (mImageListView.ScrollBars)
-            {
-                if (mImageListView.View == View.Gallery)
-                    vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < mRows * mItemSizeWithMargin.Height);
-                else
-                {
-                    if (mImageListView.showGroups)
-                    {
-                        int totalHeight = 0;
-                        foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
-                        {
-                            totalHeight += group.headerBounds.Height + group.itemBounds.Height;
-                        }
-                        vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < totalHeight);
-                    }
-                    else
-                        vScrollRequired = (mImageListView.Items.Count > 0) && (mCols * mRows < mImageListView.Items.Count);
-                }
-            }
+                vScrollRequired = (mImageListView.Items.Count > 0) && (mItemAreaBounds.Height < totalHeight);
+
             if (vScrollRequired != vScrollVisible)
             {
                 vScrollVisible = vScrollRequired;
@@ -536,7 +516,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView.View == View.Gallery)
                 {
                     mImageListView.hScrollBar.Minimum = 0;
-                    mImageListView.hScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mRows) * mItemSizeWithMargin.Width - 1);
+                    mImageListView.hScrollBar.Maximum = Math.Max(0, totalWidth - 1);
                     if (!mImageListView.IntegralScroll)
                         mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
                     else
@@ -567,17 +547,7 @@ namespace Manina.Windows.Forms
                 else
                 {
                     mImageListView.vScrollBar.Minimum = 0;
-                    if (mImageListView.showGroups)
-                    {
-                        int max = 0;
-                        foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
-                        {
-                            max += group.headerBounds.Height + group.itemBounds.Height;
-                        }
-                        mImageListView.vScrollBar.Maximum = Math.Max(0, max - 1);
-                    }
-                    else
-                        mImageListView.vScrollBar.Maximum = Math.Max(0, (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mCols) * mItemSizeWithMargin.Height - 1);
+                    mImageListView.vScrollBar.Maximum = Math.Max(0, totalHeight - 1);
                     if (!mImageListView.IntegralScroll)
                         mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
                     else
@@ -616,33 +586,67 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void UpdateVisibleItems()
         {
-            // Find the first and last partially visible items
-            if (mImageListView.View == View.Gallery)
+            if (mImageListView.showGroups)
             {
-                mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mRows;
-                mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mRows - 1;
+                mFirstPartiallyVisible = -1;
+                mLastPartiallyVisible = -1;
+                mFirstVisible = -1;
+                mLastVisible = -1;
+
+                ImageListView.ImageListViewGroup firstVisibleGroup = null;
+                ImageListView.ImageListViewGroup lastVisibleGroup = null;
+                foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
+                {
+                    if (ItemAreaBounds.IntersectsWith(group.itemBounds))
+                    {
+                        if (firstVisibleGroup == null)
+                            firstVisibleGroup = group;
+                        lastVisibleGroup = group;
+                    }
+                    else if (lastVisibleGroup != null)
+                        break;
+                }
+
+                // Find the first and last visible items
+                if (mImageListView.View == View.Gallery)
+                {
+                    mFirstPartiallyVisible = firstVisibleGroup.FirstItemIndex + (int)System.Math.Floor((float)(ItemAreaBounds.Left - firstVisibleGroup.itemBounds.Left) / (float)mItemSizeWithMargin.Width) * firstVisibleGroup.itemRows;
+                    mLastPartiallyVisible = lastVisibleGroup.FirstItemIndex + (int)System.Math.Ceiling((float)((ItemAreaBounds.Left - lastVisibleGroup.itemBounds.Left) + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * lastVisibleGroup.itemRows - 1;
+                    mFirstVisible = firstVisibleGroup.FirstItemIndex + (int)System.Math.Ceiling((float)(ItemAreaBounds.Left - firstVisibleGroup.itemBounds.Left) / (float)mItemSizeWithMargin.Width) * firstVisibleGroup.itemRows;
+                    mLastVisible = lastVisibleGroup.FirstItemIndex + (int)System.Math.Floor((float)((ItemAreaBounds.Left - lastVisibleGroup.itemBounds.Left) + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * lastVisibleGroup.itemRows - 1;
+                }
+                else
+                {
+                    mFirstPartiallyVisible = firstVisibleGroup.FirstItemIndex + (int)System.Math.Floor((float)(ItemAreaBounds.Top - firstVisibleGroup.itemBounds.Top) / (float)mItemSizeWithMargin.Height) * firstVisibleGroup.itemCols;
+                    mLastPartiallyVisible = lastVisibleGroup.FirstItemIndex + (int)System.Math.Ceiling((float)((ItemAreaBounds.Top - lastVisibleGroup.itemBounds.Top) + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * lastVisibleGroup.itemCols - 1;
+                    mFirstVisible = firstVisibleGroup.FirstItemIndex + (int)System.Math.Ceiling((float)(ItemAreaBounds.Top - firstVisibleGroup.itemBounds.Top) / (float)mItemSizeWithMargin.Height) * firstVisibleGroup.itemCols;
+                    mLastVisible = lastVisibleGroup.FirstItemIndex + (int)System.Math.Floor((float)((ItemAreaBounds.Top - lastVisibleGroup.itemBounds.Top) + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * lastVisibleGroup.itemCols - 1;
+                }
             }
             else
             {
-                mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
-                mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mCols - 1;
+                // Find the first and last visible items
+                if (mImageListView.View == View.Gallery)
+                {
+                    mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mRows;
+                    mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mRows - 1;
+                    mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mRows;
+                    mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mRows - 1;
+                }
+                else
+                {
+                    mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
+                    mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mCols - 1;
+                    mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
+                    mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mCols - 1;
+                }
             }
+
+            // Bounds check
             if (mFirstPartiallyVisible < 0) mFirstPartiallyVisible = 0;
             if (mFirstPartiallyVisible > mImageListView.Items.Count - 1) mFirstPartiallyVisible = mImageListView.Items.Count - 1;
             if (mLastPartiallyVisible < 0) mLastPartiallyVisible = 0;
             if (mLastPartiallyVisible > mImageListView.Items.Count - 1) mLastPartiallyVisible = mImageListView.Items.Count - 1;
-
-            // Find the first and last visible items
-            if (mImageListView.View == View.Gallery)
-            {
-                mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mRows;
-                mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mRows - 1;
-            }
-            else
-            {
-                mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
-                mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mCols - 1;
-            }
             if (mFirstVisible < 0) mFirstVisible = 0;
             if (mFirstVisible > mImageListView.Items.Count - 1) mFirstVisible = mImageListView.Items.Count - 1;
             if (mLastVisible < 0) mLastVisible = 0;
@@ -719,6 +723,8 @@ namespace Manina.Windows.Forms
                     // Offset to next group
                     y += group.itemBounds.Height;
                 }
+
+                group.isVisible = ItemAreaBounds.IntersectsWith(group.headerBounds) || ItemAreaBounds.IntersectsWith(group.itemBounds);
             }
 
             // Groups processed

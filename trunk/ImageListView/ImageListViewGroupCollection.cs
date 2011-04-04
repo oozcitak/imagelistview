@@ -223,6 +223,19 @@ namespace Manina.Windows.Forms
 
                 return false;
             }
+            /// <summary>
+            /// Gets the list of visible groups.
+            /// </summary>
+            internal List<ImageListViewGroup> GetDisplayedGroups()
+            {
+                List<ImageListViewGroup> visible = new List<ImageListViewGroup>();
+                foreach (ImageListViewGroup group in this)
+                {
+                    if (group.isVisible)
+                        visible.Add(group);
+                }
+                return visible;
+            }
             #endregion
 
             #region Unsupported Interface
