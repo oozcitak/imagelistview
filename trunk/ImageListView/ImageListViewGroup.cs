@@ -31,7 +31,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents the collection of items in a group in an ImageListView control.
         /// </summary>
-        internal class ImageListViewGroup : IEnumerable<ImageListViewItem>, IEnumerable, IComparable<ImageListViewGroup>
+        public class ImageListViewGroup : IEnumerable<ImageListViewItem>, IEnumerable, IComparable<ImageListViewGroup>
         {
             #region Member Variables
             internal ImageListView mImageListView;
@@ -53,11 +53,11 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the index of the first item.
             /// </summary>
-            public int FirstItemIndex { get; set; }
+            public int FirstItemIndex { get; internal set; }
             /// <summary>
             /// Gets the index of the last item.
             /// </summary>
-            public int LastItemIndex { get; set; }
+            public int LastItemIndex { get; internal set; }
             /// <summary>
             /// Gets or sets whether the group is collapsed.
             /// </summary>
