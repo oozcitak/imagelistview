@@ -738,6 +738,17 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
+        /// Gets whether groups are displayed.
+        /// </summary>
+        [Browsable(false), Category("Appearance"), Description("Gets whether groups are displayed.")]
+        public bool GroupsVisible
+        {
+            get
+            {
+                return showGroups;
+            }
+        }
+        /// <summary>
         /// Gets or sets the scroll offset.
         /// </summary>
         internal Point ViewOffset { get { return mViewOffset; } set { mViewOffset = value; } }
