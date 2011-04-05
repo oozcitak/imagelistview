@@ -1326,8 +1326,7 @@ namespace Manina.Windows.Forms
         /// <returns>true if the item was made visible; otherwise false (item is already visible or the image list view is empty).</returns>
         public bool EnsureVisible(int itemIndex)
         {
-            if (itemIndex == -1) return false;
-            if (Items.Count == 0) return false;
+            if (Items.Count == 0 || itemIndex < 0 || itemIndex > Items.Count - 1) return false;
 
             // Already visible?
             Rectangle bounds = layoutManager.ItemAreaBounds;
@@ -1339,14 +1338,7 @@ namespace Manina.Windows.Forms
             if (ScrollOrientation == ScrollOrientation.HorizontalScroll)
             {
                 int delta = 0;
-                if (itemBounds.Left < bounds.Left)
-                    delta = bounds.Left - itemBounds.Left;
-                else
-                {
-                    int topItemIndex = itemIndex - (layoutManager.Cols - 1) * layoutManager.Rows;
-                    if (topItemIndex < 0) topItemIndex = 0;
-                    delta = bounds.Left - layoutManager.GetItemBounds(topItemIndex).Left;
-                }
+                delta = bounds.Left - itemBounds.Left;
                 int newXOffset = mViewOffset.X - delta;
                 if (newXOffset > hScrollBar.Maximum - hScrollBar.LargeChange + 1)
                     newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;
@@ -1360,14 +1352,7 @@ namespace Manina.Windows.Forms
             else
             {
                 int delta = 0;
-                if (itemBounds.Top < bounds.Top)
-                    delta = bounds.Top - itemBounds.Top;
-                else
-                {
-                    int topItemIndex = itemIndex - (layoutManager.Rows - 1) * layoutManager.Cols;
-                    if (topItemIndex < 0) topItemIndex = 0;
-                    delta = bounds.Top - layoutManager.GetItemBounds(topItemIndex).Top;
-                }
+                delta = bounds.Top - itemBounds.Top;
                 int newYOffset = mViewOffset.Y - delta;
                 if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
                     newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
