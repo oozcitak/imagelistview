@@ -181,43 +181,37 @@ namespace Manina.Windows.Forms
         /// </summary>
         public Rectangle GetItemBounds(int itemIndex)
         {
-            Point location = mItemAreaBounds.Location;
-            location.X += cachedItemMargin.Width / 2 - mImageListView.ViewOffset.X;
-            location.Y += cachedItemMargin.Height / 2 - mImageListView.ViewOffset.Y;
-            if (mImageListView.View == View.Gallery)
-            {
-                location.X += itemIndex * mItemSizeWithMargin.Width;
+            Point location = new Point();
 
-                if (mImageListView.showGroups)
-                    location.Y += cachedGroupHeaderHeight;
+            if (mImageListView.showGroups)
+            {
+                foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
+                {
+                    if (itemIndex >= group.FirstItemIndex && itemIndex <= group.LastItemIndex)
+                    {
+                        location = group.itemBounds.Location;
+                        location.X += cachedItemMargin.Width / 2;
+                        location.Y += cachedItemMargin.Height / 2;
+
+                        if (mImageListView.View == View.Gallery)
+                            location.X += (itemIndex - group.FirstItemIndex) * mItemSizeWithMargin.Width;
+                        else
+                        {
+                            location.X += ((itemIndex - group.FirstItemIndex) % mCols) * mItemSizeWithMargin.Width;
+                            location.Y += ((itemIndex - group.FirstItemIndex) / mCols) * mItemSizeWithMargin.Height;
+                        }
+                        break;
+                    }
+                }
             }
             else
             {
-                if (mImageListView.showGroups)
-                {
-                    // Offset by the number of groups above the item
-                    int offset = 0;
-                    int count = 0;
-                    int firstIndex = 0;
-                    foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
-                    {
-                        count += group.ItemCount;
-                        location.Y += cachedGroupHeaderHeight;
-                        offset++;
-                        if (count > itemIndex)
-                        {
-                            location.Y += ((itemIndex - firstIndex) / mCols) * mItemSizeWithMargin.Height;
-                            break;
-                        }
-                        else
-                        {
-                            location.Y += (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols) * mItemSizeWithMargin.Height;
-                            firstIndex = count;
-                        }
-                    }
+                location = mItemAreaBounds.Location;
+                location.X += cachedItemMargin.Width / 2 - mImageListView.ViewOffset.X;
+                location.Y += cachedItemMargin.Height / 2 - mImageListView.ViewOffset.Y;
 
-                    location.X += ((itemIndex - firstIndex) % mCols) * mItemSizeWithMargin.Width;
-                }
+                if (mImageListView.View == View.Gallery)
+                    location.X += itemIndex * mItemSizeWithMargin.Width;
                 else
                 {
                     location.X += (itemIndex % mCols) * mItemSizeWithMargin.Width;
