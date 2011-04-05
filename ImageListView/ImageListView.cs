@@ -728,13 +728,13 @@ namespace Manina.Windows.Forms
             }
             set
             {
-                SuspendPaint();
-                int current = layoutManager.FirstVisible;
-                mView = value;
-                layoutManager.Update();
-                EnsureVisible(current);
-                Refresh();
-                ResumePaint();
+                if (mView != value)
+                {
+                    int current = layoutManager.FirstPartiallyVisible;
+                    mView = value;
+                    Refresh();
+                    EnsureVisible(current);
+                }
             }
         }
         /// <summary>
@@ -1363,6 +1363,7 @@ namespace Manina.Windows.Forms
                 hScrollBar.Value = 0;
                 vScrollBar.Value = newYOffset;
             }
+
             Refresh();
             return true;
         }
