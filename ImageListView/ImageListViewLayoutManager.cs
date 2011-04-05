@@ -668,10 +668,17 @@ namespace Manina.Windows.Forms
         {
             int x = mItemAreaBounds.Left - mImageListView.ViewOffset.X;
             int y = mItemAreaBounds.Top - mImageListView.ViewOffset.Y;
+
             if (mImageListView.View == View.Gallery)
+            {
                 totalWidth = 0;
+                totalHeight = mItemAreaBounds.Height;
+            }
             else
+            {
                 totalHeight = 0;
+                totalWidth = mItemAreaBounds.Width;
+            }
 
             foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
             {
