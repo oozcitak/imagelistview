@@ -23,6 +23,7 @@ using System.Drawing.Design;
 using System.Resources;
 using System.Reflection;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -144,6 +145,60 @@ namespace Manina.Windows.Forms
             public int CompareTo(ImageListViewGroup other)
             {
                 return string.Compare(Name, other.Name);
+            }
+            #endregion
+
+            #region Helper Methods
+            /// <summary>
+            /// Determines which items in the group intersect with the given
+            /// selection rectangle.
+            /// </summary>
+            /// <param name="rec">The selection rectangle.</param>
+            /// <param name="orientation">Scroll orientation of the owner control.</param>
+            /// <param name="itemSize">The size of one item including margins.</param>
+            /// <returns>List of item indices.</returns>
+            public List<int> ItemIndicesInRectangle(Rectangle rec, ScrollOrientation orientation, Size itemSize)
+            {
+                List<int> items = new List<int>();
+                if (rec.Top <= itemBounds.Bottom && rec.Bottom >= itemBounds.Top &&
+                    rec.Left <= itemBounds.Right && rec.Right >= itemBounds.Left)
+                {
+                    if (orientation == ScrollOrientation.HorizontalScroll)
+                    {
+                        int startCol = (int)Math.Floor((float)(rec.Left - itemBounds.Left) / (float)itemSize.Width);
+                        int endCol = (int)Math.Floor((float)(rec.Right - itemBounds.Left) / (float)itemSize.Width);
+
+                        startCol = Math.Min(itemCols, Math.Max(0, startCol));
+                        endCol = Math.Min(itemCols, Math.Max(0, endCol));
+
+                        for (int i = FirstItemIndex + startCol; i <= FirstItemIndex + endCol; i++)
+                        {
+                            items.Add(i);
+                        }
+                    }
+                    else if (orientation == ScrollOrientation.VerticalScroll)
+                    {
+                        int startRow = (int)Math.Floor((float)(rec.Top - itemBounds.Top) / (float)itemSize.Height);
+                        int endRow = (int)Math.Floor((float)(rec.Bottom - itemBounds.Top) / (float)itemSize.Height);
+                        int startCol = (int)Math.Floor((float)(rec.Left - itemBounds.Left) / (float)itemSize.Width);
+                        int endCol = (int)Math.Floor((float)(rec.Right - itemBounds.Left) / (float)itemSize.Width);
+
+                        startRow = Math.Min(itemRows - 1, Math.Max(0, startRow));
+                        endRow = Math.Min(itemRows - 1, Math.Max(0, endRow));
+                        startCol = Math.Min(itemCols - 1, Math.Max(0, startCol));
+                        endCol = Math.Min(itemCols - 1, Math.Max(0, endCol));
+
+                        for (int row = startRow; row <= endRow; row++)
+                        {
+                            for (int col = startCol; col <= endCol; col++)
+                            {
+                                int i = FirstItemIndex + row * itemCols + col;
+                                items.Add(i);
+                            }
+                        }
+                    }
+                }
+                return items;
             }
             #endregion
         }

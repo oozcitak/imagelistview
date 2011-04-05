@@ -1332,55 +1332,54 @@ namespace Manina.Windows.Forms
             // Already visible?
             Rectangle bounds = layoutManager.ItemAreaBounds;
             Rectangle itemBounds = layoutManager.GetItemBounds(itemIndex);
-            if (!bounds.Contains(itemBounds))
+            if (bounds.Contains(itemBounds))
+                return false;
+
+            // Scroll to item
+            if (ScrollOrientation == ScrollOrientation.HorizontalScroll)
             {
-                if (ScrollOrientation == ScrollOrientation.HorizontalScroll)
-                {
-                    int delta = 0;
-                    if (itemBounds.Left < bounds.Left)
-                        delta = bounds.Left - itemBounds.Left;
-                    else
-                    {
-                        int topItemIndex = itemIndex - (layoutManager.Cols - 1) * layoutManager.Rows;
-                        if (topItemIndex < 0) topItemIndex = 0;
-                        delta = bounds.Left - layoutManager.GetItemBounds(topItemIndex).Left;
-                    }
-                    int newXOffset = mViewOffset.X - delta;
-                    if (newXOffset > hScrollBar.Maximum - hScrollBar.LargeChange + 1)
-                        newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;
-                    if (newXOffset < hScrollBar.Minimum)
-                        newXOffset = hScrollBar.Minimum;
-                    mViewOffset.X = newXOffset;
-                    mViewOffset.Y = 0;
-                    hScrollBar.Value = newXOffset;
-                    vScrollBar.Value = 0;
-                }
+                int delta = 0;
+                if (itemBounds.Left < bounds.Left)
+                    delta = bounds.Left - itemBounds.Left;
                 else
                 {
-                    int delta = 0;
-                    if (itemBounds.Top < bounds.Top)
-                        delta = bounds.Top - itemBounds.Top;
-                    else
-                    {
-                        int topItemIndex = itemIndex - (layoutManager.Rows - 1) * layoutManager.Cols;
-                        if (topItemIndex < 0) topItemIndex = 0;
-                        delta = bounds.Top - layoutManager.GetItemBounds(topItemIndex).Top;
-                    }
-                    int newYOffset = mViewOffset.Y - delta;
-                    if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
-                        newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
-                    if (newYOffset < vScrollBar.Minimum)
-                        newYOffset = vScrollBar.Minimum;
-                    mViewOffset.X = 0;
-                    mViewOffset.Y = newYOffset;
-                    hScrollBar.Value = 0;
-                    vScrollBar.Value = newYOffset;
+                    int topItemIndex = itemIndex - (layoutManager.Cols - 1) * layoutManager.Rows;
+                    if (topItemIndex < 0) topItemIndex = 0;
+                    delta = bounds.Left - layoutManager.GetItemBounds(topItemIndex).Left;
                 }
-                Refresh();
-                return true;
+                int newXOffset = mViewOffset.X - delta;
+                if (newXOffset > hScrollBar.Maximum - hScrollBar.LargeChange + 1)
+                    newXOffset = hScrollBar.Maximum - hScrollBar.LargeChange + 1;
+                if (newXOffset < hScrollBar.Minimum)
+                    newXOffset = hScrollBar.Minimum;
+                mViewOffset.X = newXOffset;
+                mViewOffset.Y = 0;
+                hScrollBar.Value = newXOffset;
+                vScrollBar.Value = 0;
             }
             else
-                return false;
+            {
+                int delta = 0;
+                if (itemBounds.Top < bounds.Top)
+                    delta = bounds.Top - itemBounds.Top;
+                else
+                {
+                    int topItemIndex = itemIndex - (layoutManager.Rows - 1) * layoutManager.Cols;
+                    if (topItemIndex < 0) topItemIndex = 0;
+                    delta = bounds.Top - layoutManager.GetItemBounds(topItemIndex).Top;
+                }
+                int newYOffset = mViewOffset.Y - delta;
+                if (newYOffset > vScrollBar.Maximum - vScrollBar.LargeChange + 1)
+                    newYOffset = vScrollBar.Maximum - vScrollBar.LargeChange + 1;
+                if (newYOffset < vScrollBar.Minimum)
+                    newYOffset = vScrollBar.Minimum;
+                mViewOffset.X = 0;
+                mViewOffset.Y = newYOffset;
+                hScrollBar.Value = 0;
+                vScrollBar.Value = newYOffset;
+            }
+            Refresh();
+            return true;
         }
         /// <summary>
         /// Determines whether the specified item is visible on the screen.
