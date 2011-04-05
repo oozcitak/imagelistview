@@ -1076,18 +1076,22 @@ namespace Manina.Windows.Forms
                     }
 
                     // Separators 
-                    x = bounds.Left - 1;
-                    foreach (ImageListViewColumnHeader column in uicolumns)
+                    if (!ImageListView.GroupsVisible)
                     {
-                        x += column.Width;
-                        if (!ReferenceEquals(column, uicolumns[uicolumns.Count - 1]))
+                        x = bounds.Left - 1;
+                        foreach (ImageListViewColumnHeader column in uicolumns)
                         {
-                            using (Pen pGray32 = new Pen(ImageListView.Colors.ColumnSeparatorColor))
+                            x += column.Width;
+                            if (!ReferenceEquals(column, uicolumns[uicolumns.Count - 1]))
                             {
-                                g.DrawLine(pGray32, x, bounds.Top, x, bounds.Bottom);
+                                using (Pen pGray32 = new Pen(ImageListView.Colors.ColumnSeparatorColor))
+                                {
+                                    g.DrawLine(pGray32, x, bounds.Top, x, bounds.Bottom);
+                                }
                             }
                         }
                     }
+
                     Size offset = new Size(2, (bounds.Height - ImageListView.Font.Height) / 2);
                     using (StringFormat sf = new StringFormat())
                     {
