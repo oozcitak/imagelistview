@@ -33,8 +33,10 @@ namespace Manina.Windows.Forms
         private Rectangle mColumnHeaderBounds;
         private Size mItemSize;
         private Size mItemSizeWithMargin;
-        private int mCols;
-        private int mRows;
+        private int mDisplayedCols;
+        private int mDisplayedRows;
+        private int mItemCols;
+        private int mItemRows;
         private int mFirstPartiallyVisible;
         private int mLastPartiallyVisible;
         private int mFirstVisible;
@@ -89,11 +91,11 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the maximum number of columns that can be displayed.
         /// </summary>
-        public int Cols { get { return mCols; } }
+        public int Cols { get { return mDisplayedCols; } }
         /// <summary>
         /// Gets the maximum number of rows that can be displayed.
         /// </summary>
-        public int Rows { get { return mRows; } }
+        public int Rows { get { return mDisplayedRows; } }
         /// <summary>
         /// Gets the index of the first partially visible item.
         /// </summary>
@@ -197,8 +199,8 @@ namespace Manina.Windows.Forms
                             location.X += (itemIndex - group.FirstItemIndex) * mItemSizeWithMargin.Width;
                         else
                         {
-                            location.X += ((itemIndex - group.FirstItemIndex) % mCols) * mItemSizeWithMargin.Width;
-                            location.Y += ((itemIndex - group.FirstItemIndex) / mCols) * mItemSizeWithMargin.Height;
+                            location.X += ((itemIndex - group.FirstItemIndex) % mDisplayedCols) * mItemSizeWithMargin.Width;
+                            location.Y += ((itemIndex - group.FirstItemIndex) / mDisplayedCols) * mItemSizeWithMargin.Height;
                         }
                         break;
                     }
@@ -214,8 +216,8 @@ namespace Manina.Windows.Forms
                     location.X += itemIndex * mItemSizeWithMargin.Width;
                 else
                 {
-                    location.X += (itemIndex % mCols) * mItemSizeWithMargin.Width;
-                    location.Y += (itemIndex / mCols) * mItemSizeWithMargin.Height;
+                    location.X += (itemIndex % mDisplayedCols) * mItemSizeWithMargin.Width;
+                    location.Y += (itemIndex / mDisplayedCols) * mItemSizeWithMargin.Height;
                 }
             }
 
@@ -396,15 +398,30 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void CalculateGrid()
         {
-            mRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
-            mCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
-            if (mImageListView.View == View.Details) mCols = 1;
-            if (mImageListView.View == View.Gallery) mRows = 1;
-            if (mCols < 1) mCols = 1;
-            if (mRows < 1) mRows = 1;
+            // Number of rows and columns shown on screen
+            mDisplayedRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
+            mDisplayedCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
 
-            totalWidth = mRows * mItemSizeWithMargin.Width;
-            totalHeight = mCols * mItemSizeWithMargin.Height;
+            // Number of rows and columns to enclose all items
+            if (mImageListView.View == View.Gallery)
+            {
+                mItemRows = mDisplayedRows;
+                mItemCols = (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mDisplayedRows);
+            }
+            else
+            {
+                // Number of rows and columns to enclose all items
+                mItemCols = mDisplayedCols;
+                mItemRows = (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mDisplayedCols);
+            }
+
+            if (mImageListView.View == View.Details) mDisplayedCols = 1;
+            if (mImageListView.View == View.Gallery) mDisplayedRows = 1;
+            if (mDisplayedCols < 1) mDisplayedCols = 1;
+            if (mDisplayedRows < 1) mDisplayedRows = 1;
+
+            totalWidth = mItemCols * mItemSizeWithMargin.Width;
+            totalHeight = mItemRows * mItemSizeWithMargin.Height;
         }
         /// <summary>
         /// Calculates the item area.
@@ -514,13 +531,13 @@ namespace Manina.Windows.Forms
                     if (!mImageListView.IntegralScroll)
                         mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
                     else
-                        mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * mCols;
+                        mImageListView.hScrollBar.LargeChange = mItemSizeWithMargin.Width * mDisplayedCols;
                     mImageListView.hScrollBar.SmallChange = mItemSizeWithMargin.Width;
                 }
                 else
                 {
                     mImageListView.hScrollBar.Minimum = 0;
-                    mImageListView.hScrollBar.Maximum = mCols * mItemSizeWithMargin.Width;
+                    mImageListView.hScrollBar.Maximum = mDisplayedCols * mItemSizeWithMargin.Width;
                     mImageListView.hScrollBar.LargeChange = mItemAreaBounds.Width;
                     mImageListView.hScrollBar.SmallChange = 1;
                 }
@@ -534,7 +551,7 @@ namespace Manina.Windows.Forms
                 if (mImageListView.View == View.Gallery)
                 {
                     mImageListView.vScrollBar.Minimum = 0;
-                    mImageListView.vScrollBar.Maximum = mRows * mItemSizeWithMargin.Height;
+                    mImageListView.vScrollBar.Maximum = mDisplayedRows * mItemSizeWithMargin.Height;
                     mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
                     mImageListView.vScrollBar.SmallChange = 1;
                 }
@@ -545,7 +562,7 @@ namespace Manina.Windows.Forms
                     if (!mImageListView.IntegralScroll)
                         mImageListView.vScrollBar.LargeChange = mItemAreaBounds.Height;
                     else
-                        mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * mRows;
+                        mImageListView.vScrollBar.LargeChange = mItemSizeWithMargin.Height * mDisplayedRows;
                     mImageListView.vScrollBar.SmallChange = mItemSizeWithMargin.Height;
                 }
                 if (mImageListView.ViewOffset.Y > mImageListView.vScrollBar.Maximum - mImageListView.vScrollBar.LargeChange + 1)
@@ -622,17 +639,17 @@ namespace Manina.Windows.Forms
                 // Find the first and last visible items
                 if (mImageListView.View == View.Gallery)
                 {
-                    mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mRows;
-                    mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mRows - 1;
-                    mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mRows;
-                    mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mRows - 1;
+                    mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mDisplayedRows;
+                    mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mDisplayedRows - 1;
+                    mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.X / (float)mItemSizeWithMargin.Width) * mDisplayedRows;
+                    mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.X + mItemAreaBounds.Width) / (float)mItemSizeWithMargin.Width) * mDisplayedRows - 1;
                 }
                 else
                 {
-                    mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
-                    mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mCols - 1;
-                    mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mCols;
-                    mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mCols - 1;
+                    mFirstPartiallyVisible = (int)System.Math.Floor((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mDisplayedCols;
+                    mLastPartiallyVisible = (int)System.Math.Ceiling((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mDisplayedCols - 1;
+                    mFirstVisible = (int)System.Math.Ceiling((float)mImageListView.ViewOffset.Y / (float)mItemSizeWithMargin.Height) * mDisplayedCols;
+                    mLastVisible = (int)System.Math.Floor((float)(mImageListView.ViewOffset.Y + mItemAreaBounds.Height) / (float)mItemSizeWithMargin.Height) * mDisplayedCols - 1;
                 }
             }
 
@@ -666,6 +683,9 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void UpdateGroups()
         {
+            if (!mImageListView.showGroups)
+                return;
+
             int x = mItemAreaBounds.Left - mImageListView.ViewOffset.X;
             int y = mItemAreaBounds.Top - mImageListView.ViewOffset.Y;
 
@@ -685,11 +705,11 @@ namespace Manina.Windows.Forms
                 if (mImageListView.View == View.Gallery)
                 {
                     // Number of rows and columns to enclose all items
-                    group.itemRows = mRows;
-                    group.itemCols = (int)System.Math.Ceiling((float)group.ItemCount / (float)mRows);
+                    group.itemRows = mDisplayedRows;
+                    group.itemCols = (int)System.Math.Ceiling((float)group.ItemCount / (float)mDisplayedRows);
 
                     // Header area
-                    group.headerBounds = new Rectangle(x, y, cachedGroupHeaderHeight, mItemSize.Height * mRows);
+                    group.headerBounds = new Rectangle(x, y, cachedGroupHeaderHeight, mItemSize.Height * mDisplayedRows);
                     x += cachedGroupHeaderHeight;
 
                     // Item area
@@ -706,8 +726,8 @@ namespace Manina.Windows.Forms
                 else
                 {
                     // Number of rows and columns to enclose all items
-                    group.itemCols = mCols;
-                    group.itemRows = (int)System.Math.Ceiling((float)group.ItemCount / (float)mCols);
+                    group.itemCols = mDisplayedCols;
+                    group.itemRows = (int)System.Math.Ceiling((float)group.ItemCount / (float)mDisplayedCols);
 
                     // Header area
                     group.headerBounds = new Rectangle(x, y, mClientArea.Width + mImageListView.ViewOffset.X, cachedGroupHeaderHeight);
