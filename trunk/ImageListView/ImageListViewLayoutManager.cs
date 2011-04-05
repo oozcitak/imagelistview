@@ -348,6 +348,7 @@ namespace Manina.Windows.Forms
             mItemSizeWithMargin = mItemSize + cachedItemMargin;
 
             // Cache current properties to determine if we will need an update later
+            bool viewChanged = (cachedView != mImageListView.View);
             cachedView = mImageListView.View;
             cachedViewOffset = mImageListView.ViewOffset;
             cachedSize = mImageListView.ClientSize;
@@ -391,6 +392,10 @@ namespace Manina.Windows.Forms
 
             // Cache visible items
             UpdateVisibleItems();
+
+            // Recalculate the layout if view mode was changed
+            if (viewChanged)
+                Update();
         }
         /// <summary>
         /// Calculates the maximum number of rows and columns 
@@ -524,7 +529,7 @@ namespace Manina.Windows.Forms
             if (mImageListView.Items.Count != 0)
             {
                 // Horizontal scroll range
-                if (mImageListView.View == View.Gallery)
+                if (mImageListView.ScrollOrientation == System.Windows.Forms.ScrollOrientation.HorizontalScroll)
                 {
                     mImageListView.hScrollBar.Minimum = 0;
                     mImageListView.hScrollBar.Maximum = Math.Max(0, totalWidth - 1);
@@ -548,7 +553,7 @@ namespace Manina.Windows.Forms
                 }
 
                 // Vertical scroll range
-                if (mImageListView.View == View.Gallery)
+                if (mImageListView.ScrollOrientation == System.Windows.Forms.ScrollOrientation.HorizontalScroll)
                 {
                     mImageListView.vScrollBar.Minimum = 0;
                     mImageListView.vScrollBar.Maximum = mDisplayedRows * mItemSizeWithMargin.Height;
