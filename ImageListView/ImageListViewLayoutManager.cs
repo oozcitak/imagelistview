@@ -407,6 +407,11 @@ namespace Manina.Windows.Forms
             mDisplayedRows = (int)System.Math.Floor((float)mItemAreaBounds.Height / (float)mItemSizeWithMargin.Height);
             mDisplayedCols = (int)System.Math.Floor((float)mItemAreaBounds.Width / (float)mItemSizeWithMargin.Width);
 
+            if (mImageListView.View == View.Details) mDisplayedCols = 1;
+            if (mImageListView.View == View.Gallery) mDisplayedRows = 1;
+            if (mDisplayedCols < 1) mDisplayedCols = 1;
+            if (mDisplayedRows < 1) mDisplayedRows = 1;
+
             // Number of rows and columns to enclose all items
             if (mImageListView.View == View.Gallery)
             {
@@ -419,11 +424,6 @@ namespace Manina.Windows.Forms
                 mItemCols = mDisplayedCols;
                 mItemRows = (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mDisplayedCols);
             }
-
-            if (mImageListView.View == View.Details) mDisplayedCols = 1;
-            if (mImageListView.View == View.Gallery) mDisplayedRows = 1;
-            if (mDisplayedCols < 1) mDisplayedCols = 1;
-            if (mDisplayedRows < 1) mDisplayedRows = 1;
 
             totalWidth = mItemCols * mItemSizeWithMargin.Width;
             totalHeight = mItemRows * mItemSizeWithMargin.Height;
