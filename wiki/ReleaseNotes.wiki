@@ -1,7 +1,17 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
-= 9.6 (08 December 2011) =
+= 10.0 (06 April 2011) =
+
+This release introduces the item grouping option and also fixes some minor bugs. Group and sort work together. For example when you group by name and sort by date at the same time; the items will be grouped alphabetically and each group will be sorted by picture date.
+
+  * Added the !GroupColumn and !GroupOrder properties to the control (Issue 69).
+  * Column headers are no longer sorted on a right click.
+  * Fixed a possible source for a null reference exception. This may be related to Issue 122.
+  * Added the !ItemCollectionChanged event (Issue 125).
+  * The control is now refreshed when the !ScrollBars property is changed.
+
+= 9.6 (08 December 2010) =
 
   * Fixed a bug in the .NET 2.0 source (Issue 116).
   * The framework requirement is now .NET 3.5. An option to target 2.0 is still available. (If you are holding back on .NET 2.0 just for the size of the .NET 3.5 framework check the "Client-only Framework subset" in the project properties.)
