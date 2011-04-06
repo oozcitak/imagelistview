@@ -43,6 +43,8 @@
             this.EventListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ClearEventList = new System.Windows.Forms.ToolStripMenuItem();
             this.TestToolStrip = new System.Windows.Forms.ToolStrip();
+            this.ChooseImageSource = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.AddOneItem = new System.Windows.Forms.ToolStripButton();
             this.AddItems = new System.Windows.Forms.ToolStripButton();
@@ -79,9 +81,8 @@
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
-            this.ChooseImageSource = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.ChooseSourcePath = new System.Windows.Forms.FolderBrowserDialog();
+            this.GroupByName = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -105,7 +106,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(619, 599);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(619, 574);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // toolStripContainer1.LeftToolStripPanel
@@ -147,13 +148,14 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.logEventsCheckbox);
             this.splitContainer1.Panel2.Controls.Add(this.EventsListBox);
-            this.splitContainer1.Size = new System.Drawing.Size(619, 599);
+            this.splitContainer1.Size = new System.Drawing.Size(619, 574);
             this.splitContainer1.SplitterDistance = 425;
             this.splitContainer1.TabIndex = 1;
             // 
             // imageListView
             // 
             this.imageListView.AllowDuplicateFileNames = true;
+            this.imageListView.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.imageListView.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
@@ -166,9 +168,10 @@
             new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
             this.imageListView.ContextMenuStrip = this.ItemContextMenu;
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
-            this.imageListView.Size = new System.Drawing.Size(425, 599);
+            this.imageListView.Size = new System.Drawing.Size(425, 574);
             this.imageListView.TabIndex = 0;
             // 
             // ItemContextMenu
@@ -215,7 +218,7 @@
             this.EventsListBox.IntegralHeight = false;
             this.EventsListBox.Location = new System.Drawing.Point(0, 26);
             this.EventsListBox.Name = "EventsListBox";
-            this.EventsListBox.Size = new System.Drawing.Size(190, 573);
+            this.EventsListBox.Size = new System.Drawing.Size(190, 548);
             this.EventsListBox.TabIndex = 0;
             // 
             // EventListContextMenu
@@ -258,6 +261,7 @@
             this.ShowFileIcons,
             this.ShowCheckboxes,
             this.ShowScrollbars,
+            this.GroupByName,
             this.toolStripSeparator3,
             this.toolStripLabel4,
             this.CacheOnDemand,
@@ -273,9 +277,23 @@
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 558);
+            this.TestToolStrip.Size = new System.Drawing.Size(139, 571);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
+            // 
+            // ChooseImageSource
+            // 
+            this.ChooseImageSource.Image = ((System.Drawing.Image)(resources.GetObject("ChooseImageSource.Image")));
+            this.ChooseImageSource.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ChooseImageSource.Name = "ChooseImageSource";
+            this.ChooseImageSource.Size = new System.Drawing.Size(137, 20);
+            this.ChooseImageSource.Text = "Choose Image Source";
+            this.ChooseImageSource.Click += new System.EventHandler(this.ChooseImageSource_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(137, 6);
             // 
             // toolStripLabel2
             // 
@@ -595,7 +613,7 @@
             this.StartBenchmark.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.StartBenchmark.Name = "StartBenchmark";
-            this.StartBenchmark.Size = new System.Drawing.Size(137, 20);
+            this.StartBenchmark.Size = new System.Drawing.Size(106, 20);
             this.StartBenchmark.Text = "Start Benchmark";
             this.StartBenchmark.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.Click += new System.EventHandler(this.StartBenchmark_Click);
@@ -610,23 +628,20 @@
             this.CheckBenchmarkEndTimer.Interval = 2000;
             this.CheckBenchmarkEndTimer.Tick += new System.EventHandler(this.CheckBenchmarkEndTimer_Tick);
             // 
-            // ChooseImageSource
-            // 
-            this.ChooseImageSource.Image = ((System.Drawing.Image)(resources.GetObject("ChooseImageSource.Image")));
-            this.ChooseImageSource.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.ChooseImageSource.Name = "ChooseImageSource";
-            this.ChooseImageSource.Size = new System.Drawing.Size(137, 20);
-            this.ChooseImageSource.Text = "Choose Image Source";
-            this.ChooseImageSource.Click += new System.EventHandler(this.ChooseImageSource_Click);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(137, 6);
-            // 
             // ChooseSourcePath
             // 
             this.ChooseSourcePath.ShowNewFolderButton = false;
+            // 
+            // GroupByName
+            // 
+            this.GroupByName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.GroupByName.Image = ((System.Drawing.Image)(resources.GetObject("GroupByName.Image")));
+            this.GroupByName.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.GroupByName.Name = "GroupByName";
+            this.GroupByName.Size = new System.Drawing.Size(137, 17);
+            this.GroupByName.Text = "Group by Name";
+            this.GroupByName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.GroupByName.Click += new System.EventHandler(this.GroupByName_Click);
             // 
             // TestForm
             // 
@@ -712,6 +727,7 @@
         private System.Windows.Forms.ToolStripButton ChooseImageSource;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.FolderBrowserDialog ChooseSourcePath;
+        private System.Windows.Forms.ToolStripButton GroupByName;
     }
 }
 
