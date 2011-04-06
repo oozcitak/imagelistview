@@ -11,7 +11,7 @@ This release introduces the item grouping option and also fixes some minor bugs.
   * Added the !ItemCollectionChanged event (Issue 125).
   * The control is now refreshed when the !ScrollBars property is changed.
 
-Note: There is a known issue with groups. When groups are shown, each item insertion/removal will sort the items from scratch. This would be evident when inserting many items in a row. This will probably be fixed in a future release; but the current workaround is to disable grouping while inserting many items.
+Note: There is a known issue with groups. When groups are shown, each item insertion/removal will sort the items from scratch. This would be evident when inserting many items in a row. This will probably be fixed in a future release; but the current workaround is to disable grouping while inserting many items. See Issue 129.
 
 = 9.6 (08 December 2010) =
 
