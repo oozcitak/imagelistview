@@ -78,12 +78,11 @@ namespace Manina.Windows.Forms
         /// <param name="value">Exif data as a byte array.</param>
         private static string ExifAscii(byte[] value)
         {
-            if (value.Length == 0)
+            if (value == null || value.Length == 0)
                 return string.Empty;
 
-            int len = Array.IndexOf(value, (byte)0);
-            if (len == -1) len = value.Length;
-            string str = Encoding.ASCII.GetString(value, 0, len);
+            string str = Encoding.ASCII.GetString(value);
+            str = str.Trim(new char[] { '\0' });
             return str;
         }
         /// <summary>
@@ -348,127 +347,130 @@ namespace Manina.Windows.Forms
             string str;
             foreach (PropertyItem prop in img.PropertyItems)
             {
-                switch (prop.Id)
+                if (prop.Value != null && prop.Value.Length != 0)
                 {
-                    case TagImageDescription:
-                        str = ExifAscii(prop.Value).Trim();
-                        if (str != String.Empty)
-                        {
-                            ImageDescription = str;
-                        }
-                        break;
-                    case TagArtist:
-                        str = ExifAscii(prop.Value).Trim();
-                        if (str != String.Empty)
-                        {
-                            Artist = str;
-                        }
-                        break;
-                    case TagEquipmentManufacturer:
-                        str = ExifAscii(prop.Value).Trim();
-                        if (str != String.Empty)
-                        {
-                            EquipmentManufacturer = str;
-                        }
-                        break;
-                    case TagEquipmentModel:
-                        str = ExifAscii(prop.Value).Trim();
-                        if (str != String.Empty)
-                        {
-                            EquipmentModel = str;
-                        }
-                        break;
-                    case TagDateTimeOriginal:
-                        dateTime = ExifDateTime(prop.Value);
-                        if (dateTime != DateTime.MinValue)
-                        {
-                            DateTaken = dateTime;
-                        }
-                        break;
-                    case TagExposureTime:
-                        if (prop.Value.Length == 8)
-                        {
-                            dVal = ExifDouble(prop.Value);
-                            if (dVal != 0.0)
+                    switch (prop.Id)
+                    {
+                        case TagImageDescription:
+                            str = ExifAscii(prop.Value).Trim();
+                            if (str != String.Empty)
                             {
-                                ExposureTime = dVal;
+                                ImageDescription = str;
                             }
-                        }
-                        break;
-                    case TagFNumber:
-                        if (prop.Value.Length == 8)
-                        {
-                            dVal = ExifDouble(prop.Value);
-                            if (dVal != 0.0)
+                            break;
+                        case TagArtist:
+                            str = ExifAscii(prop.Value).Trim();
+                            if (str != String.Empty)
                             {
-                                FNumber = dVal;
+                                Artist = str;
                             }
-                        }
-                        break;
-                    case TagISOSpeed:
-                        if (prop.Value.Length == 2)
-                        {
-                            iVal = ExifUShort(prop.Value);
-                            if (iVal != 0)
+                            break;
+                        case TagEquipmentManufacturer:
+                            str = ExifAscii(prop.Value).Trim();
+                            if (str != String.Empty)
                             {
-                                ISOSpeed = iVal;
+                                EquipmentManufacturer = str;
                             }
-                        }
-                        break;
-                    case TagCopyright:
-                        str = ExifAscii(prop.Value);
-                        if (str != String.Empty)
-                        {
-                            Copyright = str;
-                        }
-                        break;
-                    case TagRating:
-                        if (Rating == 0 && prop.Value.Length == 2)
-                        {
-                            iVal = ExifUShort(prop.Value);
-                            if (iVal == 1)
-                                Rating = 1;
-                            else if (iVal == 2)
-                                Rating = 25;
-                            else if (iVal == 3)
-                                Rating = 50;
-                            else if (iVal == 4)
-                                Rating = 75;
-                            else if (iVal == 5)
-                                Rating = 99;
-                        }
-                        break;
-                    case TagRatingPercent:
-                        if (prop.Value.Length == 2)
-                        {
-                            iVal = ExifUShort(prop.Value);
-                            Rating = iVal;
-                        }
-                        break;
-                    case TagUserComment:
-                        str = ExifAscii(prop.Value);
-                        if (str != String.Empty)
-                        {
-                            Comment = str;
-                        }
-                        break;
-                    case TagSoftware:
-                        str = ExifAscii(prop.Value).Trim();
-                        if (str != String.Empty)
-                        {
-                            Software = str;
-                        }
-                        break;
-                    case TagFocalLength:
-                        if (prop.Value.Length == 8)
-                        {
-                            dVal = ExifDouble(prop.Value);
-                            if (dVal != 0.0)
+                            break;
+                        case TagEquipmentModel:
+                            str = ExifAscii(prop.Value).Trim();
+                            if (str != String.Empty)
                             {
-                                FocalLength = dVal;
+                                EquipmentModel = str;
                             }
-                        }
-                        break;
+                            break;
+                        case TagDateTimeOriginal:
+                            dateTime = ExifDateTime(prop.Value);
+                            if (dateTime != DateTime.MinValue)
+                            {
+                                DateTaken = dateTime;
+                            }
+                            break;
+                        case TagExposureTime:
+                            if (prop.Value.Length == 8)
+                            {
+                                dVal = ExifDouble(prop.Value);
+                                if (dVal != 0.0)
+                                {
+                                    ExposureTime = dVal;
+                                }
+                            }
+                            break;
+                        case TagFNumber:
+                            if (prop.Value.Length == 8)
+                            {
+                                dVal = ExifDouble(prop.Value);
+                                if (dVal != 0.0)
+                                {
+                                    FNumber = dVal;
+                                }
+                            }
+                            break;
+                        case TagISOSpeed:
+                            if (prop.Value.Length == 2)
+                            {
+                                iVal = ExifUShort(prop.Value);
+                                if (iVal != 0)
+                                {
+                                    ISOSpeed = iVal;
+                                }
+                            }
+                            break;
+                        case TagCopyright:
+                            str = ExifAscii(prop.Value);
+                            if (str != String.Empty)
+                            {
+                                Copyright = str;
+                            }
+                            break;
+                        case TagRating:
+                            if (Rating == 0 && prop.Value.Length == 2)
+                            {
+                                iVal = ExifUShort(prop.Value);
+                                if (iVal == 1)
+                                    Rating = 1;
+                                else if (iVal == 2)
+                                    Rating = 25;
+                                else if (iVal == 3)
+                                    Rating = 50;
+                                else if (iVal == 4)
+                                    Rating = 75;
+                                else if (iVal == 5)
+                                    Rating = 99;
+                            }
+                            break;
+                        case TagRatingPercent:
+                            if (prop.Value.Length == 2)
+                            {
+                                iVal = ExifUShort(prop.Value);
+                                Rating = iVal;
+                            }
+                            break;
+                        case TagUserComment:
+                            str = ExifAscii(prop.Value);
+                            if (str != String.Empty)
+                            {
+                                Comment = str;
+                            }
+                            break;
+                        case TagSoftware:
+                            str = ExifAscii(prop.Value).Trim();
+                            if (str != String.Empty)
+                            {
+                                Software = str;
+                            }
+                            break;
+                        case TagFocalLength:
+                            if (prop.Value.Length == 8)
+                            {
+                                dVal = ExifDouble(prop.Value);
+                                if (dVal != 0.0)
+                                {
+                                    FocalLength = dVal;
+                                }
+                            }
+                            break;
+                    }
                 }
             }
         }
