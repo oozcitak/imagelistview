@@ -1269,12 +1269,7 @@ namespace Manina.Windows.Forms
             /// <param name="bounds">The bounding rectangle of group in client coordinates.</param>
             public virtual void DrawGroupHeader(Graphics g, string name, Rectangle bounds)
             {
-                // Paint background
-                using (Brush bNormal = new SolidBrush(ImageListView.Colors.ControlBackColor))
-                {
-                    g.FillRectangle(bNormal, bounds);
-                }
-
+                // Bottom border
                 bounds.Inflate(0, -4);
                 using (Pen pSpep = new Pen(new LinearGradientBrush(bounds, ImageListView.Colors.ColumnSeparatorColor, Color.Transparent, LinearGradientMode.Horizontal)))
                 {
