@@ -352,7 +352,15 @@ namespace Manina.Windows.Forms
                     else
                         g.SetClip(ImageListView.layoutManager.ClientArea);
 
-                    DrawGroupHeader(g, group.Name, group.headerBounds);
+                    if (ImageListView.View == View.Gallery)
+                    {
+                        g.TranslateTransform(group.headerBounds.Left, group.headerBounds.Bottom);
+                        g.RotateTransform(270);
+                        DrawGroupHeader(g, group.Name, new Rectangle(0, 0, group.headerBounds.Height, group.headerBounds.Width));
+                        g.ResetTransform();
+                    }
+                    else
+                        DrawGroupHeader(g, group.Name, group.headerBounds);
                 }
             }
             /// <summary>
