@@ -1078,6 +1078,37 @@ namespace Manina.Windows.Forms
                     g.FillRectangle(b, bounds);
                 }
             }
+            /// <summary>
+            /// Draws the group headers.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="name">The name of the group to draw.</param>
+            /// <param name="bounds">The bounding rectangle of group in client coordinates.</param>
+            public override void DrawGroupHeader(Graphics g, string name, Rectangle bounds)
+            {
+                // Bottom border
+                bounds.Inflate(0, -4);
+                using (Pen pSpep = new Pen(Color.FromArgb(64, 64, 64)))
+                {
+                    g.DrawLine(pSpep, bounds.Left + 1, bounds.Bottom - 1, bounds.Right - 1, bounds.Bottom - 1);
+                }
+
+                // Text
+                if (bounds.Width > 4)
+                {
+                    using (StringFormat sf = new StringFormat())
+                    {
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        using (SolidBrush bText = new SolidBrush(Color.White))
+                        {
+                            g.DrawString(name, (ImageListView.GroupHeaderFont == null ? ImageListView.Font : ImageListView.GroupHeaderFont), bText, bounds, sf);
+                        }
+                    }
+                }
+            }
 
             /// <summary>
             /// Draws an image with a reflection effect at the bottom.
@@ -1814,6 +1845,37 @@ namespace Manina.Windows.Forms
                 using (Brush b = new SolidBrush(SystemColors.Highlight))
                 {
                     g.FillRectangle(b, bounds);
+                }
+            }
+            /// <summary>
+            /// Draws the group headers.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="name">The name of the group to draw.</param>
+            /// <param name="bounds">The bounding rectangle of group in client coordinates.</param>
+            public override void DrawGroupHeader(Graphics g, string name, Rectangle bounds)
+            {
+                // Bottom border
+                bounds.Inflate(0, -4);
+                using (Pen pSpep = new Pen(Color.FromArgb(128, SystemColors.GrayText)))
+                {
+                    g.DrawLine(pSpep, bounds.Left + 1, bounds.Bottom - 1, bounds.Right - 1, bounds.Bottom - 1);
+                }
+
+                // Text
+                if (bounds.Width > 4)
+                {
+                    using (StringFormat sf = new StringFormat())
+                    {
+                        sf.FormatFlags = StringFormatFlags.NoWrap;
+                        sf.Alignment = StringAlignment.Near;
+                        sf.LineAlignment = StringAlignment.Center;
+                        sf.Trimming = StringTrimming.EllipsisCharacter;
+                        using (SolidBrush bText = new SolidBrush(ImageListView.Colors.ColumnHeaderForeColor))
+                        {
+                            g.DrawString(name, (ImageListView.GroupHeaderFont == null ? ImageListView.Font : ImageListView.GroupHeaderFont), bText, bounds, sf);
+                        }
+                    }
                 }
             }
         }
