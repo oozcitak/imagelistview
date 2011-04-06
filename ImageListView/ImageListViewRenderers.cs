@@ -90,7 +90,7 @@ namespace Manina.Windows.Forms
                         g.FillRectangle(b, bounds);
                     }
                 }
-                
+
                 base.DrawItem(g, item, state, bounds);
             }
             /// <summary>
@@ -2177,6 +2177,9 @@ namespace Manina.Windows.Forms
             private VisualStyleRenderer rItemSelected = null;
             private VisualStyleRenderer rItemHoveredSelected = null;
             private VisualStyleRenderer rItemSelectedHidden = null;
+            // Group headers
+            private VisualStyleRenderer rGroupNormal = null;
+            private VisualStyleRenderer rGroupLine = null;
 
             /// <summary>
             /// Gets whether visual styles are supported.
@@ -2199,6 +2202,9 @@ namespace Manina.Windows.Forms
                 // Create renderers
                 if (VisualStylesEnabled)
                 {
+                    // See http://msdn.microsoft.com/en-us/library/bb773210(VS.85).aspx
+                    // for part and state codes used below.
+
                     // Check boxes
                     rCheckedNormal = GetRenderer(VisualStyleElement.Button.CheckBox.CheckedNormal);
                     rUncheckedNormal = GetRenderer(VisualStyleElement.Button.CheckBox.UncheckedNormal);
@@ -2217,6 +2223,9 @@ namespace Manina.Windows.Forms
                     rItemSelected = GetRenderer("Explorer::ListView", 1, 3);
                     rItemHoveredSelected = GetRenderer("Explorer::ListView", 1, 6);
                     rItemSelectedHidden = GetRenderer("Explorer::ListView", 1, 5);
+                    // Groups
+                    rGroupNormal = GetRenderer("Explorer::ListView", 6, 1);
+                    rGroupLine = GetRenderer("Explorer::ListView", 7, 1);
                 }
             }
 
@@ -2510,6 +2519,33 @@ namespace Manina.Windows.Forms
                 }
                 else
                     base.DrawItem(g, item, state, bounds);
+            }
+            /// <summary>
+            /// Draws the group headers.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="name">The name of the group to draw.</param>
+            /// <param name="bounds">The bounding rectangle of group in client coordinates.</param>
+            public override void DrawGroupHeader(Graphics g, string name, Rectangle bounds)
+            {
+                if (VisualStylesEnabled && rGroupNormal != null && rGroupLine != null)
+                {
+                    bounds.Inflate(-3, 0);
+
+                    // Background
+                    rGroupNormal.DrawBackground(g, bounds, bounds);
+
+                    // Text
+                    TextRenderer.DrawText(g, name,
+                        SystemFonts.MenuFont, bounds, SystemColors.ControlText,
+                        TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+
+                    // Border
+                    Rectangle lineBounds = new Rectangle(bounds.Left, bounds.Bottom - 1, bounds.Width, 1);
+                    rGroupLine.DrawBackground(g, lineBounds, lineBounds);
+                }
+                else
+                    base.DrawGroupHeader(g, name, bounds);
             }
         }
         #endregion
