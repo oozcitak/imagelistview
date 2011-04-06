@@ -7,7 +7,7 @@ This release introduces the item grouping option and also fixes some minor bugs.
 
   * Added the !GroupColumn and !GroupOrder properties to the control (Issue 69).
   * Column headers are no longer sorted on a right click.
-  * Fixed a possible source for a null reference exception. This may be related to Issue 122.
+  * Fixed possible sources for a null reference exceptions. Those may be related to Issue 122 and Issue 123.
   * Added the !ItemCollectionChanged event (Issue 125).
   * The control is now refreshed when the !ScrollBars property is changed.
 
