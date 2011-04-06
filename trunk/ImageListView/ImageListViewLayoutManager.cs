@@ -420,7 +420,6 @@ namespace Manina.Windows.Forms
             }
             else
             {
-                // Number of rows and columns to enclose all items
                 mItemCols = mDisplayedCols;
                 mItemRows = (int)System.Math.Ceiling((float)mImageListView.Items.Count / (float)mDisplayedCols);
             }
@@ -706,6 +705,10 @@ namespace Manina.Windows.Forms
             {
                 totalWidth = 0;
                 totalHeight = mItemAreaBounds.Height;
+            }
+            else if (mImageListView.View == View.Details)
+            {
+                totalHeight = 0;
             }
             else
             {
