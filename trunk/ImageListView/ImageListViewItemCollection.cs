@@ -317,6 +317,10 @@ namespace Manina.Windows.Forms
                     mImageListView.itemCacheManager.Clear();
                     mImageListView.thumbnailCache.Clear();
                     mImageListView.SelectedItems.Clear();
+
+                    if (mImageListView.showGroups)
+                        Sort();
+
                     mImageListView.Refresh();
                 }
 
@@ -610,6 +614,10 @@ namespace Manina.Windows.Forms
                             mImageListView.shellInfoCache.Add(extension);
                     }
 
+                    // Update groups
+                    if (mImageListView.showGroups)
+                        Sort();
+
                     // Raise the add event
                     mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Add, item));
                 }
@@ -641,8 +649,14 @@ namespace Manina.Windows.Forms
                 lookUp.Remove(item.Guid);
                 collectionModified = true;
 
-                // Raise the remove event
-                mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Remove, item));
+                if (mImageListView != null)
+                {
+                    // Raise the remove event
+                    mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Remove, item));
+
+                    if (mImageListView.showGroups)
+                        Sort();
+                }
 
                 return ret;
             }
@@ -689,6 +703,8 @@ namespace Manina.Windows.Forms
                     groupColumn = mImageListView.Columns[mImageListView.GroupColumn];
                 if (mImageListView.SortColumn >= 0 || mImageListView.SortColumn < mImageListView.Columns.Count)
                     sortColumn = mImageListView.Columns[mImageListView.SortColumn];
+                if (mItems.Count == 1 && groupColumn != null)
+                    mItems[0].UpdateGroup(groupColumn);
                 mItems.Sort(new ImageListViewItemComparer(groupColumn, mImageListView.GroupOrder, sortColumn, mImageListView.SortOrder));
                 if (mImageListView.GroupOrder != SortOrder.None && groupColumn != null)
                     mImageListView.showGroups = true;
@@ -742,21 +758,11 @@ namespace Manina.Windows.Forms
                     int result = 0;
                     int sign = (mGroupOrder == SortOrder.Ascending ? 1 : -1);
 
-                    if (mGroupColumn != null)
-                    {
-                        Utility.Tuple<int, string> xg = GetItemGroup(mGroupColumn, x);
-                        Utility.Tuple<int, string> yg = GetItemGroup(mGroupColumn, y);
-                        x.group = xg.Item2;
-                        y.group = yg.Item2;
-                        result = (xg.Item1 < yg.Item1 ? -1 : (xg.Item1 > yg.Item1 ? 1 : 0));
-                        if (result != 0)
-                            return sign * result;
-                    }
-                    else
-                    {
-                        x.group = string.Empty;
-                        y.group = string.Empty;
-                    }
+                    x.UpdateGroup(mGroupColumn);
+                    y.UpdateGroup(mGroupColumn);
+                    result = (x.groupOrder < y.groupOrder ? -1 : (x.groupOrder > y.groupOrder ? 1 : 0));
+                    if (result != 0)
+                        return sign * result;
 
                     result = 0;
                     sign = (mSortOrder == SortOrder.Ascending ? 1 : -1);
@@ -844,66 +850,6 @@ namespace Manina.Windows.Forms
                     }
 
                     return sign * result;
-                }
-
-                /// <summary>
-                /// Returns the group order and name for the given item.
-                /// </summary>
-                /// <param name="column">The group column.</param>
-                /// <param name="item">The item to create a group for.</param>
-                private Utility.Tuple<int, string> GetItemGroup(ImageListViewColumnHeader column, ImageListViewItem item)
-                {
-                    switch (column.Type)
-                    {
-                        case ColumnType.DateAccessed:
-                            return Utility.GroupTextDate(item.DateAccessed);
-                        case ColumnType.DateCreated:
-                            return Utility.GroupTextDate(item.DateCreated);
-                        case ColumnType.DateModified:
-                            return Utility.GroupTextDate(item.DateModified);
-                        case ColumnType.Dimensions:
-                            return Utility.GroupTextDimension(item.Dimensions);
-                        case ColumnType.FileName:
-                            return Utility.GroupTextAlpha(item.FileName);
-                        case ColumnType.FilePath:
-                            return Utility.GroupTextAlpha(item.FilePath);
-                        case ColumnType.FileSize:
-                            return Utility.GroupTextFileSize(item.FileSize);
-                        case ColumnType.FileType:
-                            return Utility.GroupTextAlpha(item.FileType);
-                        case ColumnType.Name:
-                            return Utility.GroupTextAlpha(item.Text);
-                        case ColumnType.ImageDescription:
-                            return Utility.GroupTextAlpha(item.ImageDescription);
-                        case ColumnType.EquipmentModel:
-                            return Utility.GroupTextAlpha(item.EquipmentModel);
-                        case ColumnType.DateTaken:
-                            return Utility.GroupTextDate(item.DateTaken);
-                        case ColumnType.Artist:
-                            return Utility.GroupTextAlpha(item.Artist);
-                        case ColumnType.Copyright:
-                            return Utility.GroupTextAlpha(item.Copyright);
-                        case ColumnType.UserComment:
-                            return Utility.GroupTextAlpha(item.UserComment);
-                        case ColumnType.Software:
-                            return Utility.GroupTextAlpha(item.Software);
-                        case ColumnType.Custom:
-                            return Utility.GroupTextAlpha(item.GetSubItemText(column.Guid));
-                        case ColumnType.ISOSpeed:
-                            return new Utility.Tuple<int, string>(item.ISOSpeed, item.ISOSpeed.ToString());
-                        case ColumnType.Rating:
-                            return new Utility.Tuple<int, string>(item.Rating / 5, (item.Rating / 5).ToString());
-                        case ColumnType.FocalLength:
-                            return new Utility.Tuple<int, string>((int)item.FocalLength, item.FocalLength.ToString());
-                        case ColumnType.ExposureTime:
-                            return new Utility.Tuple<int, string>((int)item.ExposureTime, item.ExposureTime.ToString());
-                        case ColumnType.FNumber:
-                            return new Utility.Tuple<int, string>((int)item.FNumber, item.FNumber.ToString());
-                        case ColumnType.Resolution:
-                            return new Utility.Tuple<int, string>((int)item.Resolution.Width, item.Resolution.Width.ToString());
-                        default:
-                            return new Utility.Tuple<int, string>(0, "Unknown");
-                    }
                 }
             }
             #endregion
