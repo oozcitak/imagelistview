@@ -71,11 +71,13 @@ namespace Manina.Windows.Forms
         private Dictionary<Guid, string> subItems;
         // Used for cloned items
         internal Image clonedThumbnail;
+        // Group info
+        internal string group;
+        internal int groupOrder;
 
         internal ImageListView.ImageListViewItemCollection owner;
         internal bool isDirty;
         private bool editing;
-        internal string group;
         #endregion
 
         #region Properties
@@ -470,6 +472,9 @@ namespace Manina.Windows.Forms
             Tag = null;
 
             subItems = new Dictionary<Guid, string>();
+
+            groupOrder = 0;
+            group = string.Empty;
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageListViewItem"/> class.
@@ -1025,6 +1030,100 @@ namespace Manina.Windows.Forms
             UpdateRating();
 
             isDirty = false;
+        }
+        /// <summary>
+        /// Updates group order and name of the item.
+        /// </summary>
+        /// <param name="column">The group column.</param>
+        internal void UpdateGroup(ImageListView.ImageListViewColumnHeader column)
+        {
+            if (column == null)
+            {
+                groupOrder = 0;
+                group = string.Empty;
+                return;
+            }
+
+            Utility.Tuple<int, string> groupInfo = new Utility.Tuple<int, string>(0, string.Empty);
+
+            switch (column.Type)
+            {
+                case ColumnType.DateAccessed:
+                    groupInfo = Utility.GroupTextDate(DateAccessed);
+                    break;
+                case ColumnType.DateCreated:
+                    groupInfo = Utility.GroupTextDate(DateCreated);
+                    break;
+                case ColumnType.DateModified:
+                    groupInfo = Utility.GroupTextDate(DateModified);
+                    break;
+                case ColumnType.Dimensions:
+                    groupInfo = Utility.GroupTextDimension(Dimensions);
+                    break;
+                case ColumnType.FileName:
+                    groupInfo = Utility.GroupTextAlpha(FileName);
+                    break;
+                case ColumnType.FilePath:
+                    groupInfo = Utility.GroupTextAlpha(FilePath);
+                    break;
+                case ColumnType.FileSize:
+                    groupInfo = Utility.GroupTextFileSize(FileSize);
+                    break;
+                case ColumnType.FileType:
+                    groupInfo = Utility.GroupTextAlpha(FileType);
+                    break;
+                case ColumnType.Name:
+                    groupInfo = Utility.GroupTextAlpha(Text);
+                    break;
+                case ColumnType.ImageDescription:
+                    groupInfo = Utility.GroupTextAlpha(ImageDescription);
+                    break;
+                case ColumnType.EquipmentModel:
+                    groupInfo = Utility.GroupTextAlpha(EquipmentModel);
+                    break;
+                case ColumnType.DateTaken:
+                    groupInfo = Utility.GroupTextDate(DateTaken);
+                    break;
+                case ColumnType.Artist:
+                    groupInfo = Utility.GroupTextAlpha(Artist);
+                    break;
+                case ColumnType.Copyright:
+                    groupInfo = Utility.GroupTextAlpha(Copyright);
+                    break;
+                case ColumnType.UserComment:
+                    groupInfo = Utility.GroupTextAlpha(UserComment);
+                    break;
+                case ColumnType.Software:
+                    groupInfo = Utility.GroupTextAlpha(Software);
+                    break;
+                case ColumnType.Custom:
+                    groupInfo = Utility.GroupTextAlpha(GetSubItemText(column.Guid));
+                    break;
+                case ColumnType.ISOSpeed:
+                    groupInfo = new Utility.Tuple<int, string>(ISOSpeed, ISOSpeed.ToString());
+                    break;
+                case ColumnType.Rating:
+                    groupInfo = new Utility.Tuple<int, string>(Rating / 5, (Rating / 5).ToString());
+                    break;
+                case ColumnType.FocalLength:
+                    groupInfo = new Utility.Tuple<int, string>((int)FocalLength, FocalLength.ToString());
+                    break;
+                case ColumnType.ExposureTime:
+                    groupInfo = new Utility.Tuple<int, string>((int)ExposureTime, ExposureTime.ToString());
+                    break;
+                case ColumnType.FNumber:
+                    groupInfo = new Utility.Tuple<int, string>((int)FNumber, FNumber.ToString());
+                    break;
+                case ColumnType.Resolution:
+                    groupInfo = new Utility.Tuple<int, string>((int)Resolution.Width, Resolution.Width.ToString());
+                    break;
+                default:
+                    groupInfo = new Utility.Tuple<int, string>(0, "Unknown");
+                    break;
+            }
+
+            groupOrder = groupInfo.Item1;
+            group = groupInfo.Item2;
         }
         #endregion
 
