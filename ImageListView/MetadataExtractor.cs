@@ -70,22 +70,17 @@ namespace Manina.Windows.Forms
         private static readonly string[] WICPathFocalLength = new string[] { "/app1/ifd/exif/{ushort=37386}", "/xmp/exif:FocalLength" };
         #endregion
 #endif
-		
+
         #region Exif Format Conversion
-        /// <summary>
-        /// Converts the given Exif data to a byte.
-        /// </summary>
-        /// <param name="value">Exif data as a byte array.</param>
-        private static byte ExifByte(byte[] value)
-        {
-            return value[0];
-        }
         /// <summary>
         /// Converts the given Exif data to an ASCII encoded string.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static string ExifAscii(byte[] value)
         {
+            if (value.Length == 0)
+                return string.Empty;
+
             int len = Array.IndexOf(value, (byte)0);
             if (len == -1) len = value.Length;
             string str = Encoding.ASCII.GetString(value, 0, len);
@@ -101,16 +96,25 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Converts the given Exif data to DateTime.
+        /// Value must be formatted as yyyy:MM:dd HH:mm:ss.
         /// </summary>
         /// <param name="value">Exif data as a string.</param>
         private static DateTime ExifDateTime(string value)
         {
-            return DateTime.ParseExact(value,
-                "yyyy:MM:dd HH:mm:ss",
-                System.Globalization.CultureInfo.InvariantCulture);
+            try
+            {
+                return DateTime.ParseExact(value,
+                    "yyyy:MM:dd HH:mm:ss",
+                    System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
         }
         /// <summary>
         /// Converts the given Exif data to an 16-bit unsigned integer.
+        /// The value must have 2 bytes.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static ushort ExifUShort(byte[] value)
@@ -119,6 +123,7 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Converts the given Exif data to an 32-bit unsigned integer.
+        /// The value must have 4 bytes.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static uint ExifUInt(byte[] value)
@@ -127,6 +132,7 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Converts the given Exif data to an 32-bit signed integer.
+        /// The value must have 4 bytes.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static int ExifInt(byte[] value)
@@ -136,6 +142,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Converts the given Exif data to an unsigned rational value
         /// represented as a string.
+        /// The value must have 8 bytes.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static string ExifURational(byte[] value)
@@ -146,6 +153,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Converts the given Exif data to a signed rational value
         /// represented as a string.
+        /// The value must have 8 bytes.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static string ExifRational(byte[] value)
@@ -155,6 +163,7 @@ namespace Manina.Windows.Forms
         }
         /// <summary>
         /// Converts the given Exif data to a double number.
+        /// The value must have 8 bytes.
         /// </summary>
         /// <param name="value">Exif data as a byte array.</param>
         private static double ExifDouble(byte[] value)
@@ -377,24 +386,33 @@ namespace Manina.Windows.Forms
                         }
                         break;
                     case TagExposureTime:
-                        dVal = ExifDouble(prop.Value);
-                        if (dVal != 0.0)
+                        if (prop.Value.Length == 8)
                         {
-                            ExposureTime = dVal;
+                            dVal = ExifDouble(prop.Value);
+                            if (dVal != 0.0)
+                            {
+                                ExposureTime = dVal;
+                            }
                         }
                         break;
                     case TagFNumber:
-                        dVal = ExifDouble(prop.Value);
-                        if (dVal != 0.0)
+                        if (prop.Value.Length == 8)
                         {
-                            FNumber = dVal;
+                            dVal = ExifDouble(prop.Value);
+                            if (dVal != 0.0)
+                            {
+                                FNumber = dVal;
+                            }
                         }
                         break;
                     case TagISOSpeed:
-                        iVal = ExifUShort(prop.Value);
-                        if (iVal != 0)
+                        if (prop.Value.Length == 2)
                         {
-                            ISOSpeed = iVal;
+                            iVal = ExifUShort(prop.Value);
+                            if (iVal != 0)
+                            {
+                                ISOSpeed = iVal;
+                            }
                         }
                         break;
                     case TagCopyright:
@@ -405,7 +423,7 @@ namespace Manina.Windows.Forms
                         }
                         break;
                     case TagRating:
-                        if (Rating == 0)
+                        if (Rating == 0 && prop.Value.Length == 2)
                         {
                             iVal = ExifUShort(prop.Value);
                             if (iVal == 1)
@@ -421,8 +439,11 @@ namespace Manina.Windows.Forms
                         }
                         break;
                     case TagRatingPercent:
-                        iVal = ExifUShort(prop.Value);
-                        Rating = iVal;
+                        if (prop.Value.Length == 2)
+                        {
+                            iVal = ExifUShort(prop.Value);
+                            Rating = iVal;
+                        }
                         break;
                     case TagUserComment:
                         str = ExifAscii(prop.Value);
@@ -439,10 +460,13 @@ namespace Manina.Windows.Forms
                         }
                         break;
                     case TagFocalLength:
-                        dVal = ExifDouble(prop.Value);
-                        if (dVal != 0.0)
+                        if (prop.Value.Length == 8)
                         {
-                            FocalLength = dVal;
+                            dVal = ExifDouble(prop.Value);
+                            if (dVal != 0.0)
+                            {
+                                FocalLength = dVal;
+                            }
                         }
                         break;
                 }
