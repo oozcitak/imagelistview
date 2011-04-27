@@ -616,7 +616,7 @@ namespace Manina.Windows.Forms
 
                     // Update groups
                     if (mImageListView.showGroups)
-                        Sort();
+                        AddRemoveGroupItem(item.Index, true);
 
                     // Raise the add event
                     mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Add, item));
@@ -637,7 +637,7 @@ namespace Manina.Windows.Forms
             /// <param name="removeFromCache">true to remove item image from cache; otherwise false.</param>
             internal bool RemoveInternal(ImageListViewItem item, bool removeFromCache)
             {
-                for (int i = item.mIndex; i < mItems.Count; i++)
+                for (int i = item.mIndex + 1; i < mItems.Count; i++)
                     mItems[i].mIndex--;
                 if (item == mFocused) mFocused = null;
                 if (removeFromCache && mImageListView != null)
@@ -655,7 +655,7 @@ namespace Manina.Windows.Forms
                     mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Remove, item));
 
                     if (mImageListView.showGroups)
-                        Sort();
+                        AddRemoveGroupItem(item.Index, false);
                 }
 
                 return ret;
@@ -728,6 +728,69 @@ namespace Manina.Windows.Forms
                 // Restore previous cursor
                 mImageListView.Cursor = cursor;
                 collectionModified = true;
+            }
+            /// <summary>
+            /// Updates groups after adding or removing an item. This just updates
+            /// the count of items in groups, it DOES NOT re-sort the items.
+            /// </summary>
+            /// <param name="index">The index of the new or removed item.</param>
+            /// <param name="add">true to add an item; false to remove a item.</param>
+            private void AddRemoveGroupItem(int index, bool add)
+            {
+                if (mImageListView == null || !mImageListView.showGroups)
+                    return;
+                if (mImageListView.groups.Count == 0)
+                {
+                    Sort();
+                    return;
+                }
+
+                // Special case of adding an item to the end
+                ImageListView.ImageListViewGroup lastGroup = mImageListView.groups[mImageListView.groups.Count - 1];
+                if (add && index == lastGroup.LastItemIndex + 1)
+                {
+                    lastGroup.LastItemIndex++;
+                    return;
+                }
+
+                // Insert into a group
+                List<ImageListView.ImageListViewGroup> emptyGroups = new List<ImageListViewGroup>();
+                foreach (ImageListView.ImageListViewGroup group in mImageListView.groups)
+                {
+                    if (group.LastItemIndex < index)
+                        continue;
+                    else if (group.FirstItemIndex <= index && group.LastItemIndex >= index)
+                    {
+                        if (add)
+                        {
+                            group.LastItemIndex++;
+                        }
+                        else
+                        {
+                            group.LastItemIndex--;
+                        }
+                    }
+                    else // if (group.FirstItemIndex > index)
+                    {
+                        if (add)
+                        {
+                            group.FirstItemIndex++;
+                            group.LastItemIndex++;
+                        }
+                        else
+                        {
+                            group.FirstItemIndex--;
+                            group.LastItemIndex--;
+                        }
+                    }
+
+                    if (group.ItemCount == 0)
+                        emptyGroups.Add(group);
+                }
+
+                // Purge empty groups
+                foreach (ImageListView.ImageListViewGroup group in emptyGroups)
+                    mImageListView.groups.Remove(group);
             }
             #endregion
 
