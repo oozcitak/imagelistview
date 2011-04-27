@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 10.1 (27 April 2011) =
+
+  * Items are no longer sorted from scratch each time an item is added or removed. Note: this adds the new item to the last group without checking which group the item actually belongs to.
+
 = 10.0 (06 April 2011) =
 
 This release introduces the item grouping option and also fixes some minor bugs. Group and sort work together. For example when you group by name and sort by date at the same time; the items will be grouped alphabetically and each group will be sorted by picture date.
