@@ -34,7 +34,6 @@
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.imageListView = new Manina.Windows.Forms.ImageListView();
             this.ItemContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,6 +66,7 @@
             this.ShowFileIcons = new System.Windows.Forms.ToolStripButton();
             this.ShowCheckboxes = new System.Windows.Forms.ToolStripButton();
             this.ShowScrollbars = new System.Windows.Forms.ToolStripButton();
+            this.GroupByName = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.CacheOnDemand = new System.Windows.Forms.ToolStripButton();
@@ -82,7 +82,8 @@
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
             this.ChooseSourcePath = new System.Windows.Forms.FolderBrowserDialog();
-            this.GroupByName = new System.Windows.Forms.ToolStripButton();
+            this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imageListView = new Manina.Windows.Forms.ImageListView();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.LeftToolStripPanel.SuspendLayout();
@@ -152,47 +153,26 @@
             this.splitContainer1.SplitterDistance = 425;
             this.splitContainer1.TabIndex = 1;
             // 
-            // imageListView
-            // 
-            this.imageListView.AllowDuplicateFileNames = true;
-            this.imageListView.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.imageListView.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateModified, "", 100, 3, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 4, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 5, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 6, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 7, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
-            this.imageListView.ContextMenuStrip = this.ItemContextMenu;
-            this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.imageListView.Location = new System.Drawing.Point(0, 0);
-            this.imageListView.Name = "imageListView";
-            this.imageListView.Size = new System.Drawing.Size(425, 574);
-            this.imageListView.TabIndex = 0;
-            // 
             // ItemContextMenu
             // 
             this.ItemContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cloneToolStripMenuItem,
-            this.deleteToolStripMenuItem});
+            this.deleteToolStripMenuItem,
+            this.rotateToolStripMenuItem});
             this.ItemContextMenu.Name = "ItemContextMenu";
-            this.ItemContextMenu.Size = new System.Drawing.Size(106, 48);
+            this.ItemContextMenu.Size = new System.Drawing.Size(108, 70);
             // 
             // cloneToolStripMenuItem
             // 
             this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.cloneToolStripMenuItem.Text = "Clone";
             this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(105, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -503,6 +483,17 @@
             this.ShowScrollbars.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ShowScrollbars.Click += new System.EventHandler(this.ShowScrollbars_Click);
             // 
+            // GroupByName
+            // 
+            this.GroupByName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.GroupByName.Image = ((System.Drawing.Image)(resources.GetObject("GroupByName.Image")));
+            this.GroupByName.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.GroupByName.Name = "GroupByName";
+            this.GroupByName.Size = new System.Drawing.Size(137, 17);
+            this.GroupByName.Text = "Group by Name";
+            this.GroupByName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.GroupByName.Click += new System.EventHandler(this.GroupByName_Click);
+            // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
@@ -613,7 +604,7 @@
             this.StartBenchmark.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.StartBenchmark.Name = "StartBenchmark";
-            this.StartBenchmark.Size = new System.Drawing.Size(106, 20);
+            this.StartBenchmark.Size = new System.Drawing.Size(137, 20);
             this.StartBenchmark.Text = "Start Benchmark";
             this.StartBenchmark.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.Click += new System.EventHandler(this.StartBenchmark_Click);
@@ -632,16 +623,34 @@
             // 
             this.ChooseSourcePath.ShowNewFolderButton = false;
             // 
-            // GroupByName
+            // rotateToolStripMenuItem
             // 
-            this.GroupByName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.GroupByName.Image = ((System.Drawing.Image)(resources.GetObject("GroupByName.Image")));
-            this.GroupByName.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.GroupByName.Name = "GroupByName";
-            this.GroupByName.Size = new System.Drawing.Size(137, 17);
-            this.GroupByName.Text = "Group by Name";
-            this.GroupByName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.GroupByName.Click += new System.EventHandler(this.GroupByName_Click);
+            this.rotateToolStripMenuItem.Name = "rotateToolStripMenuItem";
+            this.rotateToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.rotateToolStripMenuItem.Text = "Rotate";
+            this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotateToolStripMenuItem_Click);
+            // 
+            // imageListView
+            // 
+            this.imageListView.AllowDuplicateFileNames = true;
+            this.imageListView.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.imageListView.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateModified, "", 100, 3, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 4, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 5, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 6, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 7, true),
+            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
+            this.imageListView.ContextMenuStrip = this.ItemContextMenu;
+            this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.imageListView.Location = new System.Drawing.Point(0, 0);
+            this.imageListView.Name = "imageListView";
+            this.imageListView.Size = new System.Drawing.Size(425, 574);
+            this.imageListView.TabIndex = 0;
             // 
             // TestForm
             // 
@@ -728,6 +737,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.FolderBrowserDialog ChooseSourcePath;
         private System.Windows.Forms.ToolStripButton GroupByName;
+        private System.Windows.Forms.ToolStripMenuItem rotateToolStripMenuItem;
     }
 }
 
