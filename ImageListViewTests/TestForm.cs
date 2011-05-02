@@ -164,7 +164,7 @@ namespace ImageListViewTests
         // Add items
         private void AddItems_Click(object sender, EventArgs e)
         {
-            if(files.Length==0)
+            if (files.Length == 0)
             {
                 MessageBox.Show("There are no JPEG images in source folder.");
                 return;
@@ -391,6 +391,20 @@ namespace ImageListViewTests
         {
             foreach (ImageListViewItem item in imageListView.SelectedItems)
                 imageListView.Items.Remove(item);
+        }
+        // Rotate
+        private void rotateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ImageListViewItem item in imageListView.SelectedItems)
+            {
+                item.BeginEdit();
+                using (var img = Image.FromFile(item.FileName))
+                {
+                    img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    img.Save(item.FileName);
+                }
+                item.EndEdit();
+            }
         }
         #endregion
 
