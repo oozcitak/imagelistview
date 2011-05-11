@@ -33,6 +33,7 @@ namespace Manina.Windows.Forms
         /// Formats the given file size as a human readable string.
         /// </summary>
         /// <param name="size">File size in bytes.</param>
+        /// <returns>The formatted string.</returns>
         public static string FormatSize(long size)
         {
             double mod = 1024;
@@ -56,7 +57,7 @@ namespace Manina.Windows.Forms
         /// grouping with past dates.
         /// </summary>
         /// <param name="date">Date to format.</param>
-        public static Tuple<int, string> GroupTextDate(DateTime date)
+        internal static Tuple<int, string> GroupTextDate(DateTime date)
         {
             DateTime now = DateTime.Now;
             DateTime weekStart = now - new TimeSpan((int)now.DayOfWeek, now.Hour, now.Minute, now.Second, now.Millisecond);
@@ -398,6 +399,13 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="brush">The brush to use to fill the rectangle.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="width">Width of the rectangle to draw.</param>
+        /// <param name="height">Height of the rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void FillRoundedRectangle(System.Drawing.Graphics graphics, Brush brush, int x, int y, int width, int height, int radius)
         {
             using (GraphicsPath path = GetRoundedRectanglePath(x, y, width, height, radius))
@@ -408,6 +416,13 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="brush">The brush to use to fill the rectangle.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="width">Width of the rectangle to draw.</param>
+        /// <param name="height">Height of the rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void FillRoundedRectangle(System.Drawing.Graphics graphics, Brush brush, float x, float y, float width, float height, float radius)
         {
             FillRoundedRectangle(graphics, brush, (int)x, (int)y, (int)width, (int)height, (int)radius);
@@ -415,6 +430,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="brush">The brush to use to fill the rectangle.</param>
+        /// <param name="rect">The rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void FillRoundedRectangle(System.Drawing.Graphics graphics, Brush brush, Rectangle rect, int radius)
         {
             FillRoundedRectangle(graphics, brush, rect.Left, rect.Top, rect.Width, rect.Height, radius);
@@ -422,6 +441,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Fills the interior of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="brush">The brush to use to fill the rectangle.</param>
+        /// <param name="rect">The rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void FillRoundedRectangle(System.Drawing.Graphics graphics, Brush brush, RectangleF rect, float radius)
         {
             FillRoundedRectangle(graphics, brush, (int)rect.Left, (int)rect.Top, (int)rect.Width, (int)rect.Height, (int)radius);
@@ -429,6 +452,13 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="pen">The pen to use to draw the rectangle.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="width">Width of the rectangle to draw.</param>
+        /// <param name="height">Height of the rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void DrawRoundedRectangle(System.Drawing.Graphics graphics, Pen pen, int x, int y, int width, int height, int radius)
         {
             using (GraphicsPath path = GetRoundedRectanglePath(x, y, width, height, radius))
@@ -439,6 +469,13 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="pen">The pen to use to draw the rectangle.</param>
+        /// <param name="x">The x-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the rectangle to draw.</param>
+        /// <param name="width">Width of the rectangle to draw.</param>
+        /// <param name="height">Height of the rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void DrawRoundedRectangle(System.Drawing.Graphics graphics, Pen pen, float x, float y, float width, float height, float radius)
         {
             DrawRoundedRectangle(graphics, pen, (int)x, (int)y, (int)width, (int)height, (int)radius);
@@ -446,6 +483,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="pen">The pen to use to draw the rectangle.</param>
+        /// <param name="rect">The rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void DrawRoundedRectangle(System.Drawing.Graphics graphics, Pen pen, Rectangle rect, int radius)
         {
             DrawRoundedRectangle(graphics, pen, rect.Left, rect.Top, rect.Width, rect.Height, radius);
@@ -453,6 +494,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Draws the outline of a rounded rectangle.
         /// </summary>
+        /// <param name="graphics">The graphics to draw on.</param>
+        /// <param name="pen">The pen to use to draw the rectangle.</param>
+        /// <param name="rect">The rectangle to draw.</param>
+        /// <param name="radius">The radius of rounded corners.</param>
         public static void DrawRoundedRectangle(System.Drawing.Graphics graphics, Pen pen, RectangleF rect, float radius)
         {
             DrawRoundedRectangle(graphics, pen, (int)rect.Left, (int)rect.Top, (int)rect.Width, (int)rect.Height, (int)radius);
@@ -470,7 +515,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <typeparam name="T1">The type of the only component of the tuple.</typeparam>
             /// <param name="item1">The value of the only component of the tuple.</param>
-            /// <returns>A 1-tuple whose value is (<paramref name="item1"/>).</returns>
+            /// <returns>
+            /// A 1-tuple whose value is (<paramref name="item1"/>).
+            /// </returns>
             public static Tuple<T1> Create<T1>(T1 item1)
             {
                 return new Tuple<T1>(item1);
@@ -482,7 +529,9 @@ namespace Manina.Windows.Forms
             /// <typeparam name="T2">The type of the second component of the tuple.</typeparam>
             /// <param name="item1">The value of the first component of the tuple.</param>
             /// <param name="item2">The value of the second component of the tuple.</param>
-            /// <returns>A 2-tuple whose value is (<paramref name="item1"/>, <paramref name="item2"/>).</returns>
+            /// <returns>
+            /// A 2-tuple whose value is (<paramref name="item1"/>, <paramref name="item2"/>).
+            /// </returns>
             public static Tuple<T1, T2> Create<T1, T2>(T1 item1, T2 item2)
             {
                 return new Tuple<T1, T2>(item1, item2);
@@ -496,7 +545,9 @@ namespace Manina.Windows.Forms
             /// <param name="item1">The value of the first component of the tuple.</param>
             /// <param name="item2">The value of the second component of the tuple.</param>
             /// <param name="item3">The value of the third component of the tuple.</param>
-            /// <returns>A 3-tuple whose value is (<paramref name="item1"/>, <paramref name="item2"/>, <paramref name="item3"/>).</returns>
+            /// <returns>
+            /// A 3-tuple whose value is (<paramref name="item1"/>, <paramref name="item2"/>, <paramref name="item3"/>).
+            /// </returns>
             public static Tuple<T1, T2, T3> Create<T1, T2, T3>(T1 item1, T2 item2, T3 item3)
             {
                 return new Tuple<T1, T2, T3>(item1, item2, item3);
@@ -505,6 +556,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a tuple with one element.
         /// </summary>
+        /// <typeparam name="T1">The type of the first element of the tuple.</typeparam>
         public class Tuple<T1>
         {
             private T1 mItem1;
@@ -526,6 +578,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a tuple with two elements.
         /// </summary>
+        /// <typeparam name="T1">The type of the first element of the tuple.</typeparam>
+        /// <typeparam name="T2">The type of the second element of the tuple.</typeparam>
         public class Tuple<T1, T2> : Tuple<T1>
         {
             private T2 mItem2;
@@ -549,6 +603,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Represents a tuple with three elements.
         /// </summary>
+        /// <typeparam name="T1">The type of the first element of the tuple.</typeparam>
+        /// <typeparam name="T2">The type of the second element of the tuple.</typeparam>
+        /// <typeparam name="T3">The type of the third element of the tuple.</typeparam>
         public class Tuple<T1, T2, T3> : Tuple<T1, T2>
         {
             private T3 mItem3;

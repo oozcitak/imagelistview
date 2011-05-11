@@ -27,6 +27,7 @@ namespace Manina.Windows.Forms
             /// Returns the path to the source image for use in drag operations.
             /// </summary>
             /// <param name="key">Item key.</param>
+            /// <returns>The path to the source image.</returns>
             public abstract string GetSourceImage(object key);
             /// <summary>
             /// Returns the details for the given item.

@@ -305,8 +305,11 @@ namespace Manina.Windows.Forms
 
             #region Instance Methods
             /// <summary>
-            /// Loads and returns the image for the given item.
+            /// Reads and returns the image for the given item.
             /// </summary>
+            /// <param name="item">The item to read.</param>
+            /// <param name="size">The size of the requested image..</param>
+            /// <returns>Item thumbnail of requested size.</returns>
             public Image GetImageAsync(ImageListViewItem item, Size size)
             {
                 Image img = ImageListView.thumbnailCache.GetRendererImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails,
@@ -862,6 +865,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Returns the height of column headers.
             /// </summary>
+            /// <returns>The height of column headers.</returns>
             public virtual int MeasureColumnHeaderHeight()
             {
                 if (ImageListView.disposed || ImageListView.ColumnHeaderFont == null)
@@ -873,6 +877,7 @@ namespace Manina.Windows.Forms
             /// Returns the spacing between items for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the measurement should be made.</param>
+            /// <returns>The spacing between items.</returns>
             public virtual Size MeasureItemMargin(View view)
             {
                 if (view == View.Details)
@@ -884,6 +889,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the measurement should be made.</param>
+            /// <returns>The item size.</returns>
             public virtual Size MeasureItem(View view)
             {
                 Size itemSize = new Size();

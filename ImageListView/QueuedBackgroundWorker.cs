@@ -419,16 +419,18 @@ namespace Manina.Windows.Forms
 
         #region Get/Set Apartment State
         /// <summary>
-        /// Gets the apartment state of the worker thread.
+        /// Gets the apartment state of worker threads.
         /// </summary>
+        /// <returns>The apartment state of worker threads.</returns>
         public ApartmentState GetApartmentState()
         {
             return threads[0].GetApartmentState();
         }
         /// <summary>
-        /// Sets the apartment state of the worker thread. The apartment state
+        /// Sets the apartment state of worker threads. The apartment state
         /// cannot be changed after any work is added to the work queue.
         /// </summary>
+        /// <param name="state">The new state of worker threads.</param>
         public void SetApartmentState(ApartmentState state)
         {
             for (int i = 0; i < threadCount; i++)
