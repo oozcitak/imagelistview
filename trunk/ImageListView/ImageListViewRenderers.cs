@@ -621,7 +621,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the measurement should be made.</param>
-            /// <returns></returns>
+            /// <returns>The item size.</returns>
             public override Size MeasureItem(View view)
             {
                 if (view == View.Details)
@@ -1215,6 +1215,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the item measurement should be made.</param>
+            /// <returns>The item size.</returns>
             public override Size MeasureItem(Manina.Windows.Forms.View view)
             {
                 if (view == Manina.Windows.Forms.View.Thumbnails)
@@ -1410,6 +1411,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the item measurement should be made.</param>
+            /// <returns>The item size.</returns>
             public override Size MeasureItem(Manina.Windows.Forms.View view)
             {
                 Size itemSize = new Size();
@@ -1939,7 +1941,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the item measurement should be made.</param>
-            /// <returns></returns>
+            /// <returns>The item size.</returns>
             public override Size MeasureItem(Manina.Windows.Forms.View view)
             {
                 if (view == Manina.Windows.Forms.View.Thumbnails)
@@ -2363,7 +2365,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the measurement should be made.</param>
-            /// <returns></returns>
+            /// <returns>The item size.</returns>
             public override Size MeasureItem(View view)
             {
                 Size sz = base.MeasureItem(view);
@@ -2580,7 +2582,7 @@ namespace Manina.Windows.Forms
             /// Returns item size for the given view mode.
             /// </summary>
             /// <param name="view">The view mode for which the measurement should be made.</param>
-            /// <returns></returns>
+            /// <returns>The item size.</returns>
             public override Size MeasureItem(View view)
             {
                 if (view == View.Details)

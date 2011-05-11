@@ -53,6 +53,7 @@ namespace Manina.Windows.Forms
             /// Returns the path to the source image for use in drag operations.
             /// </summary>
             /// <param name="key">Item key.</param>
+            /// <returns>The path to the source image.</returns>
             public override string GetSourceImage(object key)
             {
                 if (disposed)
@@ -170,6 +171,7 @@ namespace Manina.Windows.Forms
             /// Returns the path to the source image for use in drag operations.
             /// </summary>
             /// <param name="key">Item key.</param>
+            /// <returns>The path to the source image.</returns>
             public override string GetSourceImage(object key)
             {
                 if (disposed)

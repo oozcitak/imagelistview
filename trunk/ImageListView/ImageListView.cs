@@ -1531,6 +1531,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the DragOver event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
         protected override void OnDragOver(DragEventArgs e)
         {
             navigationManager.DragOver(e);
@@ -1539,6 +1540,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the DragEnter event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
         protected override void OnDragEnter(DragEventArgs e)
         {
             navigationManager.DragEnter(e);
@@ -1547,6 +1549,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the DragLeave event.
         /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnDragLeave(EventArgs e)
         {
             navigationManager.DragLeave();
@@ -1556,6 +1559,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the DragDrop event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.DragEventArgs"/> that contains the event data.</param>
         protected override void OnDragDrop(DragEventArgs e)
         {
             navigationManager.DragDrop(e);
@@ -1564,6 +1568,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the Scroll event of the vScrollBar control.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.ScrollEventArgs"/> instance containing the event data.</param>
         private void vScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             mViewOffset.Y = e.NewValue;
@@ -1572,6 +1578,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the Scroll event of the hScrollBar control.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.Windows.Forms.ScrollEventArgs"/> instance containing the event data.</param>
         private void hScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             mViewOffset.X = e.NewValue;
@@ -1580,6 +1588,8 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the Tick event of the lazyRefreshTimer control.
         /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void lazyRefreshTimer_Tick(object sender, EventArgs e)
         {
             try
@@ -1593,6 +1603,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the Resize event.
         /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
@@ -1608,6 +1619,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the Paint event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs"/> that contains the event data.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
             if (!disposed && mRenderer != null)
@@ -1617,6 +1629,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the MouseDown event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.MouseEventArgs"/> that contains the event data.</param>
         protected override void OnMouseDown(MouseEventArgs e)
         {
             // Capture focus if right clicked
@@ -1629,6 +1642,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the MouseUp event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.MouseEventArgs"/> that contains the event data.</param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
             navigationManager.MouseUp(e);
@@ -1637,6 +1651,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the MouseMove event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.MouseEventArgs"/> that contains the event data.</param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             navigationManager.MouseMove(e);
@@ -1645,6 +1660,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the MouseWheel event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.MouseEventArgs"/> that contains the event data.</param>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             SuspendPaint();
@@ -1685,6 +1701,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the MouseLeave event.
         /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnMouseLeave(EventArgs e)
         {
             navigationManager.MouseLeave();
@@ -1693,6 +1710,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the MouseDoubleClick event.
         /// </summary>
+        /// <param name="e">An <see cref="T:System.Windows.Forms.MouseEventArgs"/> that contains the event data.</param>
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
             navigationManager.MouseDoubleClick(e);
@@ -1701,6 +1719,10 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the IsInputKey event.
         /// </summary>
+        /// <param name="keyData">One of the <see cref="T:System.Windows.Forms.Keys"/> values.</param>
+        /// <returns>
+        /// true if the specified key is a regular input key; otherwise, false.
+        /// </returns>
         protected override bool IsInputKey(Keys keyData)
         {
             if ((keyData & Keys.Left) == Keys.Left ||
@@ -1714,6 +1736,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the KeyDown event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.KeyEventArgs"/> that contains the event data.</param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
             navigationManager.KeyDown(e);
@@ -1722,6 +1745,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the KeyUp event.
         /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.KeyEventArgs"/> that contains the event data.</param>
         protected override void OnKeyUp(KeyEventArgs e)
         {
             navigationManager.KeyUp(e);
@@ -1730,6 +1754,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the GotFocus event.
         /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnGotFocus(EventArgs e)
         {
             base.OnGotFocus(e);
@@ -1738,16 +1763,17 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Handles the LostFocus event.
         /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnLostFocus(EventArgs e)
         {
             base.OnLostFocus(e);
             Refresh();
         }
         /// <summary>
-        /// Releases the unmanaged resources used by the control and its child controls 
+        /// Releases the unmanaged resources used by the control and its child controls
         /// and optionally releases the managed resources.
         /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; 
+        /// <param name="disposing">true to release both managed and unmanaged resources;
         /// false to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
@@ -2071,5 +2097,13 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Browsable(true), Description("Occurs after the item collection is changed.")]
         public event ItemCollectionChangedEventHandler ItemCollectionChanged;
         #endregion
+    }
+
+    /// <summary>
+    /// The Manina.Windows.Forms namespace contains new and
+    /// enhanced windows forms components.
+    /// </summary>
+    internal class NamespaceDoc
+    {
     }
 }

@@ -207,7 +207,7 @@ namespace Manina.Windows.Forms
             /// <param name="text">Text of the column header.</param>
             /// <param name="width">Width in pixels of the column header.</param>
             /// <param name="displayIndex">Display order of the column.</param>
-            /// <param name="visible"></param>
+            /// <param name="visible">Whether the column is initially visible.</param>
             public ImageListViewColumnHeader(ColumnType type, string text, int width, int displayIndex, bool visible)
             {
                 mImageListView = null;
@@ -341,6 +341,9 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Returns a <see cref="System.String"/> that represents this instance.
             /// </summary>
+            /// <returns>
+            /// A <see cref="System.String"/> that represents this instance.
+            /// </returns>
             public override string ToString()
             {
                 return mType.ToString();
@@ -363,6 +366,9 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Creates a new object that is a copy of the current instance.
             /// </summary>
+            /// <returns>
+            /// A new object that is a copy of this instance.
+            /// </returns>
             public object Clone()
             {
                 ImageListViewColumnHeader column = new ImageListViewColumnHeader();

@@ -322,6 +322,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets the columns as diplayed on the UI.
             /// </summary>
+            /// <returns>The list of of visible columns.</returns>
             public List<ImageListViewColumnHeader> GetDisplayedColumns()
             {
                 if (mDisplayedItems != null && !updateDisplayList)
