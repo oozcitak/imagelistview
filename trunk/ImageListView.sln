@@ -23,14 +23,6 @@ Global
 		{0C295FB8-C6C6-4A40-9F19-05A43F353A04}.Release without WIC|Any CPU.Build.0 = Release without WIC|Any CPU
 		{0C295FB8-C6C6-4A40-9F19-05A43F353A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C295FB8-C6C6-4A40-9F19-05A43F353A04}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug Designer|Any CPU.ActiveCfg = Debug|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug Designer|Any CPU.Build.0 = Debug|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release without WIC|Any CPU.ActiveCfg = Release|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release without WIC|Any CPU.Build.0 = Release|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FA5D0DA-8D80-49FE-BC54-299CC9A47ACA}.Debug Designer|Any CPU.ActiveCfg = Debug|Any CPU
 		{4FA5D0DA-8D80-49FE-BC54-299CC9A47ACA}.Debug Designer|Any CPU.Build.0 = Debug|Any CPU
 		{4FA5D0DA-8D80-49FE-BC54-299CC9A47ACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -39,6 +31,17 @@ Global
 		{4FA5D0DA-8D80-49FE-BC54-299CC9A47ACA}.Release without WIC|Any CPU.Build.0 = Release|Any CPU
 		{4FA5D0DA-8D80-49FE-BC54-299CC9A47ACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FA5D0DA-8D80-49FE-BC54-299CC9A47ACA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug Designer|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug Designer|Any CPU.Build.0 = Debug|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release without WIC|Any CPU.ActiveCfg = Release|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release without WIC|Any CPU.Build.0 = Release|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4FCA838-02E1-4C57-B0C0-8A6734657C47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = ImageListViewTests\ImageListViewTests.csproj
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
