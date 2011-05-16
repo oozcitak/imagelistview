@@ -25,6 +25,14 @@ using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
+    /// <summary>
+    /// The Manina.Windows.Forms namespace contains new and
+    /// enhanced windows forms components.
+    /// </summary>
+    internal class NamespaceDoc
+    {
+    }
+
 	/// <summary>
 	/// Represents a listview control for image files.
 	/// </summary>
@@ -2011,13 +2019,5 @@ namespace Manina.Windows.Forms
 		[Category("Behavior"), Browsable(true), Description("Occurs after the item collection is changed.")]
 		public event ItemCollectionChangedEventHandler ItemCollectionChanged;
 		#endregion
-	}
-
-	/// <summary>
-	/// The Manina.Windows.Forms namespace contains new and
-	/// enhanced windows forms components.
-	/// </summary>
-	internal class NamespaceDoc
-	{
 	}
 }
