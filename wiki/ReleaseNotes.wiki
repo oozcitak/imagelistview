@@ -3,7 +3,7 @@
 
 = 10.2 (16 May 2011) =
 
-  * Added the FindString method to the control (Issue 132).
+  * Added the !FindString method to the control (Issue 132).
   * Added sandcastle documentation.
 
 = 10.1 (27 April 2011) =
