@@ -1,6 +1,11 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 10.2 (16 May 2011) =
+
+  * Added the FindString method to the control (Issue 132).
+  * Added sandcastle documentation.
+
 = 10.1 (27 April 2011) =
 
   * Items are no longer sorted from scratch each time an item is added or removed. Note: this adds the new item to the last group without checking which group the item actually belongs to.
