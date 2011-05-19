@@ -25,13 +25,13 @@ using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
-    /// <summary>
-    /// The Manina.Windows.Forms namespace contains new and
-    /// enhanced windows forms components.
-    /// </summary>
-    internal class NamespaceDoc
-    {
-    }
+	/// <summary>
+	/// The Manina.Windows.Forms namespace contains new and
+	/// enhanced windows forms components.
+	/// </summary>
+	internal class NamespaceDoc
+	{
+	}
 
 	/// <summary>
 	/// Represents a listview control for image files.
@@ -133,7 +133,7 @@ namespace Manina.Windows.Forms
 		// Cache threads
 		internal ImageListViewCacheThumbnail thumbnailCache;
 		internal ImageListViewCacheShellInfo shellInfoCache;
-		internal ImageListViewCacheMetadata itemCacheManager;
+		internal ImageListViewCacheMetadata metadataCache;
 		internal ImageListViewItemAdaptors.FileSystemAdaptor defaultAdaptor;
 
 		// Resource manager
@@ -317,6 +317,27 @@ namespace Manina.Windows.Forms
 			}
 		}
 		/// <summary>
+		/// Gets or sets a value indicating whether the control can respond to user interaction.
+		/// Cache threads are paused while the control is disabled and resumed when the control is
+		/// enabled.
+		/// </summary>
+		[Category("Behavior"), Browsable(true), Description("Gets or sets a value indicating whether the control can respond to user interaction."), DefaultValue(true)]
+		public new bool Enabled {
+			get { return base.Enabled; }
+			set {
+				base.Enabled = value;
+				if (value) {
+					thumbnailCache.Resume ();
+					shellInfoCache.Resume ();
+					metadataCache.Resume ();
+				} else {
+					thumbnailCache.Pause ();
+					shellInfoCache.Pause ();
+					metadataCache.Pause ();
+				}
+			}
+		}
+		/// <summary>
 		/// Gets or sets the error image.
 		/// </summary>
 		[Category("Appearance"), Description("Gets or sets the error image.")]
@@ -464,8 +485,8 @@ namespace Manina.Windows.Forms
 					thumbnailCache.RetryOnError = mRetryOnError;
 				if (shellInfoCache != null)
 					shellInfoCache.RetryOnError = mRetryOnError;
-				if (itemCacheManager != null)
-					itemCacheManager.RetryOnError = mRetryOnError;
+				if (metadataCache != null)
+					metadataCache.RetryOnError = mRetryOnError;
 			}
 		}
 		/// <summary>
@@ -917,7 +938,7 @@ namespace Manina.Windows.Forms
 			defaultAdaptor = new ImageListViewItemAdaptors.FileSystemAdaptor ();
 			thumbnailCache = new ImageListViewCacheThumbnail (this);
 			shellInfoCache = new ImageListViewCacheShellInfo (this);
-			itemCacheManager = new ImageListViewCacheMetadata (this);
+			metadataCache = new ImageListViewCacheMetadata (this);
 			
 			disposed = false;
 		}
@@ -1730,7 +1751,7 @@ namespace Manina.Windows.Forms
 					defaultAdaptor.Dispose ();
 					thumbnailCache.Dispose ();
 					shellInfoCache.Dispose ();
-					itemCacheManager.Dispose ();
+					metadataCache.Dispose ();
 					navigationManager.Dispose ();
 					if (mRenderer != null)
 						mRenderer.Dispose ();

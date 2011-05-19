@@ -235,6 +235,11 @@ namespace ImageListViewTests
 		#endregion
 
 		#region Appearance Settings
+		// Enabled
+		private void SetEnabled_Click (object sender, EventArgs e)
+		{
+			imageListView.Enabled = !imageListView.Enabled;
+		}
 		// Select renderer
 		private void SelectRenderer_Click (object sender, EventArgs e)
 		{
@@ -338,6 +343,7 @@ namespace ImageListViewTests
 			}
 			ChooseImageSource.Enabled = true;
 			
+			SetEnabled.Checked = imageListView.Enabled;
 			ViewThumbnails.Checked = (imageListView.View == Manina.Windows.Forms.View.Thumbnails);
 			ViewGallery.Checked = (imageListView.View == Manina.Windows.Forms.View.Gallery);
 			ViewPane.Checked = (imageListView.View == Manina.Windows.Forms.View.Pane);
