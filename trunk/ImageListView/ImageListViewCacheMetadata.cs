@@ -25,7 +25,7 @@ namespace Manina.Windows.Forms
 {
 	/// <summary>
 	/// Represents the cache manager responsible for asynchronously loading
-	/// item metdata.
+	/// item metadata.
 	/// </summary>
 	internal class ImageListViewCacheMetadata : IDisposable
 	{
