@@ -122,7 +122,7 @@ namespace Manina.Windows.Forms
                     if (mImageListView != null)
                     {
                         mImageListView.thumbnailCache.Remove(oldItem.Guid);
-                        mImageListView.itemCacheManager.Remove(oldItem.Guid);
+                        mImageListView.metadataCache.Remove(oldItem.Guid);
                         if (mImageListView.CacheMode == CacheMode.Continuous)
                         {
                             mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
@@ -130,7 +130,7 @@ namespace Manina.Windows.Forms
                                 mImageListView.AutoRotateThumbnails,
                                 (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                         }
-                        mImageListView.itemCacheManager.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                        mImageListView.metadataCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
                             (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                         if (item.Selected != oldSelected)
                             mImageListView.OnSelectionChanged(new EventArgs());
@@ -314,7 +314,7 @@ namespace Manina.Windows.Forms
 
                 if (mImageListView != null)
                 {
-                    mImageListView.itemCacheManager.Clear();
+                    mImageListView.metadataCache.Clear();
                     mImageListView.thumbnailCache.Clear();
                     mImageListView.SelectedItems.Clear();
 
@@ -597,7 +597,7 @@ namespace Manina.Windows.Forms
                     }
 
                     // Add to details cache
-                    mImageListView.itemCacheManager.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                    mImageListView.metadataCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
 
                     // Add to shell info cache
@@ -643,7 +643,7 @@ namespace Manina.Windows.Forms
                 if (removeFromCache && mImageListView != null)
                 {
                     mImageListView.thumbnailCache.Remove(item.Guid);
-                    mImageListView.itemCacheManager.Remove(item.Guid);
+                    mImageListView.metadataCache.Remove(item.Guid);
                 }
                 bool ret = mItems.Remove(item);
                 lookUp.Remove(item.Guid);

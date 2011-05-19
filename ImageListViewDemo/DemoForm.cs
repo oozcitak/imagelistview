@@ -192,7 +192,6 @@ namespace Manina.Windows.Forms
 
         private void colorToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Type t = typeof(ImageListViewColor);
             PropertyInfo field = ((ColorComboBoxItem)colorToolStripComboBox.SelectedItem).Field;
             ImageListViewColor color = (ImageListViewColor)field.GetValue(null, null);
             imageListView1.Colors = color;

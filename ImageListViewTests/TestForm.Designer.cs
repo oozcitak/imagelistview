@@ -79,6 +79,7 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
             this.StartBenchmark = new System.Windows.Forms.ToolStripButton();
+			this.SetEnabled=new System.Windows.Forms.ToolStripButton();
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
             this.ChooseSourcePath = new System.Windows.Forms.FolderBrowserDialog();
@@ -236,6 +237,7 @@
             this.RebuildThumbnails,
             this.toolStripSeparator2,
             this.toolStripLabel1,
+				this.SetEnabled,
             this.ViewMode,
             this.SelectRenderer,
             this.ShowFileIcons,
@@ -396,6 +398,17 @@
             this.toolStripLabel1.Size = new System.Drawing.Size(137, 13);
             this.toolStripLabel1.Text = "Appearance Settings:";
             this.toolStripLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			//
+			// SetEnabled
+			//
+			this.SetEnabled.DisplayStyle= System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.SetEnabled.Image = ((System.Drawing.Image)(resources.GetObject("SetEnabled.Image")));
+			this.SetEnabled.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.SetEnabled.Name="SetEnabled";
+			this.SetEnabled.Size = new System.Drawing.Size(137, 17);
+            this.SetEnabled.Text = "Enabled";
+            this.SetEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.SetEnabled.Click += new System.EventHandler(this.SetEnabled_Click);
             // 
             // ViewMode
             // 
@@ -715,6 +728,7 @@
         private System.Windows.Forms.ToolStripButton UseEmbeddedThumbnails;
         private System.Windows.Forms.ToolStripButton AutoRotateThumbnails;
         private System.Windows.Forms.ToolStripButton AddOneItem;
+		private System.Windows.Forms.ToolStripButton SetEnabled;
         private System.Windows.Forms.StatusStrip StatusStrip;
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
         private System.Windows.Forms.SplitContainer splitContainer1;

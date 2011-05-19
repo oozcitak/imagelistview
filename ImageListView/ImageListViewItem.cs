@@ -231,8 +231,8 @@ namespace Manina.Windows.Forms
                     if (mImageListView != null)
                     {
                         mImageListView.thumbnailCache.Remove(mGuid, true);
-                        mImageListView.itemCacheManager.Remove(mGuid);
-                        mImageListView.itemCacheManager.Add(mGuid, Adaptor, mFileName,
+                        mImageListView.metadataCache.Remove(mGuid);
+                        mImageListView.metadataCache.Add(mGuid, Adaptor, mFileName,
                             (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                         if (mImageListView.IsItemVisible(mGuid))
                             mImageListView.Refresh();
@@ -537,7 +537,7 @@ namespace Manina.Windows.Forms
                 throw new InvalidOperationException("Owner control is null.");
 
             mImageListView.thumbnailCache.BeginItemEdit(mGuid);
-            mImageListView.itemCacheManager.BeginItemEdit(mGuid);
+            mImageListView.metadataCache.BeginItemEdit(mGuid);
 
             editing = true;
         }
@@ -554,7 +554,7 @@ namespace Manina.Windows.Forms
                 throw new InvalidOperationException("Owner control is null.");
 
             mImageListView.thumbnailCache.EndItemEdit(mGuid);
-            mImageListView.itemCacheManager.EndItemEdit(mGuid);
+            mImageListView.metadataCache.EndItemEdit(mGuid);
 
             editing = false;
             if (update) Update();
@@ -575,8 +575,8 @@ namespace Manina.Windows.Forms
             if (mImageListView != null)
             {
                 mImageListView.thumbnailCache.Remove(mGuid, true);
-                mImageListView.itemCacheManager.Remove(mGuid);
-                mImageListView.itemCacheManager.Add(mGuid, mAdaptor, mVirtualItemKey,
+                mImageListView.metadataCache.Remove(mGuid);
+                mImageListView.metadataCache.Add(mGuid, mAdaptor, mVirtualItemKey,
                     (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
                 mImageListView.Refresh();
             }
