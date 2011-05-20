@@ -1,6 +1,10 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 10.3 (20 May 2011) =
+
+  * The control is shown dimmed in disabled state and background processing is paused while the control is disabled (Issue 133).
+
 = 10.2 (16 May 2011) =
 
   * Added the !FindString method to the control (Issue 132).
