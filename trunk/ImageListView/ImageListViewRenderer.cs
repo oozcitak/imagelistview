@@ -923,7 +923,10 @@ namespace Manina.Windows.Forms
             public virtual void DrawBackground(Graphics g, Rectangle bounds)
             {
                 // Clear the background
-                g.Clear(ImageListView.Colors.ControlBackColor);
+                if (ImageListView.Enabled)
+                    g.Clear(ImageListView.Colors.ControlBackColor);
+                else
+                    g.Clear(ImageListView.Colors.DisabledBackColor);
 
                 // Draw the background image
                 if (ImageListView.BackgroundImage != null)
@@ -991,10 +994,20 @@ namespace Manina.Windows.Forms
                 bool alternate = (item.Index % 2 == 1);
 
                 // Paint background
-                using (Brush bItemBack = new SolidBrush(alternate && ImageListView.View == View.Details ?
-                    ImageListView.Colors.AlternateBackColor : ImageListView.Colors.BackColor))
+                if (ImageListView.Enabled)
                 {
-                    g.FillRectangle(bItemBack, bounds);
+                    using (Brush bItemBack = new SolidBrush(alternate && ImageListView.View == View.Details ?
+                        ImageListView.Colors.AlternateBackColor : ImageListView.Colors.BackColor))
+                    {
+                        g.FillRectangle(bItemBack, bounds);
+                    }
+                }
+                else
+                {
+                    using (Brush bItemBack = new SolidBrush(ImageListView.Colors.DisabledBackColor))
+                    {
+                        g.FillRectangle(bItemBack, bounds);
+                    }
                 }
 
                 // Paint background Selected
