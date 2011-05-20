@@ -34,6 +34,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         // control background color
         Color mControlBackColor;
+        Color mDisabledBackColor;
 
         // item colors
         Color mBackColor;
@@ -89,6 +90,16 @@ namespace Manina.Windows.Forms
         {
             get { return mControlBackColor; }
             set { mControlBackColor = value; }
+        }
+        /// <summary>
+        /// Gets or sets the background color of the ImageListView control in its disabled state.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the background color of the ImageListView control in its disabled state.")]
+        [DefaultValue(typeof(Color), "Control")]
+        public Color DisabledBackColor
+        {
+            get { return mDisabledBackColor; }
+            set { mDisabledBackColor = value; }
         }
         /// <summary>
         /// Gets or sets the background color of the ImageListViewItem.
@@ -430,6 +441,7 @@ namespace Manina.Windows.Forms
         {
             // control
             mControlBackColor = SystemColors.Window;
+            mDisabledBackColor = SystemColors.Control;
 
             // item
             mBackColor = SystemColors.Window;
@@ -530,7 +542,7 @@ namespace Manina.Windows.Forms
         }
         #endregion
 
-        #region InstanceMethods
+        #region Instance Methods
         /// <summary>
         /// Copies color values from the given object.
         /// </summary>
@@ -579,6 +591,7 @@ namespace Manina.Windows.Forms
 
             // control
             c.ControlBackColor = Color.White;
+            c.DisabledBackColor = Color.FromArgb(220, 220, 220);
 
             // item
             c.BackColor = Color.White;
@@ -638,6 +651,7 @@ namespace Manina.Windows.Forms
 
             // control
             c.ControlBackColor = Color.Black;
+            c.DisabledBackColor = Color.Black;
 
             // item
             c.BackColor = Color.FromArgb(0x31, 0x31, 0x31);
