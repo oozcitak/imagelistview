@@ -1792,9 +1792,15 @@ namespace Manina.Windows.Forms
 			mSelectedItems.Clear (false);
 			
 			// Add items
-			foreach (string filename in e.FileNames) {
+            bool first = true;
+			foreach (string filename in e.FileNames) 
+            {
 				ImageListViewItem item = new ImageListViewItem (filename);
-				item.mSelected = true;
+                if (first || MultiSelect)
+                {
+                    item.mSelected = true;
+                    first = false;
+                }
 				mItems.InsertInternal (index, item, defaultAdaptor);
 				if (firstItemIndex == 0)
 					firstItemIndex = item.Index;
