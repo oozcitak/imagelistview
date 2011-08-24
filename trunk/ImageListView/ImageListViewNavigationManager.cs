@@ -854,7 +854,8 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragOver(DragEventArgs e)
             {
-                if (mImageListView.AllowDrop || (mImageListView.AllowDrag && selfDragging))
+                if (e.Data.GetDataPresent(DataFormats.FileDrop) && 
+                    (mImageListView.AllowDrop || (mImageListView.AllowDrag && selfDragging)))
                 {
                     if (mImageListView.Items.Count == 0)
                     {
@@ -959,11 +960,8 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragLeave()
             {
-                if (mImageListView.AllowDrag && selfDragging)
-                {
-                    DropTarget = null;
-                    mImageListView.Refresh(true);
-                }
+                DropTarget = null;
+                mImageListView.Refresh(true);
 
                 if (scrollTimer.Enabled)
                     scrollTimer.Enabled = false;
