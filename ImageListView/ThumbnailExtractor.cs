@@ -652,8 +652,7 @@ namespace Manina.Windows.Forms
             {
                 formatBmp = System.Drawing.Imaging.PixelFormat.Format32bppPArgb;
             }
-            else if (sourceWpf.Format != System.Windows.Media.PixelFormats.Bgra32 &&
-                     sourceWpf.Format != System.Windows.Media.PixelFormats.Bgr32)
+            else if (sourceWpf.Format != System.Windows.Media.PixelFormats.Bgra32)
             {
                 // Convert BitmapSource
                 FormatConvertedBitmap convertWpf = new FormatConvertedBitmap();
