@@ -229,7 +229,7 @@ namespace ImageListViewTests
 		// Rebuild thumbnails
 		private void RebuildThumbnails_Click (object sender, EventArgs e)
 		{
-			imageListView.ClearThumbnailCache ();
+            imageListView.ClearThumbnailCache();
 		}
 		#endregion
 
