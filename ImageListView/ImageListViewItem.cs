@@ -222,6 +222,7 @@ namespace Manina.Windows.Forms
                 if (mFileName != value)
                 {
                     mFileName = value;
+                    mVirtualItemKey = mFileName;
 
                     if (string.IsNullOrEmpty(mText))
                         mText = Path.GetFileName(mFileName);
