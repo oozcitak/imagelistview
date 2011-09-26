@@ -3,10 +3,10 @@
 
 = 10.4 (26 Sept 2011) =
 
-* Dropping multiple files when MultiSelect! is set to false now selects a single file (Issue 138).
-* Insertion caret is not drawn if dragged items are not files (Issue 139).
-* Changing item filename now updates the thumbnail (Issue 141).
-* Fixed a bug for the thumbnail creation of some rare bmp formats (Issue 140).
+  * Dropping multiple files when MultiSelect! is set to false now selects a single file (Issue 138).
+  * Insertion caret is not drawn if dragged items are not files (Issue 139).
+  * Changing item filename now updates the thumbnail (Issue 141).
+  * Fixed a bug for the thumbnail creation of some rare bmp formats (Issue 140).
 
 = 10.3 (20 May 2011) =
 
