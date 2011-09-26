@@ -1,6 +1,13 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 10.4 (26 Sept 2011) =
+
+* Dropping multiple files when MultiSelect! is set to false now selects a single file (Issue 138).
+* Insertion caret is not drawn if dragged items are not files (Issue 139).
+* Changing item filename now updates the thumbnail (Issue 141).
+* Fixed a bug for the thumbnail creation of some rare bmp formats (Issue 140).
+
 = 10.3 (20 May 2011) =
 
   * The control is shown dimmed in disabled state and background processing is paused while the control is disabled (Issue 133).
