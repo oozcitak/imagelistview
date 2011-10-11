@@ -383,7 +383,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="index">The zero-based index at which the new item should be inserted.</param>
             /// <param name="filename">The name of the image file.</param>
             public void Insert(int index, string filename)
             {
@@ -392,7 +392,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Inserts an item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="index">The zero-based index at which the new item should be inserted.</param>
             /// <param name="filename">The name of the image file.</param>
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
             public void Insert(int index, string filename, Image initialThumbnail)
@@ -404,7 +404,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="index">The zero-based index at which the new item should be inserted.</param>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
             /// <param name="adaptor">The adaptor associated with this item.</param>
@@ -415,7 +415,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="index">The zero-based index at which the new item should be inserted.</param>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
             public void Insert(int index, object key, string text)
@@ -425,7 +425,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="index">The zero-based index at which the new item should be inserted.</param>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
@@ -440,7 +440,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
             /// </summary>
-            /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            /// <param name="index">The zero-based index at which the new item should be inserted.</param>
             /// <param name="key">The key identifying the item.</param>
             /// <param name="text">Text of the item.</param>
             /// <param name="initialThumbnail">The initial thumbnail image for the item.</param>
