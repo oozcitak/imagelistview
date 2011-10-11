@@ -297,16 +297,16 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Always creates the thumbnail from the embedded thumbnail.
         /// </summary>
-        Always,
+        Always = 0,
         /// <summary>
         /// Creates the thumbnail from the embedded thumbnail when possible,
         /// reverts to the source image otherwise.
         /// </summary>
-        Auto,
+        Auto = 1,
         /// <summary>
         /// Always creates the thumbnail from the source image.
         /// </summary>
-        Never,
+        Never = 2,
     }
     /// <summary>
     /// Represents Windows Imaging Component usage option.

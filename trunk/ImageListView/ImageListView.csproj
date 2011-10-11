@@ -72,6 +72,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DiskCache.cs" />
     <Compile Include="ImageListViewGroupCollection.cs">
       <SubType>Component</SubType>
     </Compile>
