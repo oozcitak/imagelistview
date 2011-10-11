@@ -131,6 +131,7 @@ namespace Manina.Windows.Forms
         /// <param name="size">Maximum cache size in bytes. When this size is exceeded,
         /// old items will be overwritten.</param>
         /// <param name="syncBehavior">The synchronization behaviour.</param>
+        /// <param name="keySize">Byte length of keys.</param>
         public DiskCache(string filename, long size, SyncBehavior syncBehavior, int keySize)
         {
             lockObject = new object();
