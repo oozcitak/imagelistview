@@ -40,12 +40,12 @@ namespace Manina.Windows.Forms
         private const int TagOrientation = 0x0112;
         #endregion
 
-#if USEWIC		
+#if USEWIC
         #region WIC Metadata Paths
         private static readonly string[] WICPathOrientation = new string[] { "/app1/ifd/{ushort=274}", "/xmp/tiff:Orientation" };
         #endregion
 #endif
-		
+
         #region Public Methods
         /// <summary>
         /// Creates a thumbnail from the given image.
@@ -116,10 +116,8 @@ namespace Manina.Windows.Forms
             else
             {
                 // .Net 2.0 fallback
-                Image img = GetThumbnailBmp(image, size,
+                return GetThumbnailBmp(image, size,
                     useExifOrientation ? GetRotation(image) : 0);
-
-                return img;
             }
         }
         /// <summary>
@@ -772,7 +770,8 @@ namespace Manina.Windows.Forms
             int thumbWidth = Math.Abs(angle) % 180 == 0 ? width : height;
             int thumbHeight = Math.Abs(angle) % 180 == 0 ? height : width;
 
-            Image thumb = new Bitmap(thumbWidth, thumbHeight);
+            Bitmap thumb = new Bitmap(thumbWidth, thumbHeight);
+            thumb.SetResolution(source.HorizontalResolution, source.VerticalResolution);
             using (Graphics g = Graphics.FromImage(thumb))
             {
                 g.PixelOffsetMode = PixelOffsetMode.None;
