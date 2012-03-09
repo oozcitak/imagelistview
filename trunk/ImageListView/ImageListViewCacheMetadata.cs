@@ -203,7 +203,10 @@ namespace Manina.Windows.Forms
 			
 			// Get result
 			Utility.Tuple<ColumnType, string, object>[] details = (Utility.Tuple<ColumnType, string, object>[])e.Result;
-			mImageListView.UpdateItemDetailsInternal (request.Guid, details);
+            if (details != null && mImageListView != null)
+            {
+                mImageListView.UpdateItemDetailsInternal(request.Guid, details);
+            }
 			
 			// Refresh the control lazily
 			if (mImageListView != null && mImageListView.IsItemVisible (request.Guid))
