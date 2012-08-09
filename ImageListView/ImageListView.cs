@@ -1990,10 +1990,14 @@ namespace Manina.Windows.Forms
                     item.mSelected = true;
                     first = false;
                 }
-                mItems.InsertInternal(index, item, defaultAdaptor);
+
+                bool inserted = mItems.InsertInternal(index, item, defaultAdaptor);
+
                 if (firstItemIndex == 0)
                     firstItemIndex = item.Index;
-                index++;
+
+                if (inserted)
+                    index++;
             }
 
             EnsureVisible(firstItemIndex);

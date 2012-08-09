@@ -536,9 +536,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             /// <param name="item">The <see cref="ImageListViewItem"/> to add.</param>
             /// <param name="adaptor">The adaptor associated with this item.</param>
-            internal void AddInternal(ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
+            /// <returns>true if the item was added; otherwise false.</returns>
+            internal bool AddInternal(ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
             {
-                InsertInternal(-1, item, adaptor);
+                return InsertInternal(-1, item, adaptor);
             }
             /// <summary>
             /// Inserts the given item without raising a selection changed event.
@@ -546,13 +547,17 @@ namespace Manina.Windows.Forms
             /// <param name="index">Insertion index. If index is -1 the item is added to the end of the list.</param>
             /// <param name="item">The <see cref="ImageListViewItem"/> to add.</param>
             /// <param name="adaptor">The adaptor associated with this item.</param>
-            internal void InsertInternal(int index, ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
+            /// <returns>true if the item was added; otherwise false.</returns>
+            internal bool InsertInternal(int index, ImageListViewItem item, ImageListView.ImageListViewItemAdaptor adaptor)
             {
+                if (mImageListView == null)
+                    return false;
+
                 // Check if the file already exists
-                if (mImageListView != null && !string.IsNullOrEmpty(item.FileName) && !mImageListView.AllowDuplicateFileNames)
+                if (!string.IsNullOrEmpty(item.FileName) && !mImageListView.AllowDuplicateFileNames)
                 {
                     if (mItems.Exists(a => string.Compare(a.FileName, item.FileName, StringComparison.OrdinalIgnoreCase) == 0))
-                        return;
+                        return false;
                 }
                 item.owner = this;
                 item.mAdaptor = adaptor;
@@ -570,57 +575,57 @@ namespace Manina.Windows.Forms
                 }
                 lookUp.Add(item.Guid, item);
                 collectionModified = true;
-                if (mImageListView != null)
+
+                item.mImageListView = mImageListView;
+
+                // Create sub item texts for custom columns
+                foreach (ImageListViewColumnHeader header in mImageListView.Columns)
+                    if (header.Type == ColumnType.Custom)
+                        item.AddSubItemText(header.Guid);
+
+                // Add current thumbnail to cache
+                if (item.clonedThumbnail != null)
                 {
-                    item.mImageListView = mImageListView;
-
-                    // Create sub item texts for custom columns
-                    foreach (ImageListViewColumnHeader header in mImageListView.Columns)
-                        if (header.Type == ColumnType.Custom)
-                            item.AddSubItemText(header.Guid);
-
-                    // Add current thumbnail to cache
-                    if (item.clonedThumbnail != null)
-                    {
-                        mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey, mImageListView.ThumbnailSize,
-                            item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                        item.clonedThumbnail = null;
-                    }
-
-                    // Add to thumbnail cache
-                    if (mImageListView.CacheMode == CacheMode.Continuous)
-                    {
-                        mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
-                            mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
-                    }
-
-                    // Add to details cache
-                    mImageListView.metadataCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
-
-                    // Add to shell info cache
-                    string extension = item.extension;
-                    if (!string.IsNullOrEmpty(extension))
-                    {
-                        CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
-                        if (state == CacheState.Error && mImageListView.RetryOnError == true)
-                        {
-                            mImageListView.shellInfoCache.Remove(extension);
-                            mImageListView.shellInfoCache.Add(extension);
-                        }
-                        else if (state == CacheState.Unknown)
-                            mImageListView.shellInfoCache.Add(extension);
-                    }
-
-                    // Update groups
-                    if (mImageListView.showGroups)
-                        AddRemoveGroupItem(item.Index, true);
-
-                    // Raise the add event
-                    mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Add, item));
+                    mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey, mImageListView.ThumbnailSize,
+                        item.clonedThumbnail, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                    item.clonedThumbnail = null;
                 }
+
+                // Add to thumbnail cache
+                if (mImageListView.CacheMode == CacheMode.Continuous)
+                {
+                    mImageListView.thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                        mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
+                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                }
+
+                // Add to details cache
+                mImageListView.metadataCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey,
+                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+
+                // Add to shell info cache
+                string extension = item.extension;
+                if (!string.IsNullOrEmpty(extension))
+                {
+                    CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
+                    if (state == CacheState.Error && mImageListView.RetryOnError == true)
+                    {
+                        mImageListView.shellInfoCache.Remove(extension);
+                        mImageListView.shellInfoCache.Add(extension);
+                    }
+                    else if (state == CacheState.Unknown)
+                        mImageListView.shellInfoCache.Add(extension);
+                }
+
+                // Update groups
+                if (mImageListView.showGroups)
+                    AddRemoveGroupItem(item.Index, true);
+
+                // Raise the add event
+                mImageListView.OnItemCollectionChanged(new ItemCollectionChangedEventArgs(CollectionChangeAction.Add, item));
+
+                return true;
             }
             /// <summary>
             /// Removes the given item without raising a selection changed event.
