@@ -716,13 +716,16 @@ namespace Manina.Windows.Forms
                     ImageListViewItem item = mItems[i];
                     item.mIndex = i;
                     string group = item.group;
+
                     if (string.Compare(lastGroup, group, StringComparison.InvariantCultureIgnoreCase) != 0)
                     {
                         lastGroup = group;
                         mImageListView.groups.Add(group, i, i);
                     }
-                    else
+                    else if (mImageListView.groups.HasName(lastGroup))
+                    {
                         mImageListView.groups[lastGroup].LastItemIndex = i;
+                    }
                 }
 
                 // Restore previous cursor
@@ -819,96 +822,105 @@ namespace Manina.Windows.Forms
                 public int Compare(ImageListViewItem x, ImageListViewItem y)
                 {
                     int result = 0;
-                    int sign = (mGroupOrder == SortOrder.Ascending ? 1 : -1);
+                    int sign = 0;
 
-                    x.UpdateGroup(mGroupColumn);
-                    y.UpdateGroup(mGroupColumn);
-                    result = (x.groupOrder < y.groupOrder ? -1 : (x.groupOrder > y.groupOrder ? 1 : 0));
-                    if (result != 0)
-                        return sign * result;
-
-                    result = 0;
-                    sign = (mSortOrder == SortOrder.Ascending ? 1 : -1);
-                    if (mSortColumn != null)
+                    if (mGroupOrder != SortOrder.None)
                     {
-                        switch (mSortColumn.Type)
+                        result = 0;
+                        sign = (mGroupOrder == SortOrder.Ascending ? 1 : -1);
+
+                        x.UpdateGroup(mGroupColumn);
+                        y.UpdateGroup(mGroupColumn);
+                        result = (x.groupOrder < y.groupOrder ? -1 : (x.groupOrder > y.groupOrder ? 1 : 0));
+                        if (result != 0)
+                            return sign * result;
+                    }
+
+                    if (mSortOrder != SortOrder.None)
+                    {
+                        result = 0;
+                        sign = (mSortOrder == SortOrder.Ascending ? 1 : -1);
+                        if (mSortColumn != null)
                         {
-                            case ColumnType.DateAccessed:
-                                result = DateTime.Compare(x.DateAccessed, y.DateAccessed);
-                                break;
-                            case ColumnType.DateCreated:
-                                result = DateTime.Compare(x.DateCreated, y.DateCreated);
-                                break;
-                            case ColumnType.DateModified:
-                                result = DateTime.Compare(x.DateModified, y.DateModified);
-                                break;
-                            case ColumnType.Dimensions:
-                                long ax = x.Dimensions.Width * x.Dimensions.Height;
-                                long ay = y.Dimensions.Width * y.Dimensions.Height;
-                                result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
-                                break;
-                            case ColumnType.FileName:
-                                result = string.Compare(x.FileName, y.FileName, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.FilePath:
-                                result = string.Compare(x.FilePath, y.FilePath, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.FileSize:
-                                result = (x.FileSize < y.FileSize ? -1 : (x.FileSize > y.FileSize ? 1 : 0));
-                                break;
-                            case ColumnType.FileType:
-                                result = string.Compare(x.FileType, y.FileType, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.Name:
-                                result = string.Compare(x.Text, y.Text, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.Resolution:
-                                float rx = x.Resolution.Width * x.Resolution.Height;
-                                float ry = y.Resolution.Width * y.Resolution.Height;
-                                result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
-                                break;
-                            case ColumnType.ImageDescription:
-                                result = string.Compare(x.ImageDescription, y.ImageDescription, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.EquipmentModel:
-                                result = string.Compare(x.EquipmentModel, y.EquipmentModel, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.DateTaken:
-                                result = DateTime.Compare(x.DateTaken, y.DateTaken);
-                                break;
-                            case ColumnType.Artist:
-                                result = string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.Copyright:
-                                result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.ExposureTime:
-                                result = (x.ExposureTime < y.ExposureTime ? -1 : (x.ExposureTime > y.ExposureTime ? 1 : 0));
-                                break;
-                            case ColumnType.FNumber:
-                                result = (x.FNumber < y.FNumber ? -1 : (x.FNumber > y.FNumber ? 1 : 0));
-                                break;
-                            case ColumnType.ISOSpeed:
-                                result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
-                                break;
-                            case ColumnType.UserComment:
-                                result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.Rating:
-                                result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
-                                break;
-                            case ColumnType.Software:
-                                result = string.Compare(x.Software, y.Software, StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            case ColumnType.FocalLength:
-                                result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
-                                break;
-                            case ColumnType.Custom:
-                                result = string.Compare(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), StringComparison.InvariantCultureIgnoreCase);
-                                break;
-                            default:
-                                result = 0;
-                                break;
+                            switch (mSortColumn.Type)
+                            {
+                                case ColumnType.DateAccessed:
+                                    result = DateTime.Compare(x.DateAccessed, y.DateAccessed);
+                                    break;
+                                case ColumnType.DateCreated:
+                                    result = DateTime.Compare(x.DateCreated, y.DateCreated);
+                                    break;
+                                case ColumnType.DateModified:
+                                    result = DateTime.Compare(x.DateModified, y.DateModified);
+                                    break;
+                                case ColumnType.Dimensions:
+                                    long ax = x.Dimensions.Width * x.Dimensions.Height;
+                                    long ay = y.Dimensions.Width * y.Dimensions.Height;
+                                    result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
+                                    break;
+                                case ColumnType.FileName:
+                                    result = string.Compare(x.FileName, y.FileName, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.FilePath:
+                                    result = string.Compare(x.FilePath, y.FilePath, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.FileSize:
+                                    result = (x.FileSize < y.FileSize ? -1 : (x.FileSize > y.FileSize ? 1 : 0));
+                                    break;
+                                case ColumnType.FileType:
+                                    result = string.Compare(x.FileType, y.FileType, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.Name:
+                                    result = string.Compare(x.Text, y.Text, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.Resolution:
+                                    float rx = x.Resolution.Width * x.Resolution.Height;
+                                    float ry = y.Resolution.Width * y.Resolution.Height;
+                                    result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
+                                    break;
+                                case ColumnType.ImageDescription:
+                                    result = string.Compare(x.ImageDescription, y.ImageDescription, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.EquipmentModel:
+                                    result = string.Compare(x.EquipmentModel, y.EquipmentModel, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.DateTaken:
+                                    result = DateTime.Compare(x.DateTaken, y.DateTaken);
+                                    break;
+                                case ColumnType.Artist:
+                                    result = string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.Copyright:
+                                    result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.ExposureTime:
+                                    result = (x.ExposureTime < y.ExposureTime ? -1 : (x.ExposureTime > y.ExposureTime ? 1 : 0));
+                                    break;
+                                case ColumnType.FNumber:
+                                    result = (x.FNumber < y.FNumber ? -1 : (x.FNumber > y.FNumber ? 1 : 0));
+                                    break;
+                                case ColumnType.ISOSpeed:
+                                    result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
+                                    break;
+                                case ColumnType.UserComment:
+                                    result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.Rating:
+                                    result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
+                                    break;
+                                case ColumnType.Software:
+                                    result = string.Compare(x.Software, y.Software, StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                case ColumnType.FocalLength:
+                                    result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
+                                    break;
+                                case ColumnType.Custom:
+                                    result = string.Compare(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), StringComparison.InvariantCultureIgnoreCase);
+                                    break;
+                                default:
+                                    result = 0;
+                                    break;
+                            }
                         }
                     }
 
