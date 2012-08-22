@@ -1,6 +1,16 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 10.6 (9 August 2012) =
+
+  * Insertion index is not incremented on drag-drop if the item
+was not successfully inserted (Issue 146).
+  * Items are no longer sorted based on groups if the !GroupOrder property is not set (Issue 151).
+
+= 10.5 (9 March 2012) =
+
+  * The source image DPI is accounted for while creating thumbnails (Issue 144).
+
 = 10.4 (26 Sept 2011) =
 
   * Dropping multiple files when !MultiSelect is set to false now selects a single file (Issue 138).
