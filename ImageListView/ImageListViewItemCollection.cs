@@ -433,9 +433,8 @@ namespace Manina.Windows.Forms
             public void Insert(int index, object key, string text, Image initialThumbnail, ImageListView.ImageListViewItemAdaptor adaptor)
             {
                 ImageListViewItem item = new ImageListViewItem(key, text);
-                item.mAdaptor = adaptor;
                 item.clonedThumbnail = initialThumbnail;
-                Insert(index, item);
+                Insert(index, item, adaptor);
             }
             /// <summary>
             /// Inserts a virtual item to the <see cref="ImageListViewItemCollection"/> at the specified index.
