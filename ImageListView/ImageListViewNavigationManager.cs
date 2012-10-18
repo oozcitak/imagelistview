@@ -336,7 +336,8 @@ namespace Manina.Windows.Forms
                             foreach (int i in indices)
                             {
                                 if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
-                                    !highlightedItems.ContainsKey(mImageListView.Items[i]))
+                                    !highlightedItems.ContainsKey(mImageListView.Items[i]) &&
+                                    mImageListView.Items[i].Enabled)
                                     highlightedItems.Add(mImageListView.Items[i],
                                         (ControlKey ? !mImageListView.Items[i].Selected : true));
                             }
@@ -366,7 +367,8 @@ namespace Manina.Windows.Forms
                             for (int i = startCol; i <= endCol; i++)
                             {
                                 if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
-                                    !highlightedItems.ContainsKey(mImageListView.Items[i]))
+                                    !highlightedItems.ContainsKey(mImageListView.Items[i]) &&
+                                    mImageListView.Items[i].Enabled)
                                     highlightedItems.Add(mImageListView.Items[i],
                                         (ControlKey ? !mImageListView.Items[i].Selected : true));
                             }
@@ -383,7 +385,8 @@ namespace Manina.Windows.Forms
                                 {
                                     int i = row * mImageListView.layoutManager.Cols + col;
                                     if (i >= 0 && i <= mImageListView.Items.Count - 1 &&
-                                        !highlightedItems.ContainsKey(mImageListView.Items[i]))
+                                        !highlightedItems.ContainsKey(mImageListView.Items[i]) &&
+                                        mImageListView.Items[i].Enabled)
                                         highlightedItems.Add(mImageListView.Items[i],
                                             (ControlKey ? !mImageListView.Items[i].Selected : true));
                                 }
@@ -526,7 +529,10 @@ namespace Manina.Windows.Forms
                     if (highlightedItems.Count != 0)
                     {
                         foreach (KeyValuePair<ImageListViewItem, bool> pair in highlightedItems)
-                            pair.Key.mSelected = pair.Value;
+                        {
+                            if(pair.Key.Enabled)
+                                pair.Key.mSelected = pair.Value;
+                        }
                         highlightedItems.Clear();
                     }
 

@@ -276,7 +276,7 @@ namespace Manina.Windows.Forms
             set { mDisabledColor1 = value; }
         }
         /// <summary>
-        /// Gets or sets the background gradient color2 if the ImageListViewItem is selected.
+        /// Gets or sets the background gradient color2 if the ImageListViewItem is disabled.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the background gradient color2 if the ImageListViewItem is disabled.")]
         [DefaultValue(typeof(Color), "32, 128, 128, 128")]
@@ -286,20 +286,20 @@ namespace Manina.Windows.Forms
             set { mDisabledColor2 = value; }
         }
         /// <summary>
-        /// Gets or sets the border color of the ImageListViewItem if the item is selected.
+        /// Gets or sets the border color of the ImageListViewItem if the item is disabled.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is disabled.")]
-        [DefaultValue(typeof(Color), "64, 128, 128, 128")]
+        [DefaultValue(typeof(Color), "32, 128, 128, 128")]
         public Color DisabledBorderColor
         {
             get { return mDisabledBorderColor; }
             set { mDisabledBorderColor = value; }
         }
         /// <summary>
-        /// Gets or sets the fore color of the ImageListViewItem if the item is selected.
+        /// Gets or sets the fore color of the ImageListViewItem if the item is disabled.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the fore color of the ImageListViewItem if the item is disabled.")]
-        [DefaultValue(typeof(Color), "ControlText")]
+        [DefaultValue(typeof(Color), "128, 128, 128")]
         public Color DisabledForeColor
         {
             get { return mDisabledForeColor; }
@@ -507,6 +507,11 @@ namespace Manina.Windows.Forms
             mSelectedBorderColor = Color.FromArgb(128, SystemColors.Highlight);
             mSelectedForeColor = SystemColors.ControlText;
 
+            mDisabledColor1 = Color.FromArgb(0, SystemColors.GrayText);
+            mDisabledColor2 = Color.FromArgb(32, SystemColors.GrayText);
+            mDisabledBorderColor = Color.FromArgb(32, SystemColors.GrayText);
+            mDisabledForeColor = Color.FromArgb(128, 128, 128);
+
             mInsertionCaretColor = SystemColors.Highlight;
 
             // thumbnails
@@ -656,10 +661,10 @@ namespace Manina.Windows.Forms
             c.SelectedBorderColor = Color.FromArgb(240, 119, 70);
             c.SelectedForeColor = Color.White;
 
-            c.DisabledColor1 = Color.FromArgb(217, 235, 235);
-            c.DisabledColor2 = Color.FromArgb(197, 217, 217);
-            c.DisabledBorderColor = Color.FromArgb(128, 129, 121);
-            c.DisabledForeColor = Color.FromArgb(40, 40, 40);
+            c.DisabledColor1 = Color.FromArgb(217, 217, 217);
+            c.DisabledColor2 = Color.FromArgb(197, 197, 197);
+            c.DisabledBorderColor = Color.FromArgb(128, 128, 128);
+            c.DisabledForeColor = Color.FromArgb(128, 128, 128);
 
             c.InsertionCaretColor = Color.FromArgb(240, 119, 70);
 
