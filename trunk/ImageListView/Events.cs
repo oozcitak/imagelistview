@@ -115,6 +115,20 @@ namespace Manina.Windows.Forms
     /// <param name="e">A ItemCollectionChangedEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ItemCollectionChangedEventHandler(object sender, ItemCollectionChangedEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the PaneResized event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A PaneResizedEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void PaneResizedEventHandler(object sender, PaneResizedEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the PaneResizing event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A PaneResizingEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void PaneResizingEventHandler(object sender, PaneResizingEventArgs e);
     #endregion
 
     #region Event Arguments
@@ -430,7 +444,7 @@ namespace Manina.Windows.Forms
         public Size Size { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the ItemEventArgs class.
+        /// Initializes a new instance of the ThumbnailCachingEventArgs class.
         /// </summary>
         /// <param name="item">The item that is the target of this event.</param>
         /// <param name="size">The size of the thumbnail request.</param>
@@ -465,7 +479,7 @@ namespace Manina.Windows.Forms
         public bool IsThumbnail { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the ItemEventArgs class.
+        /// Initializes a new instance of the ThumbnailCachedEventArgs class.
         /// </summary>
         /// <param name="item">The item that is the target of this event.</param>
         /// <param name="thumbnail">The cached thumbnail image.</param>
@@ -478,6 +492,47 @@ namespace Manina.Windows.Forms
             Thumbnail = thumbnail;
             Size = size;
             IsThumbnail = thumbnailImage;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for the pane resized event.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class PaneResizedEventArgs
+    {
+        /// <summary>
+        /// Gets the width of the pane.
+        /// </summary>
+        public int PaneWidth { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the PaneResizedEventArgs class.
+        /// </summary>
+        /// <param name="paneWidth">The width of the pane.</param>
+        public PaneResizedEventArgs(int paneWidth)
+        {
+            PaneWidth = paneWidth;
+        }
+    }
+
+    /// <summary>
+    /// Represents the event arguments for the pane resizing event.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class PaneResizingEventArgs
+    {
+        /// <summary>
+        /// Gets the width of the pane.
+        /// </summary>
+        public int PaneWidth { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the PaneResizingEventArgs class.
+        /// </summary>
+        /// <param name="paneWidth">The width of the pane.</param>
+        public PaneResizingEventArgs(int paneWidth)
+        {
+            PaneWidth = paneWidth;
         }
     }
     /// <summary>
@@ -507,7 +562,5 @@ namespace Manina.Windows.Forms
             Item = item;
         }
     }
-
-
     #endregion
 }

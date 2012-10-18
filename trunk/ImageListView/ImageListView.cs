@@ -2100,6 +2100,24 @@ namespace Manina.Windows.Forms
                 ThumbnailCached(this, e);
         }
         /// <summary>
+        /// Raises the PaneReszied event.
+        /// </summary>
+        /// <param name="e">A PaneResizedEventArgs that contains event data.</param>
+        protected virtual void OnPaneResized(PaneResizedEventArgs e)
+        {
+            if (PaneResized != null)
+                PaneResized(this, e);
+        }
+        /// <summary>
+        /// Raises the PaneResizing event.
+        /// </summary>
+        /// <param name="e">A PaneResizingEventArgs that contains event data.</param>
+        protected virtual void OnPaneResizing(PaneResizingEventArgs e)
+        {
+            if (PaneResizing != null)
+                PaneResizing(this, e);
+        }
+        /// <summary>
         /// Raises the CacheError event.
         /// This method is invoked from the thumbnail thread.
         /// </summary>
@@ -2238,6 +2256,16 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Browsable(true), Description("Occurs after the item collection is changed.")]
         public event ItemCollectionChangedEventHandler ItemCollectionChanged;
+        /// <summary>
+        /// Occurs after the pane is resized.
+        /// </summary>
+        [Category("Action"), Browsable(true), Description("Occurs after the pane is resized.")]
+        public event PaneResizedEventHandler PaneResized;
+        /// <summary>
+        /// Occurs while the pane is being resized.
+        /// </summary>
+        [Category("Action"), Browsable(true), Description("Occurs while the pane is being resized.")]
+        public event PaneResizingEventHandler PaneResizing;
         #endregion
     }
 }
