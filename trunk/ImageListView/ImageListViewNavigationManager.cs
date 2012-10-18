@@ -745,7 +745,7 @@ namespace Manina.Windows.Forms
                     int newindex = ApplyNavKey(index, e.KeyCode);
                     if (index != newindex)
                     {
-                        if (ControlKey || !mImageListView.Items[newindex].Enabled)
+                        if (ControlKey)
                         {
                             // Just move the focus
                         }
@@ -753,23 +753,37 @@ namespace Manina.Windows.Forms
                         {
                             int startIndex = 0;
                             int endIndex = 0;
-                            if (mImageListView.SelectedItems.Count != 0)
+                            int selCount = mImageListView.SelectedItems.Count;
+                            if (selCount != 0)
                             {
                                 startIndex = mImageListView.SelectedItems[0].Index;
-                                endIndex = mImageListView.SelectedItems[mImageListView.SelectedItems.Count - 1].Index;
+                                endIndex = mImageListView.SelectedItems[selCount - 1].Index;
                                 mImageListView.SelectedItems.Clear(false);
                             }
-                            if (index == startIndex)
-                                startIndex = newindex;
-                            else if (index == endIndex)
-                                endIndex = newindex;
+
+                            if (newindex > index) // Moving right or down
+                            {
+                                if (newindex > endIndex)
+                                    endIndex = newindex;
+                                else
+                                    startIndex = newindex;
+                            }
+                            else // Moving left or up
+                            {
+                                if (newindex < startIndex)
+                                    startIndex = newindex;
+                                else
+                                    endIndex = newindex;
+                            }
+
                             for (int i = Math.Min(startIndex, endIndex); i <= Math.Max(startIndex, endIndex); i++)
                             {
-                                mImageListView.Items[i].mSelected = true;
+                                if (mImageListView.Items[i].mEnabled)
+                                    mImageListView.Items[i].mSelected = true;
                             }
                             mImageListView.OnSelectionChangedInternal();
                         }
-                        else
+                        else if (mImageListView.Items[newindex].mEnabled)
                         {
                             mImageListView.SelectedItems.Clear(false);
                             mImageListView.Items[newindex].mSelected = true;
