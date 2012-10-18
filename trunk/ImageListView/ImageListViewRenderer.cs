@@ -1286,7 +1286,11 @@ namespace Manina.Windows.Forms
                 Size size = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal);
                 PointF pt = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
                     (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
-                CheckBoxState state = item.Checked ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
+                CheckBoxState state = CheckBoxState.UncheckedNormal;
+                if (item.Enabled)
+                    state = item.Checked ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
+                else
+                    state = item.Checked ? CheckBoxState.CheckedDisabled : CheckBoxState.UncheckedDisabled;
                 CheckBoxRenderer.DrawCheckBox(g, Point.Round(pt), state);
             }
             /// <summary>

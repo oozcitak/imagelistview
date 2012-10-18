@@ -192,7 +192,7 @@ namespace Manina.Windows.Forms
             }
             set
             {
-                if (value != mSelected)
+                if (value != mSelected && mEnabled)
                 {
                     mSelected = value;
                     if (mImageListView != null)

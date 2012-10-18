@@ -714,7 +714,9 @@ namespace Manina.Windows.Forms
                         foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
-                            using (Brush bItemFore = new SolidBrush(Color.White))
+                            Color foreColor = Color.White;
+                            if (!item.Enabled) foreColor = Color.FromArgb(128, 128, 128);
+                            using (Brush bItemFore = new SolidBrush(foreColor))
                             {
                                 if (column.Type == ColumnType.Rating && ImageListView.RatingImage != null && ImageListView.EmptyRatingImage != null)
                                 {
@@ -815,11 +817,25 @@ namespace Manina.Windows.Forms
                         // Draw item image
                         DrawImageWithReflection(g, img, pos, mReflectionSize);
 
-                        // Highlight
-                        using (Pen pen = new Pen(Color.FromArgb(160, Color.White)))
+                        // Shade over disabled item image
+                        if (!item.Enabled)
                         {
-                            g.DrawLine(pen, pos.X, pos.Y + 1, pos.X + pos.Width - 1, pos.Y + 1);
-                            g.DrawLine(pen, pos.X, pos.Y + 1, pos.X, pos.Y + pos.Height);
+                            pos.Inflate(4, 4);
+                            using (Brush brush = new LinearGradientBrush(pos,
+                                Color.FromArgb(64, 0, 0, 0), Color.FromArgb(196, 0, 0, 0), LinearGradientMode.Vertical))
+                            {
+                                g.FillRectangle(brush, pos);
+                            }
+                        }
+
+                        // Highlight
+                        if (item.Enabled)
+                        {
+                            using (Pen pen = new Pen(Color.FromArgb(160, Color.White)))
+                            {
+                                g.DrawLine(pen, pos.X, pos.Y + 1, pos.X + pos.Width - 1, pos.Y + 1);
+                                g.DrawLine(pen, pos.X, pos.Y + 1, pos.X, pos.Y + pos.Height);
+                            }
                         }
                     }
                 }
@@ -1262,7 +1278,15 @@ namespace Manina.Windows.Forms
                         }
                     }
 
-                    if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                    // Paint background Disabled
+                    if ((state & ItemState.Disabled) != ItemState.None)
+                    {
+                        using (Brush bDisabled = new LinearGradientBrush(bounds, ImageListView.Colors.DisabledColor1, ImageListView.Colors.DisabledColor2, LinearGradientMode.Vertical))
+                        {
+                            Utility.FillRoundedRectangle(g, bDisabled, bounds, 4);
+                        }
+                    }
+                    else if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
                         (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                     {
                         using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
@@ -1320,7 +1344,12 @@ namespace Manina.Windows.Forms
                         sf.FormatFlags = StringFormatFlags.NoWrap;
                         sf.LineAlignment = StringAlignment.Center;
                         sf.Trimming = StringTrimming.EllipsisCharacter;
-                        using (Brush bItemFore = new SolidBrush(ImageListView.Colors.ForeColor))
+                        Color foreColor = ImageListView.Colors.ForeColor;
+                        if ((state & ItemState.Disabled) != ItemState.None)
+                        {
+                            foreColor = ImageListView.Colors.DisabledForeColor;
+                        }
+                        using (Brush bItemFore = new SolidBrush(foreColor))
                         {
                             g.DrawString(item.Text, CaptionFont, bItemFore, rt, sf);
                         }
@@ -1364,7 +1393,14 @@ namespace Manina.Windows.Forms
                     {
                         Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
                     }
-                    if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if (((state & ItemState.Disabled) != ItemState.None))
+                    {
+                        using (Pen pHighlight128 = new Pen(ImageListView.Colors.DisabledBorderColor))
+                        {
+                            Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
+                        }
+                    }
+                    else if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                         {
@@ -1464,7 +1500,7 @@ namespace Manina.Windows.Forms
             public override void DrawItem(System.Drawing.Graphics g, ImageListViewItem item, ItemState state, System.Drawing.Rectangle bounds)
             {
                 // Paint background
-                if (ImageListView.Enabled)
+                if (ImageListView.Enabled || !item.Enabled)
                     g.FillRectangle(SystemBrushes.Window, bounds);
                 else
                     g.FillRectangle(SystemBrushes.Control, bounds);
@@ -1528,7 +1564,11 @@ namespace Manina.Windows.Forms
                         {
                             g.FillRectangle(SystemBrushes.GrayText, rt);
                         }
-                        if (((state & ItemState.Selected) != ItemState.None))
+                        if ((state & ItemState.Disabled) != ItemState.None)
+                        {
+                            g.DrawString(item.Text, ImageListView.Font, SystemBrushes.GrayText, rt, sf);
+                        }
+                        else if (((state & ItemState.Selected) != ItemState.None))
                         {
                             g.DrawString(item.Text, ImageListView.Font, SystemBrushes.HighlightText, rt, sf);
                         }
@@ -1583,6 +1623,12 @@ namespace Manina.Windows.Forms
                             rt.X += iconOffset;
                             rt.Width -= iconOffset;
 
+                            Brush forecolor = SystemBrushes.WindowText;
+                            if ((state & ItemState.Disabled) != ItemState.None)
+                                forecolor = SystemBrushes.GrayText;
+                            else if ((state & ItemState.Selected) != ItemState.None)
+                                forecolor = SystemBrushes.HighlightText;
+
                             if (column.Type == ColumnType.Rating && ImageListView.RatingImage != null && ImageListView.EmptyRatingImage != null)
                             {
                                 int w = ImageListView.RatingImage.Width;
@@ -1596,9 +1642,9 @@ namespace Manina.Windows.Forms
                                     g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                             }
                             else if (column.Type == ColumnType.Custom)
-                                g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? SystemBrushes.WindowText : SystemBrushes.HighlightText), rt, sf);
+                                g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, forecolor, rt, sf);
                             else
-                                g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, ((state & ItemState.Selected) == ItemState.None ? SystemBrushes.WindowText : SystemBrushes.HighlightText), rt, sf);
+                                g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, forecolor, rt, sf);
 
                             rt.X -= iconOffset;
                             rt.X += column.Width;
@@ -2017,7 +2063,14 @@ namespace Manina.Windows.Forms
                             }
                         }
 
-                        if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                        if ((state & ItemState.Disabled) != ItemState.None)
+                        {
+                            using (Brush bDisabled = new LinearGradientBrush(bounds, ImageListView.Colors.DisabledColor1, ImageListView.Colors.DisabledColor2, LinearGradientMode.Vertical))
+                            {
+                                Utility.FillRoundedRectangle(g, bDisabled, bounds, 5);
+                            }
+                        }
+                        else if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
                             (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                         {
                             using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
@@ -2113,7 +2166,14 @@ namespace Manina.Windows.Forms
                     {
                         Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, 4);
                     }
-                    if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if (((state & ItemState.Disabled) != ItemState.None))
+                    {
+                        using (Pen pHighlight128 = new Pen(ImageListView.Colors.DisabledBorderColor))
+                        {
+                            Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, 4);
+                        }
+                    }
+                    else if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                         {
@@ -2181,6 +2241,8 @@ namespace Manina.Windows.Forms
             // Check boxes
             private VisualStyleRenderer rCheckedNormal = null;
             private VisualStyleRenderer rUncheckedNormal = null;
+            private VisualStyleRenderer rCheckedDisabled = null;
+            private VisualStyleRenderer rUncheckedDisabled = null;
             // File icons
             private VisualStyleRenderer rFileIcon = null;
             // Column headers
@@ -2196,6 +2258,7 @@ namespace Manina.Windows.Forms
             private VisualStyleRenderer rItemSelected = null;
             private VisualStyleRenderer rItemHoveredSelected = null;
             private VisualStyleRenderer rItemSelectedHidden = null;
+            private VisualStyleRenderer rItemDisabled = null;
             // Group headers
             private VisualStyleRenderer rGroupNormal = null;
             private VisualStyleRenderer rGroupLine = null;
@@ -2227,6 +2290,8 @@ namespace Manina.Windows.Forms
                     // Check boxes
                     rCheckedNormal = GetRenderer(VisualStyleElement.Button.CheckBox.CheckedNormal);
                     rUncheckedNormal = GetRenderer(VisualStyleElement.Button.CheckBox.UncheckedNormal);
+                    rCheckedDisabled = GetRenderer(VisualStyleElement.Button.CheckBox.CheckedDisabled);
+                    rUncheckedDisabled = GetRenderer(VisualStyleElement.Button.CheckBox.UncheckedDisabled);
                     // File icons
                     rFileIcon = GetRenderer(VisualStyleElement.Button.PushButton.Normal);
                     // Column headers
@@ -2242,6 +2307,7 @@ namespace Manina.Windows.Forms
                     rItemSelected = GetRenderer("Explorer::ListView", 1, 3);
                     rItemHoveredSelected = GetRenderer("Explorer::ListView", 1, 6);
                     rItemSelectedHidden = GetRenderer("Explorer::ListView", 1, 5);
+                    rItemDisabled = GetRenderer("Explorer::ListView", 1, 4);
                     // Groups
                     rGroupNormal = GetRenderer("Explorer::ListView", 6, 1);
                     rGroupLine = GetRenderer("Explorer::ListView", 7, 1);
@@ -2280,10 +2346,20 @@ namespace Manina.Windows.Forms
             public override void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
             {
                 VisualStyleRenderer renderer;
-                if (item.Checked)
-                    renderer = rCheckedNormal;
+                if (item.Enabled)
+                {
+                    if (item.Checked)
+                        renderer = rCheckedNormal;
+                    else
+                        renderer = rUncheckedNormal;
+                }
                 else
-                    renderer = rUncheckedNormal;
+                {
+                    if (item.Checked)
+                        renderer = rCheckedDisabled;
+                    else
+                        renderer = rUncheckedDisabled;
+                }
 
                 if (VisualStylesEnabled && renderer != null)
                     renderer.DrawBackground(g, bounds, bounds);
@@ -2407,7 +2483,9 @@ namespace Manina.Windows.Forms
 
                 if (!ImageListView.Enabled)
                     rBack = rItemSelectedHidden;
-                if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                if (((state & ItemState.Disabled) != ItemState.None))
+                    rBack = rItemDisabled;
+                else if (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     rBack = rItemSelectedHidden;
                 else if (((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None))
                     rBack = rItemHoveredSelected;
@@ -2450,11 +2528,14 @@ namespace Manina.Windows.Forms
                         }
 
                         // Draw item text
+                        Color foreColor = SystemColors.ControlText;
+                        if ((state & ItemState.Disabled) != ItemState.None)
+                            foreColor = SystemColors.GrayText;
                         Size szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
                         Rectangle rt = new Rectangle(
                             bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height,
                             ImageListView.ThumbnailSize.Width, szt.Height);
-                        TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, SystemColors.ControlText,
+                        TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, foreColor,
                             TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
                     }
                     else // if (ImageListView.View == View.Details)
@@ -2480,6 +2561,9 @@ namespace Manina.Windows.Forms
                         if (uicolumns.Count > 0)
                             firstWidth = uicolumns[0].Width;
                         Rectangle rt = new Rectangle(bounds.Left + offset.Width, bounds.Top + offset.Height, firstWidth - 2 * offset.Width, bounds.Height - 2 * offset.Height);
+                        Color foreColor = SystemColors.ControlText;
+                        if ((state & ItemState.Disabled) != ItemState.None)
+                            foreColor = SystemColors.GrayText;
                         foreach (ImageListView.ImageListViewColumnHeader column in uicolumns)
                         {
                             rt.Width = column.Width - 2 * offset.Width;
@@ -2517,10 +2601,10 @@ namespace Manina.Windows.Forms
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Guid), ImageListView.Font, rt, SystemColors.ControlText,
+                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Guid), ImageListView.Font, rt, foreColor,
                                         TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
                                 else
-                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, SystemColors.ControlText,
+                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, foreColor,
                                         TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
 
                                 rt.X -= iconOffset;
@@ -2725,7 +2809,16 @@ namespace Manina.Windows.Forms
                     List<ImageListView.ImageListViewColumnHeader> uicolumns = ImageListView.Columns.GetDisplayedColumns();
 
                     // Paint background
-                    if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                    if ((state & ItemState.Disabled) != ItemState.None)
+                    {
+                        // Disabled
+                        using (Brush bItemBack = new LinearGradientBrush(bounds, ImageListView.Colors.DisabledColor1,
+                            ImageListView.Colors.DisabledColor2, LinearGradientMode.Vertical))
+                        {
+                            g.FillRectangle(bItemBack, bounds);
+                        }
+                    }
+                    else if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                     {
                         // Focused and selected
                         using (Brush bItemBack = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1,
@@ -2790,7 +2883,9 @@ namespace Manina.Windows.Forms
 
                     // Sub items
                     Color foreColor = ImageListView.Colors.CellForeColor;
-                    if (ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
+                    if ((state & ItemState.Disabled) != ItemState.None)
+                        foreColor = ImageListView.Colors.DisabledForeColor;
+                    else if (ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
                         foreColor = ImageListView.Colors.SelectedForeColor;
                     else if (!ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
                         foreColor = ImageListView.Colors.UnFocusedForeColor;
@@ -2889,7 +2984,16 @@ namespace Manina.Windows.Forms
                     textOutline.Height -= 1;
 
                     // Paint background
-                    if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)))
+                    if ((((state & ItemState.Disabled) != ItemState.None)))
+                    {
+                        // Disabled
+                        using (Brush bBack = new SolidBrush(ImageListView.Colors.DisabledColor1))
+                        {
+                            Utility.FillRoundedRectangle(g, bBack, textOutline, 4);
+                            Utility.FillRoundedRectangle(g, bBack, imgOutline, 4);
+                        }
+                    }
+                    else if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)))
                     {
                         // Focused and selected
                         using (Brush bBack = new SolidBrush(ImageListView.Colors.SelectedColor1))
@@ -2931,7 +3035,9 @@ namespace Manina.Windows.Forms
 
                     // Item text
                     Color foreColor = ImageListView.Colors.ForeColor;
-                    if (ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
+                    if ((state & ItemState.Disabled) != ItemState.None)
+                        foreColor = ImageListView.Colors.DisabledForeColor;
+                    else if (ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
                         foreColor = ImageListView.Colors.SelectedForeColor;
                     else if (!ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
                         foreColor = ImageListView.Colors.UnFocusedForeColor;
