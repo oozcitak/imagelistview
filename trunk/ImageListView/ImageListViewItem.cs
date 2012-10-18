@@ -37,6 +37,7 @@ namespace Manina.Windows.Forms
         internal ImageListView mImageListView;
         internal bool mChecked;
         internal bool mSelected;
+        internal bool mEnabled;
         private string mText;
         private int mZOrder;
         // File info
@@ -108,6 +109,23 @@ namespace Manina.Windows.Forms
             {
                 if (owner != null)
                     owner.FocusedItem = this;
+            }
+        }
+        /// <summary>
+        /// Gets a value determining if the item is enabled.
+        /// </summary>
+        [Category("Appearance"), Browsable(false), Description("Gets a value determining if the item is enabled."), DefaultValue(true)]
+        public bool Enabled
+        {
+            get
+            {
+                return mEnabled;
+            }
+            set
+            {
+                mEnabled = value;
+                if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
+                    mImageListView.Refresh();
             }
         }
         /// <summary>
@@ -464,6 +482,7 @@ namespace Manina.Windows.Forms
             ImageListView = null;
             Checked = false;
             Selected = false;
+            Enabled = true;
 
             isDirty = true;
             editing = false;

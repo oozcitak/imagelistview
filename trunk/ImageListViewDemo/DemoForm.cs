@@ -427,6 +427,7 @@ namespace Manina.Windows.Forms
         {
             imageListView1.Items.Clear();
             imageListView1.SuspendLayout();
+            int i = 0;
             foreach (FileInfo p in path.GetFiles("*.*"))
             {
                 if (p.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
@@ -439,7 +440,12 @@ namespace Manina.Windows.Forms
                     p.Name.EndsWith(".tif", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+                {
                     imageListView1.Items.Add(p.FullName);
+                    if (i == 1) imageListView1.Items[imageListView1.Items.Count - 1].Enabled = false;
+                    i++;
+                    if (i == 3) i = 0;
+                }
             }
             imageListView1.ResumeLayout();
         }

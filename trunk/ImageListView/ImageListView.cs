@@ -1164,6 +1164,32 @@ namespace Manina.Windows.Forms
             Refresh();
             ResumePaint();
         }
+        /// <summary>
+        /// Marks all items as enabled.
+        /// </summary>
+        public void EnableAll()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+                item.mEnabled = true;
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items as disabled.
+        /// </summary>
+        public void DisableAll()
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items)
+                item.mEnabled = false;
+
+            Refresh();
+            ResumePaint();
+        }
         #endregion
 
         #region Instance Methods
