@@ -124,6 +124,12 @@ namespace Manina.Windows.Forms
             set
             {
                 mEnabled = value;
+                if (!mEnabled && mSelected)
+                {
+                    mSelected = false;
+                    if (mImageListView != null)
+                        mImageListView.OnSelectionChangedInternal();
+                }
                 if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
                     mImageListView.Refresh();
             }
