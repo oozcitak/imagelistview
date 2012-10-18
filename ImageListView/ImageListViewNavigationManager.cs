@@ -310,6 +310,8 @@ namespace Manina.Windows.Forms
                     HoveredColumn = null;
                     HoveredSeparator = null;
                     mImageListView.Refresh();
+
+                    mImageListView.OnPaneResizing(new PaneResizingEventArgs(width));
                 }
                 else if (MouseSelecting)
                 {
@@ -516,6 +518,7 @@ namespace Manina.Windows.Forms
                 else if (ResizingPane)
                 {
                     ResizingPane = false;
+                    mImageListView.OnPaneResized(new PaneResizedEventArgs(mImageListView.mPaneWidth));
                 }
                 else if (MouseSelecting)
                 {
@@ -854,7 +857,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragOver(DragEventArgs e)
             {
-                if (e.Data.GetDataPresent(DataFormats.FileDrop) && 
+                if (e.Data.GetDataPresent(DataFormats.FileDrop) &&
                     (mImageListView.AllowDrop || (mImageListView.AllowDrag && selfDragging)))
                 {
                     if (mImageListView.Items.Count == 0)
