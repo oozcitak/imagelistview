@@ -52,6 +52,10 @@ namespace Manina.Windows.Forms
         Color mSelectedColor2;
         Color mSelectedBorderColor;
         Color mSelectedForeColor;
+        Color mDisabledColor1;
+        Color mDisabledColor2;
+        Color mDisabledBorderColor;
+        Color mDisabledForeColor;
 
         // thumbnail & pane
         Color mImageInnerBorderColor;
@@ -260,6 +264,46 @@ namespace Manina.Windows.Forms
         {
             get { return mSelectedForeColor; }
             set { mSelectedForeColor = value; }
+        }
+        /// <summary>
+        /// Gets or sets the background gradient color1 if the ImageListViewItem is disabled.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the background gradient color1 if the ImageListViewItem is disabled.")]
+        [DefaultValue(typeof(Color), "0, 128, 128, 128")]
+        public Color DisabledColor1
+        {
+            get { return mDisabledColor1; }
+            set { mDisabledColor1 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the background gradient color2 if the ImageListViewItem is selected.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the background gradient color2 if the ImageListViewItem is disabled.")]
+        [DefaultValue(typeof(Color), "32, 128, 128, 128")]
+        public Color DisabledColor2
+        {
+            get { return mDisabledColor2; }
+            set { mDisabledColor2 = value; }
+        }
+        /// <summary>
+        /// Gets or sets the border color of the ImageListViewItem if the item is selected.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the border color of the ImageListViewItem if the item is disabled.")]
+        [DefaultValue(typeof(Color), "64, 128, 128, 128")]
+        public Color DisabledBorderColor
+        {
+            get { return mDisabledBorderColor; }
+            set { mDisabledBorderColor = value; }
+        }
+        /// <summary>
+        /// Gets or sets the fore color of the ImageListViewItem if the item is selected.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets the fore color of the ImageListViewItem if the item is disabled.")]
+        [DefaultValue(typeof(Color), "ControlText")]
+        public Color DisabledForeColor
+        {
+            get { return mDisabledForeColor; }
+            set { mDisabledForeColor = value; }
         }
         /// <summary>
         /// Gets or sets the background gradient color1 of the column header.
@@ -612,6 +656,11 @@ namespace Manina.Windows.Forms
             c.SelectedBorderColor = Color.FromArgb(240, 119, 70);
             c.SelectedForeColor = Color.White;
 
+            c.DisabledColor1 = Color.FromArgb(217, 235, 235);
+            c.DisabledColor2 = Color.FromArgb(197, 217, 217);
+            c.DisabledBorderColor = Color.FromArgb(128, 129, 121);
+            c.DisabledForeColor = Color.FromArgb(40, 40, 40);
+
             c.InsertionCaretColor = Color.FromArgb(240, 119, 70);
 
             // thumbnails & pane
@@ -672,6 +721,11 @@ namespace Manina.Windows.Forms
             c.SelectedColor2 = Color.FromArgb(64, 64, 96, 160);
             c.SelectedBorderColor = Color.FromArgb(128, SystemColors.Highlight);
             c.SelectedForeColor = Color.LightGray;
+
+            c.DisabledColor1 = Color.FromArgb(0, SystemColors.GrayText);
+            c.DisabledColor2 = Color.FromArgb(32, SystemColors.GrayText);
+            c.DisabledBorderColor = Color.FromArgb(96, SystemColors.GrayText);
+            c.DisabledForeColor = Color.LightGray;
 
             c.InsertionCaretColor = Color.FromArgb(96, 144, 240);
 

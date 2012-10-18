@@ -745,7 +745,7 @@ namespace Manina.Windows.Forms
                     int newindex = ApplyNavKey(index, e.KeyCode);
                     if (index != newindex)
                     {
-                        if (ControlKey)
+                        if (ControlKey || !mImageListView.Items[newindex].Enabled)
                         {
                             // Just move the focus
                         }
@@ -980,7 +980,7 @@ namespace Manina.Windows.Forms
                 ImageListView.HitInfo h;
                 mImageListView.HitTest(pt, out h);
 
-                if (h.ItemHit)
+                if (h.ItemHit && mImageListView.Items[h.ItemIndex].Enabled)
                 {
                     HoveredItem = mImageListView.Items[h.ItemIndex];
                     HoveredSubItem = h.SubItemIndex;

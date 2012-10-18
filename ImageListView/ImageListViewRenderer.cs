@@ -538,6 +538,9 @@ namespace Manina.Windows.Forms
                     if (item.Focused)
                         state |= ItemState.Focused;
 
+                    if (!item.Enabled)
+                        state |= ItemState.Disabled;
+
                     // Get item bounds
                     Rectangle bounds = ImageListView.layoutManager.GetItemBounds(i);
 
@@ -1010,8 +1013,17 @@ namespace Manina.Windows.Forms
                     }
                 }
 
+                // Paint background Disabled
+                if ((state & ItemState.Disabled) != ItemState.None)
+                {
+                    using (Brush bDisabled = new LinearGradientBrush(bounds, ImageListView.Colors.DisabledColor1, ImageListView.Colors.DisabledColor2, LinearGradientMode.Vertical))
+                    {
+                        Utility.FillRoundedRectangle(g, bDisabled, bounds, (ImageListView.View == View.Details ? 2 : 4));
+                    }
+                }
+
                 // Paint background Selected
-                if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
+                else if ((ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None)) ||
                     (!ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None) && ((state & ItemState.Hovered) != ItemState.None)))
                 {
                     using (Brush bSelected = new LinearGradientBrush(bounds, ImageListView.Colors.SelectedColor1, ImageListView.Colors.SelectedColor2, LinearGradientMode.Vertical))
@@ -1065,7 +1077,11 @@ namespace Manina.Windows.Forms
 
                     // Draw item text
                     Color foreColor = ImageListView.Colors.ForeColor;
-                    if ((state & ItemState.Selected) != ItemState.None)
+                    if ((state & ItemState.Disabled) != ItemState.None)
+                    {
+                        foreColor = ImageListView.Colors.DisabledForeColor;
+                    }
+                    else if ((state & ItemState.Selected) != ItemState.None)
                     {
                         if (ImageListView.Focused)
                             foreColor = ImageListView.Colors.SelectedForeColor;
@@ -1135,7 +1151,11 @@ namespace Manina.Windows.Forms
                         {
                             rt.Width = column.Width - 2 * offset.Width;
                             Color foreColor = ImageListView.Colors.CellForeColor;
-                            if ((state & ItemState.Selected) != ItemState.None)
+                            if ((state & ItemState.Disabled) != ItemState.None)
+                            {
+                                foreColor = ImageListView.Colors.DisabledForeColor;
+                            }
+                            else if ((state & ItemState.Selected) != ItemState.None)
                             {
                                 if (ImageListView.Focused)
                                     foreColor = ImageListView.Colors.SelectedForeColor;
@@ -1197,7 +1217,14 @@ namespace Manina.Windows.Forms
                         Utility.DrawRoundedRectangle(g, pWhite128, bounds.Left + 1, bounds.Top + 1, bounds.Width - 3, bounds.Height - 3, (ImageListView.View == View.Details ? 2 : 4));
                     }
                 }
-                if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
+                if (((state & ItemState.Disabled) != ItemState.None))
+                {
+                    using (Pen pHighlight128 = new Pen(ImageListView.Colors.DisabledBorderColor))
+                    {
+                        Utility.DrawRoundedRectangle(g, pHighlight128, bounds.Left, bounds.Top, bounds.Width - 1, bounds.Height - 1, (ImageListView.View == View.Details ? 2 : 4));
+                    }
+                }
+                else if (ImageListView.Focused && ((state & ItemState.Selected) != ItemState.None))
                 {
                     using (Pen pHighlight128 = new Pen(ImageListView.Colors.SelectedBorderColor))
                     {

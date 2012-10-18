@@ -55,7 +55,7 @@ namespace Manina.Windows.Forms
                 {
                     int count = 0;
                     foreach (ImageListViewItem item in mImageListView.mItems)
-                        if (item.Selected) count++;
+                        if (item.Selected && item.Enabled) count++;
                     return count;
                 }
             }            /// <summary>
@@ -98,7 +98,7 @@ namespace Manina.Windows.Forms
             /// </returns>
             public bool Contains(ImageListViewItem item)
             {
-                return (item.Selected && mImageListView.Items.Contains(item));
+                return (item.Selected && item.Enabled && mImageListView.Items.Contains(item));
             }
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
@@ -292,9 +292,11 @@ namespace Manina.Windows.Forms
                     //    The current item may have differed if the user for example 
                     //    removed the current item between MoveNext calls. - OR -
                     // 3. The current item is not selected.
+                    // 3. The current item is not enabled.
                     while (current == -1 ||
                         owner[current].Guid == lastItem ||
-                        owner[current].Selected == false)
+                        owner[current].Selected == false ||
+                        owner[current].Enabled == false)
                     {
                         current++;
                         if (current > owner.Count - 1)

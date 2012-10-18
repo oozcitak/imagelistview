@@ -270,6 +270,10 @@ namespace Manina.Windows.Forms
         /// Mouse cursor is over the item.
         /// </summary>
         Hovered = 4,
+        /// <summary>
+        /// The item is disabled.
+        /// </summary>
+        Disabled = 8,
     }
     /// <summary>
     /// Determines the visibility of an item.
