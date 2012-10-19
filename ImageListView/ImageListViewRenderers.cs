@@ -904,9 +904,9 @@ namespace Manina.Windows.Forms
                 if (ImageListView.SortOrder != SortOrder.None && ((state & ColumnState.SortColumn) != ColumnState.None))
                 {
                     Image img = null;
-                    if (ImageListView.SortOrder == SortOrder.Ascending)
+                    if (ImageListView.SortOrder == SortOrder.Ascending || ImageListView.SortOrder == SortOrder.AscendingNatural)
                         img = ImageListViewResources.SortAscending;
-                    else if (ImageListView.SortOrder == SortOrder.Descending)
+                    else if (ImageListView.SortOrder == SortOrder.Descending || ImageListView.SortOrder == SortOrder.DescendingNatural)
                         img = ImageListViewResources.SortDescending;
                     g.DrawImageUnscaled(img, bounds.X + 4, bounds.Top + (bounds.Height - img.Height) / 2);
                     textOffset += img.Width;
@@ -1812,9 +1812,9 @@ namespace Manina.Windows.Forms
                 if (ImageListView.SortOrder != SortOrder.None && ((state & ColumnState.SortColumn) != ColumnState.None))
                 {
                     Image img = null;
-                    if (ImageListView.SortOrder == SortOrder.Ascending)
+                    if (ImageListView.SortOrder == SortOrder.Ascending || ImageListView.SortOrder == SortOrder.AscendingNatural)
                         img = ImageListViewResources.SortAscending;
-                    else if (ImageListView.SortOrder == SortOrder.Descending)
+                    else if (ImageListView.SortOrder == SortOrder.Descending || ImageListView.SortOrder == SortOrder.DescendingNatural)
                         img = ImageListViewResources.SortDescending;
                     if (img != null)
                     {
@@ -2408,7 +2408,7 @@ namespace Manina.Windows.Forms
                     rBack = rColumnNormal;
 
                 VisualStyleRenderer rSort;
-                if (order == SortOrder.Ascending)
+                if (order == SortOrder.Ascending || order == SortOrder.AscendingNatural)
                     rSort = rSortAscending;
                 else
                     rSort = rSortDescending;

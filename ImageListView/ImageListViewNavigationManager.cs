@@ -530,7 +530,7 @@ namespace Manina.Windows.Forms
                     {
                         foreach (KeyValuePair<ImageListViewItem, bool> pair in highlightedItems)
                         {
-                            if(pair.Key.Enabled)
+                            if (pair.Key.Enabled)
                                 pair.Key.mSelected = pair.Value;
                         }
                         highlightedItems.Clear();
@@ -660,8 +660,12 @@ namespace Manina.Windows.Forms
                             {
                                 if (mImageListView.SortOrder == SortOrder.Descending)
                                     mImageListView.SortOrder = SortOrder.Ascending;
-                                else
+                                else if (mImageListView.SortOrder == SortOrder.Ascending)
                                     mImageListView.SortOrder = SortOrder.Descending;
+                                else if (mImageListView.SortOrder == SortOrder.DescendingNatural)
+                                    mImageListView.SortOrder = SortOrder.AscendingNatural;
+                                else
+                                    mImageListView.SortOrder = SortOrder.DescendingNatural;
                             }
                             else
                             {
