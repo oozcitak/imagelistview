@@ -37,7 +37,6 @@
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.rendererToolStripLabel = new System.Windows.Forms.ToolStripLabel();
@@ -83,6 +82,7 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.sortAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -193,28 +193,6 @@
             this.imageList1.Images.SetKeyName(1, "folder_closed_16.png");
             this.imageList1.Images.SetKeyName(2, "folder_open_16.png");
             this.imageList1.Images.SetKeyName(3, "cog.png");
-            // 
-            // imageListView1
-            // 
-            this.imageListView1.AllowDrag = true;
-            this.imageListView1.AllowDrop = true;
-            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
-            this.imageListView1.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.imageListView1.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 1, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Dimensions, "", 100, 2, true)});
-            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView1.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.imageListView1.Location = new System.Drawing.Point(0, 0);
-            this.imageListView1.Name = "imageListView1";
-            this.imageListView1.PersistentCacheFile = "";
-            this.imageListView1.PersistentCacheSize = ((long)(100));
-            this.imageListView1.Size = new System.Drawing.Size(397, 389);
-            this.imageListView1.TabIndex = 0;
-            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
-            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
-            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // propertyGrid1
             // 
@@ -575,6 +553,24 @@
             this.sortDescendingToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.sortDescendingToolStripMenuItem.Text = "Descending";
             this.sortDescendingToolStripMenuItem.Click += new System.EventHandler(this.sortDescendingToolStripMenuItem_Click);
+            // 
+            // imageListView1
+            // 
+            this.imageListView1.AllowDrag = true;
+            this.imageListView1.AllowDrop = true;
+            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
+            this.imageListView1.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView1.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.imageListView1.Location = new System.Drawing.Point(0, 0);
+            this.imageListView1.Name = "imageListView1";
+            this.imageListView1.PersistentCacheFile = "";
+            this.imageListView1.PersistentCacheSize = ((long)(100));
+            this.imageListView1.Size = new System.Drawing.Size(397, 389);
+            this.imageListView1.TabIndex = 0;
+            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
+            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
+            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // DemoForm
             // 

@@ -57,14 +57,6 @@ namespace Manina.Windows.Forms
         /// Selection tolerance for left-pane border.
         /// </summary>
         internal const int PaneBorderSize = 4;
-        /// <summary>
-        /// Creates a control with a border.
-        /// </summary>
-        private const int WS_BORDER = 0x00800000;
-        /// <summary>
-        /// Specifies that the control has a border with a sunken edge.
-        /// </summary>
-        private const int WS_EX_CLIENTEDGE = 0x00000200;
         #endregion
 
         #region Member Variables
@@ -851,23 +843,6 @@ namespace Manina.Windows.Forms
         internal ScrollOrientation ScrollOrientation
         {
             get { return (mView == View.Gallery ? ScrollOrientation.HorizontalScroll : ScrollOrientation.VerticalScroll); }
-        }
-        /// <summary>
-        /// Gets the required creation parameters when the control handle is created.
-        /// </summary>
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams p = base.CreateParams;
-                p.Style &= ~WS_BORDER;
-                p.ExStyle &= ~WS_EX_CLIENTEDGE;
-                if (mBorderStyle == BorderStyle.Fixed3D)
-                    p.ExStyle |= WS_EX_CLIENTEDGE;
-                else if (mBorderStyle == BorderStyle.FixedSingle)
-                    p.Style |= WS_BORDER;
-                return p;
-            }
         }
         #endregion
 
