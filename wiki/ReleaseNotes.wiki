@@ -1,10 +1,17 @@
 #summary Release notes for ImageListView
 #labels Phase-Implementation,Featured
 
+= 11.0 (19 October 2012) =
+
+  * Fixed the issue where inserting an item with an initial thumbnail bypassed the custom adaptor (Issue 153).
+  * Added the !PaneResized and !PaneResizing events (Issue 152).
+  * Items can now be disabled. Disabled items cannot be selected (Issue 136).
+  * Added natural sorting for string columns (Issue 154). *This is a breaking change.*
+  * Control border is now drawn with !ControlPaint.DrawBorder3D (Issue 135).
+
 = 10.6 (9 August 2012) =
 
-  * Insertion index is not incremented on drag-drop if the item
-was not successfully inserted (Issue 146).
+  * Insertion index is not incremented on drag-drop if the item was not successfully inserted (Issue 146).
   * Items are no longer sorted based on groups if the !GroupOrder property is not set (Issue 151).
 
 = 10.5 (9 March 2012) =
