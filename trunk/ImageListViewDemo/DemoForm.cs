@@ -105,6 +105,8 @@ namespace Manina.Windows.Forms
 
             imageListView1.AllowDuplicateFileNames = true;
             imageListView1.SetRenderer(new ImageListViewRenderers.DefaultRenderer());
+            imageListView1.SortColumn = 0;
+            imageListView1.SortOrder = SortOrder.AscendingNatural;
 
             TreeNode node = new TreeNode("Loading...", 3, 3);
             node.Tag = null;

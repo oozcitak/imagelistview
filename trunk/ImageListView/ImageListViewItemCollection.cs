@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.Collections;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Manina.Windows.Forms
 {
@@ -821,17 +822,57 @@ namespace Manina.Windows.Forms
                 }
 
                 /// <summary>
+                /// Compares two strings and returns a value indicating whether one is less than, equal to, or greater than the other.
+                /// </summary>
+                private int CompareStrings(string x, string y, bool natural)
+                {
+                    if (!natural)
+                        return string.Compare(x, y, StringComparison.InvariantCultureIgnoreCase);
+
+                    // Following natural sort algorithm is taken from:
+                    // http://www.interact-sw.co.uk/iangblog/2007/12/13/natural-sorting
+                    string[] xparts = Regex.Split(x.Replace(" ", ""), "([0-9]+)");
+                    string[] yparts = Regex.Split(y.Replace(" ", ""), "([0-9]+)");
+                    for (int i = 0; i < Math.Max(xparts.Length, yparts.Length); i++)
+                    {
+                        bool hasx = (i < xparts.Length);
+                        bool hasy = (i < yparts.Length);
+
+                        if (!(hasx || hasy)) return 0;
+
+                        if (!hasx) return -1;
+                        if (!hasy) return 1;
+
+                        string xpart = xparts[i];
+                        string ypart = yparts[i];
+
+                        int xi = 0;
+                        int yi = 0;
+                        int res = 0;
+
+                        if (int.TryParse(xpart, out xi) && int.TryParse(ypart, out yi))
+                            res = (xi < yi ? -1 : (xi > yi ? 1 : 0));
+                        else
+                            res = string.Compare(xpart, ypart, StringComparison.InvariantCultureIgnoreCase);
+
+                        if (res != 0) return res;
+                    }
+                    return 0;
+                }
+
+                /// <summary>
                 /// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
                 /// </summary>
                 public int Compare(ImageListViewItem x, ImageListViewItem y)
                 {
                     int result = 0;
                     int sign = 0;
+                    bool natural = false;
 
                     if (mGroupOrder != SortOrder.None)
                     {
                         result = 0;
-                        sign = (mGroupOrder == SortOrder.Ascending ? 1 : -1);
+                        sign = ((mGroupOrder == SortOrder.Ascending || mGroupOrder == SortOrder.AscendingNatural) ? 1 : -1);
 
                         x.UpdateGroup(mGroupColumn);
                         y.UpdateGroup(mGroupColumn);
@@ -843,7 +884,8 @@ namespace Manina.Windows.Forms
                     if (mSortOrder != SortOrder.None)
                     {
                         result = 0;
-                        sign = (mSortOrder == SortOrder.Ascending ? 1 : -1);
+                        sign = ((mSortOrder == SortOrder.Ascending || mSortOrder == SortOrder.AscendingNatural) ? 1 : -1);
+                        natural = (mSortOrder == SortOrder.AscendingNatural || mSortOrder == SortOrder.DescendingNatural);
                         if (mSortColumn != null)
                         {
                             switch (mSortColumn.Type)
@@ -863,19 +905,19 @@ namespace Manina.Windows.Forms
                                     result = (ax < ay ? -1 : (ax > ay ? 1 : 0));
                                     break;
                                 case ColumnType.FileName:
-                                    result = string.Compare(x.FileName, y.FileName, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.FileName, y.FileName, natural);
                                     break;
                                 case ColumnType.FilePath:
-                                    result = string.Compare(x.FilePath, y.FilePath, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.FilePath, y.FilePath, natural);
                                     break;
                                 case ColumnType.FileSize:
                                     result = (x.FileSize < y.FileSize ? -1 : (x.FileSize > y.FileSize ? 1 : 0));
                                     break;
                                 case ColumnType.FileType:
-                                    result = string.Compare(x.FileType, y.FileType, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.FileType, y.FileType, natural);
                                     break;
                                 case ColumnType.Name:
-                                    result = string.Compare(x.Text, y.Text, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.Text, y.Text, natural);
                                     break;
                                 case ColumnType.Resolution:
                                     float rx = x.Resolution.Width * x.Resolution.Height;
@@ -883,19 +925,19 @@ namespace Manina.Windows.Forms
                                     result = (rx < ry ? -1 : (rx > ry ? 1 : 0));
                                     break;
                                 case ColumnType.ImageDescription:
-                                    result = string.Compare(x.ImageDescription, y.ImageDescription, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.ImageDescription, y.ImageDescription, natural);
                                     break;
                                 case ColumnType.EquipmentModel:
-                                    result = string.Compare(x.EquipmentModel, y.EquipmentModel, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.EquipmentModel, y.EquipmentModel, natural);
                                     break;
                                 case ColumnType.DateTaken:
                                     result = DateTime.Compare(x.DateTaken, y.DateTaken);
                                     break;
                                 case ColumnType.Artist:
-                                    result = string.Compare(x.Artist, y.Artist, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.Artist, y.Artist, natural);
                                     break;
                                 case ColumnType.Copyright:
-                                    result = string.Compare(x.Copyright, y.Copyright, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.Copyright, y.Copyright, natural);
                                     break;
                                 case ColumnType.ExposureTime:
                                     result = (x.ExposureTime < y.ExposureTime ? -1 : (x.ExposureTime > y.ExposureTime ? 1 : 0));
@@ -907,19 +949,19 @@ namespace Manina.Windows.Forms
                                     result = (x.ISOSpeed < y.ISOSpeed ? -1 : (x.ISOSpeed > y.ISOSpeed ? 1 : 0));
                                     break;
                                 case ColumnType.UserComment:
-                                    result = string.Compare(x.UserComment, y.UserComment, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.UserComment, y.UserComment, natural);
                                     break;
                                 case ColumnType.Rating:
                                     result = (x.Rating < y.Rating ? -1 : (x.Rating > y.Rating ? 1 : 0));
                                     break;
                                 case ColumnType.Software:
-                                    result = string.Compare(x.Software, y.Software, StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.Software, y.Software, natural);
                                     break;
                                 case ColumnType.FocalLength:
                                     result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
                                     break;
                                 case ColumnType.Custom:
-                                    result = string.Compare(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), StringComparison.InvariantCultureIgnoreCase);
+                                    result = CompareStrings(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), natural);
                                     break;
                                 default:
                                     result = 0;

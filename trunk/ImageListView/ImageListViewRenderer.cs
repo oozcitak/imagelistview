@@ -1383,9 +1383,9 @@ namespace Manina.Windows.Forms
                 if (ImageListView.SortOrder != SortOrder.None && ((state & ColumnState.SortColumn) != ColumnState.None))
                 {
                     Image img = null;
-                    if (ImageListView.SortOrder == SortOrder.Ascending)
+                    if (ImageListView.SortOrder == SortOrder.Ascending || ImageListView.SortOrder == SortOrder.AscendingNatural)
                         img = ImageListViewResources.SortAscending;
-                    else if (ImageListView.SortOrder == SortOrder.Descending)
+                    else if (ImageListView.SortOrder == SortOrder.Descending || ImageListView.SortOrder == SortOrder.DescendingNatural)
                         img = ImageListViewResources.SortDescending;
                     if (img != null)
                     {

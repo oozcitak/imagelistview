@@ -280,10 +280,10 @@ namespace ImageListViewTests
 		// Group
 		private void GroupByName_Click (object sender, EventArgs e)
 		{
-			if (imageListView.GroupOrder == SortOrder.None)
-				imageListView.GroupOrder = SortOrder.Ascending;
+			if (imageListView.GroupOrder == Manina.Windows.Forms.SortOrder.None)
+				imageListView.GroupOrder = Manina.Windows.Forms.SortOrder.Ascending;
 			else
-				imageListView.GroupOrder = SortOrder.None;
+				imageListView.GroupOrder = Manina.Windows.Forms.SortOrder.None;
 		}
 		#endregion
 
@@ -364,7 +364,7 @@ namespace ImageListViewTests
 			ShowFileIcons.Checked = imageListView.ShowFileIcons;
 			ShowCheckboxes.Checked = imageListView.ShowCheckBoxes;
 			ShowScrollbars.Checked = imageListView.ScrollBars;
-			GroupByName.Checked = (imageListView.GroupOrder != SortOrder.None);
+			GroupByName.Checked = (imageListView.GroupOrder != Manina.Windows.Forms.SortOrder.None);
 			
 			CacheOnDemand.Checked = (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.OnDemand);
             UsePersistentCache.Checked = (!string.IsNullOrEmpty(imageListView.PersistentCacheFile));
