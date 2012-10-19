@@ -108,6 +108,10 @@ namespace Manina.Windows.Forms
             imageListView1.SortColumn = 0;
             imageListView1.SortOrder = SortOrder.AscendingNatural;
 
+            imageListView1.Columns.Add(ColumnType.Name);
+            imageListView1.Columns.Add(ColumnType.Dimensions);
+            imageListView1.Columns.Add(ColumnType.FileSize);
+
             TreeNode node = new TreeNode("Loading...", 3, 3);
             node.Tag = null;
             treeView1.Nodes.Clear();

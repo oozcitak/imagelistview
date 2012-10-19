@@ -436,7 +436,9 @@ namespace Manina.Windows.Forms
         {
             // Calculate drawing area
             mClientArea = mImageListView.ClientRectangle;
-            mItemAreaBounds = mImageListView.ClientRectangle;
+            if (mImageListView.BorderStyle != System.Windows.Forms.BorderStyle.None)
+                mClientArea.Inflate(-1, -1);
+            mItemAreaBounds = mClientArea;
 
             // Allocate space for scrollbars
             if (mImageListView.hScrollBar.Visible)

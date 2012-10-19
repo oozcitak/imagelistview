@@ -328,11 +328,22 @@ namespace Manina.Windows.Forms
 
             #region Internal Methods
             /// <summary>
+            /// Renders the border of the control.
+            /// </summary>
+            /// <param name="g">The graphics to draw on.</param>
+            private void RenderBorder(Graphics g)
+            {
+                // Background
+                g.ResetClip();
+                DrawBorder(g, new Rectangle(0, 0, ImageListView.Width, ImageListView.Height));
+            }
+            /// <summary>
             /// Renders the background of the control.
             /// </summary>
             /// <param name="g">The graphics to draw on.</param>
             private void RenderBackground(Graphics g)
             {
+                // Background
                 g.SetClip(ImageListView.layoutManager.ClientArea);
                 DrawBackground(g, ImageListView.layoutManager.ClientArea);
             }
@@ -719,6 +730,9 @@ namespace Manina.Windows.Forms
                 Graphics g = bufferGraphics.Graphics;
                 g.ResetClip();
 
+                // Draw control border
+                RenderBorder(g);
+
                 // Draw background
                 RenderBackground(g);
 
@@ -917,6 +931,19 @@ namespace Manina.Windows.Forms
                 }
 
                 return itemSize;
+            }
+            /// <summary>
+            /// Draws the border of the control.
+            /// </summary>
+            /// <param name="g">The System.Drawing.Graphics to draw on.</param>
+            /// <param name="bounds">The coordinates of the border.</param>
+            public virtual void DrawBorder(Graphics g, Rectangle bounds)
+            {
+                if (ImageListView.BorderStyle != BorderStyle.None)
+                {
+                    Border3DStyle style = (ImageListView.BorderStyle == BorderStyle.FixedSingle) ? Border3DStyle.Flat : Border3DStyle.SunkenInner;
+                    ControlPaint.DrawBorder3D(g, bounds, style);
+                }
             }
             /// <summary>
             /// Draws the background of the control.
