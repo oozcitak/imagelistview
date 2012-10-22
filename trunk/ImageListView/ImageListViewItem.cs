@@ -285,7 +285,7 @@ namespace Manina.Windows.Forms
                         (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
-                return mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
+                return mImageListView.thumbnailCache.GetImage(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
                     mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
             }
         }
@@ -881,7 +881,7 @@ namespace Manina.Windows.Forms
                     return img;
                 }
 
-                img = mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
+                img = mImageListView.thumbnailCache.GetImage(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
                     mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, false);
 
                 if (state == CacheState.Cached)
@@ -1209,7 +1209,7 @@ namespace Manina.Windows.Forms
             // Current thumbnail
             if (mImageListView != null)
             {
-                item.clonedThumbnail = mImageListView.thumbnailCache.GetImage(Guid, mImageListView.ThumbnailSize,
+                item.clonedThumbnail = mImageListView.thumbnailCache.GetImage(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize,
                     mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
                     mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
             }

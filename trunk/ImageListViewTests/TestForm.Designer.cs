@@ -175,7 +175,7 @@
             this.imageListView.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
-            this.imageListView.PersistentCacheFile = "";
+            this.imageListView.PersistentCacheDirectory = "";
             this.imageListView.PersistentCacheSize = ((long)(100));
             this.imageListView.Size = new System.Drawing.Size(425, 574);
             this.imageListView.TabIndex = 0;

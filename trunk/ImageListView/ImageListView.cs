@@ -272,15 +272,15 @@ namespace Manina.Windows.Forms
         /// Gets or sets the path to the persistent cache file.
         /// </summary>
         [Category("Behavior"), Description("Gets or sets the path to the persistent cache file."), Browsable(false)]
-        public string PersistentCacheFile
+        public string PersistentCacheDirectory
         {
             get
             {
-                return thumbnailCache.diskCache.FileName;
+                return thumbnailCache.diskCache.DirectoryName;
             }
             set
             {
-                thumbnailCache.diskCache.FileName = value;
+                thumbnailCache.diskCache.DirectoryName = value;
             }
         }
         /// <summary>
