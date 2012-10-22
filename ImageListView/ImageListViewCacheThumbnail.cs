@@ -38,7 +38,7 @@ namespace Manina.Windows.Forms
 
         private ImageListView mImageListView;
 
-        internal DiskCache diskCache;
+        internal PersistentCache diskCache;
         private Dictionary<Guid, CacheItem> thumbCache;
         private Dictionary<Guid, bool> processing;
         private Guid processingRendererItem;
@@ -315,7 +315,8 @@ namespace Manina.Windows.Forms
             checkProcessingCallback = new SendOrPostCallback(CanContinueProcessing);
 
             mImageListView = owner;
-            diskCache = new DiskCache(string.Empty, 100 * 1024 * 1024, DiskCache.SyncBehavior.SyncNone, 32);
+            diskCache = new PersistentCache();
+            diskCache.Size = 100 * 1024 * 1024; // 100 MB disk cache
             CacheMode = CacheMode.OnDemand;
             CacheLimitAsItemCount = 0;
             CacheLimitAsMemory = 20 * 1024 * 1024;
@@ -466,12 +467,12 @@ namespace Manina.Windows.Forms
             }
 
             // Raise the ThumbnailCached event
-            if (mImageListView != null)
+            if (result != null && mImageListView != null)
                 mImageListView.OnThumbnailCachedInternal(result.Guid, result.Image, result.Size, request.RequestType == RequestType.Thumbnail);
 
             // Raise the CacheError event
             if (e.Error != null && mImageListView != null)
-                mImageListView.OnCacheErrorInternal(result.Guid, e.Error, CacheThread.Thumbnail);
+                mImageListView.OnCacheErrorInternal(request.Guid, e.Error, CacheThread.Thumbnail);
         }
         /// <summary>
         /// Handles the DoWork event of the queued background worker.
@@ -495,12 +496,12 @@ namespace Manina.Windows.Forms
             }
 
             Image thumb = null;
-            string diskCacheKey = GetKey(request.Guid, request.Size, request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
+            string diskCacheKey = request.Adaptor.GetUniqueIdentifier(request.VirtualItemKey, request.Size, request.UseEmbeddedThumbnails, request.AutoRotate, request.UseWIC);
 
             // Check the disk cache
-            using (MemoryStream stream = new MemoryStream())
+            using (Stream stream = diskCache.Read(diskCacheKey))
             {
-                if (diskCache.Read(diskCacheKey, stream))
+                if (stream.Length > 0)
                 {
                     thumb = new Bitmap(stream);
                 }
@@ -790,7 +791,7 @@ namespace Manina.Windows.Forms
             // Add to disk cache
             using (MemoryStream stream = new MemoryStream())
             {
-                string diskCacheKey = GetKey(guid, thumbSize, useEmbeddedThumbnails, autoRotate, useWIC);
+                string diskCacheKey = adaptor.GetUniqueIdentifier(key, thumbSize, useEmbeddedThumbnails, autoRotate, useWIC);
                 thumb.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
                 diskCache.Write(diskCacheKey, stream);
             }
@@ -877,27 +878,28 @@ namespace Manina.Windows.Forms
         /// null will be returned.
         /// </summary>
         /// <param name="guid">The guid representing this item.</param>
+        /// <param name="adaptor">The adaptor of this item.</param>
+        /// <param name="key">The key of this item.</param>
         /// <param name="thumbSize">Requested thumbnail size.</param>
         /// <param name="useEmbeddedThumbnails">UseEmbeddedThumbnails property of the owner control.</param>
         /// <param name="autoRotate">AutoRotate property of the owner control.</param>
         /// <param name="useWIC">Whether to use WIC.</param>
         /// <param name="clone">true to return a clone of the cached image; otherwise false.</param>
-        public Image GetImage(Guid guid, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC, bool clone)
+        public Image GetImage(Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object key, Size thumbSize, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC, bool clone)
         {
             CacheItem item = null;
             if (thumbCache.TryGetValue(guid, out item) && item != null && item.Image != null && item.Size == thumbSize && item.UseEmbeddedThumbnails == useEmbeddedThumbnails && item.AutoRotate == autoRotate && item.UseWIC == useWIC)
                 return clone ? (Image)item.Image.Clone() : item.Image;
             else
             {
-                // Try the disk cache
-                using (MemoryStream stream = new MemoryStream())
+                string diskCacheKey = adaptor.GetUniqueIdentifier(key, thumbSize, useEmbeddedThumbnails, autoRotate, useWIC);
+
+                // Check the disk cache
+                using (Stream stream = diskCache.Read(diskCacheKey))
                 {
-                    if (diskCache.Read(GetKey(guid, thumbSize, useEmbeddedThumbnails, autoRotate, useWIC), stream))
+                    if (stream.Length > 0)
                     {
-                        using (Image sourceImage = Image.FromStream(stream))
-                        {
-                            return new Bitmap(sourceImage);
-                        }
+                        return new Bitmap(stream);
                     }
                 }
                 return null;
@@ -918,39 +920,6 @@ namespace Manina.Windows.Forms
                 return item.State;
 
             return CacheState.Unknown;
-        }
-        /// <summary>
-        /// Returns a key for an item based on its guid, size and other
-        /// properties.
-        /// </summary>
-        /// <returns>An string key of 32 characters.</returns>
-        private string GetKey(Guid guid, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool autoRotate, bool useWIC)
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    writer.Write(guid.ToByteArray());
-                    writer.Write(size.Width);
-                    writer.Write(size.Height);
-                    writer.Write((int)useEmbeddedThumbnails);
-                    writer.Write(autoRotate);
-                    writer.Write(useWIC);
-                    writer.Flush();
-
-                    stream.Seek(0, SeekOrigin.Begin);
-                    MD5 md5 = MD5.Create();
-                    byte[] result = md5.ComputeHash(stream);
-
-                    // Convert to hex string
-                    StringBuilder sb = new StringBuilder();
-                    foreach (byte b in result)
-                    {
-                        sb.Append(b.ToString("x2"));
-                    }
-                    return sb.ToString();
-                }
-            }
         }
         #endregion
 

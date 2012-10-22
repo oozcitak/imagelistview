@@ -33,7 +33,10 @@ namespace ImageListViewTests
 				
 				return null;
 			}
-
+            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
+            {
+                return (string)key;
+            }
 			public override string GetSourceImage (object key)
 			{
 				string file = key as string;
@@ -299,15 +302,15 @@ namespace ImageListViewTests
         // Persistent cache
         private void UsePersistentCache_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(imageListView.PersistentCacheFile))
+            if (string.IsNullOrEmpty(imageListView.PersistentCacheDirectory))
             {
                 if (OpenCacheFile.ShowDialog() == DialogResult.OK)
                 {
-                    imageListView.PersistentCacheFile = OpenCacheFile.FileName;
+                    imageListView.PersistentCacheDirectory = OpenCacheFile.FileName;
                 }
             }
             else
-                imageListView.PersistentCacheFile = string.Empty;
+                imageListView.PersistentCacheDirectory = string.Empty;
         }
 		// Duplicte filenames
 		private void AllowDuplicateFilenames_Click (object sender, EventArgs e)
@@ -367,7 +370,7 @@ namespace ImageListViewTests
 			GroupByName.Checked = (imageListView.GroupOrder != Manina.Windows.Forms.SortOrder.None);
 			
 			CacheOnDemand.Checked = (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.OnDemand);
-            UsePersistentCache.Checked = (!string.IsNullOrEmpty(imageListView.PersistentCacheFile));
+            UsePersistentCache.Checked = (!string.IsNullOrEmpty(imageListView.PersistentCacheDirectory));
 			AllowDuplicateFilenames.Checked = imageListView.AllowDuplicateFileNames;
 			IntegralScroll.Checked = imageListView.IntegralScroll;
 			MultiSelect.Checked = imageListView.MultiSelect;

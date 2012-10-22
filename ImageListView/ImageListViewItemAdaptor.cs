@@ -24,6 +24,17 @@ namespace Manina.Windows.Forms
             /// <returns>The thumbnail image from the given item or null if an error occurs.</returns>
             public abstract Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC);
             /// <summary>
+            /// Returns a unique identifier for this thumbnail to be used in persistent
+            /// caching.
+            /// </summary>
+            /// <param name="key">Item key.</param>
+            /// <param name="size">Requested image size.</param>
+            /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
+            /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
+            /// <returns>A unique identifier string for the thumnail.</returns>
+            public abstract string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC);
+            /// <summary>
             /// Returns the path to the source image for use in drag operations.
             /// </summary>
             /// <param name="key">Item key.</param>

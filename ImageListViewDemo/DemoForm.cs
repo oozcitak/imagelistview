@@ -107,7 +107,13 @@ namespace Manina.Windows.Forms
             imageListView1.SetRenderer(new ImageListViewRenderers.DefaultRenderer());
             imageListView1.SortColumn = 0;
             imageListView1.SortOrder = SortOrder.AscendingNatural;
-
+            string cacheDir = Path.Combine(
+                Path.GetDirectoryName(new Uri(assembly.GetName().CodeBase).LocalPath),
+                "Cache"
+                );
+            if (!Directory.Exists(cacheDir))
+                Directory.CreateDirectory(cacheDir);
+            imageListView1.PersistentCacheDirectory = cacheDir;
             imageListView1.Columns.Add(ColumnType.Name);
             imageListView1.Columns.Add(ColumnType.Dimensions);
             imageListView1.Columns.Add(ColumnType.FileSize);
