@@ -270,6 +270,7 @@ namespace Manina.Windows.Forms
         private void PurgeCache()
         {
             if (string.IsNullOrEmpty(mDirectoryName)) return;
+            if (mSize == 0) return;
 
             Monitor.Enter(lockObject);
             try
