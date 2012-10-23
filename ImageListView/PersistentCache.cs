@@ -189,6 +189,53 @@ namespace Manina.Windows.Forms
         }
 
         /// <summary>
+        /// Removes an item from the cache.
+        /// </summary>
+        /// <param name="id">Item identifier.</param>
+        public void Remove(string id)
+        {
+            if (string.IsNullOrEmpty(mDirectoryName)) return;
+
+            id = MakeKey(id);
+            Monitor.Enter(lockObject);
+            try
+            {
+                string filename = Path.Combine(mDirectoryName, id);
+                if (!File.Exists(filename)) return;
+                FileInfo fi = new FileInfo(filename);
+                mCurrentSize -= fi.Length;
+                if (mCurrentSize < 0) mCurrentSize = 0;
+                File.Delete(filename);
+            }
+            finally
+            {
+                Monitor.Exit(lockObject);
+            }
+        }
+
+        /// <summary>
+        /// Removes all items from the cache.
+        /// </summary>
+        public void Clear()
+        {
+            if (string.IsNullOrEmpty(mDirectoryName)) return;
+
+            Monitor.Enter(lockObject);
+            try
+            {
+                foreach (string file in Directory.GetFiles(mDirectoryName))
+                {
+                    File.Delete(file);
+                }
+                mCurrentSize = 0;
+            }
+            finally
+            {
+                Monitor.Exit(lockObject);
+            }
+        }
+
+        /// <summary>
         /// Converts the given string to an item key.
         /// </summary>
         /// <param name="key">Input string.</param>
@@ -246,6 +293,7 @@ namespace Manina.Windows.Forms
                     mCurrentSize -= index[i].Length;
                     index.RemoveAt(i);
                 }
+                if (mCurrentSize < 0) mCurrentSize = 0;
             }
             finally
             {
