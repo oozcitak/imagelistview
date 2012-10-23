@@ -603,6 +603,9 @@ namespace Manina.Windows.Forms
             removedItems.Clear();
             processing.Clear();
             processingRendererItem = Guid.Empty;
+
+            // Empty persistent cache
+            diskCache.Clear();
         }
         /// <summary>
         /// Removes the given item from the cache.
