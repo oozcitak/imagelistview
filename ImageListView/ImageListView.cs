@@ -219,6 +219,7 @@ namespace Manina.Windows.Forms
                         {
                             thumbnailCache.CacheLimitAsItemCount = 0;
                             thumbnailCache.CacheLimitAsMemory = 0;
+                            thumbnailCache.diskCache.Size = 0;
                         }
                         // Rebuild the cache
                         ClearThumbnailCache();
@@ -291,11 +292,18 @@ namespace Manina.Windows.Forms
         {
             get
             {
-                return thumbnailCache.diskCache.Size / 1024 / 1024;
+                if (mCacheMode == CacheMode.Continuous)
+                    return 0;
+
+                if (thumbnailCache != null)
+                    return thumbnailCache.diskCache.Size / 1024 / 1024;
+                else
+                    return 0;
             }
             set
             {
-                thumbnailCache.diskCache.Size = value * 1024 * 1024;
+                if (thumbnailCache != null)
+                    thumbnailCache.diskCache.Size = value * 1024 * 1024;
             }
         }
         /// <summary>
