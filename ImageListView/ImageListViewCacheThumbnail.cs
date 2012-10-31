@@ -582,6 +582,7 @@ namespace Manina.Windows.Forms
         {
             foreach (CacheItem item in thumbCache.Values)
                 item.State = CacheState.Unknown;
+            diskCache.Clear();
         }
         /// <summary>
         /// Clears the thumbnail cache.
@@ -623,22 +624,30 @@ namespace Manina.Windows.Forms
         /// item later when the cache is purged.</param>
         public void Remove(Guid guid, bool removeNow)
         {
-            CacheItem item = null;
-            if (!thumbCache.TryGetValue(guid, out item))
+            CacheItem cacheItem = null;
+            if (!thumbCache.TryGetValue(guid, out cacheItem))
                 return;
 
             if (removeNow)
             {
-                MemoryUsed -= GetImageMemorySize(item.Size.Width, item.Size.Height);
-                item.Dispose();
+                MemoryUsed -= GetImageMemorySize(cacheItem.Size.Width, cacheItem.Size.Height);
+                cacheItem.Dispose();
                 thumbCache.Remove(guid);
             }
             else
             {
-                MemoryUsedByRemoved += GetImageMemorySize(item.Size.Width, item.Size.Height);
+                MemoryUsedByRemoved += GetImageMemorySize(cacheItem.Size.Width, cacheItem.Size.Height);
                 removedItems.Add(guid);
 
                 Purge();
+            }
+
+            // Remove from disk cache
+            ImageListViewItem item = null;
+            if (mImageListView != null && mImageListView.Items.TryGetValue(guid, out item))
+            {
+                string diskCacheKey = item.Adaptor.GetUniqueIdentifier(item.VirtualItemKey, cacheItem.Size, cacheItem.UseEmbeddedThumbnails, cacheItem.AutoRotate, cacheItem.UseWIC);
+                diskCache.Remove(diskCacheKey);
             }
         }
         /// <summary>
