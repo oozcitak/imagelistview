@@ -37,6 +37,7 @@
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.rendererToolStripLabel = new System.Windows.Forms.ToolStripLabel();
@@ -82,7 +83,8 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.sortAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
+            this.label1 = new System.Windows.Forms.Label();
+            this.ofBrowseImage = new System.Windows.Forms.OpenFileDialog();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -162,6 +164,7 @@
             // 
             // splitContainer3.Panel1
             // 
+            this.splitContainer3.Panel1.Controls.Add(this.label1);
             this.splitContainer3.Panel1.Controls.Add(this.treeView1);
             // 
             // splitContainer3.Panel2
@@ -173,14 +176,16 @@
             // 
             // treeView1
             // 
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView1.HideSelection = false;
             this.treeView1.ImageIndex = 0;
             this.treeView1.ImageList = this.imageList1;
-            this.treeView1.Location = new System.Drawing.Point(0, 0);
+            this.treeView1.Location = new System.Drawing.Point(0, 48);
             this.treeView1.Name = "treeView1";
             this.treeView1.SelectedImageIndex = 0;
-            this.treeView1.Size = new System.Drawing.Size(200, 389);
+            this.treeView1.Size = new System.Drawing.Size(200, 341);
             this.treeView1.TabIndex = 2;
             this.treeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeExpand);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -193,6 +198,24 @@
             this.imageList1.Images.SetKeyName(1, "folder_closed_16.png");
             this.imageList1.Images.SetKeyName(2, "folder_open_16.png");
             this.imageList1.Images.SetKeyName(3, "cog.png");
+            // 
+            // imageListView1
+            // 
+            this.imageListView1.AllowDrag = true;
+            this.imageListView1.AllowDrop = true;
+            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
+            this.imageListView1.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView1.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.imageListView1.Location = new System.Drawing.Point(0, 0);
+            this.imageListView1.Name = "imageListView1";
+            this.imageListView1.PersistentCacheDirectory = "";
+            this.imageListView1.PersistentCacheSize = ((long)(100));
+            this.imageListView1.Size = new System.Drawing.Size(397, 389);
+            this.imageListView1.TabIndex = 0;
+            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
+            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
+            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // propertyGrid1
             // 
@@ -554,23 +577,25 @@
             this.sortDescendingToolStripMenuItem.Text = "Descending";
             this.sortDescendingToolStripMenuItem.Click += new System.EventHandler(this.sortDescendingToolStripMenuItem_Click);
             // 
-            // imageListView1
+            // label1
             // 
-            this.imageListView1.AllowDrag = true;
-            this.imageListView1.AllowDrop = true;
-            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
-            this.imageListView1.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView1.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.imageListView1.Location = new System.Drawing.Point(0, 0);
-            this.imageListView1.Name = "imageListView1";
-            this.imageListView1.PersistentCacheDirectory = "";
-            this.imageListView1.PersistentCacheSize = ((long)(100));
-            this.imageListView1.Size = new System.Drawing.Size(397, 389);
-            this.imageListView1.TabIndex = 0;
-            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
-            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
-            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.BackColor = System.Drawing.SystemColors.Info;
+            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(200, 48);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Select a folder containing image files from the folder tree below or click here t" +
+                "o browse for images.";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // ofBrowseImage
+            // 
+            this.ofBrowseImage.Filter = "JPEG Files|*.jpg|All Files|*.*";
+            this.ofBrowseImage.Multiselect = true;
+            this.ofBrowseImage.Title = "Select Images";
             // 
             // DemoForm
             // 
@@ -658,6 +683,8 @@
         private System.Windows.Forms.ToolStripMenuItem groupDescendingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sortAscendingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem sortDescendingToolStripMenuItem;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.OpenFileDialog ofBrowseImage;
 
     }
 }

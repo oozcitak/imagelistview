@@ -173,6 +173,17 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Set ImageListView options
+        private void label1_Click(object sender, EventArgs e)
+        {
+            if (ofBrowseImage.ShowDialog() == DialogResult.OK)
+            {
+                foreach (string file in ofBrowseImage.FileNames)
+                {
+                    imageListView1.Items.Add(file);
+                }
+            }
+        }
+
         private void checkboxAlignmentToolStripButton_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
