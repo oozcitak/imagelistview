@@ -93,6 +93,14 @@ namespace Manina.Windows.Forms
                 }
 
                 base.DrawItem(g, item, state, bounds);
+
+                if ((state & ItemState.Selected) != ItemState.None)
+                {
+                    using (Pen p = new Pen(Color.Blue))
+                    {
+                        g.DrawRectangle(p, bounds);
+                    }
+                }
             }
             /// <summary>
             /// Draws an overlay image over the client area.
