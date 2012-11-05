@@ -114,7 +114,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets a value determining if the item is enabled.
         /// </summary>
-        [Category("Appearance"), Browsable(false), Description("Gets a value determining if the item is enabled."), DefaultValue(true)]
+        [Category("Appearance"), Browsable(true), Description("Gets a value determining if the item is enabled."), DefaultValue(true)]
         public bool Enabled
         {
             get
@@ -163,7 +163,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets a value determining if the item is checked.
         /// </summary>
-        [Category("Appearance"), Browsable(false), Description("Gets or sets a value determining if the item is checked."), DefaultValue(false)]
+        [Category("Appearance"), Browsable(true), Description("Gets or sets a value determining if the item is checked."), DefaultValue(false)]
         public bool Checked
         {
             get
@@ -292,7 +292,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the draw order of the item.
         /// </summary>
-        [Category("Appearance"), Browsable(false), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
+        [Category("Appearance"), Browsable(true), Description("Gets or sets the draw order of the item."), DefaultValue(0)]
         public int ZOrder { get { return mZOrder; } set { mZOrder = value; } }
         #endregion
 
@@ -920,16 +920,6 @@ namespace Manina.Windows.Forms
         internal string GetSubItemText(Guid guid)
         {
             return subItems[guid];
-        }
-        /// <summary>
-        /// Sets the sub item item text corresponding to the specified custom column.
-        /// </summary>
-        /// <param name="guid">The Guid of the custom column.</param>
-        /// <param name="text">The text of the subitem.</param>
-        /// <returns>Formatted text for the given column.</returns>
-        internal void SetSubItemText(Guid guid, string text)
-        {
-            subItems[guid] = text;
         }
         /// <summary>
         /// Removes the sub item item text corresponding to the specified custom column.
