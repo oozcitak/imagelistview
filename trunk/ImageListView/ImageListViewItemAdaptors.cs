@@ -202,7 +202,7 @@ namespace Manina.Windows.Forms
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
             /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
-            /// <returns>A unique identifier string for the thumnail.</returns>
+            /// <returns>A unique identifier string for the thumbnail.</returns>
             public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
             {
                 StringBuilder sb = new StringBuilder();
