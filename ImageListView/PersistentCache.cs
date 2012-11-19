@@ -28,27 +28,17 @@ namespace Manina.Windows.Forms
         {
             get
             {
-                Monitor.Enter(lockObject);
-                try
+                lock(lockObject)
                 {
                     return mDirectoryName;
-                }
-                finally
-                {
-                    Monitor.Exit(lockObject);
                 }
             }
             set
             {
-                Monitor.Enter(lockObject);
-                try
+                lock(lockObject)
                 {
                     mDirectoryName = value;
                     CalculateSize();
-                }
-                finally
-                {
-                    Monitor.Exit(lockObject);
                 }
             }
         }
@@ -59,26 +49,16 @@ namespace Manina.Windows.Forms
         {
             get
             {
-                Monitor.Enter(lockObject);
-                try
+                lock(lockObject)
                 {
                     return mSize;
-                }
-                finally
-                {
-                    Monitor.Exit(lockObject);
                 }
             }
             set
             {
-                Monitor.Enter(lockObject);
-                try
+                lock(lockObject)
                 {
                     mSize = value;
-                }
-                finally
-                {
-                    Monitor.Exit(lockObject);
                 }
             }
         }
@@ -101,9 +81,10 @@ namespace Manina.Windows.Forms
                 if (!Directory.Exists(directoryName))
                     Directory.CreateDirectory(directoryName);
 
-                Monitor.Enter(lockObject);
-                CalculateSize();
-                Monitor.Exit(lockObject);
+                lock (lockObject)
+                {
+                    CalculateSize();
+                }
             }
         }
         /// <summary>
@@ -124,13 +105,13 @@ namespace Manina.Windows.Forms
         /// <returns>A stream holding item data.</returns>
         public Stream Read(string id)
         {
-            MemoryStream ms = new MemoryStream();
-            if (string.IsNullOrEmpty(mDirectoryName)) return ms;
-
-            id = MakeKey(id);
-            Monitor.Enter(lockObject);
-            try
+            lock(lockObject)
             {
+                MemoryStream ms = new MemoryStream();
+                if (string.IsNullOrEmpty(mDirectoryName)) return ms;
+
+                id = MakeKey(id);
+
                 string filename = Path.Combine(mDirectoryName, id);
                 if (!File.Exists(filename)) return ms;
 
@@ -143,13 +124,9 @@ namespace Manina.Windows.Forms
                         ms.Write(buffer, 0, read);
                     }
                 }
-            }
-            finally
-            {
-                Monitor.Exit(lockObject);
-            }
 
-            return ms;
+                return ms;
+            }
         }
 
         /// <summary>
@@ -160,12 +137,11 @@ namespace Manina.Windows.Forms
         /// <param name="data">Item data.</param>
         public void Write(string id, Stream data)
         {
-            if (string.IsNullOrEmpty(mDirectoryName)) return;
-
-            id = MakeKey(id);
-            Monitor.Enter(lockObject);
-            try
+            lock(lockObject)
             {
+                if (string.IsNullOrEmpty(mDirectoryName)) return;
+
+                id = MakeKey(id);
                 string filename = Path.Combine(mDirectoryName, id);
                 long bytesWritten = 0;
                 using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
@@ -180,13 +156,9 @@ namespace Manina.Windows.Forms
                     }
                 }
                 mCurrentSize += bytesWritten;
-            }
-            finally
-            {
-                Monitor.Exit(lockObject);
-            }
 
-            if (mCurrentSize > mSize / 2) PurgeCache();
+                if (mCurrentSize > mSize / 2) PurgeCache();
+            }
         }
 
         /// <summary>
@@ -195,22 +167,17 @@ namespace Manina.Windows.Forms
         /// <param name="id">Item identifier.</param>
         public void Remove(string id)
         {
-            if (string.IsNullOrEmpty(mDirectoryName)) return;
-
-            id = MakeKey(id);
-            Monitor.Enter(lockObject);
-            try
+            lock(lockObject)
             {
+                if (string.IsNullOrEmpty(mDirectoryName)) return;
+
+                id = MakeKey(id);
                 string filename = Path.Combine(mDirectoryName, id);
                 if (!File.Exists(filename)) return;
                 FileInfo fi = new FileInfo(filename);
                 mCurrentSize -= fi.Length;
                 if (mCurrentSize < 0) mCurrentSize = 0;
                 File.Delete(filename);
-            }
-            finally
-            {
-                Monitor.Exit(lockObject);
             }
         }
 
@@ -219,20 +186,15 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void Clear()
         {
-            if (string.IsNullOrEmpty(mDirectoryName)) return;
-
-            Monitor.Enter(lockObject);
-            try
+            lock(lockObject)
             {
+                if (string.IsNullOrEmpty(mDirectoryName)) return;
+
                 foreach (string file in Directory.GetFiles(mDirectoryName))
                 {
                     File.Delete(file);
                 }
                 mCurrentSize = 0;
-            }
-            finally
-            {
-                Monitor.Exit(lockObject);
             }
         }
 
@@ -255,13 +217,16 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void CalculateSize()
         {
-            mCurrentSize = 0;
-
-            if (string.IsNullOrEmpty(mDirectoryName)) return;
-
-            foreach (FileInfo file in new DirectoryInfo(mDirectoryName).GetFiles())
+            lock (lockObject)
             {
-                mCurrentSize += file.Length;
+                mCurrentSize = 0;
+
+                if (string.IsNullOrEmpty(mDirectoryName)) return;
+
+                foreach (FileInfo file in new DirectoryInfo(mDirectoryName).GetFiles())
+                {
+                    mCurrentSize += file.Length;
+                }
             }
         }
 
@@ -270,12 +235,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         private void PurgeCache()
         {
-            if (string.IsNullOrEmpty(mDirectoryName)) return;
-            if (mSize == 0) return;
-
-            Monitor.Enter(lockObject);
-            try
+            lock(lockObject)
             {
+                if (string.IsNullOrEmpty(mDirectoryName)) return;
+                if (mSize == 0) return;
+
                 FileInfo[] files = new DirectoryInfo(mDirectoryName).GetFiles();
                 List<FileInfo> index = new List<FileInfo>();
 
@@ -294,12 +258,9 @@ namespace Manina.Windows.Forms
                     int i = index.Count - 1;
                     mCurrentSize -= index[i].Length;
                     index.RemoveAt(i);
+                    File.Delete(index[i].FullName);
                 }
                 if (mCurrentSize < 0) mCurrentSize = 0;
-            }
-            finally
-            {
-                Monitor.Exit(lockObject);
             }
         }
         #endregion
