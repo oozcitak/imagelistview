@@ -180,12 +180,13 @@ namespace Manina.Windows.Forms
                     }
                 }
                 mCurrentSize += bytesWritten;
-                if (mCurrentSize > mSize / 2) PurgeCache();
             }
             finally
             {
                 Monitor.Exit(lockObject);
             }
+
+            if (mCurrentSize > mSize / 2) PurgeCache();
         }
 
         /// <summary>
