@@ -17,3 +17,9 @@
   * Optionally works with [WICSupport .NET 2.0] and [MonoSupport Mono 2.6]
 
 http://imagelistview.googlecode.com/svn/wiki/ImageListView.thumbnails.jpg
+
+= Installation =
+
+If you are using [https://nuget.org/ NuGet] you can install the assembly with:
+
+{{{PM> Install-Package ImageListView}}}
