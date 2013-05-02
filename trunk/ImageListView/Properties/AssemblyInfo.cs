@@ -23,11 +23,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ImageListView")]
-[assembly: AssemblyDescription("A listview control for image files")]
+[assembly: AssemblyDescription("A ListView like control for displaying image files with asynchronously loaded thumbnails.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ImageListView")]
-[assembly: AssemblyCopyright("Copyright ©  2009 Ozgur Ozcitak")]
+[assembly: AssemblyCopyright("Copyright ©  2013 Ozgur Ozcitak")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
