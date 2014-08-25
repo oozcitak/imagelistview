@@ -100,13 +100,27 @@ namespace Manina.Windows.Forms
         /// <param name="value">Exif data as a string.</param>
         private static DateTime ExifDateTime(string value)
         {
+            string[] parts = value.Split(new char[] { ':', ' ' });
             try
             {
-                return DateTime.ParseExact(value,
-                    "yyyy:MM:dd HH:mm:ss",
-                    System.Globalization.CultureInfo.InvariantCulture);
+                if (parts.Length == 6)
+                {
+                    // yyyy:MM:dd HH:mm:ss
+                    // This is the expected format though some cameras
+                    // can use single digits. See Issue 21.
+                    return new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]), int.Parse(parts[5]));
+                }
+                else if (parts.Length == 3)
+                {
+                    // yyyy:MM:dd
+                    return new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+                }
+                else
+                {
+                    return DateTime.MinValue;
+                }
             }
-            catch
+            catch 
             {
                 return DateTime.MinValue;
             }
