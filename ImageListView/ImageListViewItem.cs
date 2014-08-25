@@ -676,7 +676,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="type">The type of information to return.</param>
         /// <returns>Formatted text for the given column type.</returns>
-        internal string GetSubItemText(ColumnType type)
+        public string GetSubItemText(ColumnType type)
         {
             switch (type)
             {
@@ -849,7 +849,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         /// <param name="imageType">Type of cached image to return.</param>
         /// <returns>Requested thumbnail or icon.</returns>
-        internal Image GetCachedImage(CachedImageType imageType)
+        public Image GetCachedImage(CachedImageType imageType)
         {
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");

@@ -53,6 +53,24 @@ namespace Manina.Windows.Forms
         Continuous,
     }
     /// <summary>
+    /// Represents the type of image in the cache manager.
+    /// </summary>
+    public enum CachedImageType
+    {
+        /// <summary>
+        /// Thumbnail image.
+        /// </summary>
+        Thumbnail,
+        /// <summary>
+        /// Small shell icon.
+        /// </summary>
+        SmallIcon,
+        /// <summary>
+        /// Large shell icon.
+        /// </summary>
+        LargeIcon,
+    }
+    /// <summary>
     /// Represents the cache state of a thumbnail image.
     /// </summary>
     public enum CacheState
@@ -393,24 +411,6 @@ namespace Manina.Windows.Forms
     #endregion
 
     #region Internal Enums
-    /// <summary>
-    /// Represents the type of image in the cache manager.
-    /// </summary>
-    internal enum CachedImageType
-    {
-        /// <summary>
-        /// Thumbnail image.
-        /// </summary>
-        Thumbnail,
-        /// <summary>
-        /// Small shell icon.
-        /// </summary>
-        SmallIcon,
-        /// <summary>
-        /// Large shell icon.
-        /// </summary>
-        LargeIcon,
-    }
     /// <summary>
     /// Represents the item highlight state during mouse selection.
     /// </summary>
