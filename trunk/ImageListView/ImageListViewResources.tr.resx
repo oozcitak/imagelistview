@@ -192,4 +192,7 @@
   <data name="Software" xml:space="preserve">
     <value>Yazılım</value>
   </data>
+  <data name="FolderName" xml:space="preserve">
+    <value>Klasör</value>
+  </data>
 </root>

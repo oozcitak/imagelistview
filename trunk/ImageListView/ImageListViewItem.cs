@@ -48,6 +48,7 @@ namespace Manina.Windows.Forms
         private string mFileType;
         private string mFileName;
         private string mFilePath;
+        private string mFolderName;
         private long mFileSize;
         private Size mDimensions;
         private SizeF mResolution;
@@ -389,6 +390,11 @@ namespace Manina.Windows.Forms
         [Category("File Properties"), Browsable(true), Description("Gets the path of the image file represented by this item.")]
         public string FilePath { get { UpdateFileInfo(); return mFilePath; } }
         /// <summary>
+        /// Gets the name of the folder represented by this item.
+        /// </summary>        
+        [Category("File Properties"), Browsable(true), Description(" Gets the name of the folder represented by this item.")]
+        public string FolderName { get { UpdateFileInfo(); return mFolderName; } }
+        /// <summary>
         /// Gets file size in bytes.
         /// </summary>
         [Category("File Properties"), Browsable(true), Description("Gets file size in bytes.")]
@@ -697,6 +703,8 @@ namespace Manina.Windows.Forms
                         return mDateModified.ToString("g");
                 case ColumnType.FilePath:
                     return mFilePath;
+                case ColumnType.FolderName:
+                    return mFolderName;
                 case ColumnType.FileSize:
                     if (mFileSize == 0)
                         return "";
@@ -992,6 +1000,9 @@ namespace Manina.Windows.Forms
                     case ColumnType.FilePath:
                         mFilePath = (string)item.Item3;
                         break;
+                    case ColumnType.FolderName:
+                        mFolderName = (string)item.Item3;
+                        break;
                     case ColumnType.Dimensions:
                         mDimensions = (Size)item.Item3;
                         break;
@@ -1096,6 +1107,9 @@ namespace Manina.Windows.Forms
                     break;
                 case ColumnType.FilePath:
                     groupInfo = Utility.GroupTextAlpha(FilePath);
+                    break;
+                case ColumnType.FolderName:
+                    groupInfo = Utility.GroupTextAlpha(FolderName);
                     break;
                 case ColumnType.FileSize:
                     groupInfo = Utility.GroupTextFileSize(FileSize);
