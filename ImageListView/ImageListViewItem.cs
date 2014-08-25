@@ -510,11 +510,23 @@ namespace Manina.Windows.Forms
         public ImageListViewItem(string filename, string text)
             : this()
         {
-            mFileName = filename;
-            extension = Path.GetExtension(filename);
-            if (string.IsNullOrEmpty(text))
-                text = Path.GetFileName(filename);
-            mText = text;
+            if (File.Exists(filename))
+            {
+                mFileName = filename;
+                extension = Path.GetExtension(filename);
+                if (string.IsNullOrEmpty(text))
+                    mText = Path.GetFileName(filename);
+            }
+            else if (string.IsNullOrEmpty(text))
+            {
+                mFileName = filename;
+                mText = filename;
+            }
+            else
+            {
+                mFileName = filename;
+                mText = text;
+            }
             mVirtualItemKey = mFileName;
         }
         /// <summary>
