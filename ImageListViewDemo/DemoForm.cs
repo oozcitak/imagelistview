@@ -117,6 +117,7 @@ namespace Manina.Windows.Forms
             imageListView1.Columns.Add(ColumnType.Name);
             imageListView1.Columns.Add(ColumnType.Dimensions);
             imageListView1.Columns.Add(ColumnType.FileSize);
+            imageListView1.Columns.Add(ColumnType.FolderName);
 
             TreeNode node = new TreeNode("Loading...", 3, 3);
             node.Tag = null;

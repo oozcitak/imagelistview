@@ -192,4 +192,7 @@
   <data name="Software" xml:space="preserve">
     <value>Software</value>
   </data>
+  <data name="FolderName" xml:space="preserve">
+    <value>Ordner</value>
+  </data>
 </root>

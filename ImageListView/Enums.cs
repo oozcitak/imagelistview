@@ -150,6 +150,10 @@ namespace Manina.Windows.Forms
         /// </summary>
         FilePath,
         /// <summary>
+        /// The name of the folder containing the file.
+        /// </summary>
+        FolderName,
+        /// <summary>
         /// The size of the file.
         /// </summary>
         FileSize,
