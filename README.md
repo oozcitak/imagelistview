@@ -11,7 +11,7 @@ ImageListView requires .NET framework 3.5 to take advantage of the Windows Imagi
   * Works with .NET 3.5
   * Optionally works with [.NET 2.0](WICSupport.md) and [Mono 2.6](MonoSupport.md)
 
-![http://imagelistview.googlecode.com/svn/wiki/ImageListView.demo.jpg](http://imagelistview.googlecode.com/svn/wiki/ImageListView.demo.jpg)
+![ImageListView](https://github.com/oozcitak/imagelistview/blob/wiki/ImageListView.demo.jpg)
 
 ### Installation ###
 
