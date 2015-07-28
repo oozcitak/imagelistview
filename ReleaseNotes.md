@@ -1,34 +1,34 @@
 # 11.0 (19 October 2012) #
 
-  * Fixed the issue where inserting an item with an initial thumbnail bypassed the custom adaptor ([Issue 153](https://code.google.com/p/imagelistview/issues/detail?id=153)).
-  * Added the PaneResized and PaneResizing events ([Issue 152](https://code.google.com/p/imagelistview/issues/detail?id=152)).
-  * Items can now be disabled. Disabled items cannot be selected ([Issue 136](https://code.google.com/p/imagelistview/issues/detail?id=136)).
-  * Added natural sorting for string columns ([Issue 154](https://code.google.com/p/imagelistview/issues/detail?id=154)). **This is a breaking change.**
-  * Control border is now drawn with ControlPaint.DrawBorder3D ([Issue 135](https://code.google.com/p/imagelistview/issues/detail?id=135)).
+  * Fixed the issue where inserting an item with an initial thumbnail bypassed the custom adaptor ([Issue 153](https://github.com/oozcitak/imagelistview/issues/153)).
+  * Added the PaneResized and PaneResizing events ([Issue 152](https://github.com/oozcitak/imagelistview/issues/152)).
+  * Items can now be disabled. Disabled items cannot be selected ([Issue 136](https://github.com/oozcitak/imagelistview/issues/136)).
+  * Added natural sorting for string columns ([Issue 154](https://github.com/oozcitak/imagelistview/issues/154)). **This is a breaking change.**
+  * Control border is now drawn with ControlPaint.DrawBorder3D ([Issue 135](https://github.com/oozcitak/imagelistview/issues/135)).
 
 # 10.6 (9 August 2012) #
 
-  * Insertion index is not incremented on drag-drop if the item was not successfully inserted ([Issue 146](https://code.google.com/p/imagelistview/issues/detail?id=146)).
-  * Items are no longer sorted based on groups if the GroupOrder property is not set ([Issue 151](https://code.google.com/p/imagelistview/issues/detail?id=151)).
+  * Insertion index is not incremented on drag-drop if the item was not successfully inserted ([Issue 146](https://github.com/oozcitak/imagelistview/issues/146)).
+  * Items are no longer sorted based on groups if the GroupOrder property is not set ([Issue 151](https://github.com/oozcitak/imagelistview/issues/151)).
 
 # 10.5 (9 March 2012) #
 
-  * The source image DPI is accounted for while creating thumbnails ([Issue 144](https://code.google.com/p/imagelistview/issues/detail?id=144)).
+  * The source image DPI is accounted for while creating thumbnails ([Issue 144](https://github.com/oozcitak/imagelistview/issues/144)).
 
 # 10.4 (26 Sept 2011) #
 
-  * Dropping multiple files when MultiSelect is set to false now selects a single file ([Issue 138](https://code.google.com/p/imagelistview/issues/detail?id=138)).
-  * Insertion caret is not drawn if dragged items are not files ([Issue 139](https://code.google.com/p/imagelistview/issues/detail?id=139)).
-  * Changing item filename now updates the thumbnail ([Issue 141](https://code.google.com/p/imagelistview/issues/detail?id=141)).
-  * Fixed a bug for the thumbnail creation of some rare bmp formats ([Issue 140](https://code.google.com/p/imagelistview/issues/detail?id=140)).
+  * Dropping multiple files when MultiSelect is set to false now selects a single file ([Issue 138](https://github.com/oozcitak/imagelistview/issues/138)).
+  * Insertion caret is not drawn if dragged items are not files ([Issue 139](https://github.com/oozcitak/imagelistview/issues/139)).
+  * Changing item filename now updates the thumbnail ([Issue 141](https://github.com/oozcitak/imagelistview/issues/141)).
+  * Fixed a bug for the thumbnail creation of some rare bmp formats ([Issue 140](https://github.com/oozcitak/imagelistview/issues/140)).
 
 # 10.3 (20 May 2011) #
 
-  * The control is shown dimmed in disabled state and background processing is paused while the control is disabled ([Issue 133](https://code.google.com/p/imagelistview/issues/detail?id=133)).
+  * The control is shown dimmed in disabled state and background processing is paused while the control is disabled ([Issue 133](https://github.com/oozcitak/imagelistview/issues/133)).
 
 # 10.2 (16 May 2011) #
 
-  * Added the FindString method to the control ([Issue 132](https://code.google.com/p/imagelistview/issues/detail?id=132)).
+  * Added the FindString method to the control ([Issue 132](https://github.com/oozcitak/imagelistview/issues/132)).
   * Added sandcastle documentation.
 
 # 10.1 (27 April 2011) #
@@ -39,26 +39,26 @@
 
 This release introduces the item grouping option and also fixes some minor bugs. Group and sort work together. For example when you group by name and sort by date at the same time; the items will be grouped alphabetically and each group will be sorted by picture date.
 
-  * Added the GroupColumn and GroupOrder properties to the control ([Issue 69](https://code.google.com/p/imagelistview/issues/detail?id=69)).
+  * Added the GroupColumn and GroupOrder properties to the control ([Issue 69](https://github.com/oozcitak/imagelistview/issues/69)).
   * Column headers are no longer sorted on a right click.
-  * Fixed possible sources for null reference exceptions. Those may be related to [Issue 122](https://code.google.com/p/imagelistview/issues/detail?id=122) and [Issue 123](https://code.google.com/p/imagelistview/issues/detail?id=123).
-  * Added the ItemCollectionChanged event ([Issue 125](https://code.google.com/p/imagelistview/issues/detail?id=125)).
+  * Fixed possible sources for null reference exceptions. Those may be related to [Issue 122](https://github.com/oozcitak/imagelistview/issues/122) and [Issue 123](https://github.com/oozcitak/imagelistview/issues/123).
+  * Added the ItemCollectionChanged event ([Issue 125](https://github.com/oozcitak/imagelistview/issues/125)).
   * The control is now refreshed when the ScrollBars property is changed.
 
-Note: There is a known issue with groups. When groups are shown, each item insertion/removal will sort the items from scratch. This would be evident when inserting many items in a row. This will probably be fixed in a future release; but the current workaround is to disable grouping while inserting many items. See [Issue 129](https://code.google.com/p/imagelistview/issues/detail?id=129).
+Note: There is a known issue with groups. When groups are shown, each item insertion/removal will sort the items from scratch. This would be evident when inserting many items in a row. This will probably be fixed in a future release; but the current workaround is to disable grouping while inserting many items. See [Issue 129](https://github.com/oozcitak/imagelistview/issues/129).
 
 # 9.6 (08 December 2010) #
 
-  * Fixed a bug in the .NET 2.0 source ([Issue 116](https://code.google.com/p/imagelistview/issues/detail?id=116)).
+  * Fixed a bug in the .NET 2.0 source ([Issue 116](https://github.com/oozcitak/imagelistview/issues/116)).
   * The framework requirement is now .NET 3.5. An option to target 2.0 is still available. (If you are holding back on .NET 2.0 just for the size of the .NET 3.5 framework check the "Client-only Framework subset" in the project properties.)
-  * Added the AllowCheckBoxClick property to the control ([Issue 114](https://code.google.com/p/imagelistview/issues/detail?id=114)).
+  * Added the AllowCheckBoxClick property to the control ([Issue 114](https://github.com/oozcitak/imagelistview/issues/114)).
 
 # 9.5 (12 November 2010) #
 
 This release fixes a few minor bugs.
 
   * Fixed a bug in URIAdaptor where it prevented its use with multiple threads.
-  * FileSystemAdaptor now checkes if the file exists. ([Issue 113](https://code.google.com/p/imagelistview/issues/detail?id=113))
+  * FileSystemAdaptor now checkes if the file exists. ([Issue 113](https://github.com/oozcitak/imagelistview/issues/113))
   * Fixed a bug in Items Add method where the user supplied adaptor was overwritten.
 
 # 9.4 (05 November 2010) #
@@ -68,12 +68,12 @@ This release introduces a new approach to virtual items. Instead of handling the
   * Added the ImageListViewItemAdaptor class and built-in FileSystemAdaptor and URIAdaptor adaptors. Virtual item events are removed. **This is a breaking change.**
   * Removed the Error property from ThumbnailCachedEventArgs, since we already have the CacheError event. **This is a breaking change.**
   * ImageListViewItem.ThumbnailImage returns a clone of the cached thumbnail.
-  * ImageListViewItem.Clone() now clones the current thumbnail ([Issue 109](https://code.google.com/p/imagelistview/issues/detail?id=109)).
-  * Metadata fall-back to .net 2.0 now works (hopefully :)) ([Issue 107](https://code.google.com/p/imagelistview/issues/detail?id=107)).
+  * ImageListViewItem.Clone() now clones the current thumbnail ([Issue 109](https://github.com/oozcitak/imagelistview/issues/109)).
+  * Metadata fall-back to .net 2.0 now works (hopefully :)) ([Issue 107](https://github.com/oozcitak/imagelistview/issues/107)).
   * Added one-shot async work option to QueuedBackgroundWorker. This can be used to quickly run a background operation bypassing the queued items. ImageListView uses this to load large images in gallery view mode.
   * Added the IsThumbnail property to the ThumbnailCached event.
-  * Fixed a bug where the control sometimes failed to refresh itself after loading large images in gallery view mode ([Issue 108](https://code.google.com/p/imagelistview/issues/detail?id=108)).
-  * Fixed a bug where control resources could not be loaded if it was subclassed ([Issue 111](https://code.google.com/p/imagelistview/issues/detail?id=111)).
+  * Fixed a bug where the control sometimes failed to refresh itself after loading large images in gallery view mode ([Issue 108](https://github.com/oozcitak/imagelistview/issues/108)).
+  * Fixed a bug where control resources could not be loaded if it was subclassed ([Issue 111](https://github.com/oozcitak/imagelistview/issues/111)).
 
 # 9.3 (13 October 2010) #
 
@@ -104,7 +104,7 @@ This release includes many performance tweaks. The new ThemeRenderer is also int
 
   * Accessing the rating property of an item by the renderer no longer issues a full item update.
   * Zooming renderer zooms items in Gallery and Pane modes too.
-  * Added the ThemeRenderer. ([Issue 44](https://code.google.com/p/imagelistview/issues/detail?id=44))
+  * Added the ThemeRenderer. ([Issue 44](https://github.com/oozcitak/imagelistview/issues/44))
   * Added the UseWIC property to the control.
   * .Net 2.0 thumbnail fallback now automatically rotates thumbnails depending on orientation metadata.
   * Added toolbox bitmap to QueuedBackgroundWorker.
@@ -126,7 +126,7 @@ This release introduces the QueuedBackgroundWorker. This component is used inter
 
 This release aims better integration with the control designer. Some of the changes are  invisible to the user (ie. new InstanceDescriptors and default property values emit cleaner code in InitializeComponent), some are visible on the designer surface (ie. items can now be added to the control from the designer. Both thumbnail and item details will be fetched and shown on the designer), some changes fix long standing glitches (ie. editing child item collections from the designer could not be undone). There is also a minor bug fix and new properties for items.
 
-  * Reintroduced Software and FocalLength properties to items ([Issue 102](https://code.google.com/p/imagelistview/issues/detail?id=102)).
+  * Reintroduced Software and FocalLength properties to items ([Issue 102](https://github.com/oozcitak/imagelistview/issues/102)).
   * IntegralScroll property now defaults to false.
   * Added default values for DefaultImage, ErrorImage, RatingImage, EmptyRatingImage, Colors and HeaderFont properties for better designer integration.
   * Added type converters to ImageListViewColors, ImageListItem and ImageListViewColumnHeader for designer serialization.
@@ -142,34 +142,34 @@ This release aims better integration with the control designer. Some of the chan
 
   * Thumbnail images are now automatically mirrored depending on Exif orientation tag.
   * Thumbnail extraction should now work faster since the control longer extracts all metadata to get the Exif rotation tag.
-  * Fixed a bug where the thumbnail image was disposed by the cache manager while the image was being drawn by the control. ([Issue 101](https://code.google.com/p/imagelistview/issues/detail?id=101))
+  * Fixed a bug where the thumbnail image was disposed by the cache manager while the image was being drawn by the control. ([Issue 101](https://github.com/oozcitak/imagelistview/issues/101))
 
 # 8.1 (28 September 2010) #
 
   * Added the conditional compilation symbol USEWIC to enable/disable Windows Imaging Component support. See the [WICSupport](WICSupport.md) wiki page for more information.
-  * Thumbnail size is now adjusted for the Exif orientation tag. ([Issue 100](https://code.google.com/p/imagelistview/issues/detail?id=100))
+  * Thumbnail size is now adjusted for the Exif orientation tag. ([Issue 100](https://github.com/oozcitak/imagelistview/issues/100))
   * Column headers are no longer displayed in hovered state if both AllowColumnClick and AllowColumnResize properties of the control are set to false.
   * ExposureTime property of ImageListViewItem is now a real value. **This is a breaking change.**
   * Removed ShutterSpeed and ApertureValue columns. They were duplicates of ExposureTime and FNumber. **This is a breaking change.**
   * Added .Net 2.0 fall-back to ThumbnailExtractor.
-  * .Net 2.0 fall-back of MetadataExtractor should now work. ([Issue 99](https://code.google.com/p/imagelistview/issues/detail?id=99))
+  * .Net 2.0 fall-back of MetadataExtractor should now work. ([Issue 99](https://github.com/oozcitak/imagelistview/issues/99))
 
 # 8.0 for .Net 3.0 (25 September 2010) #
 
   * Added the AutoRotateThumbnails property to the control. Image rotation is determined by the Exif orientation metadata.
   * Details cache manager now obeys the RetryOnError property of the control.
   * File icons are no longer drawn over column headers in Details view.
-  * Fixed an issue where item details were not being updated if the shell icon extraction failed for an item. ([Issue 97](https://code.google.com/p/imagelistview/issues/detail?id=97))
-  * Thumbnails and metadata are now extracted using WIC (Windows Imaging Component). ([Issue 85](https://code.google.com/p/imagelistview/issues/detail?id=85)) Contributed by Jens.
+  * Fixed an issue where item details were not being updated if the shell icon extraction failed for an item. ([Issue 97](https://github.com/oozcitak/imagelistview/issues/97))
+  * Thumbnails and metadata are now extracted using WIC (Windows Imaging Component). ([Issue 85](https://github.com/oozcitak/imagelistview/issues/85)) Contributed by Jens.
   * With this release target framework is increased to .Net 3.0 to take advantage of WIC. Previous v7 branch will be continued to be supported for bug fixes.
 
 # 7.7 for .Net 2.0 (22 September 2010) #
 
-  * Mouse wheel scrolls by scrollbar settings. ([Issue 95](https://code.google.com/p/imagelistview/issues/detail?id=95))
-  * Fixed a bug where item details could be updated by the UI thread while the cache thread was still working on them. ([Issue 94](https://code.google.com/p/imagelistview/issues/detail?id=94))
+  * Mouse wheel scrolls by scrollbar settings. ([Issue 95](https://github.com/oozcitak/imagelistview/issues/95))
+  * Fixed a bug where item details could be updated by the UI thread while the cache thread was still working on them. ([Issue 94](https://github.com/oozcitak/imagelistview/issues/94))
   * Fixed NoirRenderer's reflections to match the background color.
-  * Fixed an issue where item details could not be read by the renderers. ([Issue 97](https://code.google.com/p/imagelistview/issues/detail?id=97))
-  * ThumbnailImage, SmallIcon and LargeIcon properties of ImageListViewItem now return a clone of cached images from the cache manager. ([Issue 96](https://code.google.com/p/imagelistview/issues/detail?id=96))
+  * Fixed an issue where item details could not be read by the renderers. ([Issue 97](https://github.com/oozcitak/imagelistview/issues/97))
+  * ThumbnailImage, SmallIcon and LargeIcon properties of ImageListViewItem now return a clone of cached images from the cache manager. ([Issue 96](https://github.com/oozcitak/imagelistview/issues/96))
 
 # 7.6 (14 September 2010) #
 
@@ -181,24 +181,24 @@ This release aims better integration with the control designer. Some of the chan
 
 # 7.5 (12 September 2010) #
 
-  * Fixed a bug where removing an item from the control while its thumbnail was being cached threw an exception. ([Issue 92](https://code.google.com/p/imagelistview/issues/detail?id=92))
-  * Fixed a bug where adding items while the parent form was minimized did not refresh the control. ([Issue 93](https://code.google.com/p/imagelistview/issues/detail?id=93))
+  * Fixed a bug where removing an item from the control while its thumbnail was being cached threw an exception. ([Issue 92](https://github.com/oozcitak/imagelistview/issues/92))
+  * Fixed a bug where adding items while the parent form was minimized did not refresh the control. ([Issue 93](https://github.com/oozcitak/imagelistview/issues/93))
 
 # 7.4 (07 September 2010) #
 
-  * Added the CacheError event to the control. ([Issue 91](https://code.google.com/p/imagelistview/issues/detail?id=91))
-  * BeginEdit and EndEdit methods work as intended. ([Issue 90](https://code.google.com/p/imagelistview/issues/detail?id=90))
+  * Added the CacheError event to the control. ([Issue 91](https://github.com/oozcitak/imagelistview/issues/91))
+  * BeginEdit and EndEdit methods work as intended. ([Issue 90](https://github.com/oozcitak/imagelistview/issues/90))
   * Setting the FileName property of an item updates the item thumbnail.
 
 # 7.3 (30 August 2010) #
 
-  * Fixed a bug where the ItemCacheManager would continue working on old items even after they were removed from the control. (Follow up to [Issue 88](https://code.google.com/p/imagelistview/issues/detail?id=88))
-  * Fixed a bug where the control wasn't redrawn after ItemCacheManager cached new items. (Follow up to [Issue 88](https://code.google.com/p/imagelistview/issues/detail?id=88))
+  * Fixed a bug where the ItemCacheManager would continue working on old items even after they were removed from the control. (Follow up to [Issue 88](https://github.com/oozcitak/imagelistview/issues/88))
+  * Fixed a bug where the control wasn't redrawn after ItemCacheManager cached new items. (Follow up to [Issue 88](https://github.com/oozcitak/imagelistview/issues/88))
 
 # 7.2 (27 August 2010) #
 
-  * Fixed a bug where SmallChange property of scrollbars was calculated incorrectly if the control was sized smaller than the item height. ([Issue 87](https://code.google.com/p/imagelistview/issues/detail?id=87))
-  * Reordering items by dragging now displays the move cursor instead of the copy cursor. ([Issue 86](https://code.google.com/p/imagelistview/issues/detail?id=86))
+  * Fixed a bug where SmallChange property of scrollbars was calculated incorrectly if the control was sized smaller than the item height. ([Issue 87](https://github.com/oozcitak/imagelistview/issues/87))
+  * Reordering items by dragging now displays the move cursor instead of the copy cursor. ([Issue 86](https://github.com/oozcitak/imagelistview/issues/86))
 
 # 7.1 (26 August 2010) #
 
@@ -213,7 +213,7 @@ This release aims better integration with the control designer. Some of the chan
 
 # 7.0 (26 August 2010) #
 
-  * Added support for custom columns. ([Issue 52](https://code.google.com/p/imagelistview/issues/detail?id=52), [Issue 53](https://code.google.com/p/imagelistview/issues/detail?id=53), [Issue 55](https://code.google.com/p/imagelistview/issues/detail?id=55), [Issue 56](https://code.google.com/p/imagelistview/issues/detail?id=56))
+  * Added support for custom columns. ([Issue 52](https://github.com/oozcitak/imagelistview/issues/52), [Issue 53](https://github.com/oozcitak/imagelistview/issues/53), [Issue 55](https://github.com/oozcitak/imagelistview/issues/55), [Issue 56](https://github.com/oozcitak/imagelistview/issues/56))
   * The SortColumn property of the control is now an int value corresponding to column index. This change was necessary to support sorting of custom columns. **This is a breaking change.**
   * Added language resources for German. Thanks to Uwe.
   * Added a TypeConverter to ImageListViewColor to make it possible to modify the color palette from the object browser.
@@ -222,7 +222,7 @@ This release aims better integration with the control designer. Some of the chan
   * Improved the control designer. The designer now displays a preview of items on the control.
   * Added item borders to the default renderer for Gallery and Pane view modes so that item display is consistent with the Thumbnail view mode.
   * Fixed a bug where setting checkboxes and file icons the same alignment resulted in the checkboxes to move away from the icon location even when the ShowFileIcons property was set to false.
-  * Fixed a bug in the scrollbar value calculation when the control had no items to display. ([Issue 84](https://code.google.com/p/imagelistview/issues/detail?id=84))
+  * Fixed a bug in the scrollbar value calculation when the control had no items to display. ([Issue 84](https://github.com/oozcitak/imagelistview/issues/84))
 
 # 7.0 RC 3 (25 August 2010) #
 
@@ -240,117 +240,117 @@ This release aims better integration with the control designer. Some of the chan
 
 # 7.0 RC 1 (23 August 2010) #
 
-  * Added support for custom columns. ([Issue 52](https://code.google.com/p/imagelistview/issues/detail?id=52), [Issue 53](https://code.google.com/p/imagelistview/issues/detail?id=53), [Issue 55](https://code.google.com/p/imagelistview/issues/detail?id=55), [Issue 56](https://code.google.com/p/imagelistview/issues/detail?id=56))
+  * Added support for custom columns. ([Issue 52](https://github.com/oozcitak/imagelistview/issues/52), [Issue 53](https://github.com/oozcitak/imagelistview/issues/53), [Issue 55](https://github.com/oozcitak/imagelistview/issues/55), [Issue 56](https://github.com/oozcitak/imagelistview/issues/56))
 
 # 6.11 (20 August 2010) #
 
-  * Fixed a bug where the layout update code was called after the control was disposed. ([Issue 82](https://code.google.com/p/imagelistview/issues/detail?id=82))
-  * ImageListViewItems's are now clone-able. Useful when copying items between different instances of the control. ([Issue 83](https://code.google.com/p/imagelistview/issues/detail?id=83))
+  * Fixed a bug where the layout update code was called after the control was disposed. ([Issue 82](https://github.com/oozcitak/imagelistview/issues/82))
+  * ImageListViewItems's are now clone-able. Useful when copying items between different instances of the control. ([Issue 83](https://github.com/oozcitak/imagelistview/issues/83))
 
 # 6.10 (03 August 2010) #
 
-  * Fixed a bug where the old thumbnail size was used if the thumbnail size was changed while the cache manager was working. ([Issue 80](https://code.google.com/p/imagelistview/issues/detail?id=80))
-  * Fixed a bug where items added while the control was invisible did not result in a layout update. ([Issue 81](https://code.google.com/p/imagelistview/issues/detail?id=81))
-  * Fixed [Issue 77](https://code.google.com/p/imagelistview/issues/detail?id=77).
+  * Fixed a bug where the old thumbnail size was used if the thumbnail size was changed while the cache manager was working. ([Issue 80](https://github.com/oozcitak/imagelistview/issues/80))
+  * Fixed a bug where items added while the control was invisible did not result in a layout update. ([Issue 81](https://github.com/oozcitak/imagelistview/issues/81))
+  * Fixed [Issue 77](https://github.com/oozcitak/imagelistview/issues/77).
 
 # 6.9 (08 Juny 2010) #
 
-  * Fixed a bug where large thumbnail images of **virtual items** in gallery and pane view modes were not being loaded. ([Issue 79](https://code.google.com/p/imagelistview/issues/detail?id=79))
+  * Fixed a bug where large thumbnail images of **virtual items** in gallery and pane view modes were not being loaded. ([Issue 79](https://github.com/oozcitak/imagelistview/issues/79))
 
 # 6.8 (07 June 2010) #
 
-  * Fixed a bug where multiple items could be selected with the shift/ctrl+mouse even when the MultiSelect property was set to false. ([Issue 72](https://code.google.com/p/imagelistview/issues/detail?id=72))
-  * Fixed a bug where the control was not refreshed after reading shell icons for non-image files. ([Issue 73](https://code.google.com/p/imagelistview/issues/detail?id=73))
-  * Added the ShellIconFallback property to disable the display of shell icons in place of thumbnails. ([Issue 74](https://code.google.com/p/imagelistview/issues/detail?id=74))
-  * Added the rating column ([Issue 54](https://code.google.com/p/imagelistview/issues/detail?id=54)).
+  * Fixed a bug where multiple items could be selected with the shift/ctrl+mouse even when the MultiSelect property was set to false. ([Issue 72](https://github.com/oozcitak/imagelistview/issues/72))
+  * Fixed a bug where the control was not refreshed after reading shell icons for non-image files. ([Issue 73](https://github.com/oozcitak/imagelistview/issues/73))
+  * Added the ShellIconFallback property to disable the display of shell icons in place of thumbnails. ([Issue 74](https://github.com/oozcitak/imagelistview/issues/74))
+  * Added the rating column ([Issue 54](https://github.com/oozcitak/imagelistview/issues/54)).
 
 # 6.7 (17 May 2010) #
 
-  * Fixed a bug where scrollbars were not created with the control. ([Issue 71](https://code.google.com/p/imagelistview/issues/detail?id=71))
+  * Fixed a bug where scrollbars were not created with the control. ([Issue 71](https://github.com/oozcitak/imagelistview/issues/71))
   * Added the IntegralScroll property to the control. When set to true, the scrollbars' large change property will be calculated as a multiple of item height. This however, has a slightly unpleasant side effect of the item area of the control sized somewhat larger than the minimum required. Setting IntegralScroll to false prevents this.
 
 # 6.6 (12 May 2010) #
 
-  * Fixed a bug where changing the Selected property of items did not refresh the control. ([Issue 68](https://code.google.com/p/imagelistview/issues/detail?id=68))
-  * Fixed a bug where switching between designer and run-time resized the control to its initial size. ([Issue 70](https://code.google.com/p/imagelistview/issues/detail?id=70))
+  * Fixed a bug where changing the Selected property of items did not refresh the control. ([Issue 68](https://github.com/oozcitak/imagelistview/issues/68))
+  * Fixed a bug where switching between designer and run-time resized the control to its initial size. ([Issue 70](https://github.com/oozcitak/imagelistview/issues/70))
 
 # 6.5 (21 April 2010) #
 
-  * Fixed a bug where file types were not being cached after the first item. ([Issue 66](https://code.google.com/p/imagelistview/issues/detail?id=66))
-  * Fixed a bug where moving the mouse to the edges of the control resulted in the selection rectangle to jump to the top.  ([Issue 67](https://code.google.com/p/imagelistview/issues/detail?id=67))
+  * Fixed a bug where file types were not being cached after the first item. ([Issue 66](https://github.com/oozcitak/imagelistview/issues/66))
+  * Fixed a bug where moving the mouse to the edges of the control resulted in the selection rectangle to jump to the top.  ([Issue 67](https://github.com/oozcitak/imagelistview/issues/67))
 
 # 6.4 (21 April 2010) #
 
-  * ImageListView now tries to guess the image format before attempting to load images. ([Issue 61](https://code.google.com/p/imagelistview/issues/detail?id=61))
-  * When changing the thumbnail size property of the control, old thumbnails will no longer be cleared immediately. They will be replaced after new thumbnails are created.  ([Issue 64](https://code.google.com/p/imagelistview/issues/detail?id=64))
-  * Shell icons are no longer cached per file extension, they are read for every item in the control. ([Issue 65](https://code.google.com/p/imagelistview/issues/detail?id=65))
+  * ImageListView now tries to guess the image format before attempting to load images. ([Issue 61](https://github.com/oozcitak/imagelistview/issues/61))
+  * When changing the thumbnail size property of the control, old thumbnails will no longer be cleared immediately. They will be replaced after new thumbnails are created.  ([Issue 64](https://github.com/oozcitak/imagelistview/issues/64))
+  * Shell icons are no longer cached per file extension, they are read for every item in the control. ([Issue 65](https://github.com/oozcitak/imagelistview/issues/65))
 
 # 6.3 (03 April 2010) #
 
-  * Public properties of ImageListViewItem are now properly categorized. ([Issue 60](https://code.google.com/p/imagelistview/issues/detail?id=60))
-  * Fixed an issue where the wrong exif tag was read for the DateTaken property. The Exif DateTime tag was being read instead of DateTimeOriginal. ([Issue 62](https://code.google.com/p/imagelistview/issues/detail?id=62))
+  * Public properties of ImageListViewItem are now properly categorized. ([Issue 60](https://github.com/oozcitak/imagelistview/issues/60))
+  * Fixed an issue where the wrong exif tag was read for the DateTaken property. The Exif DateTime tag was being read instead of DateTimeOriginal. ([Issue 62](https://github.com/oozcitak/imagelistview/issues/62))
 
 # 6.2 (16 March 2010) #
 
-  * Fixed a bug where virtual items could not be inserted if AllowDuplicateFileNames was set to true. ([Issue 51](https://code.google.com/p/imagelistview/issues/detail?id=51))
+  * Fixed a bug where virtual items could not be inserted if AllowDuplicateFileNames was set to true. ([Issue 51](https://github.com/oozcitak/imagelistview/issues/51))
 
 # 6.1 (11 March 2010) #
 
-  * Added CheckedItems property to ImageListView to iterate checked items. ([Issue 47](https://code.google.com/p/imagelistview/issues/detail?id=47))
-  * Added a new overload for the Items.Add method to provide an initial thumbnail for regular items (similar to virtual items). ([Issue 49](https://code.google.com/p/imagelistview/issues/detail?id=49))
-  * Fixed an issue where checkbox and icon padding resulted in weird rendering in details view. ([Issue 50](https://code.google.com/p/imagelistview/issues/detail?id=50))
+  * Added CheckedItems property to ImageListView to iterate checked items. ([Issue 47](https://github.com/oozcitak/imagelistview/issues/47))
+  * Added a new overload for the Items.Add method to provide an initial thumbnail for regular items (similar to virtual items). ([Issue 49](https://github.com/oozcitak/imagelistview/issues/49))
+  * Fixed an issue where checkbox and icon padding resulted in weird rendering in details view. ([Issue 50](https://github.com/oozcitak/imagelistview/issues/50))
 
 # 6.0 (10 March 2010) #
 
-  * Added support for color themes. ([Issue 37](https://code.google.com/p/imagelistview/issues/detail?id=37)) Contributed by Robby.
-  * Added file icons that can be displayed over items. ([Issue 39](https://code.google.com/p/imagelistview/issues/detail?id=39), [Issue 45](https://code.google.com/p/imagelistview/issues/detail?id=45), [Issue 46](https://code.google.com/p/imagelistview/issues/detail?id=46)) Contributed by Robby.
-  * Added checkboxes to items. ([Issue 40](https://code.google.com/p/imagelistview/issues/detail?id=40), [Issue 46](https://code.google.com/p/imagelistview/issues/detail?id=46)) Contributed by Robby.
-  * Fixed a bug where the hovered item was not updated while scrolling with the mouse wheel. ([Issue 42](https://code.google.com/p/imagelistview/issues/detail?id=42))
-  * Scrollbars' large change property now calculated as a multiple of item height. ([Issue 43](https://code.google.com/p/imagelistview/issues/detail?id=43))
+  * Added support for color themes. ([Issue 37](https://github.com/oozcitak/imagelistview/issues/37)) Contributed by Robby.
+  * Added file icons that can be displayed over items. ([Issue 39](https://github.com/oozcitak/imagelistview/issues/39), [Issue 45](https://github.com/oozcitak/imagelistview/issues/45), [Issue 46](https://github.com/oozcitak/imagelistview/issues/46)) Contributed by Robby.
+  * Added checkboxes to items. ([Issue 40](https://github.com/oozcitak/imagelistview/issues/40), [Issue 46](https://github.com/oozcitak/imagelistview/issues/46)) Contributed by Robby.
+  * Fixed a bug where the hovered item was not updated while scrolling with the mouse wheel. ([Issue 42](https://github.com/oozcitak/imagelistview/issues/42))
+  * Scrollbars' large change property now calculated as a multiple of item height. ([Issue 43](https://github.com/oozcitak/imagelistview/issues/43))
 
 # 5.4 (03 March 2010) #
 
-  * Added the MultiSelect property. ([Issue 32](https://code.google.com/p/imagelistview/issues/detail?id=32))
-  * Fixed an issue where transparent images were always drawn with a white background  ([Issue 35](https://code.google.com/p/imagelistview/issues/detail?id=35))
-  * Scrollbars can now be hidden with the new ScrollBars property. ([Issue 36](https://code.google.com/p/imagelistview/issues/detail?id=36))
+  * Added the MultiSelect property. ([Issue 32](https://github.com/oozcitak/imagelistview/issues/32))
+  * Fixed an issue where transparent images were always drawn with a white background  ([Issue 35](https://github.com/oozcitak/imagelistview/issues/35))
+  * Scrollbars can now be hidden with the new ScrollBars property. ([Issue 36](https://github.com/oozcitak/imagelistview/issues/36))
 
 # 5.3 (02 March 2010) #
 
-  * Initial thumbnails of virtual items are now sized down to control's ThumbnailSize property on item add. ([Issue 33](https://code.google.com/p/imagelistview/issues/detail?id=33))
+  * Initial thumbnails of virtual items are now sized down to control's ThumbnailSize property on item add. ([Issue 33](https://github.com/oozcitak/imagelistview/issues/33))
 
 # 5.2 (01 March 2010) #
 
-  * Fixed a bug where the control was not refreshed after removing all items ([Issue 29](https://code.google.com/p/imagelistview/issues/detail?id=29)).
-  * ImageListView now falls back to shell icons if it cannot extract image thumbnails ([Issue 30](https://code.google.com/p/imagelistview/issues/detail?id=30)). Contributed by Robby.
-  * Exif properties of ImageListViewItem are now marked as browsable ([Issue 31](https://code.google.com/p/imagelistview/issues/detail?id=31)).
+  * Fixed a bug where the control was not refreshed after removing all items ([Issue 29](https://github.com/oozcitak/imagelistview/issues/29)).
+  * ImageListView now falls back to shell icons if it cannot extract image thumbnails ([Issue 30](https://github.com/oozcitak/imagelistview/issues/30)). Contributed by Robby.
+  * Exif properties of ImageListViewItem are now marked as browsable ([Issue 31](https://github.com/oozcitak/imagelistview/issues/31)).
 
 # 5.1 (25 February 2010) #
 
-  * Fixed a bug where source image files were being kept locked ([Issue 26](https://code.google.com/p/imagelistview/issues/detail?id=26)).
-  * Removed the ImageListViewItem.GetImage method ([Issue 27](https://code.google.com/p/imagelistview/issues/detail?id=27)).
+  * Fixed a bug where source image files were being kept locked ([Issue 26](https://github.com/oozcitak/imagelistview/issues/26)).
+  * Removed the ImageListViewItem.GetImage method ([Issue 27](https://github.com/oozcitak/imagelistview/issues/27)).
 
 # 5.0 (17 February 2010) #
 
-  * Added the CacheMode property. ([Issue 22](https://code.google.com/p/imagelistview/issues/detail?id=22))
-  * Added Mono support. ([Issue 25](https://code.google.com/p/imagelistview/issues/detail?id=25))
+  * Added the CacheMode property. ([Issue 22](https://github.com/oozcitak/imagelistview/issues/22))
+  * Added Mono support. ([Issue 25](https://github.com/oozcitak/imagelistview/issues/25))
 
 # 4.8 (11 February 2010) #
 
-  * Added the public VirtualItemKey property to ImageListViewItem ([Issue 24](https://code.google.com/p/imagelistview/issues/detail?id=24)).
+  * Added the public VirtualItemKey property to ImageListViewItem ([Issue 24](https://github.com/oozcitak/imagelistview/issues/24)).
 
 # 4.7 (10 February 2010) #
 
-  * Added the ItemHover and ColumnHover events ([Issue 23](https://code.google.com/p/imagelistview/issues/detail?id=23)).
-  * Added the DropFiles event ([Issue 19](https://code.google.com/p/imagelistview/issues/detail?id=19)).
+  * Added the ItemHover and ColumnHover events ([Issue 23](https://github.com/oozcitak/imagelistview/issues/23)).
+  * Added the DropFiles event ([Issue 19](https://github.com/oozcitak/imagelistview/issues/19)).
 
 # 4.6 (27 January 2010) #
 
-  * Fixed a bug in renderers where virtual item thumbnails were drawn without regards to the ThumbnailSize property ([Issue 17](https://code.google.com/p/imagelistview/issues/detail?id=17)).
-  * Fixed a bug where the item click event was fired only if the item was not selected ([Issue 18](https://code.google.com/p/imagelistview/issues/detail?id=18)).
+  * Fixed a bug in renderers where virtual item thumbnails were drawn without regards to the ThumbnailSize property ([Issue 17](https://github.com/oozcitak/imagelistview/issues/17)).
+  * Fixed a bug where the item click event was fired only if the item was not selected ([Issue 18](https://github.com/oozcitak/imagelistview/issues/18)).
 
 # 4.5 (26 January 2010) #
 
-  * Fixed a race condition that occurred if an initial thumbnail image was supplied for a virtual item ([Issue 16](https://code.google.com/p/imagelistview/issues/detail?id=16)).
+  * Fixed a race condition that occurred if an initial thumbnail image was supplied for a virtual item ([Issue 16](https://github.com/oozcitak/imagelistview/issues/16)).
   * Added the RetryOnError property to the control. When set to true, the cache thread will continuously poll the control for a thumbnail, until it gets a valid image. When set to false, the cache thread will give up after the first error and display the ErrorImage.
 
 # 4.4 (21 January 2010) #
@@ -359,12 +359,12 @@ This release aims better integration with the control designer. Some of the chan
 
 # 4.3 (21 January 2010) #
 
-  * Fixed an issue where item text was not set in virtual mode. ([Issue 14](https://code.google.com/p/imagelistview/issues/detail?id=14))
-  * Fixed an issue where the ImageListViewItemCollection.Clear method did not immediately empty the thumbnail cache. ([Issue 15](https://code.google.com/p/imagelistview/issues/detail?id=15))
+  * Fixed an issue where item text was not set in virtual mode. ([Issue 14](https://github.com/oozcitak/imagelistview/issues/14))
+  * Fixed an issue where the ImageListViewItemCollection.Clear method did not immediately empty the thumbnail cache. ([Issue 15](https://github.com/oozcitak/imagelistview/issues/15))
 
 # 4.2 (12 January 2010) #
 
-  * An initial thumbnail image may now be specified while adding virtual items. ([Issue 13](https://code.google.com/p/imagelistview/issues/detail?id=13))
+  * An initial thumbnail image may now be specified while adding virtual items. ([Issue 13](https://github.com/oozcitak/imagelistview/issues/13))
 
 # 4.1 (12 January 2010) #
 
@@ -372,11 +372,11 @@ This release aims better integration with the control designer. Some of the chan
 
 # 4.0 (12 January 2010) #
 
-  * Added support for virtual items. ([Issue 12](https://code.google.com/p/imagelistview/issues/detail?id=12))
+  * Added support for virtual items. ([Issue 12](https://github.com/oozcitak/imagelistview/issues/12))
 
 # 3.4 (04 January 2010) #
 
-  * Fixed a bug in drag and drop controller. ([Issue 11](https://code.google.com/p/imagelistview/issues/detail?id=11))
+  * Fixed a bug in drag and drop controller. ([Issue 11](https://github.com/oozcitak/imagelistview/issues/11))
 
 # 3.3 (29 December 2009) #
 
@@ -387,12 +387,12 @@ This release aims better integration with the control designer. Some of the chan
 
 # 3.2 (29 December 2009) #
 
-  * Added the new NoirRenderer. ([Issue 10](https://code.google.com/p/imagelistview/issues/detail?id=10))
+  * Added the new NoirRenderer. ([Issue 10](https://github.com/oozcitak/imagelistview/issues/10))
 
 # 3.1 (28 December 2009) #
 
-  * XPRenderer now works in Pane view mode. ([Issue 8](https://code.google.com/p/imagelistview/issues/detail?id=8))
-  * Drag-and-drop honors AllowDuplicateFileNames setting. ([Issue 9](https://code.google.com/p/imagelistview/issues/detail?id=9))
+  * XPRenderer now works in Pane view mode. ([Issue 8](https://github.com/oozcitak/imagelistview/issues/8))
+  * Drag-and-drop honors AllowDuplicateFileNames setting. ([Issue 9](https://github.com/oozcitak/imagelistview/issues/9))
 
 # 3.0 (27 December 2009) #
 
@@ -415,7 +415,7 @@ This release aims better integration with the control designer. Some of the chan
 
   * Added XML comments for all public fields.
   * Removed the ImageListViewRenderer.GetSortArrow function. Sort arrow is now drawn in the DrawColumnHeader method.
-  * Fixed the issue about the missing semicolon in GIF files. ([Issue 6](https://code.google.com/p/imagelistview/issues/detail?id=6))
+  * Fixed the issue about the missing semicolon in GIF files. ([Issue 6](https://github.com/oozcitak/imagelistview/issues/6))
   * Removed the SortOrder enum, it was a duplicate of Windows.Forms.SortOrder.
   * Double clicking on a separator no longer rises a column click event.
 
@@ -439,7 +439,7 @@ This release aims better integration with the control designer. Some of the chan
   * Sorting properties now check if a sort is actually needed.
   * Removed the Hovered property from ImageListViewItem and ImageListViewColumnHeader.
   * The wait cursor is displayed while sorting items.
-  * Fixed issues with keyboard navigation and drag&drop logic. (inc. [Issue 1](https://code.google.com/p/imagelistview/issues/detail?id=1), [Issue 4](https://code.google.com/p/imagelistview/issues/detail?id=4), [Issue 5](https://code.google.com/p/imagelistview/issues/detail?id=5) and [Issue 7](https://code.google.com/p/imagelistview/issues/detail?id=7))
+  * Fixed issues with keyboard navigation and drag&drop logic. (inc. [Issue 1](https://github.com/oozcitak/imagelistview/issues/1), [Issue 4](https://github.com/oozcitak/imagelistview/issues/4), [Issue 5](https://github.com/oozcitak/imagelistview/issues/5) and [Issue 7](https://github.com/oozcitak/imagelistview/issues/7))
 
 # 2.2 (13 December 2009) #
 
@@ -487,7 +487,7 @@ This release aims better integration with the control designer. Some of the chan
   * PanelRenderer now displays some common Exif tags.
 
 # 1.0 (28 November 2009) #
-  * Added the Gallery view mode. ([Issue 2](https://code.google.com/p/imagelistview/issues/detail?id=2))
+  * Added the Gallery view mode. ([Issue 2](https://github.com/oozcitak/imagelistview/issues/2))
   * Modified the hit testing, scrolling and the custom renderers to work with the Gallery view mode.
 
 # 0.18 (27 November 2009) #
