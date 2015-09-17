@@ -119,7 +119,7 @@ namespace Manina.Windows.Forms
 
 		#region Constructor
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ImageListViewCacheShellInfo"/> class.
+        /// Initializes a new instance of the <see cref="ImageListViewCacheMetadata"/> class.
 		/// </summary>
 		/// <param name="owner">The owner control.</param>
 		public ImageListViewCacheMetadata (ImageListView owner)
@@ -127,6 +127,7 @@ namespace Manina.Windows.Forms
 			context = null;
 			bw = new QueuedBackgroundWorker ();
 			bw.IsBackground = true;
+            bw.ThreadName = "Metadata Cache Worker Thread";
 			bw.DoWork += bw_DoWork;
 			bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 			

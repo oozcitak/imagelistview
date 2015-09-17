@@ -168,6 +168,7 @@ namespace Manina.Windows.Forms
 			bw = new QueuedBackgroundWorker ();
 			bw.Threads = 1;
 			bw.IsBackground = true;
+            bw.ThreadName = "Shell Info Cache Worker Thread";
 			bw.DoWork += bw_DoWork;
 			bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 			

@@ -309,6 +309,7 @@ namespace Manina.Windows.Forms
             bw = new QueuedBackgroundWorker();
             bw.ProcessingMode = ProcessingMode.LIFO;
             bw.IsBackground = true;
+            bw.ThreadName = "Thumbnail Cache Worker Thread";
             bw.DoWork += bw_DoWork;
             bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 
