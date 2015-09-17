@@ -87,8 +87,6 @@ namespace ImageListViewTests
                 if (type.BaseType == typeof(ImageListView.ImageListViewRenderer))
                 {
                     ToolStripMenuItem item = new ToolStripMenuItem(type.Name);
-                    ImageListView.ImageListViewRenderer renderer = (ImageListView.ImageListViewRenderer)assembly.CreateInstance(type.FullName);
-                    item.Tag = renderer;
                     item.Click += SelectRenderer_Click;
                     SelectRenderer.DropDownItems.Add(item);
                 }
@@ -265,7 +263,17 @@ namespace ImageListViewTests
         private void SelectRenderer_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
-            imageListView.SetRenderer((ImageListView.ImageListViewRenderer)item.Tag);
+
+            // Find the renderer
+            Assembly assembly = Assembly.GetAssembly(typeof(ImageListView));
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.BaseType == typeof(ImageListView.ImageListViewRenderer) && type.Name == item.Text)
+                {
+                    ImageListView.ImageListViewRenderer renderer = (ImageListView.ImageListViewRenderer)assembly.CreateInstance(type.FullName);
+                    imageListView.SetRenderer(renderer);
+                }
+            }
         }
         // View modes
         private void ViewThumbnails_Click(object sender, EventArgs e)
