@@ -51,7 +51,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments of the RunWorkerCompleted event.
+    /// Represents the event arguments of the DoWork event.
     /// </summary>
     public class QueuedWorkerDoWorkEventArgs : DoWorkEventArgs
     {
