@@ -682,13 +682,12 @@ namespace Manina.Windows.Forms
                 Rectangle sel = ImageListView.navigationManager.SelectionRectangle;
                 if (sel.Height > 0 && sel.Width > 0)
                 {
+                    g.SetClip(ImageListView.layoutManager.ClientArea);
                     if (Clip)
                     {
                         Rectangle selclip = new Rectangle(sel.Left, sel.Top, sel.Width + 1, sel.Height + 1);
-                        g.SetClip(selclip);
+                        g.IntersectClip(selclip);
                     }
-                    else
-                        g.SetClip(ImageListView.layoutManager.ClientArea);
                     g.ExcludeClip(ImageListView.layoutManager.ColumnHeaderBounds);
                     DrawSelectionRectangle(g, sel);
                 }

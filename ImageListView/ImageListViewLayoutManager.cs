@@ -589,14 +589,18 @@ namespace Manina.Windows.Forms
                 mImageListView.ViewOffset = new Point(0, 0);
             }
 
+            Rectangle bounds = mImageListView.ClientRectangle;
+            if (mImageListView.BorderStyle != System.Windows.Forms.BorderStyle.None)
+                bounds.Inflate(-1, -1);
+
             // Horizontal scrollbar position
-            mImageListView.hScrollBar.Left = 0;
-            mImageListView.hScrollBar.Top = mImageListView.ClientRectangle.Bottom - mImageListView.hScrollBar.Height;
-            mImageListView.hScrollBar.Width = mImageListView.ClientRectangle.Width - (mImageListView.vScrollBar.Visible ? mImageListView.vScrollBar.Width : 0);
+            mImageListView.hScrollBar.Left = bounds.Left;
+            mImageListView.hScrollBar.Top = bounds.Bottom - mImageListView.hScrollBar.Height;
+            mImageListView.hScrollBar.Width = bounds.Width - (mImageListView.vScrollBar.Visible ? mImageListView.vScrollBar.Width : 0);
             // Vertical scrollbar position
-            mImageListView.vScrollBar.Left = mImageListView.ClientRectangle.Right - mImageListView.vScrollBar.Width;
-            mImageListView.vScrollBar.Top = 0;
-            mImageListView.vScrollBar.Height = mImageListView.ClientRectangle.Height - (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
+            mImageListView.vScrollBar.Left = bounds.Right - mImageListView.vScrollBar.Width;
+            mImageListView.vScrollBar.Top = bounds.Top;
+            mImageListView.vScrollBar.Height = bounds.Height - (mImageListView.hScrollBar.Visible ? mImageListView.hScrollBar.Height : 0);
         }
         /// <summary>
         /// Updates the dictionary of visible items.
