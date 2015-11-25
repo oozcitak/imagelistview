@@ -25,9 +25,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ImageListView")]
 [assembly: AssemblyDescription("A ListView like control for displaying image files with asynchronously loaded thumbnails.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Özgür Özçıtak")]
 [assembly: AssemblyProduct("ImageListView")]
-[assembly: AssemblyCopyright("Copyright ©  2013 Ozgur Ozcitak")]
+[assembly: AssemblyCopyright("Copyright ©  2013 Özgür Özçıtak")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

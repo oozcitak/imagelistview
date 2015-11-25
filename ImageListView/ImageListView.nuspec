@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package >
   <metadata>
-    <id>ImageListView</id>
-    <version>11.0.3</version>
-    <title>ImageListView</title>
-    <authors>Özgür Özçitak</authors>
-    <owners>Özgür Özçitak</owners>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <projectUrl>https://code.google.com/p/imagelistview/</projectUrl>
+    <projectUrl>https://github.com/oozcitak/imagelistview</projectUrl>
     <iconUrl>https://code.google.com/p/imagelistview/logo</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A ListView like control for displaying image files with asynchronously loaded thumbnails.</description>
-    <copyright>Copyright 2013</copyright>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
     <tags>winforms controls listview image imagelistview</tags>
   </metadata>
   <files>
-    <file src="bin\Release\ImageListView.dll" target="lib\net35" /> 
+    <file src="\bin\Release\ImageListView.dll" target="lib\net35" /> 
   </files>  
 </package>
