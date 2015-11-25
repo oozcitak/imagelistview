@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>https://github.com/oozcitak/imagelistview</projectUrl>
-    <iconUrl>https://code.google.com/p/imagelistview/logo</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/oozcitak/imagelistview/wiki/imagelistview_64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>$copyright$</copyright>
