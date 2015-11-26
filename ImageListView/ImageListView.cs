@@ -616,6 +616,12 @@ namespace Manina.Windows.Forms
         [Browsable(false), Category("Behavior"), Description("Gets or sets whether shell icons are displayed for non-image files."), DefaultValue(true)]
         public bool ShellIconFallback { get; set; }
         /// <summary>
+        /// Gets or sets whether shell icons are extracted from the contents of icon and executable files.
+        /// When set to false, the generic shell icon for the filename extension is extracted.
+        /// </summary>
+        [Browsable(false), Category("Behavior"), Description("Gets or sets whether shell icons are extracted from the contents of icon and executable files."), DefaultValue(true)]
+        public bool ShellIconFromFileContent { get; set; }
+        /// <summary>
         /// Gets or sets whether to display the file icons.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets whether to display the file icons."), DefaultValue(false)]
@@ -1014,6 +1020,7 @@ namespace Manina.Windows.Forms
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.Opaque | ControlStyles.Selectable | ControlStyles.UserMouse, true);
             ScrollBars = true;
             ShellIconFallback = true;
+            ShellIconFromFileContent = true;
             Size = new Size(120, 100);
             mShowCheckBoxes = false;
             mCheckBoxAlignment = ContentAlignment.BottomRight;

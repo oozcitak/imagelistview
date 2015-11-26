@@ -310,23 +310,24 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Owner control is null.");
 
-                CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
+                string iconPath = PathForShellIcon();
+                CacheState state = mImageListView.shellInfoCache.GetCacheState(iconPath);
                 if (state == CacheState.Cached)
                 {
-                    return mImageListView.shellInfoCache.GetSmallIcon(extension);
+                    return mImageListView.shellInfoCache.GetSmallIcon(iconPath);
                 }
                 else if (state == CacheState.Error)
                 {
                     if (mImageListView.RetryOnError)
                     {
-                        mImageListView.shellInfoCache.Remove(extension);
-                        mImageListView.shellInfoCache.Add(extension);
+                        mImageListView.shellInfoCache.Remove(iconPath);
+                        mImageListView.shellInfoCache.Add(iconPath);
                     }
                     return null;
                 }
                 else
                 {
-                    mImageListView.shellInfoCache.Add(extension);
+                    mImageListView.shellInfoCache.Add(iconPath);
                     return null;
                 }
             }
@@ -343,23 +344,24 @@ namespace Manina.Windows.Forms
                 if (mImageListView == null)
                     throw new InvalidOperationException("Owner control is null.");
 
-                CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
+                string iconPath = PathForShellIcon();
+                CacheState state = mImageListView.shellInfoCache.GetCacheState(iconPath);
                 if (state == CacheState.Cached)
                 {
-                    return mImageListView.shellInfoCache.GetLargeIcon(extension);
+                    return mImageListView.shellInfoCache.GetLargeIcon(iconPath);
                 }
                 else if (state == CacheState.Error)
                 {
                     if (mImageListView.RetryOnError)
                     {
-                        mImageListView.shellInfoCache.Remove(extension);
-                        mImageListView.shellInfoCache.Add(extension);
+                        mImageListView.shellInfoCache.Remove(iconPath);
+                        mImageListView.shellInfoCache.Add(iconPath);
                     }
                     return null;
                 }
                 else
                 {
-                    mImageListView.shellInfoCache.Add(extension);
+                    mImageListView.shellInfoCache.Add(iconPath);
                     return null;
                 }
             }
@@ -854,31 +856,33 @@ namespace Manina.Windows.Forms
             if (mImageListView == null)
                 throw new InvalidOperationException("Owner control is null.");
 
+            string iconPath = PathForShellIcon();
+
             if (imageType == CachedImageType.SmallIcon || imageType == CachedImageType.LargeIcon)
             {
-                if (string.IsNullOrEmpty(extension))
+                if (string.IsNullOrEmpty(iconPath))
                     return mImageListView.DefaultImage;
 
-                CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
+                CacheState state = mImageListView.shellInfoCache.GetCacheState(iconPath);
                 if (state == CacheState.Cached)
                 {
                     if (imageType == CachedImageType.SmallIcon)
-                        return mImageListView.shellInfoCache.GetSmallIcon(extension);
+                        return mImageListView.shellInfoCache.GetSmallIcon(iconPath);
                     else
-                        return mImageListView.shellInfoCache.GetLargeIcon(extension);
+                        return mImageListView.shellInfoCache.GetLargeIcon(iconPath);
                 }
                 else if (state == CacheState.Error)
                 {
                     if (mImageListView.RetryOnError)
                     {
-                        mImageListView.shellInfoCache.Remove(extension);
-                        mImageListView.shellInfoCache.Add(extension);
+                        mImageListView.shellInfoCache.Remove(iconPath);
+                        mImageListView.shellInfoCache.Add(iconPath);
                     }
                     return mImageListView.ErrorImage;
                 }
                 else
                 {
-                    mImageListView.shellInfoCache.Add(extension);
+                    mImageListView.shellInfoCache.Add(iconPath);
                     return mImageListView.DefaultImage;
                 }
             }
@@ -889,13 +893,30 @@ namespace Manina.Windows.Forms
 
                 if (state == CacheState.Error)
                 {
-                    if (string.IsNullOrEmpty(extension))
-                        return mImageListView.ErrorImage;
+                    if (mImageListView.ShellIconFallback && !string.IsNullOrEmpty(iconPath))
+                    {
+                        CacheState iconstate = mImageListView.shellInfoCache.GetCacheState(iconPath);
+                        if (iconstate == CacheState.Cached)
+                        {
+                            if (mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32)
+                                img = mImageListView.shellInfoCache.GetLargeIcon(iconPath);
+                            else
+                                img = mImageListView.shellInfoCache.GetSmallIcon(iconPath);
+                        }
+                        else if (iconstate == CacheState.Error)
+                        {
+                            if (mImageListView.RetryOnError)
+                            {
+                                mImageListView.shellInfoCache.Remove(iconPath);
+                                mImageListView.shellInfoCache.Add(iconPath);
+                            }
+                        }
+                        else
+                        {
+                            mImageListView.shellInfoCache.Add(iconPath);
+                        }
+                    }
 
-                    if (mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 32 && mImageListView.ThumbnailSize.Height > 32)
-                        img = mImageListView.shellInfoCache.GetLargeIcon(extension);
-                    if (img == null && mImageListView.ShellIconFallback)
-                        img = mImageListView.shellInfoCache.GetSmallIcon(extension);
                     if (img == null)
                         img = mImageListView.ErrorImage;
                     return img;
@@ -911,13 +932,13 @@ namespace Manina.Windows.Forms
                     mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
                     (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
 
-                if (img == null && string.IsNullOrEmpty(extension))
+                if (img == null && string.IsNullOrEmpty(iconPath))
                     return mImageListView.DefaultImage;
 
                 if (img == null && mImageListView.ShellIconFallback && mImageListView.ThumbnailSize.Width > 16 && mImageListView.ThumbnailSize.Height > 16)
-                    img = mImageListView.shellInfoCache.GetLargeIcon(extension);
+                    img = mImageListView.shellInfoCache.GetLargeIcon(iconPath);
                 if (img == null && mImageListView.ShellIconFallback)
-                    img = mImageListView.shellInfoCache.GetSmallIcon(extension);
+                    img = mImageListView.shellInfoCache.GetSmallIcon(iconPath);
                 if (img == null)
                     img = mImageListView.DefaultImage;
 
@@ -1169,6 +1190,19 @@ namespace Manina.Windows.Forms
 
             groupOrder = groupInfo.Item1;
             group = groupInfo.Item2;
+        }
+        /// <summary>
+        /// Returns a path string to be used for extracting the shell icon
+        /// of the item. Returns the filename for icon files and executables,
+        /// file extension for other files.
+        /// </summary>
+        private string PathForShellIcon()
+        {
+            if (mImageListView != null && mImageListView.ShellIconFromFileContent && 
+                (string.Compare(extension, ".ico", StringComparison.OrdinalIgnoreCase) == 0 || string.Compare(extension, ".exe", StringComparison.OrdinalIgnoreCase) == 0))
+                return mFileName;
+            else
+                return extension;
         }
         #endregion
 
