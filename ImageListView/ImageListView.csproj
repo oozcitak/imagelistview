@@ -196,7 +196,7 @@
     <None Include="Resources\EmptyRatingImage.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="QueuedBackgroundWorker.bmp" />
+    <EmbeddedResource Include="QueuedBackgroundWorker.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
