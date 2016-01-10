@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package >
+<package>
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
@@ -13,8 +13,5 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>winforms controls listview image imagelistview</tags>
-  </metadata>
-  <files>
-    <file src="\bin\Release\ImageListView.dll" target="lib\net35" /> 
-  </files>  
+  </metadata> 
 </package>
