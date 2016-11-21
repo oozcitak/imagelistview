@@ -59,7 +59,7 @@ namespace Manina.Windows.Forms
         private static readonly string[] WICPathComment = new string[] { "/app1/ifd/{ushort=40092}", "/app1/ifd/{ushort=37510}", "/xmp/<xmpalt>exif:UserComment" };
         private static readonly string[] WICPathSoftware = new string[] { "/app1/ifd/{ushort=305}", "/xmp/xmp:CreatorTool", "/xmp/xmp:creatortool", "/xmp/tiff:Software", "/xmp/tiff:software", "/app13/irb/8bimiptc/iptc/Originating Program" };
         private static readonly string[] WICPathSimpleRating = new string[] { "/app1/ifd/{ushort=18246}", "/xmp/xmp:Rating" };
-        private static readonly string[] WICPathRating = new string[] { "/app1/ifd/exif/{ushort=34855}", "/xmp/<xmpseq>exif:ISOSpeedRatings", "/xmp/exif:ISOSpeed" };
+        private static readonly string[] WICPathRating = new string[] { "/app1/ifd/{ushort=18249}", "/xmp/MicrosoftPhoto:Rating" };
         private static readonly string[] WICPathArtist = new string[] { "/app1/ifd/{ushort=315}", "/app13/irb/8bimiptc/iptc/by-line", "/app1/ifd/{ushort=40093}", "/xmp/tiff:artist" };
         private static readonly string[] WICPathEquipmentManufacturer = new string[] { "/app1/ifd/{ushort=271}", "/xmp/tiff:Make", "/xmp/tiff:make" };
         private static readonly string[] WICPathEquipmentModel = new string[] { "/app1/ifd/{ushort=272}", "/xmp/tiff:Model", "/xmp/tiff:model" };
@@ -120,7 +120,7 @@ namespace Manina.Windows.Forms
                     return DateTime.MinValue;
                 }
             }
-            catch 
+            catch
             {
                 return DateTime.MinValue;
             }
@@ -518,7 +518,7 @@ namespace Manina.Windows.Forms
             val = GetMetadataObject(data, WICPathSimpleRating);
             if (val != null)
             {
-                ushort simpleRating = (ushort)val;
+                ushort simpleRating = Convert.ToUInt16(val);
 
                 if (simpleRating == 1)
                     Rating = 1;
@@ -534,7 +534,7 @@ namespace Manina.Windows.Forms
             // Rating
             val = GetMetadataObject(data, WICPathRating);
             if (val != null)
-                Rating = (int)((ushort)val);
+                Rating = (int)Convert.ToUInt16(val);
             // Authors
             val = GetMetadataObject(data, WICPathArtist);
             if (val != null)
@@ -580,7 +580,7 @@ namespace Manina.Windows.Forms
             // ISOSpeed
             val = GetMetadataObject(data, WICPathISOSpeed);
             if (val != null)
-                ISOSpeed = (ushort)val;
+                ISOSpeed = Convert.ToUInt16(val);
             // FocalLength
             val = GetMetadataObject(data, WICPathFocalLength);
             if (val != null)
