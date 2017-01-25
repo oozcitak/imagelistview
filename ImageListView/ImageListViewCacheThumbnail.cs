@@ -583,6 +583,10 @@ namespace Manina.Windows.Forms
         {
             foreach (CacheItem item in thumbCache.Values)
                 item.State = CacheState.Unknown;
+
+            if (galleryItem != null)
+                galleryItem.State = CacheState.Unknown;
+
             diskCache.Clear();
         }
         /// <summary>
@@ -593,6 +597,12 @@ namespace Manina.Windows.Forms
             foreach (CacheItem item in thumbCache.Values)
                 item.Dispose();
             thumbCache.Clear();
+
+            if (galleryItem != null)
+            {
+                galleryItem.Dispose();
+                galleryItem = null;
+            }
 
             if (rendererItem != null)
                 rendererItem.Dispose();
@@ -634,6 +644,12 @@ namespace Manina.Windows.Forms
                 MemoryUsed -= GetImageMemorySize(cacheItem.Size.Width, cacheItem.Size.Height);
                 cacheItem.Dispose();
                 thumbCache.Remove(guid);
+
+                if (galleryItem != null && galleryItem.Guid == guid)
+                {
+                    galleryItem.Dispose();
+                    galleryItem = null;
+                }
             }
             else
             {
@@ -669,6 +685,12 @@ namespace Manina.Windows.Forms
                     {
                         item.Dispose();
                         thumbCache.Remove(guid);
+                    }
+
+                    if (galleryItem != null && galleryItem.Guid == guid)
+                    {
+                        galleryItem.Dispose();
+                        galleryItem = null;
                     }
                 }
                 removedItems.Clear();
