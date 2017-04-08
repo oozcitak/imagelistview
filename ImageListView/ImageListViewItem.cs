@@ -522,8 +522,11 @@ namespace Manina.Windows.Forms
             {
                 mFileName = filename;
                 extension = Path.GetExtension(filename);
+                //if text parameter is empty then get file name for itme text
                 if (string.IsNullOrEmpty(text))
                     mText = Path.GetFileName(filename);
+                else // else use text parameter
+                    mText = text;
             }
             else if (string.IsNullOrEmpty(text))
             {
