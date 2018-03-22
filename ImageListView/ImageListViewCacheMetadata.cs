@@ -61,6 +61,10 @@ namespace Manina.Windows.Forms
 			/// Gets the virtual item key.
 			/// </summary>
 			public object VirtualItemKey { get; private set; }
+			/// <summary>
+			/// Whether to use the Windows Imaging Component.
+			/// </summary>
+			public bool UseWIC { get; private set; }
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="CacheRequest"/> class.
@@ -68,11 +72,13 @@ namespace Manina.Windows.Forms
 			/// <param name="guid">The guid of the item.</param>
 			/// <param name="adaptor">The adaptor of this item.</param>
 			/// <param name="virtualItemKey">The virtual item key of this item.</param>
-			public CacheRequest (Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object virtualItemKey)
+			/// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+			public CacheRequest (Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object virtualItemKey, bool useWIC)
 			{
 				Guid = guid;
 				Adaptor = adaptor;
 				VirtualItemKey = virtualItemKey;
+				UseWIC = useWIC;
 			}
 		}
 		#endregion
@@ -231,7 +237,7 @@ namespace Manina.Windows.Forms
 			}
 			
 			// Get item details
-			e.Result = request.Adaptor.GetDetails (request.VirtualItemKey);
+			e.Result = request.Adaptor.GetDetails (request.VirtualItemKey, request.UseWIC);
 		}
 		#endregion
 
@@ -292,10 +298,11 @@ namespace Manina.Windows.Forms
 		/// <param name="guid">Item guid.</param>
 		/// <param name="adaptor">The adaptor for this item.</param>
 		/// <param name="virtualItemKey">The virtual item key.</param>
-		public void Add (Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object virtualItemKey)
+		/// <param name="useWIC">Whether to use the Windows Imaging Component.</param>
+		public void Add (Guid guid, ImageListView.ImageListViewItemAdaptor adaptor, object virtualItemKey, bool useWIC)
 		{
 			// Add to cache queue
-			RunWorker (new CacheRequest (guid, adaptor, virtualItemKey));
+			RunWorker (new CacheRequest (guid, adaptor, virtualItemKey, useWIC));
 		}
 		#endregion
 

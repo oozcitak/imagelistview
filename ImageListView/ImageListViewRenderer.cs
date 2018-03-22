@@ -313,12 +313,13 @@ namespace Manina.Windows.Forms
             public Image GetImageAsync(ImageListViewItem item, Size size)
             {
                 Image img = ImageListView.thumbnailCache.GetRendererImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails,
-                    ImageListView.AutoRotateThumbnails);
+                    ImageListView.AutoRotateThumbnails, ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly);
 
                 if (img == null)
                 {
                     ImageListView.thumbnailCache.AddToRendererCache(item.Guid, item.mAdaptor, item.VirtualItemKey,
-                        size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                        size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
+                        (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
                 return img;
@@ -779,12 +780,13 @@ namespace Manina.Windows.Forms
             private Image GetGalleryImageAsync(ImageListViewItem item, Size size)
             {
                 Image img = ImageListView.thumbnailCache.GetGalleryImage(item.Guid, size, ImageListView.UseEmbeddedThumbnails,
-                    ImageListView.AutoRotateThumbnails);
+                    ImageListView.AutoRotateThumbnails, ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly);
 
                 if (img == null)
                 {
                     ImageListView.thumbnailCache.AddToGalleryCache(item.Guid, item.mAdaptor, item.VirtualItemKey,
-                        size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails);
+                        size, ImageListView.UseEmbeddedThumbnails, ImageListView.AutoRotateThumbnails,
+                        (ImageListView.UseWIC == UseWIC.Auto || ImageListView.UseWIC == UseWIC.ThumbnailsOnly));
                 }
 
                 return img;

@@ -36,15 +36,16 @@ namespace Manina.Windows.Forms
             /// <param name="size">Requested image size.</param>
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>The thumbnail image from the given item or null if an error occurs.</returns>
-            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
+            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
             {
                 if (disposed)
                     return null;
 
                 string filename = (string)key;
                 if (File.Exists(filename))
-                    return Extractor.Instance.GetThumbnail(filename, size, (EmbeddedThumbnail)useEmbeddedThumbnails, useExifOrientation);
+                    return ThumbnailExtractor.FromFile(filename, size, useEmbeddedThumbnails, useExifOrientation, useWIC);
                 else
                     return null;
             }
@@ -56,8 +57,9 @@ namespace Manina.Windows.Forms
             /// <param name="size">Requested image size.</param>
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>A unique identifier string for the thumnail.</returns>
-            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
+            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append((string)key);// Filename
@@ -69,6 +71,8 @@ namespace Manina.Windows.Forms
                 sb.Append(useEmbeddedThumbnails);
                 sb.Append(':');
                 sb.Append(useExifOrientation);
+                sb.Append(':');
+                sb.Append(useWIC);
                 return sb.ToString();
             }
             /// <summary>
@@ -88,8 +92,9 @@ namespace Manina.Windows.Forms
             /// Returns the details for the given item.
             /// </summary>
             /// <param name="key">Item key.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>An array of tuples containing item details or null if an error occurs.</returns>
-            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key)
+            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC)
             {
                 if (disposed)
                     return null;
@@ -109,7 +114,7 @@ namespace Manina.Windows.Forms
                     details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.FolderName, string.Empty, info.Directory.Name ?? ""));
 
                     // Get metadata
-                    Metadata metadata = Extractor.Instance.GetMetadata(filename);
+                    MetadataExtractor metadata = MetadataExtractor.FromFile(filename, useWIC);
                     details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Dimensions, string.Empty, new Size(metadata.Width, metadata.Height)));
                     details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.Resolution, string.Empty, new SizeF((float)metadata.DPIX, (float)metadata.DPIY)));
                     details.Add(new Utility.Tuple<ColumnType, string, object>(ColumnType.ImageDescription, string.Empty, metadata.ImageDescription ?? ""));
@@ -162,8 +167,9 @@ namespace Manina.Windows.Forms
             /// <param name="size">Requested image size.</param>
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>The thumbnail image from the given item or null if an error occurs.</returns>
-            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
+            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
             {
                 if (disposed)
                     return null;
@@ -178,7 +184,7 @@ namespace Manina.Windows.Forms
                         {
                             using (Image sourceImage = Image.FromStream(stream))
                             {
-                                return Extractor.Instance.GetThumbnail(sourceImage, size, (EmbeddedThumbnail)useEmbeddedThumbnails, useExifOrientation);
+                                return ThumbnailExtractor.FromImage(sourceImage, size, useEmbeddedThumbnails, useExifOrientation, useWIC);
                             }
                         }
                     }
@@ -196,8 +202,9 @@ namespace Manina.Windows.Forms
             /// <param name="size">Requested image size.</param>
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>A unique identifier string for the thumbnail.</returns>
-            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
+            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append((string)key);// Uri
@@ -210,6 +217,7 @@ namespace Manina.Windows.Forms
                 sb.Append(':');
                 sb.Append(useExifOrientation);
                 sb.Append(':');
+                sb.Append(useWIC);
                 return sb.ToString();
             }
             /// <summary>
@@ -241,8 +249,9 @@ namespace Manina.Windows.Forms
             /// Returns the details for the given item.
             /// </summary>
             /// <param name="key">Item key.</param>
+            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>An array of 2-tuples containing item details or null if an error occurs.</returns>
-            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key)
+            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC)
             {
                 if (disposed)
                     return null;
