@@ -15,5 +15,5 @@ $client.DownloadFile($nugeturl, $nugetexe)
 
 # create the nuspec file for the "Release" build
 iex "$($nugetexe) pack '.\ImageListView\ImageListView.csproj' -Properties Configuration=Release"
-iex "$($nugetexe) push .\*.nupkg $($apikey)"
+iex "$($nugetexe) push -source https://api.nuget.org/v3/index.json .\*.nupkg $($apikey)"
 Remove-Item ".\*.nupkg"
