@@ -13,5 +13,11 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>winforms controls listview image imagelistview</tags>
-  </metadata> 
+    <references>
+      <reference file="WPFThumbnailExtractor.dll"></reference>
+    </references>
+  </metadata>
+  <files>
+    <file src="..\WPFThumbnailExtractor\bin\Release\WPFThumbnailExtractor.dll" target="lib\net35"/>
+  </files>
 </package>

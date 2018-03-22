@@ -335,28 +335,6 @@ namespace Manina.Windows.Forms
         Never = 2,
     }
     /// <summary>
-    /// Represents Windows Imaging Component usage option.
-    /// </summary>
-    public enum UseWIC
-    {
-        /// <summary>
-        /// Uses WIC if when possible.
-        /// </summary>
-        Auto,
-        /// <summary>
-        /// Never uses WIC.
-        /// </summary>
-        Never,
-        /// <summary>
-        /// Uses WIC for extracting thumbnails only.
-        /// </summary>
-        ThumbnailsOnly,
-        /// <summary>
-        /// Uses WIC for reading metadata only.
-        /// </summary>
-        DetailsOnly,
-    }
-    /// <summary>
     /// Represents the view mode of the image list view.
     /// </summary>
     public enum View

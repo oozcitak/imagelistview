@@ -25,7 +25,8 @@
     <DefineConstants>TRACE;DEBUG;BONUSPACK;USEWIC;BENCHMARK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\ImageListView.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,45 +36,23 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>bin\Release\ImageListView.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release without WIC|AnyCPU' ">
-    <OutputPath>bin\Release without WIC\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DebugType>none</DebugType>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug Designer|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\DesignerDebug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BONUSPACK;USEWIC</DefineConstants>
-    <DocumentationFile>bin\Debug\ImageListView.XML</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
+    <DocumentationFile>bin\Release\ImageListView.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GDIMetadataExtractor.cs" />
+    <Compile Include="GDIShellInfoExtractor.cs" />
+    <Compile Include="GDIThumbnailExtractor.cs" />
+    <Compile Include="IExtractor.cs" />
+    <Compile Include="Metadata.cs" />
     <Compile Include="PersistentCache.cs" />
     <Compile Include="ImageListViewGroupCollection.cs">
       <SubType>Component</SubType>
@@ -97,8 +76,6 @@
     <Compile Include="QueuedBackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ShellInfoExtractor.cs" />
-    <Compile Include="MetadataExtractor.cs" />
     <Compile Include="ImageListViewColorTypeConverter.cs" />
     <Compile Include="ImageListViewCheckedItemCollection.cs">
       <SubType>Component</SubType>
@@ -152,7 +129,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImageListViewResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ThumbnailExtractor.cs" />
+    <Compile Include="Extractor.cs" />
+    <Compile Include="ShellInfo.cs" />
     <Compile Include="Utility.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>

@@ -73,10 +73,10 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.CacheOnDemand = new System.Windows.Forms.ToolStripButton();
+            this.UsePersistentCache = new System.Windows.Forms.ToolStripButton();
             this.AllowDuplicateFilenames = new System.Windows.Forms.ToolStripButton();
             this.IntegralScroll = new System.Windows.Forms.ToolStripButton();
             this.MultiSelect = new System.Windows.Forms.ToolStripButton();
-            this.UseWIC = new System.Windows.Forms.ToolStripButton();
             this.UseEmbeddedThumbnails = new System.Windows.Forms.ToolStripButton();
             this.AutoRotateThumbnails = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -85,7 +85,6 @@
             this.ChooseBenchmarkPath = new System.Windows.Forms.FolderBrowserDialog();
             this.CheckBenchmarkEndTimer = new System.Windows.Forms.Timer(this.components);
             this.ChooseSourcePath = new System.Windows.Forms.FolderBrowserDialog();
-            this.UsePersistentCache = new System.Windows.Forms.ToolStripButton();
             this.OpenCacheFile = new System.Windows.Forms.OpenFileDialog();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -110,7 +109,7 @@
             // toolStripContainer1.ContentPanel
             // 
             this.toolStripContainer1.ContentPanel.Controls.Add(this.splitContainer1);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(619, 574);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(601, 574);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
             // toolStripContainer1.LeftToolStripPanel
@@ -135,7 +134,7 @@
             // StatusLabel
             // 
             this.StatusLabel.Name = "StatusLabel";
-            this.StatusLabel.Size = new System.Drawing.Size(38, 17);
+            this.StatusLabel.Size = new System.Drawing.Size(39, 17);
             this.StatusLabel.Text = "Ready";
             // 
             // splitContainer1
@@ -152,8 +151,8 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.logEventsCheckbox);
             this.splitContainer1.Panel2.Controls.Add(this.EventsListBox);
-            this.splitContainer1.Size = new System.Drawing.Size(619, 574);
-            this.splitContainer1.SplitterDistance = 425;
+            this.splitContainer1.Size = new System.Drawing.Size(601, 574);
+            this.splitContainer1.SplitterDistance = 412;
             this.splitContainer1.TabIndex = 1;
             // 
             // imageListView
@@ -177,7 +176,7 @@
             this.imageListView.Name = "imageListView";
             this.imageListView.PersistentCacheDirectory = "";
             this.imageListView.PersistentCacheSize = ((long)(100));
-            this.imageListView.Size = new System.Drawing.Size(425, 574);
+            this.imageListView.Size = new System.Drawing.Size(412, 574);
             this.imageListView.TabIndex = 0;
             // 
             // ItemContextMenu
@@ -187,26 +186,26 @@
             this.deleteToolStripMenuItem,
             this.rotateToolStripMenuItem});
             this.ItemContextMenu.Name = "ItemContextMenu";
-            this.ItemContextMenu.Size = new System.Drawing.Size(108, 70);
+            this.ItemContextMenu.Size = new System.Drawing.Size(109, 70);
             // 
             // cloneToolStripMenuItem
             // 
             this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.cloneToolStripMenuItem.Text = "Clone";
             this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // rotateToolStripMenuItem
             // 
             this.rotateToolStripMenuItem.Name = "rotateToolStripMenuItem";
-            this.rotateToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.rotateToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.rotateToolStripMenuItem.Text = "Rotate";
             this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotateToolStripMenuItem_Click);
             // 
@@ -224,15 +223,15 @@
             // 
             // EventsListBox
             // 
-            this.EventsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.EventsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.EventsListBox.ContextMenuStrip = this.EventListContextMenu;
             this.EventsListBox.FormattingEnabled = true;
             this.EventsListBox.IntegralHeight = false;
             this.EventsListBox.Location = new System.Drawing.Point(0, 26);
             this.EventsListBox.Name = "EventsListBox";
-            this.EventsListBox.Size = new System.Drawing.Size(190, 548);
+            this.EventsListBox.Size = new System.Drawing.Size(185, 548);
             this.EventsListBox.TabIndex = 0;
             // 
             // EventListContextMenu
@@ -241,12 +240,12 @@
             this.ClearEventList});
             this.EventListContextMenu.Name = "EventListContextMenu";
             this.EventListContextMenu.ShowImageMargin = false;
-            this.EventListContextMenu.Size = new System.Drawing.Size(75, 26);
+            this.EventListContextMenu.Size = new System.Drawing.Size(77, 26);
             // 
             // ClearEventList
             // 
             this.ClearEventList.Name = "ClearEventList";
-            this.ClearEventList.Size = new System.Drawing.Size(74, 22);
+            this.ClearEventList.Size = new System.Drawing.Size(76, 22);
             this.ClearEventList.Text = "Clear";
             this.ClearEventList.Click += new System.EventHandler(this.ClearEventList_Click);
             // 
@@ -284,7 +283,6 @@
             this.AllowDuplicateFilenames,
             this.IntegralScroll,
             this.MultiSelect,
-            this.UseWIC,
             this.UseEmbeddedThumbnails,
             this.AutoRotateThumbnails,
             this.toolStripSeparator4,
@@ -293,7 +291,7 @@
             this.TestToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
             this.TestToolStrip.Location = new System.Drawing.Point(0, 3);
             this.TestToolStrip.Name = "TestToolStrip";
-            this.TestToolStrip.Size = new System.Drawing.Size(139, 571);
+            this.TestToolStrip.Size = new System.Drawing.Size(157, 571);
             this.TestToolStrip.TabIndex = 2;
             this.TestToolStrip.Text = "Test Toolbar";
             // 
@@ -302,20 +300,20 @@
             this.ChooseImageSource.Image = ((System.Drawing.Image)(resources.GetObject("ChooseImageSource.Image")));
             this.ChooseImageSource.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ChooseImageSource.Name = "ChooseImageSource";
-            this.ChooseImageSource.Size = new System.Drawing.Size(137, 20);
+            this.ChooseImageSource.Size = new System.Drawing.Size(155, 20);
             this.ChooseImageSource.Text = "Choose Image Source";
             this.ChooseImageSource.Click += new System.EventHandler(this.ChooseImageSource_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(155, 6);
             // 
             // toolStripLabel2
             // 
             this.toolStripLabel2.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(137, 13);
+            this.toolStripLabel2.Size = new System.Drawing.Size(155, 15);
             this.toolStripLabel2.Text = "Items:";
             this.toolStripLabel2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -325,7 +323,7 @@
             this.AddOneItem.Image = ((System.Drawing.Image)(resources.GetObject("AddOneItem.Image")));
             this.AddOneItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AddOneItem.Name = "AddOneItem";
-            this.AddOneItem.Size = new System.Drawing.Size(137, 17);
+            this.AddOneItem.Size = new System.Drawing.Size(155, 19);
             this.AddOneItem.Text = "Add One Item";
             this.AddOneItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AddOneItem.Click += new System.EventHandler(this.AddOneItem_Click);
@@ -336,7 +334,7 @@
             this.AddItems.Image = ((System.Drawing.Image)(resources.GetObject("AddItems.Image")));
             this.AddItems.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AddItems.Name = "AddItems";
-            this.AddItems.Size = new System.Drawing.Size(137, 17);
+            this.AddItems.Size = new System.Drawing.Size(155, 19);
             this.AddItems.Text = "Add 1000 Items";
             this.AddItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AddItems.Click += new System.EventHandler(this.AddItems_Click);
@@ -347,7 +345,7 @@
             this.AddVirtualItems.Image = ((System.Drawing.Image)(resources.GetObject("AddVirtualItems.Image")));
             this.AddVirtualItems.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AddVirtualItems.Name = "AddVirtualItems";
-            this.AddVirtualItems.Size = new System.Drawing.Size(137, 17);
+            this.AddVirtualItems.Size = new System.Drawing.Size(155, 19);
             this.AddVirtualItems.Text = "Add 1000 Virtual Items";
             this.AddVirtualItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AddVirtualItems.Click += new System.EventHandler(this.AddVirtualItems_Click);
@@ -358,7 +356,7 @@
             this.AddURIItems.Image = ((System.Drawing.Image)(resources.GetObject("AddURIItems.Image")));
             this.AddURIItems.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AddURIItems.Name = "AddURIItems";
-            this.AddURIItems.Size = new System.Drawing.Size(137, 17);
+            this.AddURIItems.Size = new System.Drawing.Size(155, 19);
             this.AddURIItems.Text = "Add URI Items";
             this.AddURIItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AddURIItems.Click += new System.EventHandler(this.AddURIItems_Click);
@@ -369,7 +367,7 @@
             this.InsertItemAtIndex0.Image = ((System.Drawing.Image)(resources.GetObject("InsertItemAtIndex0.Image")));
             this.InsertItemAtIndex0.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.InsertItemAtIndex0.Name = "InsertItemAtIndex0";
-            this.InsertItemAtIndex0.Size = new System.Drawing.Size(137, 17);
+            this.InsertItemAtIndex0.Size = new System.Drawing.Size(155, 19);
             this.InsertItemAtIndex0.Text = "Insert Item At Index 0";
             this.InsertItemAtIndex0.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.InsertItemAtIndex0.Click += new System.EventHandler(this.InsertItemAtIndex0_Click);
@@ -380,7 +378,7 @@
             this.RemoveItemAtIndex0.Image = ((System.Drawing.Image)(resources.GetObject("RemoveItemAtIndex0.Image")));
             this.RemoveItemAtIndex0.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.RemoveItemAtIndex0.Name = "RemoveItemAtIndex0";
-            this.RemoveItemAtIndex0.Size = new System.Drawing.Size(137, 17);
+            this.RemoveItemAtIndex0.Size = new System.Drawing.Size(155, 19);
             this.RemoveItemAtIndex0.Text = "Remove Item At Index 0";
             this.RemoveItemAtIndex0.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.RemoveItemAtIndex0.Click += new System.EventHandler(this.RemoveItemAtIndex0_Click);
@@ -391,7 +389,7 @@
             this.ClearItems.Image = ((System.Drawing.Image)(resources.GetObject("ClearItems.Image")));
             this.ClearItems.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ClearItems.Name = "ClearItems";
-            this.ClearItems.Size = new System.Drawing.Size(137, 17);
+            this.ClearItems.Size = new System.Drawing.Size(155, 19);
             this.ClearItems.Text = "Clear Items";
             this.ClearItems.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ClearItems.Click += new System.EventHandler(this.ClearItems_Click);
@@ -399,13 +397,13 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(155, 6);
             // 
             // toolStripLabel3
             // 
             this.toolStripLabel3.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(137, 13);
+            this.toolStripLabel3.Size = new System.Drawing.Size(155, 15);
             this.toolStripLabel3.Text = "Thumbnails:";
             this.toolStripLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -415,7 +413,7 @@
             this.RebuildThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("RebuildThumbnails.Image")));
             this.RebuildThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.RebuildThumbnails.Name = "RebuildThumbnails";
-            this.RebuildThumbnails.Size = new System.Drawing.Size(137, 17);
+            this.RebuildThumbnails.Size = new System.Drawing.Size(155, 19);
             this.RebuildThumbnails.Text = "Rebuild Thumbnails";
             this.RebuildThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.RebuildThumbnails.Click += new System.EventHandler(this.RebuildThumbnails_Click);
@@ -423,13 +421,13 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(155, 6);
             // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(137, 13);
+            this.toolStripLabel1.Size = new System.Drawing.Size(155, 15);
             this.toolStripLabel1.Text = "Appearance Settings:";
             this.toolStripLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -438,7 +436,7 @@
             this.SetEnabled.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.SetEnabled.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.SetEnabled.Name = "SetEnabled";
-            this.SetEnabled.Size = new System.Drawing.Size(137, 17);
+            this.SetEnabled.Size = new System.Drawing.Size(155, 19);
             this.SetEnabled.Text = "Enabled";
             this.SetEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.SetEnabled.Click += new System.EventHandler(this.SetEnabled_Click);
@@ -454,35 +452,35 @@
             this.ViewMode.Image = ((System.Drawing.Image)(resources.GetObject("ViewMode.Image")));
             this.ViewMode.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ViewMode.Name = "ViewMode";
-            this.ViewMode.Size = new System.Drawing.Size(137, 17);
+            this.ViewMode.Size = new System.Drawing.Size(155, 19);
             this.ViewMode.Text = "View Mode";
             this.ViewMode.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ViewThumbnails
             // 
             this.ViewThumbnails.Name = "ViewThumbnails";
-            this.ViewThumbnails.Size = new System.Drawing.Size(127, 22);
+            this.ViewThumbnails.Size = new System.Drawing.Size(137, 22);
             this.ViewThumbnails.Text = "Thumbnails";
             this.ViewThumbnails.Click += new System.EventHandler(this.ViewThumbnails_Click);
             // 
             // ViewGallery
             // 
             this.ViewGallery.Name = "ViewGallery";
-            this.ViewGallery.Size = new System.Drawing.Size(127, 22);
+            this.ViewGallery.Size = new System.Drawing.Size(137, 22);
             this.ViewGallery.Text = "Gallery";
             this.ViewGallery.Click += new System.EventHandler(this.ViewGallery_Click);
             // 
             // ViewPane
             // 
             this.ViewPane.Name = "ViewPane";
-            this.ViewPane.Size = new System.Drawing.Size(127, 22);
+            this.ViewPane.Size = new System.Drawing.Size(137, 22);
             this.ViewPane.Text = "Pane";
             this.ViewPane.Click += new System.EventHandler(this.ViewPane_Click);
             // 
             // ViewDetails
             // 
             this.ViewDetails.Name = "ViewDetails";
-            this.ViewDetails.Size = new System.Drawing.Size(127, 22);
+            this.ViewDetails.Size = new System.Drawing.Size(137, 22);
             this.ViewDetails.Text = "Details";
             this.ViewDetails.Click += new System.EventHandler(this.ViewDetails_Click);
             // 
@@ -492,7 +490,7 @@
             this.SelectRenderer.Image = ((System.Drawing.Image)(resources.GetObject("SelectRenderer.Image")));
             this.SelectRenderer.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.SelectRenderer.Name = "SelectRenderer";
-            this.SelectRenderer.Size = new System.Drawing.Size(137, 17);
+            this.SelectRenderer.Size = new System.Drawing.Size(155, 19);
             this.SelectRenderer.Text = "Renderer";
             this.SelectRenderer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -502,7 +500,7 @@
             this.ShowFileIcons.Image = ((System.Drawing.Image)(resources.GetObject("ShowFileIcons.Image")));
             this.ShowFileIcons.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ShowFileIcons.Name = "ShowFileIcons";
-            this.ShowFileIcons.Size = new System.Drawing.Size(137, 17);
+            this.ShowFileIcons.Size = new System.Drawing.Size(155, 19);
             this.ShowFileIcons.Text = "Show File Icons";
             this.ShowFileIcons.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ShowFileIcons.Click += new System.EventHandler(this.ShowFileIcons_Click);
@@ -513,7 +511,7 @@
             this.ShowCheckboxes.Image = ((System.Drawing.Image)(resources.GetObject("ShowCheckboxes.Image")));
             this.ShowCheckboxes.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ShowCheckboxes.Name = "ShowCheckboxes";
-            this.ShowCheckboxes.Size = new System.Drawing.Size(137, 17);
+            this.ShowCheckboxes.Size = new System.Drawing.Size(155, 19);
             this.ShowCheckboxes.Text = "Show Checkboxes";
             this.ShowCheckboxes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ShowCheckboxes.Click += new System.EventHandler(this.ShowCheckboxes_Click);
@@ -524,7 +522,7 @@
             this.ShowScrollbars.Image = ((System.Drawing.Image)(resources.GetObject("ShowScrollbars.Image")));
             this.ShowScrollbars.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.ShowScrollbars.Name = "ShowScrollbars";
-            this.ShowScrollbars.Size = new System.Drawing.Size(137, 17);
+            this.ShowScrollbars.Size = new System.Drawing.Size(155, 19);
             this.ShowScrollbars.Text = "Show Scrollbars";
             this.ShowScrollbars.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ShowScrollbars.Click += new System.EventHandler(this.ShowScrollbars_Click);
@@ -535,7 +533,7 @@
             this.GroupByName.Image = ((System.Drawing.Image)(resources.GetObject("GroupByName.Image")));
             this.GroupByName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.GroupByName.Name = "GroupByName";
-            this.GroupByName.Size = new System.Drawing.Size(137, 17);
+            this.GroupByName.Size = new System.Drawing.Size(155, 19);
             this.GroupByName.Text = "Group by Name";
             this.GroupByName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.GroupByName.Click += new System.EventHandler(this.GroupByName_Click);
@@ -543,13 +541,13 @@
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(155, 6);
             // 
             // toolStripLabel4
             // 
             this.toolStripLabel4.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(137, 13);
+            this.toolStripLabel4.Size = new System.Drawing.Size(155, 15);
             this.toolStripLabel4.Text = "Behavior Settings:";
             this.toolStripLabel4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -559,10 +557,21 @@
             this.CacheOnDemand.Image = ((System.Drawing.Image)(resources.GetObject("CacheOnDemand.Image")));
             this.CacheOnDemand.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.CacheOnDemand.Name = "CacheOnDemand";
-            this.CacheOnDemand.Size = new System.Drawing.Size(137, 17);
+            this.CacheOnDemand.Size = new System.Drawing.Size(155, 19);
             this.CacheOnDemand.Text = "Cache On Demand";
             this.CacheOnDemand.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.CacheOnDemand.Click += new System.EventHandler(this.CacheOnDemand_Click);
+            // 
+            // UsePersistentCache
+            // 
+            this.UsePersistentCache.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.UsePersistentCache.Image = ((System.Drawing.Image)(resources.GetObject("UsePersistentCache.Image")));
+            this.UsePersistentCache.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.UsePersistentCache.Name = "UsePersistentCache";
+            this.UsePersistentCache.Size = new System.Drawing.Size(155, 19);
+            this.UsePersistentCache.Text = "Use Persistent Cache";
+            this.UsePersistentCache.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.UsePersistentCache.Click += new System.EventHandler(this.UsePersistentCache_Click);
             // 
             // AllowDuplicateFilenames
             // 
@@ -570,7 +579,7 @@
             this.AllowDuplicateFilenames.Image = ((System.Drawing.Image)(resources.GetObject("AllowDuplicateFilenames.Image")));
             this.AllowDuplicateFilenames.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AllowDuplicateFilenames.Name = "AllowDuplicateFilenames";
-            this.AllowDuplicateFilenames.Size = new System.Drawing.Size(137, 17);
+            this.AllowDuplicateFilenames.Size = new System.Drawing.Size(155, 19);
             this.AllowDuplicateFilenames.Text = "Allow Duplicate Filenames";
             this.AllowDuplicateFilenames.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AllowDuplicateFilenames.Click += new System.EventHandler(this.AllowDuplicateFilenames_Click);
@@ -581,7 +590,7 @@
             this.IntegralScroll.Image = ((System.Drawing.Image)(resources.GetObject("IntegralScroll.Image")));
             this.IntegralScroll.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.IntegralScroll.Name = "IntegralScroll";
-            this.IntegralScroll.Size = new System.Drawing.Size(137, 17);
+            this.IntegralScroll.Size = new System.Drawing.Size(155, 19);
             this.IntegralScroll.Text = "Integral Scroll";
             this.IntegralScroll.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.IntegralScroll.Click += new System.EventHandler(this.IntegralScroll_Click);
@@ -592,21 +601,10 @@
             this.MultiSelect.Image = ((System.Drawing.Image)(resources.GetObject("MultiSelect.Image")));
             this.MultiSelect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MultiSelect.Name = "MultiSelect";
-            this.MultiSelect.Size = new System.Drawing.Size(137, 17);
+            this.MultiSelect.Size = new System.Drawing.Size(73, 19);
             this.MultiSelect.Text = "Multi Select";
             this.MultiSelect.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.MultiSelect.Click += new System.EventHandler(this.MultiSelect_Click);
-            // 
-            // UseWIC
-            // 
-            this.UseWIC.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.UseWIC.Image = ((System.Drawing.Image)(resources.GetObject("UseWIC.Image")));
-            this.UseWIC.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.UseWIC.Name = "UseWIC";
-            this.UseWIC.Size = new System.Drawing.Size(137, 17);
-            this.UseWIC.Text = "Use WIC";
-            this.UseWIC.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.UseWIC.Click += new System.EventHandler(this.UseWIC_Click);
             // 
             // UseEmbeddedThumbnails
             // 
@@ -614,7 +612,7 @@
             this.UseEmbeddedThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("UseEmbeddedThumbnails.Image")));
             this.UseEmbeddedThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.UseEmbeddedThumbnails.Name = "UseEmbeddedThumbnails";
-            this.UseEmbeddedThumbnails.Size = new System.Drawing.Size(137, 17);
+            this.UseEmbeddedThumbnails.Size = new System.Drawing.Size(156, 19);
             this.UseEmbeddedThumbnails.Text = "Use Embedded Thumbnails";
             this.UseEmbeddedThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.UseEmbeddedThumbnails.Click += new System.EventHandler(this.UseEmbeddedThumbnails_Click);
@@ -625,7 +623,7 @@
             this.AutoRotateThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("AutoRotateThumbnails.Image")));
             this.AutoRotateThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AutoRotateThumbnails.Name = "AutoRotateThumbnails";
-            this.AutoRotateThumbnails.Size = new System.Drawing.Size(126, 17);
+            this.AutoRotateThumbnails.Size = new System.Drawing.Size(140, 19);
             this.AutoRotateThumbnails.Text = "Auto Rotate Thumbnails";
             this.AutoRotateThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AutoRotateThumbnails.Click += new System.EventHandler(this.AutoRotateThumbnails_Click);
@@ -633,13 +631,13 @@
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(155, 6);
             // 
             // toolStripLabel5
             // 
             this.toolStripLabel5.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel5.Name = "toolStripLabel5";
-            this.toolStripLabel5.Size = new System.Drawing.Size(63, 13);
+            this.toolStripLabel5.Size = new System.Drawing.Size(70, 15);
             this.toolStripLabel5.Text = "Benchmark:";
             this.toolStripLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -650,7 +648,7 @@
             this.StartBenchmark.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.StartBenchmark.Name = "StartBenchmark";
-            this.StartBenchmark.Size = new System.Drawing.Size(106, 20);
+            this.StartBenchmark.Size = new System.Drawing.Size(114, 20);
             this.StartBenchmark.Text = "Start Benchmark";
             this.StartBenchmark.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.Click += new System.EventHandler(this.StartBenchmark_Click);
@@ -668,17 +666,6 @@
             // ChooseSourcePath
             // 
             this.ChooseSourcePath.ShowNewFolderButton = false;
-            // 
-            // UsePersistentCache
-            // 
-            this.UsePersistentCache.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.UsePersistentCache.Image = ((System.Drawing.Image)(resources.GetObject("UsePersistentCache.Image")));
-            this.UsePersistentCache.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.UsePersistentCache.Name = "UsePersistentCache";
-            this.UsePersistentCache.Size = new System.Drawing.Size(137, 17);
-            this.UsePersistentCache.Text = "Use Persistent Cache";
-            this.UsePersistentCache.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.UsePersistentCache.Click += new System.EventHandler(this.UsePersistentCache_Click);
             // 
             // OpenCacheFile
             // 
@@ -758,7 +745,6 @@
         private System.Windows.Forms.ToolStripMenuItem ClearEventList;
         private System.Windows.Forms.FolderBrowserDialog ChooseBenchmarkPath;
         private System.Windows.Forms.Timer CheckBenchmarkEndTimer;
-        private System.Windows.Forms.ToolStripButton UseWIC;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripLabel toolStripLabel5;
         private System.Windows.Forms.ToolStripButton StartBenchmark;

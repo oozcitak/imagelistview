@@ -156,6 +156,8 @@ namespace Manina.Windows.Forms
             allowDuplicateFilenamesToolStripMenuItem.Checked = imageListView1.AllowDuplicateFileNames;
             continuousCacheModeToolStripMenuItem.Checked = (imageListView1.CacheMode == CacheMode.Continuous);
 
+            usingWPFWICToolStripMenuItem.Checked = (imageListView1.UseWIC);
+
             ContentAlignment ca = imageListView1.CheckBoxAlignment;
             foreach (ToolStripMenuItem item in checkboxAlignmentToolStripMenuItem.DropDownItems)
                 item.Checked = (ContentAlignment)item.Tag == ca;
@@ -410,6 +412,11 @@ namespace Manina.Windows.Forms
         {
             imageListView1.SortOrder = SortOrder.Descending;
         }
+
+        private void usingWPFWICToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.UseWIC = !imageListView1.UseWIC;
+        }
         #endregion
 
         #region Set selected image to PropertyGrid
@@ -530,7 +537,7 @@ namespace Manina.Windows.Forms
                 List<TreeNode> volNodes = new List<TreeNode>();
                 foreach (DriveInfo info in System.IO.DriveInfo.GetDrives())
                 {
-                    if (info.IsReady)
+                    if (info.IsReady && info.DriveType == DriveType.Fixed)
                     {
                         DirectoryInfo rootPath = info.RootDirectory;
                         TreeNode volNode = new TreeNode(info.VolumeLabel + " (" + info.Name + ")", 0, 0);
