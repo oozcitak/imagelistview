@@ -520,8 +520,11 @@ namespace Manina.Windows.Forms
             {
                 mFileName = filename;
                 extension = Path.GetExtension(filename);
+                // if text parameter is empty then get file name for item text
                 if (string.IsNullOrEmpty(text))
                     mText = Path.GetFileName(filename);
+                else // else use text parameter
+                    mText = text;
             }
             else if (string.IsNullOrEmpty(text))
             {
@@ -1193,7 +1196,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         private string PathForShellIcon()
         {
-            if (mImageListView != null && mImageListView.ShellIconFromFileContent && 
+            if (mImageListView != null && mImageListView.ShellIconFromFileContent &&
                 (string.Compare(extension, ".ico", StringComparison.OrdinalIgnoreCase) == 0 || string.Compare(extension, ".exe", StringComparison.OrdinalIgnoreCase) == 0))
                 return mFileName;
             else
