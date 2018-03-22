@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>bin\Release\ImageListView.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\ImageListView.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release without WIC|AnyCPU' ">
     <OutputPath>bin\Release without WIC\</OutputPath>
