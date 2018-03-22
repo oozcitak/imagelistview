@@ -14,6 +14,6 @@ $client = new-object System.Net.WebClient
 $client.DownloadFile($nugeturl, $nugetexe)
 
 # create the nuspec file for the "Release" build
-iex "$($nugetexe) pack '.\ImageListView\ImageListView.csproj' -Properties Configuration=Release"
-iex "$($nugetexe) push -source https://api.nuget.org/v3/index.json .\*.nupkg $($apikey)"
+Invoke-Expression "$($nugetexe) Pack '.\ImageListView\ImageListView.csproj' -Properties Configuration=Release"
+Invoke-Expression "$($nugetexe) Push .\*.nupkg -Source https://www.nuget.org -ApiKey $($apikey) -Verbosity Detailed"
 Remove-Item ".\*.nupkg"
