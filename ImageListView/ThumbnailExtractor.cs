@@ -17,34 +17,31 @@
 //
 // WIC support coded by Jens
 
+using Manina.Windows.Forms;
 using System;
-using System.IO;
-using System.Drawing.Imaging;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Text;
-#if USEWIC
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-#endif
 
 namespace Manina.Windows.Forms
 {
     /// <summary>
     /// Extracts thumbnails from images.
     /// </summary>
-    internal static class ThumbnailExtractor
+    public partial class WPFExtractor : GDIExtractor
     {
         #region Exif Tag IDs
         private const int TagThumbnailData = 0x501B;
         private const int TagOrientation = 0x0112;
         #endregion
 
-#if USEWIC
         #region WIC Metadata Paths
         private static readonly string[] WICPathOrientation = new string[] { "/app1/ifd/{ushort=274}", "/xmp/tiff:Orientation" };
         #endregion
-#endif
 
         #region Public Methods
         /// <summary>
@@ -54,71 +51,52 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
-        /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
         /// <returns>The thumbnail image from the given image or null if an error occurs.</returns>
-        public static Image FromImage(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
+        public override Image GetThumbnail(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
 
-            if (useWIC)
+            MemoryStream stream = null;
+            BitmapFrame frameWpf = null;
+            try
             {
-#if USEWIC
-                MemoryStream stream = null;
-                BitmapFrame frameWpf = null;
-                try
-                {
-                    stream = new MemoryStream();
+                stream = new MemoryStream();
 
-                    image.Save(stream, ImageFormat.Bmp);
-                    // Performance vs image quality settings.
-                    // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
-                    // if the file contains no embedded thumbnail. The image quality is only slightly worse.
-                    stream.Seek(0, SeekOrigin.Begin);
-                    frameWpf = BitmapFrame.Create(stream,
-                        BitmapCreateOptions.IgnoreColorProfile,
-                        BitmapCacheOption.None);
-                }
-                catch
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                        stream = null;
-                    }
-                    frameWpf = null;
-                }
-
-                if (stream == null || frameWpf == null)
-                {
-                    if (stream != null)
-                    {
-                        stream.Dispose();
-                        stream = null;
-                    }
-
-                    // .Net 2.0 fallback
-                    Image img = GetThumbnailBmp(image, size,
-                        useExifOrientation ? GetRotation(image) : 0);
-                    return img;
-                }
-
-                Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
-                    useExifOrientation ? GetRotation(frameWpf) : 0);
-                stream.Dispose();
-                return thumb;
-#else
-                // .Net 2.0 fallback
-                return GetThumbnailBmp(image, size,
-                     useExifOrientation ? GetRotation(image) : 0);
-#endif
+                image.Save(stream, ImageFormat.Bmp);
+                // Performance vs image quality settings.
+                // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
+                // if the file contains no embedded thumbnail. The image quality is only slightly worse.
+                stream.Seek(0, SeekOrigin.Begin);
+                frameWpf = BitmapFrame.Create(stream,
+                    BitmapCreateOptions.IgnoreColorProfile,
+                    BitmapCacheOption.None);
             }
-            else
+            catch
             {
-                // .Net 2.0 fallback
-                return GetThumbnailBmp(image, size,
-                    useExifOrientation ? GetRotation(image) : 0);
+                if (stream != null)
+                {
+                    stream.Dispose();
+                    stream = null;
+                }
+                frameWpf = null;
             }
+
+            if (stream == null || frameWpf == null)
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                    stream = null;
+                }
+
+                // .Net 2.0 fallback
+                return base.GetThumbnail(image, size, useEmbeddedThumbnails, useExifOrientation);
+            }
+
+            Image thumb = GetThumbnail(frameWpf, size, useEmbeddedThumbnails, useExifOrientation ? GetRotation(frameWpf) : 0);
+            stream.Dispose();
+            return thumb;
         }
         /// <summary>
         /// Creates a thumbnail from the given image file.
@@ -131,9 +109,8 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested image size.</param>
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
-        /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
         /// <returns>The thumbnail image from the given file or null if an error occurs.</returns>
-        public static Image FromFile(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
+        public override Image GetThumbnail(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
         {
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentException("Filename cannot be empty", "filename");
@@ -141,258 +118,29 @@ namespace Manina.Windows.Forms
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException("Thumbnail size cannot be empty.", "size");
 
-            if (useWIC)
+            try
             {
-#if USEWIC
-                try
+                using (FileStream stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    using (FileStream stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        // Performance vs image quality settings.
-                        // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
-                        // if the file contains no embedded thumbnail. The image quality is only slightly worse.
-                        BitmapFrame frameWpf = BitmapFrame.Create(stream,
-                            BitmapCreateOptions.IgnoreColorProfile,
-                            BitmapCacheOption.None);
-                        return GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
-                            useExifOrientation ? GetRotation(frameWpf) : 0);
-                    }
+                    // Performance vs image quality settings.
+                    // Selecting BitmapCacheOption.None speeds up thumbnail generation of large images tremendously
+                    // if the file contains no embedded thumbnail. The image quality is only slightly worse.
+                    BitmapFrame frameWpf = BitmapFrame.Create(stream,
+                        BitmapCreateOptions.IgnoreColorProfile,
+                        BitmapCacheOption.None);
+                    return GetThumbnail(frameWpf, size, useEmbeddedThumbnails,
+                        useExifOrientation ? GetRotation(frameWpf) : 0);
                 }
-                catch
-                {
-                    // .Net 2.0 fallback
-                    return GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
-                        useExifOrientation ? GetRotation(filename) : 0);
-                }
-#else
-                // .Net 2.0 fallback
-                return GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
-                    useExifOrientation ? GetRotation(filename) : 0);
-#endif
             }
-            else
+            catch
             {
                 // .Net 2.0 fallback
-                return GetThumbnailBmp(filename, size, useEmbeddedThumbnails,
-                    useExifOrientation ? GetRotation(filename) : 0);
+                return base.GetThumbnail(filename, size, useEmbeddedThumbnails, useExifOrientation);
             }
         }
         #endregion
 
         #region Helper Methods
-        /// <summary>
-        /// Creates a thumbnail from the given image.
-        /// </summary>
-        /// <param name="image">The source image.</param>
-        /// <param name="size">Requested image size.</param>
-        /// <param name="rotate">Rotation angle.</param>
-        /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image GetThumbnailBmp(Image image, Size size, int rotate)
-        {
-            if (size.Width <= 0 || size.Height <= 0)
-                throw new ArgumentException();
-
-            Image thumb = null;
-            try
-            {
-                double scale;
-                if (rotate % 180 != 0)
-                {
-                    scale = Math.Min(size.Height / (double)image.Width,
-                        size.Width / (double)image.Height);
-                }
-                else
-                {
-                    scale = Math.Min(size.Width / (double)image.Width,
-                        size.Height / (double)image.Height);
-                }
-
-                thumb = ScaleDownRotateBitmap(image, scale, rotate);
-            }
-            catch
-            {
-                if (thumb != null)
-                    thumb.Dispose();
-                thumb = null;
-            }
-
-            return thumb;
-        }
-        /// <summary>
-        /// Creates a thumbnail from the given image file.
-        /// </summary>
-        /// <param name="filename">The filename pointing to an image.</param>
-        /// <param name="size">Requested image size.</param>
-        /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
-        /// <param name="rotate">Rotation angle.</param>
-        /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image GetThumbnailBmp(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, int rotate)
-        {
-            if (size.Width <= 0 || size.Height <= 0)
-                throw new ArgumentException();
-
-            // Check if this is an image file
-            try
-            {
-                using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                {
-                    if (!Utility.IsImage(stream))
-                        return null;
-                }
-            }
-            catch
-            {
-                return null;
-            }
-
-            Image source = null;
-            Image thumb = null;
-
-            // Try to read the exif thumbnail
-            if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
-            {
-                try
-                {
-                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                    {
-                        using (Image img = Image.FromStream(stream, false, false))
-                        {
-                            foreach (int index in img.PropertyIdList)
-                            {
-                                if (index == TagThumbnailData)
-                                {
-                                    // Fetch the embedded thumbnail
-                                    byte[] rawImage = img.GetPropertyItem(TagThumbnailData).Value;
-                                    using (MemoryStream memStream = new MemoryStream(rawImage))
-                                    {
-                                        source = Image.FromStream(memStream);
-                                    }
-                                    if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
-                                    {
-                                        // Check that the embedded thumbnail is large enough.
-                                        if (Math.Max((float)source.Width / (float)size.Width,
-                                            (float)source.Height / (float)size.Height) < 1.0f)
-                                        {
-                                            source.Dispose();
-                                            source = null;
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    if (source != null)
-                        source.Dispose();
-                    source = null;
-                }
-            }
-
-            // Fix for the missing semicolon in GIF files
-            MemoryStream streamCopy = null;
-            try
-            {
-                if (source == null)
-                {
-                    using (FileStream stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
-                    {
-                        byte[] gifSignature = new byte[4];
-                        stream.Read(gifSignature, 0, 4);
-                        if (Encoding.ASCII.GetString(gifSignature) == "GIF8")
-                        {
-                            stream.Seek(0, SeekOrigin.Begin);
-                            streamCopy = new MemoryStream();
-                            byte[] buffer = new byte[32768];
-                            int read = 0;
-                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                streamCopy.Write(buffer, 0, read);
-                            }
-                            // Append the missing semicolon
-                            streamCopy.Seek(-1, SeekOrigin.End);
-                            if (streamCopy.ReadByte() != 0x3b)
-                                streamCopy.WriteByte(0x3b);
-                            source = Image.FromStream(streamCopy);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                if (source != null)
-                    source.Dispose();
-                source = null;
-                if (streamCopy != null)
-                    streamCopy.Dispose();
-                streamCopy = null;
-            }
-
-            // Revert to source image if an embedded thumbnail of required size
-            // was not found.
-            FileStream sourceStream = null;
-            if (source == null)
-            {
-                try
-                {
-                    sourceStream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-                    source = Image.FromStream(sourceStream);
-                }
-                catch
-                {
-                    if (source != null)
-                        source.Dispose();
-                    if (sourceStream != null)
-                        sourceStream.Dispose();
-                    source = null;
-                    sourceStream = null;
-                }
-            }
-
-            // If all failed, return null.
-            if (source == null) return null;
-
-            // Create the thumbnail
-            try
-            {
-                double scale;
-                if (rotate % 180 != 0)
-                {
-                    scale = Math.Min(size.Height / (double)source.Width,
-                        size.Width / (double)source.Height);
-                }
-                else
-                {
-                    scale = Math.Min(size.Width / (double)source.Width,
-                        size.Height / (double)source.Height);
-                }
-
-                thumb = ScaleDownRotateBitmap(source, scale, rotate);
-            }
-            catch
-            {
-                if (thumb != null)
-                    thumb.Dispose();
-                thumb = null;
-            }
-            finally
-            {
-                if (source != null)
-                    source.Dispose();
-                source = null;
-                if (sourceStream != null)
-                    sourceStream.Dispose();
-                sourceStream = null;
-                if (streamCopy != null)
-                    streamCopy.Dispose();
-                streamCopy = null;
-            }
-
-            return thumb;
-        }
-#if USEWIC
         /// <summary>
         /// Returns Exif rotation in degrees. Returns 0 if the metadata 
         /// does not exist or could not be read. A negative value means
@@ -435,22 +183,6 @@ namespace Manina.Windows.Forms
             }
 
             return 0;
-        }
-        /// <summary>
-        /// Returns the metadata for the given query.
-        /// </summary>
-        /// <param name="metadata">The image metadata.</param>
-        /// <param name="query">A list of query strings.</param>
-        /// <returns>Metadata object or null if the metadata is not found.</returns>
-        private static object GetMetadataObject(BitmapMetadata metadata, params string[] query)
-        {
-            foreach (string q in query)
-            {
-                object val = metadata.GetQuery(q);
-                if (val != null)
-                    return val;
-            }
-            return null;
         }
         /// <summary>
         /// Creates a  thumbnail from the given bitmap.
@@ -670,7 +402,6 @@ namespace Manina.Windows.Forms
 
             return bmp;
         }
-#endif
         /// <summary>
         /// Returns Exif rotation in degrees. Returns 0 if the metadata 
         /// does not exist or could not be read. A negative value means

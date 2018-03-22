@@ -156,6 +156,8 @@ namespace Manina.Windows.Forms
             allowDuplicateFilenamesToolStripMenuItem.Checked = imageListView1.AllowDuplicateFileNames;
             continuousCacheModeToolStripMenuItem.Checked = (imageListView1.CacheMode == CacheMode.Continuous);
 
+            usingWPFWICToolStripMenuItem.Checked = (imageListView1.UseWIC);
+
             ContentAlignment ca = imageListView1.CheckBoxAlignment;
             foreach (ToolStripMenuItem item in checkboxAlignmentToolStripMenuItem.DropDownItems)
                 item.Checked = (ContentAlignment)item.Tag == ca;
@@ -409,6 +411,11 @@ namespace Manina.Windows.Forms
         private void sortDescendingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             imageListView1.SortOrder = SortOrder.Descending;
+        }
+
+        private void usingWPFWICToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.UseWIC = !imageListView1.UseWIC;
         }
         #endregion
 

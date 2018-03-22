@@ -858,6 +858,10 @@ namespace Manina.Windows.Forms
         {
             get { return (mView == View.Gallery ? ScrollOrientation.HorizontalScroll : ScrollOrientation.VerticalScroll); }
         }
+        /// <summary>
+        /// Determines whether the control is using WPF/WIC for thumbnail extraction.
+        /// </summary>
+        public bool UseWIC { get { return Extractor.UseWIC; } set { Extractor.UseWIC = value; } }
         #endregion
 
         #region Custom Property Serializers
