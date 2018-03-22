@@ -530,7 +530,7 @@ namespace Manina.Windows.Forms
                 List<TreeNode> volNodes = new List<TreeNode>();
                 foreach (DriveInfo info in System.IO.DriveInfo.GetDrives())
                 {
-                    if (info.IsReady)
+                    if (info.IsReady && info.DriveType == DriveType.Fixed)
                     {
                         DirectoryInfo rootPath = info.RootDirectory;
                         TreeNode volNode = new TreeNode(info.VolumeLabel + " (" + info.Name + ")", 0, 0);
