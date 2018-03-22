@@ -156,6 +156,8 @@ namespace Manina.Windows.Forms
             allowDuplicateFilenamesToolStripMenuItem.Checked = imageListView1.AllowDuplicateFileNames;
             continuousCacheModeToolStripMenuItem.Checked = (imageListView1.CacheMode == CacheMode.Continuous);
 
+            usingWPFWICToolStripMenuItem.Checked = (imageListView1.UsingWIC);
+
             ContentAlignment ca = imageListView1.CheckBoxAlignment;
             foreach (ToolStripMenuItem item in checkboxAlignmentToolStripMenuItem.DropDownItems)
                 item.Checked = (ContentAlignment)item.Tag == ca;

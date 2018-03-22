@@ -35,6 +35,7 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.label1 = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.imageListView1 = new Manina.Windows.Forms.ImageListView();
@@ -83,8 +84,9 @@
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
             this.sortAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label1 = new System.Windows.Forms.Label();
             this.ofBrowseImage = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
+            this.usingWPFWICToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -174,11 +176,25 @@
             this.splitContainer3.SplitterDistance = 200;
             this.splitContainer3.TabIndex = 1;
             // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.BackColor = System.Drawing.SystemColors.Info;
+            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(200, 48);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Select a folder containing image files from the folder tree below or click here t" +
+    "o browse for images.";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
             // treeView1
             // 
-            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.treeView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView1.HideSelection = false;
             this.treeView1.ImageIndex = 0;
             this.treeView1.ImageList = this.imageList1;
@@ -213,8 +229,8 @@
             this.imageListView1.PersistentCacheSize = ((long)(100));
             this.imageListView1.Size = new System.Drawing.Size(397, 389);
             this.imageListView1.TabIndex = 0;
-            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
             this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
+            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
             this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // propertyGrid1
@@ -388,7 +404,9 @@
             this.checkboxAlignmentToolStripMenuItem,
             this.iconAlignmentToolStripMenuItem,
             this.toolStripMenuItem3,
-            this.continuousCacheModeToolStripMenuItem});
+            this.continuousCacheModeToolStripMenuItem,
+            this.toolStripMenuItem7,
+            this.usingWPFWICToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
@@ -577,25 +595,23 @@
             this.sortDescendingToolStripMenuItem.Text = "Descending";
             this.sortDescendingToolStripMenuItem.Click += new System.EventHandler(this.sortDescendingToolStripMenuItem_Click);
             // 
-            // label1
-            // 
-            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.label1.BackColor = System.Drawing.SystemColors.Info;
-            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(200, 48);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Select a folder containing image files from the folder tree below or click here t" +
-                "o browse for images.";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
-            // 
             // ofBrowseImage
             // 
             this.ofBrowseImage.Filter = "JPEG Files|*.jpg|All Files|*.*";
             this.ofBrowseImage.Multiselect = true;
             this.ofBrowseImage.Title = "Select Images";
+            // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(210, 6);
+            // 
+            // usingWPFWICToolStripMenuItem
+            // 
+            this.usingWPFWICToolStripMenuItem.Enabled = false;
+            this.usingWPFWICToolStripMenuItem.Name = "usingWPFWICToolStripMenuItem";
+            this.usingWPFWICToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.usingWPFWICToolStripMenuItem.Text = "Using WPF/WIC";
             // 
             // DemoForm
             // 
@@ -685,7 +701,8 @@
         private System.Windows.Forms.ToolStripMenuItem sortDescendingToolStripMenuItem;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.OpenFileDialog ofBrowseImage;
-
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
+        private System.Windows.Forms.ToolStripMenuItem usingWPFWICToolStripMenuItem;
     }
 }
 
