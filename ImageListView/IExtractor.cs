@@ -40,7 +40,7 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
         /// <returns>The thumbnail image from the given file or null if an error occurs.</returns>
-        Image GetThumbnail(string filename, Size size, EmbeddedThumbnail useEmbeddedThumbnails, bool useExifOrientation);
+        Image GetThumbnail(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation);
 
         /// <summary>
         /// Creates a thumbnail from the given image.
@@ -50,7 +50,7 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
         /// <returns>The thumbnail image from the given image or null if an error occurs.</returns>
-        Image GetThumbnail(Image image, Size size, EmbeddedThumbnail useEmbeddedThumbnails, bool useExifOrientation);
+        Image GetThumbnail(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation);
 
         /// <summary>
         /// Returns shell info.

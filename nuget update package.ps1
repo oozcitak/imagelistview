@@ -14,6 +14,6 @@ $client = new-object System.Net.WebClient
 $client.DownloadFile($nugeturl, $nugetexe)
 
 # create the nuspec file for the "Release" build
-iex "$($nugetexe) pack '.\ImageListView\ImageListView.csproj' -IncludeReferencedProjects -Properties Configuration=Release"
+iex "$($nugetexe) pack '.\ImageListView\ImageListView.csproj' -Properties Configuration=Release"
 iex "$($nugetexe) push .\*.nupkg $($apikey)"
 Remove-Item ".\*.nupkg"

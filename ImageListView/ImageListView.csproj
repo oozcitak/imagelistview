@@ -38,25 +38,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>bin\Release\ImageListView.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release without WIC|AnyCPU' ">
-    <OutputPath>bin\Release without WIC\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DebugType>none</DebugType>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug without WIC|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug without WIC\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Design" />
@@ -67,6 +48,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GDIMetadataExtractor.cs" />
+    <Compile Include="GDIShellInfoExtractor.cs" />
+    <Compile Include="GDIThumbnailExtractor.cs" />
+    <Compile Include="IExtractor.cs" />
+    <Compile Include="Metadata.cs" />
     <Compile Include="PersistentCache.cs" />
     <Compile Include="ImageListViewGroupCollection.cs">
       <SubType>Component</SubType>
@@ -144,6 +130,7 @@
       <DependentUpon>ImageListViewResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Extractor.cs" />
+    <Compile Include="ShellInfo.cs" />
     <Compile Include="Utility.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
@@ -188,16 +175,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="QueuedBackgroundWorker.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ThumbnailExtractor\ThumbnailExtractor.csproj">
-      <Project>{3e182f99-fbc6-4219-a4ab-451ce303be3a}</Project>
-      <Name>ThumbnailExtractor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WPFThumbnailExtractor\WPFThumbnailExtractor.csproj">
-      <Project>{819a4362-3a60-4fea-b193-5baa2faffc3f}</Project>
-      <Name>WPFThumbnailExtractor</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

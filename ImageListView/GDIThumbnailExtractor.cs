@@ -45,7 +45,7 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
         /// <returns>The thumbnail image from the given image or null if an error occurs.</returns>
-        public virtual Image GetThumbnail(Image image, Size size, EmbeddedThumbnail useEmbeddedThumbnails, bool useExifOrientation)
+        public virtual Image GetThumbnail(Image image, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -61,7 +61,7 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
         /// <returns>The thumbnail image from the given file or null if an error occurs.</returns>
-        public virtual Image GetThumbnail(string filename, Size size, EmbeddedThumbnail useEmbeddedThumbnails, bool useExifOrientation)
+        public virtual Image GetThumbnail(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
         {
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentException("Filename cannot be empty", "filename");
@@ -121,7 +121,7 @@ namespace Manina.Windows.Forms
         /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
         /// <param name="rotate">Rotation angle.</param>
         /// <returns>The image from the given file or null if an error occurs.</returns>
-        internal static Image GetThumbnailBmp(string filename, Size size, EmbeddedThumbnail useEmbeddedThumbnails, int rotate)
+        internal static Image GetThumbnailBmp(string filename, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, int rotate)
         {
             if (size.Width <= 0 || size.Height <= 0)
                 throw new ArgumentException();
@@ -144,7 +144,7 @@ namespace Manina.Windows.Forms
             Image thumb = null;
 
             // Try to read the exif thumbnail
-            if (useEmbeddedThumbnails != EmbeddedThumbnail.Never)
+            if (useEmbeddedThumbnails != UseEmbeddedThumbnails.Never)
             {
                 try
                 {
@@ -162,7 +162,7 @@ namespace Manina.Windows.Forms
                                     {
                                         source = Image.FromStream(memStream);
                                     }
-                                    if (useEmbeddedThumbnails == EmbeddedThumbnail.Auto)
+                                    if (useEmbeddedThumbnails == UseEmbeddedThumbnails.Auto)
                                     {
                                         // Check that the embedded thumbnail is large enough.
                                         if (Math.Max((float)source.Width / (float)size.Width,

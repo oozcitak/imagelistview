@@ -782,7 +782,7 @@ namespace Manina.Windows.Forms
             }
 
             // Resize
-            thumb = Extractor.Instance.GetThumbnail(thumb, thumbSize, (EmbeddedThumbnail)useEmbeddedThumbnails, autoRotate);
+            thumb = Extractor.Instance.GetThumbnail(thumb, thumbSize, useEmbeddedThumbnails, autoRotate);
 
             // Add to cache
             thumbCache.Add(guid, new CacheItem(guid, thumbSize, thumb, CacheState.Cached, useEmbeddedThumbnails, autoRotate));

@@ -17,7 +17,8 @@
 //
 // WIC support coded by Jens
 
-using System.Drawing;
+using System;
+using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
@@ -26,15 +27,42 @@ namespace Manina.Windows.Forms
     /// </summary>
     internal static class Extractor
     {
-        public static IExtractor Instance { get; private set; }
+        private static bool useWIC = true;
+        private static IExtractor instance = null;
 
-        static Extractor()
+        public static IExtractor Instance
         {
-#if USEWIC
-            Instance = new WPFExtractor();
-#else
-            Instance = new GDIExtractor();
-#endif
+            get
+            {
+                if (instance == null)
+                {
+                    if (!useWIC)
+                    {
+                        instance = new GDIExtractor();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Assembly assembly = Assembly.LoadFrom("WPFThumbnailExtractor.dll");
+                            Type type = assembly.GetType("WPFExtractor");
+                            instance = (IExtractor)Activator.CreateInstance(type);
+                        }
+                        catch
+                        {
+                            instance = new GDIExtractor();
+                        }
+                    }
+                }
+
+                return instance;
+            }
+        }
+
+        public static bool UseWIC
+        {
+            get { return useWIC; }
+            set { useWIC = value; instance = null; }
         }
     }
 }

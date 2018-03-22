@@ -43,9 +43,9 @@
     <Compile Include="WPFThumbnailExtractor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThumbnailExtractor\ThumbnailExtractor.csproj">
-      <Project>{3e182f99-fbc6-4219-a4ab-451ce303be3a}</Project>
-      <Name>ThumbnailExtractor</Name>
+    <ProjectReference Include="..\ImageListView\ImageListView.csproj">
+      <Project>{0c295fb8-c6c6-4a40-9f19-05a43f353a04}</Project>
+      <Name>ImageListView</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

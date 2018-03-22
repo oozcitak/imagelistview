@@ -75,6 +75,8 @@
             this.iconAlignmentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.continuousCacheModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
+            this.usingWPFWICToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.columnContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.groupByToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
@@ -85,8 +87,6 @@
             this.sortAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ofBrowseImage = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
-            this.usingWPFWICToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -229,6 +229,7 @@
             this.imageListView1.PersistentCacheSize = ((long)(100));
             this.imageListView1.Size = new System.Drawing.Size(397, 389);
             this.imageListView1.TabIndex = 0;
+            this.imageListView1.UseWIC = true;
             this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
             this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
             this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
@@ -261,7 +262,7 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(611, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(642, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // rendererToolStripLabel
@@ -529,6 +530,18 @@
             this.continuousCacheModeToolStripMenuItem.Text = "Continuous Cache Mode";
             this.continuousCacheModeToolStripMenuItem.Click += new System.EventHandler(this.continuousCacheModeToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(210, 6);
+            // 
+            // usingWPFWICToolStripMenuItem
+            // 
+            this.usingWPFWICToolStripMenuItem.Name = "usingWPFWICToolStripMenuItem";
+            this.usingWPFWICToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.usingWPFWICToolStripMenuItem.Text = "Using WPF/WIC";
+            this.usingWPFWICToolStripMenuItem.Click += new System.EventHandler(this.usingWPFWICToolStripMenuItem_Click);
+            // 
             // columnContextMenu
             // 
             this.columnContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -600,18 +613,6 @@
             this.ofBrowseImage.Filter = "JPEG Files|*.jpg|All Files|*.*";
             this.ofBrowseImage.Multiselect = true;
             this.ofBrowseImage.Title = "Select Images";
-            // 
-            // toolStripMenuItem7
-            // 
-            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(210, 6);
-            // 
-            // usingWPFWICToolStripMenuItem
-            // 
-            this.usingWPFWICToolStripMenuItem.Enabled = false;
-            this.usingWPFWICToolStripMenuItem.Name = "usingWPFWICToolStripMenuItem";
-            this.usingWPFWICToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.usingWPFWICToolStripMenuItem.Text = "Using WPF/WIC";
             // 
             // DemoForm
             // 

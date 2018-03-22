@@ -44,7 +44,7 @@ namespace Manina.Windows.Forms
 
                 string filename = (string)key;
                 if (File.Exists(filename))
-                    return Extractor.Instance.GetThumbnail(filename, size, (EmbeddedThumbnail)useEmbeddedThumbnails, useExifOrientation);
+                    return Extractor.Instance.GetThumbnail(filename, size, useEmbeddedThumbnails, useExifOrientation);
                 else
                     return null;
             }
@@ -178,7 +178,7 @@ namespace Manina.Windows.Forms
                         {
                             using (Image sourceImage = Image.FromStream(stream))
                             {
-                                return Extractor.Instance.GetThumbnail(sourceImage, size, (EmbeddedThumbnail)useEmbeddedThumbnails, useExifOrientation);
+                                return Extractor.Instance.GetThumbnail(sourceImage, size, useEmbeddedThumbnails, useExifOrientation);
                             }
                         }
                     }
