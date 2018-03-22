@@ -92,7 +92,7 @@ namespace Manina.Windows.Forms
             get
             {
                 return mImageListView.thumbnailCache.GetCacheState(mGuid, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly);
+                    mImageListView.AutoRotateThumbnails);
             }
         }
         /// <summary>
@@ -258,8 +258,7 @@ namespace Manina.Windows.Forms
                     {
                         mImageListView.thumbnailCache.Remove(mGuid, true);
                         mImageListView.metadataCache.Remove(mGuid);
-                        mImageListView.metadataCache.Add(mGuid, Adaptor, mFileName,
-                            (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+                        mImageListView.metadataCache.Add(mGuid, Adaptor, mFileName);
                         if (mImageListView.IsItemVisible(mGuid))
                             mImageListView.Refresh();
                     }
@@ -282,12 +281,11 @@ namespace Manina.Windows.Forms
                 if (ThumbnailCacheState != CacheState.Cached)
                 {
                     mImageListView.thumbnailCache.Add(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize,
-                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                        (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                        mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
                 }
 
                 return mImageListView.thumbnailCache.GetImage(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
+                    mImageListView.AutoRotateThumbnails, true);
             }
         }
         /// <summary>
@@ -622,8 +620,7 @@ namespace Manina.Windows.Forms
             {
                 mImageListView.thumbnailCache.Remove(mGuid, true);
                 mImageListView.metadataCache.Remove(mGuid);
-                mImageListView.metadataCache.Add(mGuid, mAdaptor, mVirtualItemKey,
-                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly));
+                mImageListView.metadataCache.Add(mGuid, mAdaptor, mVirtualItemKey);
                 mImageListView.Refresh();
             }
         }
@@ -923,14 +920,13 @@ namespace Manina.Windows.Forms
                 }
 
                 img = mImageListView.thumbnailCache.GetImage(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize, mImageListView.UseEmbeddedThumbnails,
-                    mImageListView.AutoRotateThumbnails, mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, false);
+                    mImageListView.AutoRotateThumbnails, false);
 
                 if (state == CacheState.Cached)
                     return img;
 
                 mImageListView.thumbnailCache.Add(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize,
-                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly));
+                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails);
 
                 if (img == null && string.IsNullOrEmpty(iconPath))
                     return mImageListView.DefaultImage;
@@ -989,8 +985,7 @@ namespace Manina.Windows.Forms
 
             if (mImageListView != null)
             {
-                UpdateDetailsInternal(Adaptor.GetDetails(mVirtualItemKey,
-                    (mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.DetailsOnly)));
+                UpdateDetailsInternal(Adaptor.GetDetails(mVirtualItemKey));
             }
         }
         /// <summary>
@@ -1260,8 +1255,7 @@ namespace Manina.Windows.Forms
             if (mImageListView != null)
             {
                 item.clonedThumbnail = mImageListView.thumbnailCache.GetImage(Guid, mAdaptor, mVirtualItemKey, mImageListView.ThumbnailSize,
-                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails,
-                    mImageListView.UseWIC == UseWIC.Auto || mImageListView.UseWIC == UseWIC.ThumbnailsOnly, true);
+                    mImageListView.UseEmbeddedThumbnails, mImageListView.AutoRotateThumbnails, true);
             }
 
             return item;

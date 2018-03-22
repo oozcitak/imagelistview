@@ -21,7 +21,7 @@ namespace ImageListViewTests
         /// </summary>
         private class CustomAdaptor : ImageListView.ImageListViewItemAdaptor
         {
-            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
+            public override Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
             {
                 string file = key as string;
                 if (!string.IsNullOrEmpty(file))
@@ -35,7 +35,7 @@ namespace ImageListViewTests
 
                 return null;
             }
-            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC)
+            public override string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation)
             {
                 return (string)key;
             }
@@ -45,7 +45,7 @@ namespace ImageListViewTests
                 return file;
             }
 
-            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC)
+            public override Utility.Tuple<ColumnType, string, object>[] GetDetails(object key)
             {
                 throw new NotImplementedException();
             }
@@ -358,14 +358,6 @@ namespace ImageListViewTests
         {
             imageListView.MultiSelect = !imageListView.MultiSelect;
         }
-        // Use WIC
-        private void UseWIC_Click(object sender, EventArgs e)
-        {
-            if (imageListView.UseWIC == Manina.Windows.Forms.UseWIC.Auto)
-                imageListView.UseWIC = Manina.Windows.Forms.UseWIC.Never;
-            else
-                imageListView.UseWIC = Manina.Windows.Forms.UseWIC.Auto;
-        }
         // Embedded thumbnails
         private void UseEmbeddedThumbnails_Click(object sender, EventArgs e)
         {
@@ -406,7 +398,6 @@ namespace ImageListViewTests
             AllowDuplicateFilenames.Checked = imageListView.AllowDuplicateFileNames;
             IntegralScroll.Checked = imageListView.IntegralScroll;
             MultiSelect.Checked = imageListView.MultiSelect;
-            UseWIC.Checked = (imageListView.UseWIC == Manina.Windows.Forms.UseWIC.Auto);
             UseEmbeddedThumbnails.Checked = (imageListView.UseEmbeddedThumbnails == Manina.Windows.Forms.UseEmbeddedThumbnails.Auto);
             AutoRotateThumbnails.Checked = imageListView.AutoRotateThumbnails;
 

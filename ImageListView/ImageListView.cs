@@ -96,7 +96,6 @@ namespace Manina.Windows.Forms
         private Size mCheckBoxPadding;
         private Size mThumbnailSize;
         private UseEmbeddedThumbnails mUseEmbeddedThumbnails;
-        private UseWIC mUseWIC;
         private View mView;
         private Point mViewOffset;
         private bool mShowScrollBars;
@@ -802,22 +801,6 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Gets or sets whether Windows Imaging Compomnent will be used.
-        /// </summary>
-        [Browsable(false), Category("Behavior"), Description("Gets or sets whether Windows Imaging Compomnent will be used."), DefaultValue(typeof(UseWIC), "Auto")]
-        public UseWIC UseWIC
-        {
-            get { return mUseWIC; }
-            set
-            {
-                if (mUseWIC != value)
-                {
-                    mUseWIC = value;
-                    Refresh();
-                }
-            }
-        }
-        /// <summary>
         /// Gets or sets the view mode of the image list view.
         /// </summary>
         [Category("Appearance"), Description("Gets or sets the view mode of the image list view."), DefaultValue(typeof(View), "Thumbnails")]
@@ -1031,7 +1014,6 @@ namespace Manina.Windows.Forms
             Text = string.Empty;
             mThumbnailSize = new Size(96, 96);
             mUseEmbeddedThumbnails = UseEmbeddedThumbnails.Auto;
-            mUseWIC = UseWIC.Auto;
             mView = View.Thumbnails;
             mViewOffset = new Point(0, 0);
             mShowScrollBars = true;
@@ -1195,7 +1177,7 @@ namespace Manina.Windows.Forms
                 {
                     foreach (ImageListViewItem item in mItems)
                     {
-                        thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey, mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails, (mUseWIC == UseWIC.Auto || mUseWIC == UseWIC.ThumbnailsOnly));
+                        thumbnailCache.Add(item.Guid, item.Adaptor, item.VirtualItemKey, mThumbnailSize, mUseEmbeddedThumbnails, AutoRotateThumbnails);
                     }
                 }
                 Refresh();

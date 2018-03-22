@@ -45,30 +45,21 @@
     <DebugType>none</DebugType>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug Designer|AnyCPU' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug without WIC|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\DesignerDebug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;BONUSPACK;USEWIC</DefineConstants>
+    <OutputPath>bin\Debug without WIC\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DocumentationFile>bin\Debug\ImageListView.XML</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -97,8 +88,6 @@
     <Compile Include="QueuedBackgroundWorker.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ShellInfoExtractor.cs" />
-    <Compile Include="MetadataExtractor.cs" />
     <Compile Include="ImageListViewColorTypeConverter.cs" />
     <Compile Include="ImageListViewCheckedItemCollection.cs">
       <SubType>Component</SubType>
@@ -152,7 +141,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImageListViewResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ThumbnailExtractor.cs" />
+    <Compile Include="Extractor.cs" />
     <Compile Include="Utility.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
@@ -197,6 +186,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="QueuedBackgroundWorker.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThumbnailExtractor\ThumbnailExtractor.csproj">
+      <Project>{3e182f99-fbc6-4219-a4ab-451ce303be3a}</Project>
+      <Name>ThumbnailExtractor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WPFThumbnailExtractor\WPFThumbnailExtractor.csproj">
+      <Project>{819a4362-3a60-4fea-b193-5baa2faffc3f}</Project>
+      <Name>WPFThumbnailExtractor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

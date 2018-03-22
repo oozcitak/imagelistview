@@ -20,9 +20,8 @@ namespace Manina.Windows.Forms
             /// <param name="size">Requested image size.</param>
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
-            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>The thumbnail image from the given item or null if an error occurs.</returns>
-            public abstract Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC);
+            public abstract Image GetThumbnail(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation);
             /// <summary>
             /// Returns a unique identifier for this thumbnail to be used in persistent
             /// caching.
@@ -31,9 +30,8 @@ namespace Manina.Windows.Forms
             /// <param name="size">Requested image size.</param>
             /// <param name="useEmbeddedThumbnails">Embedded thumbnail usage.</param>
             /// <param name="useExifOrientation">true to automatically rotate images based on Exif orientation; otherwise false.</param>
-            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>A unique identifier string for the thumnail.</returns>
-            public abstract string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation, bool useWIC);
+            public abstract string GetUniqueIdentifier(object key, Size size, UseEmbeddedThumbnails useEmbeddedThumbnails, bool useExifOrientation);
             /// <summary>
             /// Returns the path to the source image for use in drag operations.
             /// </summary>
@@ -44,9 +42,8 @@ namespace Manina.Windows.Forms
             /// Returns the details for the given item.
             /// </summary>
             /// <param name="key">Item key.</param>
-            /// <param name="useWIC">true to use Windows Imaging Component; otherwise false.</param>
             /// <returns>An array of tuples containing item details or null if an error occurs.</returns>
-            public abstract Utility.Tuple<ColumnType, string, object>[] GetDetails(object key, bool useWIC);
+            public abstract Utility.Tuple<ColumnType, string, object>[] GetDetails(object key);
             /// <summary>
             /// Performs application-defined tasks associated with freeing,
             /// releasing, or resetting unmanaged resources.
