@@ -5,11 +5,6 @@ Param(
 # download latest nuget.exe
 $nugeturl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 $nugetexe = "$($env:temp)\nuget.exe"
-try 
-{
-  Remove-Item "$($nugetexe)"
-}
-catch { }
 $client = new-object System.Net.WebClient
 $client.DownloadFile($nugeturl, $nugetexe)
 

@@ -14,7 +14,7 @@
     <copyright>$copyright$</copyright>
     <tags>winforms controls listview image imagelistview</tags>
     <references>
-      <reference file="WPFThumbnailExtractor.dll"></reference>
+      <reference file="ImageListView.dll"></reference>
     </references>
   </metadata>
   <files>
