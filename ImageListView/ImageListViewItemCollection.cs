@@ -483,15 +483,6 @@ namespace Manina.Windows.Forms
 
             #region Helper Methods
             /// <summary>
-            /// Adds the (empty) subitem to each item for the given custom column.
-            /// </summary>
-            /// <param name="guid">Custom column ID.</param>
-            internal void AddCustomColumn(Guid guid)
-            {
-                foreach (ImageListViewItem item in mItems)
-                    item.AddSubItemText(guid);
-            }
-            /// <summary>
             /// Determines whether the collection contains the given key.
             /// </summary>
             /// <param name="guid">The key of the item.</param>
@@ -511,23 +502,6 @@ namespace Manina.Windows.Forms
             internal bool TryGetValue(Guid guid, out ImageListViewItem item)
             {
                 return lookUp.TryGetValue(guid, out item);
-            }
-            /// <summary>
-            /// Removes the subitem of each item for the given custom column.
-            /// </summary>
-            /// <param name="guid">Custom column ID.</param>
-            internal void RemoveCustomColumn(Guid guid)
-            {
-                foreach (ImageListViewItem item in mItems)
-                    item.RemoveSubItemText(guid);
-            }
-            /// <summary>
-            /// Removes the subitem of each item for the given custom column.
-            /// </summary>
-            internal void RemoveAllCustomColumns()
-            {
-                foreach (ImageListViewItem item in mItems)
-                    item.RemoveAllSubItemTexts();
             }
             /// <summary>
             /// Adds the given item without raising a selection changed event.
@@ -575,11 +549,6 @@ namespace Manina.Windows.Forms
                 collectionModified = true;
 
                 item.mImageListView = mImageListView;
-
-                // Create sub item texts for custom columns
-                foreach (ImageListViewColumnHeader header in mImageListView.Columns)
-                    if (header.Type == ColumnType.Custom)
-                        item.AddSubItemText(header.Guid);
 
                 // Add current thumbnail to cache
                 if (item.clonedThumbnail != null)
@@ -956,7 +925,7 @@ namespace Manina.Windows.Forms
                                     result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
                                     break;
                                 case ColumnType.Custom:
-                                    result = CompareStrings(x.GetSubItemText(mSortColumn.Guid), y.GetSubItemText(mSortColumn.Guid), natural);
+                                    result = CompareStrings(x.GetSubItemText(mSortColumn.Key), y.GetSubItemText(mSortColumn.Key), natural);
                                     break;
                                 default:
                                     result = 0;

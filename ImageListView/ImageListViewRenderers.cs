@@ -743,7 +743,7 @@ namespace Manina.Windows.Forms
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.GetSubItemText(column.Key), ImageListView.Font, bItemFore, rt, sf);
                                 else
                                     g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
                             }
@@ -1650,7 +1650,7 @@ namespace Manina.Windows.Forms
                                     g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                             }
                             else if (column.Type == ColumnType.Custom)
-                                g.DrawString(item.GetSubItemText(column.Guid), ImageListView.Font, forecolor, rt, sf);
+                                g.DrawString(item.GetSubItemText(column.Key), ImageListView.Font, forecolor, rt, sf);
                             else
                                 g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, forecolor, rt, sf);
 
@@ -2609,7 +2609,7 @@ namespace Manina.Windows.Forms
                                     }
                                 }
                                 else if (column.Type == ColumnType.Custom)
-                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Guid), ImageListView.Font, rt, foreColor,
+                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Key), ImageListView.Font, rt, foreColor,
                                         TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
                                 else
                                     TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, foreColor,
@@ -2940,7 +2940,7 @@ namespace Manina.Windows.Forms
                             }
                         }
                         else if (column.Type == ColumnType.Custom)
-                            TextRenderer.DrawText(g, item.GetSubItemText(column.Guid), ImageListView.Font, rt, foreColor,
+                            TextRenderer.DrawText(g, item.GetSubItemText(column.Key), ImageListView.Font, rt, foreColor,
                                 TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping);
                         else
                             TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, foreColor,

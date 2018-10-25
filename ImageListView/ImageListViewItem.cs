@@ -16,11 +16,11 @@
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
-using System.Collections.Generic;
 using System.Drawing.Design;
+using System.IO;
 
 namespace Manina.Windows.Forms
 {
@@ -70,7 +70,7 @@ namespace Manina.Windows.Forms
         internal object mVirtualItemKey;
         internal ImageListView.ImageListViewItemAdaptor mAdaptor;
         // Used for custom columns
-        private Dictionary<Guid, string> subItems;
+        private Dictionary<string, string> subItems;
         // Used for cloned items
         internal Image clonedThumbnail;
         // Group info
@@ -503,7 +503,7 @@ namespace Manina.Windows.Forms
 
             Tag = null;
 
-            subItems = new Dictionary<Guid, string>();
+            subItems = new Dictionary<string, string>();
 
             groupOrder = 0;
             group = string.Empty;
@@ -630,48 +630,23 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Returns the sub item item text corresponding to the custom column with the given index.
         /// </summary>
-        /// <param name="index">Index of the custom column.</param>
-        /// <returns>Sub item text text for the given custom column type.</returns>
-        public string GetSubItemText(int index)
+        /// <param name="key">Key of the custom column.</param>
+        /// <returns>Sub item text for the given custom column.</returns>
+        public string GetSubItemText(string key)
         {
-            int i = 0;
-            foreach (string val in subItems.Values)
-            {
-                if (i == index)
-                    return val;
-                i++;
-            }
-
-            throw new IndexOutOfRangeException();
+            return subItems[key];
         }
         /// <summary>
         /// Sets the sub item item text corresponding to the custom column with the given index.
         /// </summary>
-        /// <param name="index">Index of the custom column.</param>
+        /// <param name="key">Key of the custom column.</param>
         /// <param name="text">New sub item text</param>
-        public void SetSubItemText(int index, string text)
+        public void SetSubItemText(string key, string text)
         {
-            int i = 0;
-            Guid found = Guid.Empty;
-            foreach (Guid guid in subItems.Keys)
-            {
-                if (i == index)
-                {
-                    found = guid;
-                    break;
-                }
+            subItems[key] = text;
 
-                i++;
-            }
-
-            if (found != Guid.Empty)
-            {
-                subItems[found] = text;
-                if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
-                    mImageListView.Refresh();
-            }
-            else
-                throw new IndexOutOfRangeException();
+            if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
+                mImageListView.Refresh();
         }
         /// <summary>
         /// Returns the sub item item text corresponding to the specified column type.
@@ -683,7 +658,7 @@ namespace Manina.Windows.Forms
             switch (type)
             {
                 case ColumnType.Custom:
-                    throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
+                    throw new ArgumentException("Column type is ambiguous. You must access custom columns by key.", "type");
                 case ColumnType.Name:
                     return Text;
                 case ColumnType.FileName:
@@ -945,39 +920,6 @@ namespace Manina.Windows.Forms
             }
         }
         /// <summary>
-        /// Adds a new subitem for the specified custom column.
-        /// </summary>
-        /// <param name="guid">The Guid of the custom column.</param>
-        internal void AddSubItemText(Guid guid)
-        {
-            subItems.Add(guid, "");
-        }
-        /// <summary>
-        /// Returns the sub item item text corresponding to the specified custom column.
-        /// </summary>
-        /// <param name="guid">The Guid of the custom column.</param>
-        /// <returns>Formatted text for the given column.</returns>
-        internal string GetSubItemText(Guid guid)
-        {
-            return subItems[guid];
-        }
-        /// <summary>
-        /// Removes the sub item item text corresponding to the specified custom column.
-        /// </summary>
-        /// <param name="guid">The Guid of the custom column.</param>
-        /// <returns>true if the item was removed; otherwise false.</returns>
-        internal bool RemoveSubItemText(Guid guid)
-        {
-            return subItems.Remove(guid);
-        }
-        /// <summary>
-        /// Removes all sub item item texts.
-        /// </summary>
-        internal void RemoveAllSubItemTexts()
-        {
-            subItems.Clear();
-        }
-        /// <summary>
         /// Updates file info for the image file represented by this item.
         /// Item details will be updated synchronously without waiting for the
         /// cache thread.
@@ -1065,23 +1007,9 @@ namespace Manina.Windows.Forms
                         mFocalLength = (float)item.Item3;
                         break;
                     case ColumnType.Custom:
-                        string label = item.Item2;
+                        string key = item.Item2;
                         string value = (string)item.Item3;
-                        Guid columnID = Guid.Empty;
-                        foreach (ImageListView.ImageListViewColumnHeader column in mImageListView.Columns)
-                        {
-                            if (label == column.Text)
-                                columnID = column.Guid;
-                        }
-                        if (columnID == Guid.Empty)
-                        {
-                            ImageListView.ImageListViewColumnHeader column = new ImageListView.ImageListViewColumnHeader(ColumnType.Custom, label);
-                            columnID = column.Guid;
-                        }
-                        if (subItems.ContainsKey(columnID))
-                            subItems[columnID] = value;
-                        else
-                            subItems.Add(columnID, value);
+                        subItems[key] = value;
                         break;
                     default:
                         throw new Exception("Unknown column type.");
@@ -1161,7 +1089,7 @@ namespace Manina.Windows.Forms
                     groupInfo = Utility.GroupTextAlpha(Software);
                     break;
                 case ColumnType.Custom:
-                    groupInfo = Utility.GroupTextAlpha(GetSubItemText(column.Guid));
+                    groupInfo = Utility.GroupTextAlpha(GetSubItemText(column.Key));
                     break;
                 case ColumnType.ISOSpeed:
                     groupInfo = new Utility.Tuple<int, string>(ISOSpeed, ISOSpeed.ToString());
@@ -1251,7 +1179,7 @@ namespace Manina.Windows.Forms
             item.mVirtualItemKey = mVirtualItemKey;
 
             // Sub items
-            foreach (KeyValuePair<Guid, string> kv in subItems)
+            foreach (KeyValuePair<string, string> kv in subItems)
                 item.subItems.Add(kv.Key, kv.Value);
 
             // Current thumbnail

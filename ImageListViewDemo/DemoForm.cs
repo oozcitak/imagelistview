@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
-using System.Reflection;
 using System.IO;
 using System.Net;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -118,6 +118,7 @@ namespace Manina.Windows.Forms
             imageListView1.Columns.Add(ColumnType.Dimensions);
             imageListView1.Columns.Add(ColumnType.FileSize);
             imageListView1.Columns.Add(ColumnType.FolderName);
+            imageListView1.Columns.Add(ColumnType.Custom, "random", "Random");
 
             TreeNode node = new TreeNode("Loading...", 3, 3);
             node.Tag = null;
@@ -458,7 +459,7 @@ namespace Manina.Windows.Forms
         {
             imageListView1.Items.Clear();
             imageListView1.SuspendLayout();
-            int i = 0;
+            Random rnd = new Random();
             foreach (FileInfo p in path.GetFiles("*.*"))
             {
                 if (p.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
@@ -472,10 +473,9 @@ namespace Manina.Windows.Forms
                     p.Name.EndsWith(".tiff", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
                 {
-                    imageListView1.Items.Add(p.FullName);
-                    if (i == 1) imageListView1.Items[imageListView1.Items.Count - 1].Enabled = false;
-                    i++;
-                    if (i == 3) i = 0;
+                    ImageListViewItem item = new ImageListViewItem(p.FullName);
+                    item.SetSubItemText("random", rnd.Next(111, 999).ToString());
+                    imageListView1.Items.Add(item);
                 }
             }
             imageListView1.ResumeLayout();

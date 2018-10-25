@@ -16,10 +16,9 @@
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
 using System;
-using System.Windows.Forms;
 using System.ComponentModel;
 using System.Resources;
-using System.Reflection;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -60,6 +59,11 @@ namespace Manina.Windows.Forms
                     return GetDefaultText(mType);
                 }
             }
+            /// <summary>
+            /// Gets or sets a unique key to access this column.
+            /// </summary>
+            [Category("Behavior"), Browsable(true), Description("Gets or sets a unique key to access this column."), DefaultValue("")]
+            public string Key { get; set; }
             /// <summary>
             /// Gets or sets the display order of the column.
             /// </summary>
@@ -121,23 +125,7 @@ namespace Manina.Windows.Forms
                 }
                 set
                 {
-                    ColumnType oldType = mType;
-
-                    if (owner != null && oldType == ColumnType.Custom)
-                    {
-                        if (mImageListView == null)
-                            throw new InvalidOperationException("Owner control is null.");
-                        mImageListView.Items.RemoveCustomColumn(mGuid);
-                    }
-
                     mType = value;
-
-                    if (owner != null && mType == ColumnType.Custom)
-                    {
-                        if (mImageListView == null)
-                            throw new InvalidOperationException("Owner control is null.");
-                        mImageListView.Items.AddCustomColumn(mGuid);
-                    }
                 }
             }
             /// <summary>
@@ -204,15 +192,17 @@ namespace Manina.Windows.Forms
             /// Initializes a new instance of the ImageListViewColumnHeader class.
             /// </summary>
             /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="key">Key of the column header.</param>
             /// <param name="text">Text of the column header.</param>
             /// <param name="width">Width in pixels of the column header.</param>
             /// <param name="displayIndex">Display order of the column.</param>
             /// <param name="visible">Whether the column is initially visible.</param>
-            public ImageListViewColumnHeader(ColumnType type, string text, int width, int displayIndex, bool visible)
+            public ImageListViewColumnHeader(ColumnType type, string key, string text, int width = ImageListView.DefaultColumnWidth, int displayIndex = -1, bool visible = true)
             {
                 mImageListView = null;
                 owner = null;
                 mGuid = Guid.NewGuid();
+                Key = key;
                 mText = text;
                 mType = type;
                 mWidth = width;
@@ -226,8 +216,9 @@ namespace Manina.Windows.Forms
             /// <param name="text">Text of the column header.</param>
             /// <param name="width">Width in pixels of the column header.</param>
             /// <param name="displayIndex">Display order of the column.</param>
-            public ImageListViewColumnHeader(ColumnType type, string text, int width, int displayIndex)
-                : this(type, text, width, displayIndex, true)
+            /// <param name="visible">Whether the column is initially visible.</param>
+            public ImageListViewColumnHeader(ColumnType type, string text, int width = ImageListView.DefaultColumnWidth, int displayIndex = -1, bool visible = true)
+                : this(type, "", text, width, displayIndex, visible)
             {
                 ;
             }
@@ -237,48 +228,9 @@ namespace Manina.Windows.Forms
             /// <param name="type">The type of data to display in this column.</param>
             /// <param name="width">Width in pixels of the column header.</param>
             /// <param name="displayIndex">Display order of the column.</param>
-            public ImageListViewColumnHeader(ColumnType type, int width, int displayIndex)
-                : this(type, "", width, displayIndex)
-            {
-                ;
-            }
-            /// <summary>
-            /// Initializes a new instance of the ImageListViewColumnHeader class.
-            /// </summary>
-            /// <param name="type">The type of data to display in this column.</param>
-            /// <param name="text">Text of the column header.</param>
-            /// <param name="width">Width in pixels of the column header.</param>
-            public ImageListViewColumnHeader(ColumnType type, string text, int width)
-                : this(type, text, width, -1)
-            {
-                ;
-            }
-            /// <summary>
-            /// Initializes a new instance of the ImageListViewColumnHeader class.
-            /// </summary>
-            /// <param name="type">The type of data to display in this column.</param>
-            /// <param name="text">Text of the column header.</param>
-            public ImageListViewColumnHeader(ColumnType type, string text)
-                : this(type, text, ImageListView.DefaultColumnWidth)
-            {
-                ;
-            }
-            /// <summary>
-            /// Initializes a new instance of the ImageListViewColumnHeader class.
-            /// </summary>
-            /// <param name="type">The type of data to display in this column.</param>
-            /// <param name="width">Width in pixels of the column header.</param>
-            public ImageListViewColumnHeader(ColumnType type, int width)
-                : this(type, "", width)
-            {
-                ;
-            }
-            /// <summary>
-            /// Initializes a new instance of the ImageListViewColumnHeader class.
-            /// </summary>
-            /// <param name="type">The type of data to display in this column.</param>
-            public ImageListViewColumnHeader(ColumnType type)
-                : this(type, "", ImageListView.DefaultColumnWidth)
+            /// <param name="visible">Whether the column is initially visible.</param>
+            public ImageListViewColumnHeader(ColumnType type, int width = ImageListView.DefaultColumnWidth, int displayIndex = -1, bool visible = true)
+                : this(type, "", "", width, displayIndex, visible)
             {
                 ;
             }
@@ -311,7 +263,7 @@ namespace Manina.Windows.Forms
                 {
                     foreach (ImageListViewItem item in mImageListView.Items)
                     {
-                        int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(mGuid), mImageListView.Font).Width;
+                        int itemwidth = TextRenderer.MeasureText(item.GetSubItemText(Key), mImageListView.Font).Width;
                         width = System.Math.Max(width, itemwidth);
                     }
                 }
