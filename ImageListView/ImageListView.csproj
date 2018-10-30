@@ -73,6 +73,8 @@
     <Compile Include="GDIShellInfoExtractor.cs" />
     <Compile Include="GDIThumbnailExtractor.cs" />
     <Compile Include="IExtractor.cs" />
+    <Compile Include="ImageListViewSubItem.cs" />
+    <Compile Include="ImageListViewSubItemCollection.cs" />
     <Compile Include="Metadata.cs" />
     <Compile Include="PersistentCache.cs" />
     <Compile Include="ImageListViewGroupCollection.cs">
@@ -118,9 +120,7 @@
     <Compile Include="HitInfo.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ImageListView.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="ImageListView.cs" />
     <Compile Include="ImageListViewColumnHeader.cs">
       <SubType>Component</SubType>
     </Compile>

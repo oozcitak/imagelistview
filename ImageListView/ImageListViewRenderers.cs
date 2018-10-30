@@ -742,10 +742,8 @@ namespace Manina.Windows.Forms
                                             g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                                     }
                                 }
-                                else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.Key), ImageListView.Font, bItemFore, rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.SubItems[column].Text, ImageListView.Font, bItemFore, rt, sf);
                             }
                             rt.X += column.Width;
                         }
@@ -1649,10 +1647,8 @@ namespace Manina.Windows.Forms
                                 for (int i = rating + 1; i <= 5; i++)
                                     g.DrawImage(ImageListView.EmptyRatingImage, rt.Left + (i - 1) * w, y);
                             }
-                            else if (column.Type == ColumnType.Custom)
-                                g.DrawString(item.GetSubItemText(column.Key), ImageListView.Font, forecolor, rt, sf);
                             else
-                                g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, forecolor, rt, sf);
+                                g.DrawString(item.SubItems[column].Text, ImageListView.Font, forecolor, rt, sf);
 
                             rt.X -= iconOffset;
                             rt.X += column.Width;
@@ -2608,11 +2604,8 @@ namespace Manina.Windows.Forms
                                         }
                                     }
                                 }
-                                else if (column.Type == ColumnType.Custom)
-                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Key), ImageListView.Font, rt, foreColor,
-                                        TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
                                 else
-                                    TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, foreColor,
+                                    TextRenderer.DrawText(g, item.SubItems[column].Text, ImageListView.Font, rt, foreColor,
                                         TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
 
                                 rt.X -= iconOffset;
@@ -2939,11 +2932,8 @@ namespace Manina.Windows.Forms
                                 }
                             }
                         }
-                        else if (column.Type == ColumnType.Custom)
-                            TextRenderer.DrawText(g, item.GetSubItemText(column.Key), ImageListView.Font, rt, foreColor,
-                                TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping);
                         else
-                            TextRenderer.DrawText(g, item.GetSubItemText(column.Type), ImageListView.Font, rt, foreColor,
+                            TextRenderer.DrawText(g, item.SubItems[column].Text, ImageListView.Font, rt, foreColor,
                                 TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping);
 
                         rt.X -= iconOffset;

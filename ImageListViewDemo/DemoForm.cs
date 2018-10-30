@@ -118,7 +118,7 @@ namespace Manina.Windows.Forms
             imageListView1.Columns.Add(ColumnType.Dimensions);
             imageListView1.Columns.Add(ColumnType.FileSize);
             imageListView1.Columns.Add(ColumnType.FolderName);
-            imageListView1.Columns.Add(ColumnType.Custom, "random", "Random");
+            imageListView1.Columns.Add("random", "Random");
 
             TreeNode node = new TreeNode("Loading...", 3, 3);
             node.Tag = null;
@@ -474,7 +474,7 @@ namespace Manina.Windows.Forms
                     p.Name.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
                 {
                     ImageListViewItem item = new ImageListViewItem(p.FullName);
-                    item.SetSubItemText("random", rnd.Next(111, 999).ToString());
+                    item.SubItems.Add("random", rnd.Next(0, 999).ToString("000"));
                     imageListView1.Items.Add(item);
                 }
             }

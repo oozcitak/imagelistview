@@ -1221,10 +1221,8 @@ namespace Manina.Windows.Forms
                                         }
                                     }
                                 }
-                                else if (column.Type == ColumnType.Custom)
-                                    g.DrawString(item.GetSubItemText(column.Key), ImageListView.Font, bItemFore, rt, sf);
                                 else
-                                    g.DrawString(item.GetSubItemText(column.Type), ImageListView.Font, bItemFore, rt, sf);
+                                    g.DrawString(item.SubItems[column].Text, ImageListView.Font, bItemFore, rt, sf);
 
                                 rt.X -= iconOffset;
                             }

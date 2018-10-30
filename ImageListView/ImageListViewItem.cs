@@ -70,7 +70,7 @@ namespace Manina.Windows.Forms
         internal object mVirtualItemKey;
         internal ImageListView.ImageListViewItemAdaptor mAdaptor;
         // Used for custom columns
-        private Dictionary<string, string> subItems;
+        private ImageListViewSubItemCollection mSubItems;
         // Used for cloned items
         internal Image clonedThumbnail;
         // Group info
@@ -226,6 +226,17 @@ namespace Manina.Windows.Forms
                 mText = value;
                 if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
                     mImageListView.Refresh();
+            }
+        }
+        /// <summary>
+        /// Gets the collection of sub items.
+        /// </summary>
+        [Category("Appearance"), Browsable(true), Description("Gets the collection of sub items.")]
+        public ImageListViewSubItemCollection SubItems
+        {
+            get
+            {
+                return mSubItems;
             }
         }
         /// <summary>
@@ -503,7 +514,7 @@ namespace Manina.Windows.Forms
 
             Tag = null;
 
-            subItems = new Dictionary<string, string>();
+            mSubItems = new ImageListViewSubItemCollection(this);
 
             groupOrder = 0;
             group = string.Empty;
@@ -626,27 +637,6 @@ namespace Manina.Windows.Forms
                 mImageListView.metadataCache.Add(mGuid, mAdaptor, mVirtualItemKey);
                 mImageListView.Refresh();
             }
-        }
-        /// <summary>
-        /// Returns the sub item item text corresponding to the custom column with the given index.
-        /// </summary>
-        /// <param name="key">Key of the custom column.</param>
-        /// <returns>Sub item text for the given custom column.</returns>
-        public string GetSubItemText(string key)
-        {
-            return subItems[key];
-        }
-        /// <summary>
-        /// Sets the sub item item text corresponding to the custom column with the given index.
-        /// </summary>
-        /// <param name="key">Key of the custom column.</param>
-        /// <param name="text">New sub item text</param>
-        public void SetSubItemText(string key, string text)
-        {
-            subItems[key] = text;
-
-            if (mImageListView != null && mImageListView.IsItemVisible(mGuid))
-                mImageListView.Refresh();
         }
         /// <summary>
         /// Returns the sub item item text corresponding to the specified column type.
@@ -1009,7 +999,7 @@ namespace Manina.Windows.Forms
                     case ColumnType.Custom:
                         string key = item.Item2;
                         string value = (string)item.Item3;
-                        subItems[key] = value;
+                        mSubItems[key] = new ImageListViewSubItem(this, value);
                         break;
                     default:
                         throw new Exception("Unknown column type.");
@@ -1089,7 +1079,7 @@ namespace Manina.Windows.Forms
                     groupInfo = Utility.GroupTextAlpha(Software);
                     break;
                 case ColumnType.Custom:
-                    groupInfo = Utility.GroupTextAlpha(GetSubItemText(column.Key));
+                    groupInfo = Utility.GroupTextAlpha(SubItems[column].Text);
                     break;
                 case ColumnType.ISOSpeed:
                     groupInfo = new Utility.Tuple<int, string>(ISOSpeed, ISOSpeed.ToString());
@@ -1179,8 +1169,8 @@ namespace Manina.Windows.Forms
             item.mVirtualItemKey = mVirtualItemKey;
 
             // Sub items
-            foreach (KeyValuePair<string, string> kv in subItems)
-                item.subItems.Add(kv.Key, kv.Value);
+            foreach (KeyValuePair<string, ImageListViewSubItem> kv in mSubItems)
+                ((IDictionary<string, ImageListViewSubItem>)item.mSubItems).Add(kv.Key, kv.Value);
 
             // Current thumbnail
             if (mImageListView != null)

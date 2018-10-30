@@ -925,7 +925,7 @@ namespace Manina.Windows.Forms
                                     result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
                                     break;
                                 case ColumnType.Custom:
-                                    result = CompareStrings(x.GetSubItemText(mSortColumn.Key), y.GetSubItemText(mSortColumn.Key), natural);
+                                    result = CompareStrings(x.SubItems[mSortColumn].Text, y.SubItems[mSortColumn].Text, natural);
                                     break;
                                 default:
                                     result = 0;

@@ -29,6 +29,16 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader1 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "Name", 100, 0, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader2 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "Type", 100, 1, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader3 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "Size", 100, 2, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader4 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateModified, "Modified", 100, 3, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader5 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "Taken", 100, 4, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader6 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "Exposure Time", 100, 5, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader7 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "F Number", 100, 6, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader8 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "ISO Speed", 100, 7, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader9 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "Rating", 100, 8, true);
+            Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader ımageListViewColumnHeader10 = new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Custom, "Custom", "Custom", 100, 9, true);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
@@ -159,16 +169,47 @@
             // 
             this.imageListView.AllowDuplicateFileNames = true;
             this.imageListView.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            ımageListViewColumnHeader1.DisplayIndex = 0;
+            ımageListViewColumnHeader1.Key = "";
+            ımageListViewColumnHeader1.Type = Manina.Windows.Forms.ColumnType.Name;
+            ımageListViewColumnHeader2.DisplayIndex = 1;
+            ımageListViewColumnHeader2.Key = "";
+            ımageListViewColumnHeader2.Type = Manina.Windows.Forms.ColumnType.FileType;
+            ımageListViewColumnHeader3.DisplayIndex = 2;
+            ımageListViewColumnHeader3.Key = "";
+            ımageListViewColumnHeader3.Type = Manina.Windows.Forms.ColumnType.FileSize;
+            ımageListViewColumnHeader4.DisplayIndex = 3;
+            ımageListViewColumnHeader4.Key = "";
+            ımageListViewColumnHeader4.Type = Manina.Windows.Forms.ColumnType.DateModified;
+            ımageListViewColumnHeader5.DisplayIndex = 4;
+            ımageListViewColumnHeader5.Key = "";
+            ımageListViewColumnHeader5.Type = Manina.Windows.Forms.ColumnType.DateTaken;
+            ımageListViewColumnHeader6.DisplayIndex = 5;
+            ımageListViewColumnHeader6.Key = "";
+            ımageListViewColumnHeader6.Type = Manina.Windows.Forms.ColumnType.ExposureTime;
+            ımageListViewColumnHeader7.DisplayIndex = 6;
+            ımageListViewColumnHeader7.Key = "";
+            ımageListViewColumnHeader7.Type = Manina.Windows.Forms.ColumnType.FNumber;
+            ımageListViewColumnHeader8.DisplayIndex = 7;
+            ımageListViewColumnHeader8.Key = "";
+            ımageListViewColumnHeader8.Type = Manina.Windows.Forms.ColumnType.ISOSpeed;
+            ımageListViewColumnHeader9.DisplayIndex = 8;
+            ımageListViewColumnHeader9.Key = "";
+            ımageListViewColumnHeader9.Type = Manina.Windows.Forms.ColumnType.Rating;
+            ımageListViewColumnHeader10.DisplayIndex = 9;
+            ımageListViewColumnHeader10.Key = "Custom";
+            ımageListViewColumnHeader10.Type = Manina.Windows.Forms.ColumnType.Custom;
             this.imageListView.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Name, "", 100, 0, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileType, "", 100, 1, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FileSize, "", 100, 2, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateModified, "", 100, 3, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.DateTaken, "", 100, 4, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ExposureTime, "", 100, 5, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.FNumber, "", 100, 6, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.ISOSpeed, "", 100, 7, true),
-            new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader(Manina.Windows.Forms.ColumnType.Rating, "", 100, 8, true)});
+            ımageListViewColumnHeader1,
+            ımageListViewColumnHeader2,
+            ımageListViewColumnHeader3,
+            ımageListViewColumnHeader4,
+            ımageListViewColumnHeader5,
+            ımageListViewColumnHeader6,
+            ımageListViewColumnHeader7,
+            ımageListViewColumnHeader8,
+            ımageListViewColumnHeader9,
+            ımageListViewColumnHeader10});
             this.imageListView.ContextMenuStrip = this.ItemContextMenu;
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.imageListView.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
@@ -178,6 +219,7 @@
             this.imageListView.PersistentCacheSize = ((long)(100));
             this.imageListView.Size = new System.Drawing.Size(412, 574);
             this.imageListView.TabIndex = 0;
+            this.imageListView.UseWIC = true;
             // 
             // ItemContextMenu
             // 
@@ -601,7 +643,7 @@
             this.MultiSelect.Image = ((System.Drawing.Image)(resources.GetObject("MultiSelect.Image")));
             this.MultiSelect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MultiSelect.Name = "MultiSelect";
-            this.MultiSelect.Size = new System.Drawing.Size(73, 19);
+            this.MultiSelect.Size = new System.Drawing.Size(155, 19);
             this.MultiSelect.Text = "Multi Select";
             this.MultiSelect.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.MultiSelect.Click += new System.EventHandler(this.MultiSelect_Click);
@@ -612,7 +654,7 @@
             this.UseEmbeddedThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("UseEmbeddedThumbnails.Image")));
             this.UseEmbeddedThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.UseEmbeddedThumbnails.Name = "UseEmbeddedThumbnails";
-            this.UseEmbeddedThumbnails.Size = new System.Drawing.Size(156, 19);
+            this.UseEmbeddedThumbnails.Size = new System.Drawing.Size(155, 19);
             this.UseEmbeddedThumbnails.Text = "Use Embedded Thumbnails";
             this.UseEmbeddedThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.UseEmbeddedThumbnails.Click += new System.EventHandler(this.UseEmbeddedThumbnails_Click);
@@ -623,7 +665,7 @@
             this.AutoRotateThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("AutoRotateThumbnails.Image")));
             this.AutoRotateThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AutoRotateThumbnails.Name = "AutoRotateThumbnails";
-            this.AutoRotateThumbnails.Size = new System.Drawing.Size(140, 19);
+            this.AutoRotateThumbnails.Size = new System.Drawing.Size(155, 19);
             this.AutoRotateThumbnails.Text = "Auto Rotate Thumbnails";
             this.AutoRotateThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AutoRotateThumbnails.Click += new System.EventHandler(this.AutoRotateThumbnails_Click);
@@ -637,7 +679,7 @@
             // 
             this.toolStripLabel5.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel5.Name = "toolStripLabel5";
-            this.toolStripLabel5.Size = new System.Drawing.Size(70, 15);
+            this.toolStripLabel5.Size = new System.Drawing.Size(155, 15);
             this.toolStripLabel5.Text = "Benchmark:";
             this.toolStripLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -648,7 +690,7 @@
             this.StartBenchmark.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.StartBenchmark.Name = "StartBenchmark";
-            this.StartBenchmark.Size = new System.Drawing.Size(114, 20);
+            this.StartBenchmark.Size = new System.Drawing.Size(155, 20);
             this.StartBenchmark.Text = "Start Benchmark";
             this.StartBenchmark.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.Click += new System.EventHandler(this.StartBenchmark_Click);

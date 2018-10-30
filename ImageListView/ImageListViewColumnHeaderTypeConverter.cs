@@ -16,13 +16,10 @@
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
 using System;
-using System.Globalization;
 using System.ComponentModel;
-using System.Drawing;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
+using System.Globalization;
+using System.Reflection;
 
 namespace Manina.Windows.Forms
 {
@@ -57,24 +54,53 @@ namespace Manina.Windows.Forms
         /// <returns>An object that represents the converted value.</returns>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if (value != null && value is ImageListView.ImageListViewColumnHeader)
+            if (destinationType == typeof(InstanceDescriptor) && value is ImageListView.ImageListViewColumnHeader col)
             {
-                ImageListView.ImageListViewColumnHeader column = (ImageListView.ImageListViewColumnHeader)value;
+                Type t = TypeDescriptor.GetReflectionType(value);
+                ConstructorInfo ctor;
+                InstanceDescriptor id = null;
 
-                if (destinationType == typeof(InstanceDescriptor))
+                if (col.Type == ColumnType.Custom)
                 {
-                    string text = column.Text;
-                    // Used by the designer serializer
-                    if (text == column.DefaultText)
-                        text = string.Empty;
+                    ctor = t.GetConstructor(new Type[] {
+                            typeof(ColumnType), typeof(string), typeof(string), typeof(int), typeof(int), typeof(bool)
+                        });
 
-                    ConstructorInfo consInfo = typeof(ImageListView.ImageListViewColumnHeader).GetConstructor(new Type[] { 
+                    if (ctor != null)
+                    {
+                        id = new InstanceDescriptor(ctor, new object[] {
+                            col.Type, col.Key, col.Text, col.Width, col.DisplayIndex, col.Visible
+                        }, false);
+                    }
+                }
+
+                if (id == null && col.Type != ColumnType.Custom)
+                {
+                    ctor = t.GetConstructor(new Type[] {
                             typeof(ColumnType), typeof(string), typeof(int), typeof(int), typeof(bool)
                         });
-                    return new InstanceDescriptor(consInfo, new object[] { 
-                        column.Type, text, column.Width, column.DisplayIndex, column.Visible
-                    });
+
+                    if (ctor != null)
+                    {
+                        id = new InstanceDescriptor(ctor, new object[] {
+                            col.Type, col.Text, col.Width, col.DisplayIndex, col.Visible
+                        }, false);
+                    }
                 }
+
+                if (id == null)
+                {
+                    ctor = t.GetConstructor(new Type[0]);
+                    if (ctor != null)
+                    {
+                        return new InstanceDescriptor(ctor, new object[0], false);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("No default parameterless constructor exists for ImageListViewColumnHeader.");
+                    }
+                }
+                return id;
             }
 
             return base.ConvertTo(context, culture, value, destinationType);

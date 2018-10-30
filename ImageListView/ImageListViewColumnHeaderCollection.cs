@@ -48,7 +48,7 @@ namespace Manina.Windows.Forms
             [Category("Behavior"), Browsable(false), Description("Gets the ImageListView owning this collection.")]
             public ImageListView ImageListView { get { return mImageListView; } }
             /// <summary>
-            /// Gets or sets the column at the specified index within the collection.
+            /// Gets the column at the specified index within the collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or item at the specified index within the collection.")]
             public ImageListViewColumnHeader this[int index]
@@ -65,24 +65,6 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Gets or sets the column with the given key within the collection.
-            /// </summary>
-            [Category("Behavior"), Browsable(false), Description("Gets or sets the column with the given key within the collection.")]
-            public ImageListViewColumnHeader this[string key]
-            {
-                get
-                {
-                    return mItems.Find(p => p.Key == key);
-                }
-                set
-                {
-                    int index = mItems.FindIndex(p => p.Key == key);
-                    mItems[index] = value;
-
-                    updateDisplayList = true;
-                }
-            }
-            /// <summary>
             /// Gets the column with the specified type within the collection.
             /// </summary>
             [Category("Behavior"), Browsable(false), Description("Gets or sets the item with the specified type within the collection.")]
@@ -91,7 +73,7 @@ namespace Manina.Windows.Forms
                 get
                 {
                     if (type == ColumnType.Custom)
-                        throw new ArgumentException("Column type is ambiguous. You must access custom columns by key.", "type");
+                        throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
 
                     foreach (ImageListViewColumnHeader column in this)
                         if (column.Type == type) return column;
@@ -99,9 +81,9 @@ namespace Manina.Windows.Forms
                 }
             }
             /// <summary>
-            /// Gets a value indicating whether the collection is read-only.
+            /// Gets a value indicating whether the Collection is read-only.
             /// </summary>
-            [Category("Behavior"), Browsable(false), Description("Gets a value indicating whether the collection is read-only.")]
+            [Category("Behavior"), Browsable(false), Description("Gets a value indicating whether the Collection is read-only.")]
             public bool IsReadOnly
             {
                 get { return false; }
@@ -143,15 +125,21 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             /// </summary>
-            /// <param name="type">The type of data to display in this column.</param>
-            /// <param name="key">Key of the column header.</param>
+            /// <param name="key">The key to associate this column with sub items.</param>
             /// <param name="text">Text of the column header.</param>
             /// <param name="width">Width in pixels of the column header.</param>
-            /// <param name="displayIndex">Display order of the column.</param>
-            /// <param name="visible">Whether the column is initially visible.</param>
-            public void Add(ColumnType type, string key, string text, int width = ImageListView.DefaultColumnWidth, int displayIndex = -1, bool visible = true)
+            public void Add(string key , string text, int width)
             {
-                Add(new ImageListViewColumnHeader(type, key, text, width, displayIndex, visible));
+                Add(new ImageListViewColumnHeader(ColumnType.Custom, key, text, width));
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="key">The key to associate this column with sub items.</param>
+            /// <param name="text">Text of the column header.</param>
+            public void Add(string key, string text)
+            {
+                Add(new ImageListViewColumnHeader(ColumnType.Custom, key, text));
             }
             /// <summary>
             /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -159,22 +147,35 @@ namespace Manina.Windows.Forms
             /// <param name="type">The type of data to display in this column.</param>
             /// <param name="text">Text of the column header.</param>
             /// <param name="width">Width in pixels of the column header.</param>
-            /// <param name="displayIndex">Display order of the column.</param>
-            /// <param name="visible">Whether the column is initially visible.</param>
-            public void Add(ColumnType type, string text, int width = ImageListView.DefaultColumnWidth, int displayIndex = -1, bool visible = true)
+            public void Add(ColumnType type, string text, int width)
             {
-                Add(new ImageListViewColumnHeader(type, text, width, displayIndex, visible));
+                Add(new ImageListViewColumnHeader(type, text, width));
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            /// <param name="text">Text of the column header.</param>
+            public void Add(ColumnType type, string text)
+            {
+                Add(new ImageListViewColumnHeader(type, text));
             }
             /// <summary>
             /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             /// </summary>
             /// <param name="type">The type of data to display in this column.</param>
             /// <param name="width">Width in pixels of the column header.</param>
-            /// <param name="displayIndex">Display order of the column.</param>
-            /// <param name="visible">Whether the column is initially visible.</param>
-            public void Add(ColumnType type, int width = ImageListView.DefaultColumnWidth, int displayIndex = -1, bool visible = true)
+            public void Add(ColumnType type, int width)
             {
-                Add(new ImageListViewColumnHeader(type, width, displayIndex, visible));
+                Add(new ImageListViewColumnHeader(type, width));
+            }
+            /// <summary>
+            /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            /// </summary>
+            /// <param name="type">The type of data to display in this column.</param>
+            public void Add(ColumnType type)
+            {
+                Add(new ImageListViewColumnHeader(type));
             }
             /// <summary>
             /// Adds a range of items to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -200,7 +201,6 @@ namespace Manina.Windows.Forms
             public void Clear()
             {
                 mItems.Clear();
-
                 updateDisplayList = true;
             }
             /// <summary>
@@ -217,7 +217,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Returns an enumerator to use to iterate through columns.
             /// </summary>
-            /// <returns>An IEnumerator&lt;ImageListViewColumn&gt; that represents the item collection.</returns>
+            /// <returns>An <see cref="IEnumerator{ImageListViewColumnHeader}" that represents the item collection.</returns>
             public IEnumerator<ImageListViewColumnHeader> GetEnumerator()
             {
                 foreach (ImageListViewColumnHeader column in mItems)
@@ -293,9 +293,6 @@ namespace Manina.Windows.Forms
             /// <param name="type">The type of column.</param>
             internal bool HasType(ColumnType type)
             {
-                if (type == ColumnType.Custom)
-                    throw new ArgumentException("Column type is ambiguous. You must access custom columns by index.", "type");
-
                 foreach (ImageListViewColumnHeader column in this)
                     if (column.Type == type) return true;
 
