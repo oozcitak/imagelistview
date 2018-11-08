@@ -673,10 +673,7 @@ namespace Manina.Windows.Forms
                 case ColumnType.FolderName:
                     return mFolderName;
                 case ColumnType.FileSize:
-                    if (mFileSize == 0)
-                        return "";
-                    else
-                        return Utility.FormatSize(mFileSize);
+                    return Utility.FormatSize(mFileSize);
                 case ColumnType.FileType:
                     if (!string.IsNullOrEmpty(mFileType))
                         return mFileType;

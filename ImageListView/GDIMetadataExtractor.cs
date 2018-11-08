@@ -18,10 +18,10 @@
 // WIC support coded by Jens
 
 using System;
-using System.Text;
-using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Text;
 
 namespace Manina.Windows.Forms
 {
@@ -366,7 +366,16 @@ namespace Manina.Windows.Forms
         /// <param name="path">Filepath of image</param>
         public virtual Metadata GetMetadata(string path)
         {
-            return InitViaBmp(path);
+            Metadata m = new Metadata();
+            try
+            {
+                m = InitViaBmp(path);
+            }
+            catch (Exception e)
+            {
+                m.Error = e;
+            }
+            return m;
         }
         #endregion
     }

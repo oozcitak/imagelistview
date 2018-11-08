@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Data;
+using System.Text;
 
 namespace Manina.Windows.Forms
 {
