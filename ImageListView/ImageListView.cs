@@ -17,11 +17,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Resources;
-using System.Reflection;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -242,9 +242,8 @@ namespace Manina.Windows.Forms
             set
             {
                 string slimit = value;
-                int limit = 0;
                 mCacheMode = CacheMode.OnDemand;
-                if ((slimit.EndsWith("MB", StringComparison.OrdinalIgnoreCase) && int.TryParse(slimit.Substring(0, slimit.Length - 2).Trim(), out limit)) || (slimit.EndsWith("MiB", StringComparison.OrdinalIgnoreCase) && int.TryParse(slimit.Substring(0, slimit.Length - 3).Trim(), out limit)))
+                if ((slimit.EndsWith("MB", StringComparison.OrdinalIgnoreCase) && int.TryParse(slimit.Substring(0, slimit.Length - 2).Trim(), out int limit)) || (slimit.EndsWith("MiB", StringComparison.OrdinalIgnoreCase) && int.TryParse(slimit.Substring(0, slimit.Length - 3).Trim(), out limit)))
                 {
                     mCacheLimitAsItemCount = 0;
                     mCacheLimitAsMemory = limit * 1024 * 1024;
@@ -1099,6 +1098,32 @@ namespace Manina.Windows.Forms
             ResumePaint();
         }
         /// <summary>
+        /// Marks all items that satisfy a condition as selected.
+        /// </summary>
+        public void SelectWhere(Func<ImageListViewItem, bool> predicate)
+        {
+            foreach (ImageListViewItem item in Items.Where(predicate))
+                item.mSelected = true;
+
+            OnSelectionChangedInternal();
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items that satisfy a condition as unselected.
+        /// </summary>
+        public void UnselectWhere(Func<ImageListViewItem, bool> predicate)
+        {
+            foreach (ImageListViewItem item in Items.Where(predicate))
+                item.mSelected = false;
+
+            OnSelectionChangedInternal();
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
         /// Marks all items as checked.
         /// </summary>
         public void CheckAll()
@@ -1141,6 +1166,38 @@ namespace Manina.Windows.Forms
             ResumePaint();
         }
         /// <summary>
+        /// Marks all items that satisfy a condition as checked.
+        /// </summary>
+        public void CheckWhere(Func<ImageListViewItem, bool> predicate)
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items.Where(predicate))
+            {
+                item.mChecked = true;
+                OnItemCheckBoxClickInternal(item);
+            }
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items that satisfy a condition as unchecked.
+        /// </summary>
+        public void UncheckWhere(Func<ImageListViewItem, bool> predicate)
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items.Where(predicate))
+            {
+                item.mChecked = false;
+                OnItemCheckBoxClickInternal(item);
+            }
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
         /// Marks all items as enabled.
         /// </summary>
         public void EnableAll()
@@ -1161,6 +1218,32 @@ namespace Manina.Windows.Forms
             SuspendPaint();
 
             foreach (ImageListViewItem item in Items)
+                item.mEnabled = false;
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items that satisfy a condition as enabled.
+        /// </summary>
+        public void EnableWhere(Func<ImageListViewItem, bool> predicate)
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items.Where(predicate))
+                item.mEnabled = true;
+
+            Refresh();
+            ResumePaint();
+        }
+        /// <summary>
+        /// Marks all items that satisfy a condition as disabled.
+        /// </summary>
+        public void DisableWhere(Func<ImageListViewItem, bool> predicate)
+        {
+            SuspendPaint();
+
+            foreach (ImageListViewItem item in Items.Where(predicate))
                 item.mEnabled = false;
 
             Refresh();
@@ -1610,8 +1693,7 @@ namespace Manina.Windows.Forms
         /// <returns>true if the item is modified; otherwise false.</returns>
         internal bool IsItemDirty(Guid guid)
         {
-            ImageListViewItem item = null;
-            if (mItems.TryGetValue(guid, out item))
+            if (mItems.TryGetValue(guid, out ImageListViewItem item))
                 return item.isDirty;
 
             return false;
@@ -1717,12 +1799,13 @@ namespace Manina.Windows.Forms
             mViewOffset.X = e.NewValue;
             Refresh();
         }
+
         /// <summary>
         /// Handles the Tick event of the lazyRefreshTimer control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void lazyRefreshTimer_Tick(object sender, EventArgs e)
+        private void lazyRefreshTimer_Tick(object sender, EventArgs e)
         {
             try
             {
@@ -2129,8 +2212,7 @@ namespace Manina.Windows.Forms
         /// <param name="cacheThread">The thread raising the error.</param>
         internal void OnCacheErrorInternal(Guid guid, Exception error, CacheThread cacheThread)
         {
-            ImageListViewItem item = null;
-            mItems.TryGetValue(guid, out item);
+            mItems.TryGetValue(guid, out ImageListViewItem item);
             OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
         }
         /// <summary>
@@ -2144,8 +2226,7 @@ namespace Manina.Windows.Forms
         /// if the image is a large image for gallery or pane views.</param>
         internal void OnThumbnailCachedInternal(Guid guid, Image thumbnail, Size size, bool thumbnailImage)
         {
-            ImageListViewItem item = null;
-            if (mItems.TryGetValue(guid, out item))
+            if (mItems.TryGetValue(guid, out ImageListViewItem item))
                 OnThumbnailCached(new ThumbnailCachedEventArgs(item, thumbnail, size, thumbnailImage));
         }
         /// <summary>
@@ -2156,8 +2237,7 @@ namespace Manina.Windows.Forms
         /// <param name="details">Array of item details.</param>
         internal void UpdateItemDetailsInternal(Guid guid, Utility.Tuple<ColumnType, string, object>[] details)
         {
-            ImageListViewItem item = null;
-            if (mItems.TryGetValue(guid, out item))
+            if (mItems.TryGetValue(guid, out ImageListViewItem item))
                 item.UpdateDetailsInternal(details);
         }
         /// <summary>
@@ -2168,8 +2248,7 @@ namespace Manina.Windows.Forms
         /// <param name="size">Requested thumbnail size.</param>
         internal void OnThumbnailCachingInternal(Guid guid, Size size)
         {
-            ImageListViewItem item = null;
-            if (mItems.TryGetValue(guid, out item))
+            if (mItems.TryGetValue(guid, out ImageListViewItem item))
                 OnThumbnailCaching(new ThumbnailCachingEventArgs(item, size));
         }
         /// <summary>
