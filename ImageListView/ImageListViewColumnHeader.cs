@@ -16,6 +16,7 @@
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Resources;
 using System.Windows.Forms;
@@ -177,6 +178,11 @@ namespace Manina.Windows.Forms
                         mImageListView.Refresh();
                 }
             }
+            /// <summary>
+            /// Gets or sets the comparer used while sorting items with this custom column.
+            /// </summary>
+            [Browsable(false)]
+            public IComparer<ImageListViewItem> Comparer { get; set; }
             #endregion
 
             #region Custom Property Serializers
@@ -213,6 +219,7 @@ namespace Manina.Windows.Forms
                 mImageListView = null;
                 owner = null;
                 mGuid = Guid.NewGuid();
+                Comparer = null;
 
                 mType = type;
                 mKey = key;

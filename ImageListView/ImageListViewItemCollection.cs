@@ -16,12 +16,12 @@
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Collections;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
@@ -641,8 +641,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             internal int IndexOf(Guid guid)
             {
-                ImageListViewItem item = null;
-                if (lookUp.TryGetValue(guid, out item))
+                if (lookUp.TryGetValue(guid, out ImageListViewItem item))
                     return item.Index;
                 return -1;
             }
@@ -772,10 +771,10 @@ namespace Manina.Windows.Forms
             /// </summary>
             private class ImageListViewItemComparer : IComparer<ImageListViewItem>
             {
-                private ImageListViewColumnHeader mGroupColumn;
+                private readonly ImageListViewColumnHeader mGroupColumn;
                 private ImageListViewColumnHeader mSortColumn;
-                private SortOrder mGroupOrder;
-                private SortOrder mSortOrder;
+                private readonly SortOrder mGroupOrder;
+                private readonly SortOrder mSortOrder;
 
                 public ImageListViewItemComparer(ImageListViewColumnHeader groupColumn, SortOrder groupOrder, ImageListViewColumnHeader sortColumn, SortOrder sortOrder)
                 {
@@ -809,12 +808,9 @@ namespace Manina.Windows.Forms
 
                         string xpart = xparts[i];
                         string ypart = yparts[i];
-
-                        int xi = 0;
-                        int yi = 0;
                         int res = 0;
 
-                        if (int.TryParse(xpart, out xi) && int.TryParse(ypart, out yi))
+                        if (int.TryParse(xpart, out int xi) && int.TryParse(ypart, out int yi))
                             res = (xi < yi ? -1 : (xi > yi ? 1 : 0));
                         else
                             res = string.Compare(xpart, ypart, StringComparison.InvariantCultureIgnoreCase);
@@ -925,7 +921,10 @@ namespace Manina.Windows.Forms
                                     result = (x.FocalLength < y.FocalLength ? -1 : (x.FocalLength > y.FocalLength ? 1 : 0));
                                     break;
                                 case ColumnType.Custom:
-                                    result = CompareStrings(x.SubItems[mSortColumn].Text, y.SubItems[mSortColumn].Text, natural);
+                                    if (mSortColumn.Comparer != null)
+                                        result = mSortColumn.Comparer.Compare(x, y);
+                                    else
+                                        result = CompareStrings(x.SubItems[mSortColumn].Text, y.SubItems[mSortColumn].Text, natural);
                                     break;
                                 default:
                                     result = 0;
