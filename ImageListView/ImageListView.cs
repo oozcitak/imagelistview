@@ -421,7 +421,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the font of the group headers.
         /// </summary>
-        [Category("Appearance"), Description("Gets or sets the font of the group headers.")]
+        [Category("Appearance"), Description("Gets or sets the font of the group headers."), DefaultValue(typeof(Font), "Microsoft Sans Serif, 8.25pt, style=Bold")]
         public Font GroupHeaderFont
         {
             get
@@ -445,7 +445,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the font of the column headers.
         /// </summary>
-        [Category("Appearance"), Description("Gets or sets the font of the column headers.")]
+        [Category("Appearance"), Description("Gets or sets the font of the column headers."), DefaultValue(typeof(Font), "Microsoft Sans Serif, 8.25pt")]
         public Font ColumnHeaderFont
         {
             get
