@@ -195,4 +195,14 @@
   <data name="FolderName" xml:space="preserve">
     <value>Ordner</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="DragDropCursor_Copy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\DragDropCursor_Copy.cur;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="DragDropCursor_Move" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\DragDropCursor_Move.cur;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="DragDropCursor_No" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\DragDropCursor_No.cur;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

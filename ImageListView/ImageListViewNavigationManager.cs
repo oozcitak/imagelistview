@@ -18,6 +18,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Resources;
 using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
@@ -63,6 +66,8 @@ namespace Manina.Windows.Forms
             private bool lastMouseDownOverPaneBorder;
 
             private bool selfDragging;
+            private Cursor selfDragCursor;
+            private DragDropEffects selfDragEffect;
 
             private System.Windows.Forms.Timer scrollTimer;
             #endregion
@@ -185,8 +190,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public ItemHighlightState HighlightState(ImageListViewItem item)
             {
-                bool highlighted = false;
-                if (highlightedItems.TryGetValue(item, out highlighted))
+                if (highlightedItems.TryGetValue(item, out bool highlighted))
                 {
                     if (highlighted)
                         return ItemHighlightState.HighlightedAndSelected;
@@ -353,13 +357,13 @@ namespace Manina.Windows.Forms
                         pt1.Offset(itemAreaOffset);
                         pt2.Offset(itemAreaOffset);
 
-                        int startRow = (int)Math.Floor((float)(Math.Min(pt1.Y, pt2.Y) + viewOffset.Y) /
+                        int startRow = (int)Math.Floor((Math.Min(pt1.Y, pt2.Y) + viewOffset.Y) /
                             (float)mImageListView.layoutManager.ItemSizeWithMargin.Height);
-                        int endRow = (int)Math.Floor((float)(Math.Max(pt1.Y, pt2.Y) + viewOffset.Y) /
+                        int endRow = (int)Math.Floor((Math.Max(pt1.Y, pt2.Y) + viewOffset.Y) /
                             (float)mImageListView.layoutManager.ItemSizeWithMargin.Height);
-                        int startCol = (int)Math.Floor((float)(Math.Min(pt1.X, pt2.X) + viewOffset.X) /
+                        int startCol = (int)Math.Floor((Math.Min(pt1.X, pt2.X) + viewOffset.X) /
                             (float)mImageListView.layoutManager.ItemSizeWithMargin.Width);
-                        int endCol = (int)Math.Floor((float)(Math.Max(pt1.X, pt2.X) + viewOffset.X) /
+                        int endCol = (int)Math.Floor((Math.Max(pt1.X, pt2.X) + viewOffset.X) /
                             (float)mImageListView.layoutManager.ItemSizeWithMargin.Width);
                         if (mImageListView.ScrollOrientation == ScrollOrientation.HorizontalScroll &&
                             (startRow >= 0 || endRow >= 0))
@@ -436,9 +440,11 @@ namespace Manina.Windows.Forms
                         }
                         DataObject data = new DataObject(DataFormats.FileDrop, filenames.ToArray());
                         DropTarget = null;
+
                         selfDragging = true;
                         mImageListView.DoDragDrop(data, DragDropEffects.All);
                         selfDragging = false;
+                        DestroySelfDragCursor();
 
                         // Since the MouseUp event will be eaten by DoDragDrop we will not receive
                         // the MouseUp event. We need to manually update mouse button flags after
@@ -877,6 +883,22 @@ namespace Manina.Windows.Forms
                     e.Effect = DragDropEffects.None;
             }
             /// <summary>
+            /// Handles control's GiveFeedback event.
+            /// </summary>
+            public void GiveFeedback(GiveFeedbackEventArgs e)
+            {
+                if (selfDragging)
+                {
+                    e.UseDefaultCursors = false;
+                    CreateSelfDragCursor(e.Effect);
+                }
+                else
+                {
+                    DestroySelfDragCursor();
+                    e.UseDefaultCursors = true;
+                }
+            }
+            /// <summary>
             /// Handles control's DragOver event.
             /// </summary>
             public void DragOver(DragEventArgs e)
@@ -1001,8 +1023,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             private void DoHitTest(Point pt)
             {
-                ImageListView.HitInfo h;
-                mImageListView.HitTest(pt, out h);
+                mImageListView.HitTest(pt, out HitInfo h);
 
                 if (h.ItemHit && mImageListView.Items[h.ItemIndex].Enabled)
                 {
@@ -1081,6 +1102,104 @@ namespace Manina.Windows.Forms
                     index = mImageListView.Items.Count - 1;
 
                 return index;
+            }
+
+            /// <summary>
+            /// Sets the cursor of the control to a shadow image of dragged items.
+            /// </summary>
+            /// <param name="effect">The effect to apply to the cursor.</param>
+            /// <returns>A cursor of shadow items</returns>
+            private void CreateSelfDragCursor(DragDropEffects effect)
+            {
+                if (selfDragCursor == null || (effect != selfDragEffect))
+                {
+                    selfDragEffect = effect;
+
+                    if (selfDragCursor != null)
+                    {
+                        selfDragCursor.Dispose();
+                        selfDragCursor = null;
+                    }
+
+                    Size itemSize = mImageListView.layoutManager.ItemSize;
+
+                    var resources = new ResourceManager("Manina.Windows.Forms.ImageListViewResources", typeof(ImageListView).Assembly);
+                    var effectCursorName = (effect == DragDropEffects.Copy ? "DragDropCursor_Copy" : effect == DragDropEffects.Move ? "DragDropCursor_Move" : "DragDropCursor_No");
+
+                    // Color matrix to scale alpha values
+                    float[][] matrixItems = {
+                            new float[] {1, 0, 0, 0, 0},
+                            new float[] {0, 1, 0, 0, 0},
+                            new float[] {0, 0, 1, 0, 0},
+                            new float[] {0, 0, 0, 0.8f, 0},
+                            new float[] {0, 0, 0, 0, 1}};
+                    ColorMatrix colorMatrix = new ColorMatrix(matrixItems);
+
+                    using (Stream effectCursorStream = new MemoryStream((byte[])resources.GetObject(effectCursorName)))
+                    using (Cursor effectCursor = new Cursor(effectCursorStream))
+                    using (var bitmap = new Bitmap(128 + effectCursor.Size.Height / 2, 128 + effectCursor.Size.Height / 2, PixelFormat.Format32bppArgb))
+                    using (ImageAttributes imageAtt = new ImageAttributes())
+                    using (var graphics = Graphics.FromImage(bitmap))
+                    {
+                        graphics.Clear(Color.Yellow);
+                        //bitmap.MakeTransparent();
+
+                        Point effectCursorLocation = new Point(bitmap.Width / 2 - effectCursor.Size.Width / 2, bitmap.Height - effectCursor.Size.Height);
+
+                        imageAtt.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                        int count = 0;
+                        Point itemLocation = new Point(0, 0);
+                        foreach (var item in mImageListView.SelectedItems)
+                        {
+                            using (var itemBitmap = new Bitmap(itemSize.Width, itemSize.Height, PixelFormat.Format32bppArgb))
+                            using (var itemGraphics = Graphics.FromImage(itemBitmap))
+                            {
+                                mImageListView.mRenderer.DrawItem(itemGraphics, item, ItemState.None, new Rectangle(new Point(0, 0), itemSize));
+                                graphics.DrawImage(itemBitmap, new Rectangle(itemLocation, itemSize), 0, 0, itemSize.Width, itemSize.Height, GraphicsUnit.Pixel);//, imageAtt);
+                            }
+                            itemLocation += new Size(8, 8);
+                            count++;
+                            if (count == 5) break;
+                        }
+
+                        // Draw the drag effect cursor over
+                        effectCursor.Draw(graphics, new Rectangle(effectCursorLocation.X, effectCursorLocation.Y, effectCursor.Size.Width, effectCursor.Size.Height));
+
+                        // Overwrite the hotspot
+                        effectCursorStream.Seek(10, SeekOrigin.Begin);
+                        byte[] buffer = new byte[4];
+                        effectCursorStream.Read(buffer, 0, 4);
+                        short hotspotX = BitConverter.ToInt16(buffer, 0);
+                        short hotspotY = BitConverter.ToInt16(buffer, 2);
+                        var icon = Icon.FromHandle(bitmap.GetHicon());
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            icon.Save(stream);
+
+                            stream.Seek(10, SeekOrigin.Begin);
+                            stream.Write(BitConverter.GetBytes((short)effectCursorLocation.X + hotspotX), 0, 2);
+                            stream.Write(BitConverter.GetBytes((short)effectCursorLocation.Y + hotspotY), 0, 2);
+
+                            stream.Seek(0, SeekOrigin.Begin);
+                            selfDragCursor = new Cursor(stream);
+                        }
+                    }
+
+                    mImageListView.Cursor = selfDragCursor;
+                }
+            }
+            /// <summary>
+            /// Destroys the self drag cursor.
+            /// </summary>
+            private void DestroySelfDragCursor()
+            {
+                if (selfDragCursor != null)
+                {
+                    mImageListView.Cursor = mImageListView.DefaultCursor;
+                    selfDragCursor.Dispose();
+                    selfDragCursor = null;
+                }
             }
             #endregion
 

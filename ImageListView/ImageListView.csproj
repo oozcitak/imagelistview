@@ -197,6 +197,15 @@
   <ItemGroup>
     <EmbeddedResource Include="QueuedBackgroundWorker.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DragDropCursor_Copy.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DragDropCursor_Move.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DragDropCursor_No.cur" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

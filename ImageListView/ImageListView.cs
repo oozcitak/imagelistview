@@ -1770,7 +1770,6 @@ namespace Manina.Windows.Forms
             navigationManager.DragLeave();
             base.OnDragLeave(e);
         }
-
         /// <summary>
         /// Handles the DragDrop event.
         /// </summary>
@@ -1780,6 +1779,16 @@ namespace Manina.Windows.Forms
             navigationManager.DragDrop(e);
             base.OnDragDrop(e);
         }
+        /// <summary>
+        /// Handles the GiveFeedback event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.Forms.GiveFeedbackEventArgs"/> that contains the event data.</param>
+        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
+        {
+            navigationManager.GiveFeedback(e);
+            base.OnGiveFeedback(e);
+        }
+
         /// <summary>
         /// Handles the Scroll event of the vScrollBar control.
         /// </summary>

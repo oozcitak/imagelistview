@@ -108,7 +108,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets or sets the column header text.
             /// </summary>
-            [Category("Appearance"), Browsable(true), Description("Gets or sets the column header text.")]
+            [Category("Appearance"), Browsable(true), Description("Gets or sets the column header text."), Localizable(true)]
             public string Text
             {
                 get
@@ -164,7 +164,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Gets or sets the column width.
             /// </summary>
-            [Category("Appearance"), Browsable(true), Description("Gets or sets the column width."), DefaultValue(ImageListView.DefaultColumnWidth)]
+            [Category("Appearance"), Browsable(true), Description("Gets or sets the column width."), DefaultValue(ImageListView.DefaultColumnWidth), Localizable(true)]
             public int Width
             {
                 get
