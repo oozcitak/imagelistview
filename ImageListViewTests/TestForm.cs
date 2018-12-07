@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
-using Manina.Windows.Forms;
-using System.Xml;
 using System.ServiceModel.Syndication;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
+using Manina.Windows.Forms;
 
 namespace ImageListViewTests
 {
@@ -58,9 +56,9 @@ namespace ImageListViewTests
         #endregion
 
         #region Constructor
-        string[] files;
-        CustomAdaptor adaptor;
-        ImageListView.ImageListViewItemAdaptor uriAdaptor;
+        private string[] files;
+        private CustomAdaptor adaptor;
+        private ImageListView.ImageListViewItemAdaptor uriAdaptor;
 
         public TestForm()
         {
@@ -114,7 +112,7 @@ namespace ImageListViewTests
 
         #region Events
         // Search
-        void imageListView_KeyPress(object sender, KeyPressEventArgs e)
+        private void imageListView_KeyPress(object sender, KeyPressEventArgs e)
         {
             string s = e.KeyChar.ToString();
             int index = imageListView.FindString(s);
@@ -125,14 +123,16 @@ namespace ImageListViewTests
                 imageListView.EnsureVisible(index);
             }
         }
+
         // Cache error
-        void imageListView1_CacheError(object sender, Manina.Windows.Forms.CacheErrorEventArgs e)
+        private void imageListView1_CacheError(object sender, Manina.Windows.Forms.CacheErrorEventArgs e)
         {
             if (!benchMarking && logEventsCheckbox.Checked)
                 LogEvent(string.Format("!!! {0} -> {1}", (e.CacheThread == Manina.Windows.Forms.CacheThread.Thumbnail ? "Thumbnail" : "Details"), e.Error.Message));
         }
+
         // Thumbnail cached
-        void imageListView1_ThumbnailCached(object sender, Manina.Windows.Forms.ThumbnailCachedEventArgs e)
+        private void imageListView1_ThumbnailCached(object sender, Manina.Windows.Forms.ThumbnailCachedEventArgs e)
         {
             if (benchMarking)
             {
@@ -147,8 +147,9 @@ namespace ImageListViewTests
                 LogEvent(string.Format("<-- {0} ({1})", index, e.Size));
             }
         }
+
         // Thumbnail caching
-        void imageListView1_ThumbnailCaching(object sender, Manina.Windows.Forms.ThumbnailCachingEventArgs e)
+        private void imageListView1_ThumbnailCaching(object sender, Manina.Windows.Forms.ThumbnailCachingEventArgs e)
         {
             if (!benchMarking && logEventsCheckbox.Checked)
             {
@@ -158,8 +159,9 @@ namespace ImageListViewTests
                 LogEvent(string.Format("--> {0} ({1})", index, e.Size));
             }
         }
+
         // Collection changed
-        void imageListView_ItemCollectionChanged(object sender, ItemCollectionChangedEventArgs e)
+        private void imageListView_ItemCollectionChanged(object sender, ItemCollectionChangedEventArgs e)
         {
             if (!benchMarking && logEventsCheckbox.Checked)
             {
@@ -314,6 +316,45 @@ namespace ImageListViewTests
                 imageListView.GroupOrder = Manina.Windows.Forms.SortOrder.Ascending;
             else
                 imageListView.GroupOrder = Manina.Windows.Forms.SortOrder.None;
+
+            imageListView.GroupColumn = 0;
+        }
+        // Group custom
+        private void GroupByCustom_Click(object sender, EventArgs e)
+        {
+            if (imageListView.Columns[0].Grouper == null)
+            {
+                imageListView.Columns[0].Grouper = new CustomGrouper();
+
+                imageListView.GroupOrder = Manina.Windows.Forms.SortOrder.Ascending;
+                imageListView.GroupColumn = 0;
+                imageListView.SortColumn = 0;
+                imageListView.SortOrder = Manina.Windows.Forms.SortOrder.Ascending;
+            }
+            else
+            {
+                imageListView.Columns[0].Grouper = null;
+
+                imageListView.GroupOrder = Manina.Windows.Forms.SortOrder.None;
+                imageListView.GroupColumn = 0;
+                imageListView.SortColumn = 0;
+                imageListView.SortOrder = Manina.Windows.Forms.SortOrder.None;
+            }
+        }
+
+        private class CustomGrouper : ImageListView.IGrouper
+        {
+            public ImageListView.GroupInfo GetGroupInfo(ImageListViewItem item)
+            {
+                string str = item.Text;
+                while (str.Length < 3) str = "_" + str;
+                str = str.Substring(0, 3);
+
+                int hash = 0;
+                int order = hash ^ str[0] ^ str[1] ^ str[2];
+
+                return new ImageListView.GroupInfo(str, hash);
+            }
         }
         #endregion
 
@@ -374,7 +415,7 @@ namespace ImageListViewTests
         #endregion
 
         #region Update UI
-        void Application_Idle(object sender, EventArgs e)
+        private void Application_Idle(object sender, EventArgs e)
         {
             foreach (ToolStripItem item in TestToolStrip.Items)
             {
@@ -391,7 +432,8 @@ namespace ImageListViewTests
             ShowFileIcons.Checked = imageListView.ShowFileIcons;
             ShowCheckboxes.Checked = imageListView.ShowCheckBoxes;
             ShowScrollbars.Checked = imageListView.ScrollBars;
-            GroupByName.Checked = (imageListView.GroupOrder != Manina.Windows.Forms.SortOrder.None);
+            GroupByName.Checked = (imageListView.Columns[0].Grouper == null && imageListView.GroupOrder != Manina.Windows.Forms.SortOrder.None);
+            GroupByCustom.Checked = (imageListView.Columns[0].Grouper != null);
 
             CacheOnDemand.Checked = (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.OnDemand);
             UsePersistentCache.Checked = (!string.IsNullOrEmpty(imageListView.PersistentCacheDirectory));

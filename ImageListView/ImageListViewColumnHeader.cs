@@ -183,6 +183,12 @@ namespace Manina.Windows.Forms
             /// </summary>
             [Browsable(false)]
             public IComparer<ImageListViewItem> Comparer { get; set; }
+
+            /// <summary>
+            /// Gets or sets the grouper used while grouping items with this column.
+            /// </summary>
+            [Browsable(false)]
+            public IGrouper Grouper { get; set; }
             #endregion
 
             #region Custom Property Serializers
@@ -220,6 +226,7 @@ namespace Manina.Windows.Forms
                 owner = null;
                 mGuid = Guid.NewGuid();
                 Comparer = null;
+                Grouper = null;
 
                 mType = type;
                 mKey = key;

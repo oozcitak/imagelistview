@@ -73,6 +73,9 @@
     <Compile Include="GDIShellInfoExtractor.cs" />
     <Compile Include="GDIThumbnailExtractor.cs" />
     <Compile Include="IExtractor.cs" />
+    <Compile Include="IGrouper.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ImageListViewSubItem.cs" />
     <Compile Include="ImageListViewSubItemCollection.cs" />
     <Compile Include="Metadata.cs" />

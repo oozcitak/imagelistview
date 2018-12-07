@@ -80,6 +80,7 @@
             this.ShowCheckboxes = new System.Windows.Forms.ToolStripButton();
             this.ShowScrollbars = new System.Windows.Forms.ToolStripButton();
             this.GroupByName = new System.Windows.Forms.ToolStripButton();
+            this.GroupByCustom = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.CacheOnDemand = new System.Windows.Forms.ToolStripButton();
@@ -168,35 +169,54 @@
             // imageListView
             // 
             this.imageListView.AllowDuplicateFileNames = true;
-            this.imageListView.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            ımageListViewColumnHeader1.Comparer = null;
             ımageListViewColumnHeader1.DisplayIndex = 0;
+            ımageListViewColumnHeader1.Grouper = null;
             ımageListViewColumnHeader1.Key = "";
             ımageListViewColumnHeader1.Type = Manina.Windows.Forms.ColumnType.Name;
+            ımageListViewColumnHeader2.Comparer = null;
             ımageListViewColumnHeader2.DisplayIndex = 1;
+            ımageListViewColumnHeader2.Grouper = null;
             ımageListViewColumnHeader2.Key = "";
             ımageListViewColumnHeader2.Type = Manina.Windows.Forms.ColumnType.FileType;
+            ımageListViewColumnHeader3.Comparer = null;
             ımageListViewColumnHeader3.DisplayIndex = 2;
+            ımageListViewColumnHeader3.Grouper = null;
             ımageListViewColumnHeader3.Key = "";
             ımageListViewColumnHeader3.Type = Manina.Windows.Forms.ColumnType.FileSize;
+            ımageListViewColumnHeader4.Comparer = null;
             ımageListViewColumnHeader4.DisplayIndex = 3;
+            ımageListViewColumnHeader4.Grouper = null;
             ımageListViewColumnHeader4.Key = "";
             ımageListViewColumnHeader4.Type = Manina.Windows.Forms.ColumnType.DateModified;
+            ımageListViewColumnHeader5.Comparer = null;
             ımageListViewColumnHeader5.DisplayIndex = 4;
+            ımageListViewColumnHeader5.Grouper = null;
             ımageListViewColumnHeader5.Key = "";
             ımageListViewColumnHeader5.Type = Manina.Windows.Forms.ColumnType.DateTaken;
+            ımageListViewColumnHeader6.Comparer = null;
             ımageListViewColumnHeader6.DisplayIndex = 5;
+            ımageListViewColumnHeader6.Grouper = null;
             ımageListViewColumnHeader6.Key = "";
             ımageListViewColumnHeader6.Type = Manina.Windows.Forms.ColumnType.ExposureTime;
+            ımageListViewColumnHeader7.Comparer = null;
             ımageListViewColumnHeader7.DisplayIndex = 6;
+            ımageListViewColumnHeader7.Grouper = null;
             ımageListViewColumnHeader7.Key = "";
             ımageListViewColumnHeader7.Type = Manina.Windows.Forms.ColumnType.FNumber;
+            ımageListViewColumnHeader8.Comparer = null;
             ımageListViewColumnHeader8.DisplayIndex = 7;
+            ımageListViewColumnHeader8.Grouper = null;
             ımageListViewColumnHeader8.Key = "";
             ımageListViewColumnHeader8.Type = Manina.Windows.Forms.ColumnType.ISOSpeed;
+            ımageListViewColumnHeader9.Comparer = null;
             ımageListViewColumnHeader9.DisplayIndex = 8;
+            ımageListViewColumnHeader9.Grouper = null;
             ımageListViewColumnHeader9.Key = "";
             ımageListViewColumnHeader9.Type = Manina.Windows.Forms.ColumnType.Rating;
+            ımageListViewColumnHeader10.Comparer = null;
             ımageListViewColumnHeader10.DisplayIndex = 9;
+            ımageListViewColumnHeader10.Grouper = null;
             ımageListViewColumnHeader10.Key = "Custom";
             ımageListViewColumnHeader10.Type = Manina.Windows.Forms.ColumnType.Custom;
             this.imageListView.Columns.AddRange(new Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader[] {
@@ -212,7 +232,6 @@
             ımageListViewColumnHeader10});
             this.imageListView.ContextMenuStrip = this.ItemContextMenu;
             this.imageListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.imageListView.Location = new System.Drawing.Point(0, 0);
             this.imageListView.Name = "imageListView";
             this.imageListView.PersistentCacheDirectory = "";
@@ -318,6 +337,7 @@
             this.ShowCheckboxes,
             this.ShowScrollbars,
             this.GroupByName,
+            this.GroupByCustom,
             this.toolStripSeparator3,
             this.toolStripLabel4,
             this.CacheOnDemand,
@@ -580,6 +600,17 @@
             this.GroupByName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.GroupByName.Click += new System.EventHandler(this.GroupByName_Click);
             // 
+            // GroupByCustom
+            // 
+            this.GroupByCustom.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.GroupByCustom.Image = ((System.Drawing.Image)(resources.GetObject("GroupByCustom.Image")));
+            this.GroupByCustom.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.GroupByCustom.Name = "GroupByCustom";
+            this.GroupByCustom.Size = new System.Drawing.Size(155, 19);
+            this.GroupByCustom.Text = "Group by Custom";
+            this.GroupByCustom.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.GroupByCustom.Click += new System.EventHandler(this.GroupByCustom_Click);
+            // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
@@ -643,7 +674,7 @@
             this.MultiSelect.Image = ((System.Drawing.Image)(resources.GetObject("MultiSelect.Image")));
             this.MultiSelect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MultiSelect.Name = "MultiSelect";
-            this.MultiSelect.Size = new System.Drawing.Size(155, 19);
+            this.MultiSelect.Size = new System.Drawing.Size(73, 19);
             this.MultiSelect.Text = "Multi Select";
             this.MultiSelect.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.MultiSelect.Click += new System.EventHandler(this.MultiSelect_Click);
@@ -654,7 +685,7 @@
             this.UseEmbeddedThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("UseEmbeddedThumbnails.Image")));
             this.UseEmbeddedThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.UseEmbeddedThumbnails.Name = "UseEmbeddedThumbnails";
-            this.UseEmbeddedThumbnails.Size = new System.Drawing.Size(155, 19);
+            this.UseEmbeddedThumbnails.Size = new System.Drawing.Size(156, 19);
             this.UseEmbeddedThumbnails.Text = "Use Embedded Thumbnails";
             this.UseEmbeddedThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.UseEmbeddedThumbnails.Click += new System.EventHandler(this.UseEmbeddedThumbnails_Click);
@@ -665,7 +696,7 @@
             this.AutoRotateThumbnails.Image = ((System.Drawing.Image)(resources.GetObject("AutoRotateThumbnails.Image")));
             this.AutoRotateThumbnails.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.AutoRotateThumbnails.Name = "AutoRotateThumbnails";
-            this.AutoRotateThumbnails.Size = new System.Drawing.Size(155, 19);
+            this.AutoRotateThumbnails.Size = new System.Drawing.Size(140, 19);
             this.AutoRotateThumbnails.Text = "Auto Rotate Thumbnails";
             this.AutoRotateThumbnails.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.AutoRotateThumbnails.Click += new System.EventHandler(this.AutoRotateThumbnails_Click);
@@ -679,7 +710,7 @@
             // 
             this.toolStripLabel5.ForeColor = System.Drawing.SystemColors.GrayText;
             this.toolStripLabel5.Name = "toolStripLabel5";
-            this.toolStripLabel5.Size = new System.Drawing.Size(155, 15);
+            this.toolStripLabel5.Size = new System.Drawing.Size(70, 15);
             this.toolStripLabel5.Text = "Benchmark:";
             this.toolStripLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -690,7 +721,7 @@
             this.StartBenchmark.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.StartBenchmark.Name = "StartBenchmark";
-            this.StartBenchmark.Size = new System.Drawing.Size(155, 20);
+            this.StartBenchmark.Size = new System.Drawing.Size(114, 20);
             this.StartBenchmark.Text = "Start Benchmark";
             this.StartBenchmark.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.StartBenchmark.Click += new System.EventHandler(this.StartBenchmark_Click);
@@ -778,7 +809,7 @@
         private System.Windows.Forms.ToolStripButton UseEmbeddedThumbnails;
         private System.Windows.Forms.ToolStripButton AutoRotateThumbnails;
         private System.Windows.Forms.ToolStripButton AddOneItem;
-		private System.Windows.Forms.ToolStripButton SetEnabled;
+        private System.Windows.Forms.ToolStripButton SetEnabled;
         private System.Windows.Forms.StatusStrip StatusStrip;
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
         private System.Windows.Forms.SplitContainer splitContainer1;
@@ -800,6 +831,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.FolderBrowserDialog ChooseSourcePath;
         private System.Windows.Forms.ToolStripButton GroupByName;
+        private System.Windows.Forms.ToolStripButton GroupByCustom;
         private System.Windows.Forms.ToolStripMenuItem rotateToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton UsePersistentCache;
         private System.Windows.Forms.OpenFileDialog OpenCacheFile;

@@ -1019,6 +1019,13 @@ namespace Manina.Windows.Forms
                 group = string.Empty;
                 return;
             }
+            else if (column.Grouper != null)
+            {
+                ImageListView.GroupInfo info = column.Grouper.GetGroupInfo(this);
+                groupOrder = info.Order;
+                group = info.Name;
+                return;
+            }
 
             Utility.Tuple<int, string> groupInfo = new Utility.Tuple<int, string>(0, string.Empty);
 
