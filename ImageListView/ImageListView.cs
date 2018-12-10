@@ -2067,6 +2067,7 @@ namespace Manina.Windows.Forms
 
             // Add items
             bool first = true;
+            List<ImageListViewItem> items = new List<ImageListViewItem>();
             foreach (string filename in e.FileNames)
             {
                 ImageListViewItem item = new ImageListViewItem(filename);
@@ -2076,19 +2077,21 @@ namespace Manina.Windows.Forms
                     first = false;
                 }
 
-                bool inserted = mItems.InsertInternal(index, item, defaultAdaptor);
+                if (mItems.InsertInternal(index, item, defaultAdaptor))
+                {
+                    if (firstItemIndex == 0)
+                        firstItemIndex = item.Index;
 
-                if (firstItemIndex == 0)
-                    firstItemIndex = item.Index;
-
-                if (inserted)
+                    items.Add(item);
                     index++;
+                }
             }
 
             EnsureVisible(firstItemIndex);
             OnSelectionChangedInternal();
-        }
 
+            OnDropComplete(new DropCompleteEventArgs(items.ToArray(), false));
+        }
         /// <summary>
         /// Raises the DropItems event.
         /// </summary>
@@ -2114,6 +2117,7 @@ namespace Manina.Windows.Forms
 
             // Add items
             bool first = true;
+            List<ImageListViewItem> items = new List<ImageListViewItem>();
             foreach (ImageListViewItem item in e.Items)
             {
                 if (first || MultiSelect)
@@ -2122,13 +2126,25 @@ namespace Manina.Windows.Forms
                     first = false;
                 }
 
-                bool inserted = Items.InsertInternal(index, item, item.Adaptor);
-
-                if (inserted)
+                if (Items.InsertInternal(index, item, item.Adaptor))
+                {
+                    items.Add(item);
                     index++;
+                }
             }
 
             OnSelectionChangedInternal();
+
+            OnDropComplete(new DropCompleteEventArgs(items.ToArray(), true));
+        }
+        /// <summary>
+        /// Raises the DropComplete event.
+        /// </summary>
+        /// <param name="e">A DropCompleteEventArgs that contains event data.</param>
+        protected virtual void OnDropComplete(DropCompleteEventArgs e)
+        {
+            if (DropComplete != null)
+                DropComplete(this, e);
         }
         /// <summary>
         /// Raises the ColumnWidthChanged event.
@@ -2329,6 +2345,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Drag Drop"), Browsable(true), Description("Occurs after the user drops items on to the control.")]
         public event DropItemsEventHandler DropItems;
+        /// <summary>
+        /// Occurs after items are dropped successfully.
+        /// </summary>
+        [Category("Drag Drop"), Browsable(true), Description("Occurs after items are dropped successfully.")]
+        public event DropCompleteEventHandler DropComplete;
         /// <summary>
         /// Occurs after the user successfully resized a column header.
         /// </summary>

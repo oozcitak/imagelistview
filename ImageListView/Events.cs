@@ -16,11 +16,10 @@
 // Ozgur Ozcitak (ozcitak@yahoo.com)
 
 using System;
-using System.Windows.Forms;
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.ComponentModel;
-using System.Collections.Generic;
+using System.Windows.Forms;
 
 
 namespace Manina.Windows.Forms
@@ -47,6 +46,13 @@ namespace Manina.Windows.Forms
     /// <param name="e">A DropItemEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void DropItemsEventHandler(object sender, DropItemEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the DropComplete event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A DropCompleteEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void DropCompleteEventHandler(object sender, DropCompleteEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ColumnClick event. 
     /// </summary>
@@ -238,6 +244,32 @@ namespace Manina.Windows.Forms
             Cancel = false;
             Index = index;
             Items = items;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for drag&drop events' completion.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class DropCompleteEventArgs
+    {
+        /// <summary>
+        /// Gets the array of items droppped on the control.
+        /// </summary>
+        public ImageListViewItem[] Items { get; private set; }
+        /// <summary>
+        /// Gets if the drag operation is internal or external to the control.
+        /// In an internal drag operation, own items of the control are reordered.
+        /// </summary>
+        public bool InternalDrag { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the DropCompleteEventArgs class.
+        /// </summary>
+        /// <param name="fileNames">The array of items droppped on the control.</param>
+        public DropCompleteEventArgs(ImageListViewItem[] items, bool internalDrag)
+        {
+            Items = items;
+            InternalDrag = internalDrag;
         }
     }
     /// <summary>
