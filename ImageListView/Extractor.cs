@@ -54,9 +54,8 @@ namespace Manina.Windows.Forms
                             string pluginFileName = Path.Combine(programFolder, "WPFThumbnailExtractor.dll");
                             instance = LoadFrom(pluginFileName);
                         }
-                        catch (Exception e)
+                        catch
                         {
-                            System.Windows.Forms.MessageBox.Show(e.ToString());
                             instance = new GDIExtractor();
                         }
                     }
