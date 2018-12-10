@@ -220,9 +220,7 @@
             this.imageListView1.AllowDrag = true;
             this.imageListView1.AllowDrop = true;
             this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
-            this.imageListView1.ColumnHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView1.GroupHeaderFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.imageListView1.Location = new System.Drawing.Point(0, 0);
             this.imageListView1.Name = "imageListView1";
             this.imageListView1.PersistentCacheDirectory = "";

@@ -41,6 +41,13 @@ namespace Manina.Windows.Forms
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void DropFilesEventHandler(object sender, DropFileEventArgs e);
     /// <summary>
+    /// Represents the method that will handle the DropItems event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A DropItemEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void DropItemsEventHandler(object sender, DropItemEventArgs e);
+    /// <summary>
     /// Represents the method that will handle the ColumnClick event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
@@ -166,7 +173,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for column related events.
+    /// Represents the event arguments for external drag&drop events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class DropFileEventArgs
@@ -197,6 +204,40 @@ namespace Manina.Windows.Forms
             Cancel = false;
             Index = index;
             FileNames = fileNames;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for internal drag&drop events.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class DropItemEventArgs
+    {
+        /// <summary>
+        /// Gets or sets whether default event code will be processed.
+        /// When set to true, the control will automatically insert the new items.
+        /// Otherwise, the control will not process the dropped items.
+        /// </summary>
+        public bool Cancel { get; set; }
+        /// <summary>
+        /// Gets the position of the insertion caret.
+        /// This determines where the new items will be inserted.
+        /// </summary>
+        public int Index { get; private set; }
+        /// <summary>
+        /// Gets the array of items droppped on the control.
+        /// </summary>
+        public ImageListViewItem[] Items { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the DropItemEventArgs class.
+        /// </summary>
+        /// <param name="index">The position of the insertion caret.</param>
+        /// <param name="fileNames">The array of items droppped on the control.</param>
+        public DropItemEventArgs(int index, ImageListViewItem[] items)
+        {
+            Cancel = false;
+            Index = index;
+            Items = items;
         }
     }
     /// <summary>

@@ -1780,16 +1780,6 @@ namespace Manina.Windows.Forms
             base.OnDragDrop(e);
         }
         /// <summary>
-        /// Handles the GiveFeedback event.
-        /// </summary>
-        /// <param name="e">A <see cref="T:System.Windows.Forms.GiveFeedbackEventArgs"/> that contains the event data.</param>
-        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
-        {
-            navigationManager.GiveFeedback(e);
-            base.OnGiveFeedback(e);
-        }
-
-        /// <summary>
         /// Handles the Scroll event of the vScrollBar control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -2098,6 +2088,48 @@ namespace Manina.Windows.Forms
             EnsureVisible(firstItemIndex);
             OnSelectionChangedInternal();
         }
+
+        /// <summary>
+        /// Raises the DropItems event.
+        /// </summary>
+        /// <param name="e">A DropItemEventArgs that contains event data.</param>
+        protected virtual void OnDropItems(DropItemEventArgs e)
+        {
+            if (DropItems != null)
+                DropItems(this, e);
+
+            if (e.Cancel)
+                return;
+
+            int index = e.Index;
+            mSelectedItems.Clear(false);
+
+            foreach (ImageListViewItem item in e.Items)
+            {
+                if (item.Index < index) index--;
+                Items.RemoveInternal(item, false);
+            }
+            if (index < 0) index = 0;
+            if (index > Items.Count) index = Items.Count;
+
+            // Add items
+            bool first = true;
+            foreach (ImageListViewItem item in e.Items)
+            {
+                if (first || MultiSelect)
+                {
+                    item.mSelected = true;
+                    first = false;
+                }
+
+                bool inserted = Items.InsertInternal(index, item, item.Adaptor);
+
+                if (inserted)
+                    index++;
+            }
+
+            OnSelectionChangedInternal();
+        }
         /// <summary>
         /// Raises the ColumnWidthChanged event.
         /// </summary>
@@ -2292,6 +2324,11 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Drag Drop"), Browsable(true), Description("Occurs after the user drops files on to the control.")]
         public event DropFilesEventHandler DropFiles;
+        /// <summary>
+        /// Occurs after the user drops items on to the control.
+        /// </summary>
+        [Category("Drag Drop"), Browsable(true), Description("Occurs after the user drops items on to the control.")]
+        public event DropItemsEventHandler DropItems;
         /// <summary>
         /// Occurs after the user successfully resized a column header.
         /// </summary>
