@@ -482,8 +482,8 @@ namespace Manina.Windows.Forms
             }
             foreach (FileInfo p in files)
             {
-                if (p.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                    p.Name.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
+                if (p.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) ||

@@ -18,6 +18,8 @@
 // WIC support coded by Jens
 
 using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Manina.Windows.Forms
@@ -48,19 +50,37 @@ namespace Manina.Windows.Forms
                     {
                         try
                         {
-                            Assembly assembly = Assembly.LoadFrom("WPFThumbnailExtractor.dll");
-                            Type type = assembly.GetType("WPFExtractor");
-                            instance = (IExtractor)Activator.CreateInstance(type);
+                            string programFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                            string pluginFileName = Path.Combine(programFolder, "WPFThumbnailExtractor.dll");
+                            instance = LoadFrom(pluginFileName);
                         }
-                        catch
+                        catch (Exception e)
                         {
+                            System.Windows.Forms.MessageBox.Show(e.ToString());
                             instance = new GDIExtractor();
                         }
                     }
                 }
 
+                if (instance == null)
+                    instance = new GDIExtractor();
+
                 return instance;
             }
+        }
+
+        private static IExtractor LoadFrom(string pluginFileName)
+        {
+            Assembly assembly = Assembly.LoadFrom(pluginFileName);
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.GetInterfaces().Contains(typeof(IExtractor)) && !type.IsInterface && type.IsClass && !type.IsAbstract)
+                {
+                    return (IExtractor)Activator.CreateInstance(type, new object[0]);
+                }
+            }
+
+            return null;
         }
 
         public static bool UseWIC
