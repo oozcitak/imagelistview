@@ -30,6 +30,13 @@ namespace Manina.Windows.Forms
     /// </summary>
     public partial class GDIExtractor : IExtractor
     {
+        #region Properties
+        /// <summary>
+        /// Gets the name of this extractor.
+        /// </summary>
+        public virtual string Name => "GDI Thumbnail Extractor";
+        #endregion
+
         #region Constructor
         /// <summary>
         /// Initializes a new instance of the GDIExtractor class.

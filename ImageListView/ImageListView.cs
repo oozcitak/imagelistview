@@ -845,6 +845,12 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Appearance"), Description("Gets or sets whether the control uses for thumbnail extraction.")]
         public bool UseWIC { get { return Extractor.UseWIC; } set { Extractor.UseWIC = value; } }
+
+        /// <summary>
+        /// Gets the thumbnail extractor.
+        /// </summary>
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Advanced)]
+        public IExtractor ThumbnailExtractor { get { return Extractor.Instance; } }
         #endregion
 
         #region Custom Property Serializers

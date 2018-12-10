@@ -217,7 +217,7 @@ namespace Manina.Windows.Forms
             /// <summary>
             /// Returns an enumerator to use to iterate through columns.
             /// </summary>
-            /// <returns>An <see cref="IEnumerator{ImageListViewColumnHeader}" that represents the item collection.</returns>
+            /// <returns>An <see cref="IEnumerator{ImageListViewColumnHeader}"/> that represents the item collection.</returns>
             public IEnumerator<ImageListViewColumnHeader> GetEnumerator()
             {
                 foreach (ImageListViewColumnHeader column in mItems)

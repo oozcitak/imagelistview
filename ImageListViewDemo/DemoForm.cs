@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -107,6 +106,7 @@ namespace Manina.Windows.Forms
             imageListView1.SetRenderer(new ImageListViewRenderers.DefaultRenderer());
             imageListView1.SortColumn = 0;
             imageListView1.SortOrder = SortOrder.AscendingNatural;
+
             string cacheDir = Path.Combine(
                 Path.GetDirectoryName(new Uri(assembly.GetName().CodeBase).LocalPath),
                 "Cache"
@@ -121,6 +121,8 @@ namespace Manina.Windows.Forms
             var col = new ImageListView.ImageListViewColumnHeader(ColumnType.Custom, "random", "Random");
             col.Comparer = new RandomColumnComparer();
             imageListView1.Columns.Add(col);
+
+            Text = string.Format("ImageListView Demo ({0})", imageListView1.ThumbnailExtractor.Name);
 
             TreeNode node = new TreeNode("Loading...", 3, 3);
             node.Tag = null;
@@ -140,7 +142,7 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Update UI while idle
-        void Application_Idle(object sender, EventArgs e)
+        private void Application_Idle(object sender, EventArgs e)
         {
             detailsToolStripButton.Checked = (imageListView1.View == View.Details);
             thumbnailsToolStripButton.Checked = (imageListView1.View == View.Thumbnails);
@@ -469,9 +471,19 @@ namespace Manina.Windows.Forms
             imageListView1.Items.Clear();
             imageListView1.SuspendLayout();
             Random rnd = new Random();
-            foreach (FileInfo p in path.GetFiles("*.*"))
+            FileInfo[] files = new FileInfo[0];
+            try
+            {
+                files = path.GetFiles("*.*");
+            }
+            catch
+            {
+                files = new FileInfo[0];
+            }
+            foreach (FileInfo p in files)
             {
                 if (p.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
                     p.Name.EndsWith(".ico", StringComparison.OrdinalIgnoreCase) ||
@@ -509,7 +521,7 @@ namespace Manina.Windows.Forms
             PopulateListView(ktag.Key);
         }
 
-        void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             KeyValuePair<TreeNode, List<TreeNode>> kv = (KeyValuePair<TreeNode, List<TreeNode>>)e.Result;
             TreeNode rootNode = kv.Key;

@@ -142,7 +142,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Returns an enumerator to use to iterate through columns.
         /// </summary>
-        /// <returns>An <see cref="IEnumerator{KeyValuePair{string, ImageListViewSubItem}}" that represents the item collection.</returns>
+        /// <returns>An enumerator that represents the item collection.</returns>
         public IEnumerator<KeyValuePair<string, ImageListViewSubItem>> GetEnumerator()
         {
             return ((IDictionary<string, ImageListViewSubItem>)mItems).GetEnumerator();
@@ -150,7 +150,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Returns an enumerator to use to iterate through columns.
         /// </summary>
-        /// <returns>An <see cref="IEnumerator" that represents the item collection.</returns>
+        /// <returns>An <see cref="IEnumerator"/> that represents the item collection.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IDictionary<string, ImageListViewSubItem>)mItems).GetEnumerator();

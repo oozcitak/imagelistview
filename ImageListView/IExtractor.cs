@@ -27,6 +27,11 @@ namespace Manina.Windows.Forms
     public interface IExtractor
     {
         /// <summary>
+        /// Gets the name of this extractor.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Returns image metadata.
         /// </summary>
         /// <param name="path">Filepath of image</param>

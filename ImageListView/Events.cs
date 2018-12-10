@@ -179,7 +179,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for external drag&drop events.
+    /// Represents the event arguments for external drag drop events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class DropFileEventArgs
@@ -213,7 +213,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for internal drag&drop events.
+    /// Represents the event arguments for internal drag drop events.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class DropItemEventArgs
@@ -238,7 +238,7 @@ namespace Manina.Windows.Forms
         /// Initializes a new instance of the DropItemEventArgs class.
         /// </summary>
         /// <param name="index">The position of the insertion caret.</param>
-        /// <param name="fileNames">The array of items droppped on the control.</param>
+        /// <param name="items">The array of items droppped on the control.</param>
         public DropItemEventArgs(int index, ImageListViewItem[] items)
         {
             Cancel = false;
@@ -247,7 +247,7 @@ namespace Manina.Windows.Forms
         }
     }
     /// <summary>
-    /// Represents the event arguments for drag&drop events' completion.
+    /// Represents the event arguments for drag drop event completion.
     /// </summary>
     [Serializable, ComVisible(true)]
     public class DropCompleteEventArgs
@@ -265,7 +265,9 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Initializes a new instance of the DropCompleteEventArgs class.
         /// </summary>
-        /// <param name="fileNames">The array of items droppped on the control.</param>
+        /// <param name="items">The array of items droppped on the control.</param>
+        /// <param name="internalDrag">true if a drop event occurred after an internal reordering of items,
+        /// otherwise false if image files were externally dropped onto the control.</param>
         public DropCompleteEventArgs(ImageListViewItem[] items, bool internalDrag)
         {
             Items = items;

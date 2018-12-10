@@ -34,6 +34,13 @@ namespace Manina.Windows.Forms
     /// </summary>
     public partial class WPFExtractor : GDIExtractor
     {
+        #region Properties
+        /// <summary>
+        /// Gets the name of this extractor.
+        /// </summary>
+        public override string Name => "WPF/WIC Thumbnail Extractor";
+        #endregion
+
         #region Exif Tag IDs
         private const int TagImageDescription = 0x010E;
         private const int TagEquipmentModel = 0x0110;
