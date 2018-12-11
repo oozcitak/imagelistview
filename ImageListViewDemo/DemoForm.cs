@@ -12,6 +12,7 @@ namespace Manina.Windows.Forms
     {
         #region Member variables
         private BackgroundWorker bw = new BackgroundWorker();
+        private string message = "";
         #endregion
 
         #region Renderer and color combobox items
@@ -177,8 +178,15 @@ namespace Manina.Windows.Forms
             foreach (ToolStripMenuItem item in iconAlignmentToolStripMenuItem.DropDownItems)
                 item.Checked = (ContentAlignment)item.Tag == ia;
 
-            toolStripStatusLabel1.Text = string.Format("{0} Items: {1} Selected, {2} Checked",
-                imageListView1.Items.Count, imageListView1.SelectedItems.Count, imageListView1.CheckedItems.Count);
+            if (string.IsNullOrEmpty(message))
+            {
+                toolStripStatusLabel1.Text = string.Format("{0} Items: {1} Selected, {2} Checked",
+                    imageListView1.Items.Count, imageListView1.SelectedItems.Count, imageListView1.CheckedItems.Count);
+            }
+            else
+            {
+                toolStripStatusLabel1.Text = message;
+            }
 
             groupAscendingToolStripMenuItem.Checked = imageListView1.GroupOrder == SortOrder.Ascending;
             groupDescendingToolStripMenuItem.Checked = imageListView1.GroupOrder == SortOrder.Descending;
@@ -652,6 +660,40 @@ namespace Manina.Windows.Forms
             }
 
             return dirs.Length;
+        }
+        #endregion
+
+        #region Show Message on Item Click
+        private void imageListView1_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            DoHitTest(e.Location);
+        }
+
+        private void imageListView1_ItemCheckBoxClick(object sender, ItemEventArgs e)
+        {
+            DoHitTest(imageListView1.PointToClient(Cursor.Position));
+        }
+
+        private void DoHitTest(Point pt)
+        {
+            imageListView1.HitTest(pt, out var h);
+            if (h.ItemHit)
+            {
+                if (h.CheckBoxHit)
+                    message = string.Format("Checkbox of item {0} clicked.", h.ItemIndex);
+                else if (h.FileIconHit)
+                    message = string.Format("File icon of item {0} clicked.", h.ItemIndex);
+                else
+                    message = string.Format("Item {0} clicked.", h.ItemIndex);
+
+                messageTimer.Enabled = true;
+            }
+        }
+
+        private void messageTimer_Tick(object sender, EventArgs e)
+        {
+            message = "";
+            messageTimer.Enabled = false;
         }
         #endregion
     }

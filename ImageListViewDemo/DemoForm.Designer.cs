@@ -38,7 +38,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.rendererToolStripLabel = new System.Windows.Forms.ToolStripLabel();
@@ -87,6 +86,8 @@
             this.sortAscendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ofBrowseImage = new System.Windows.Forms.OpenFileDialog();
+            this.messageTimer = new System.Windows.Forms.Timer(this.components);
+            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -214,23 +215,6 @@
             this.imageList1.Images.SetKeyName(1, "folder_closed_16.png");
             this.imageList1.Images.SetKeyName(2, "folder_open_16.png");
             this.imageList1.Images.SetKeyName(3, "cog.png");
-            // 
-            // imageListView1
-            // 
-            this.imageListView1.AllowDrag = true;
-            this.imageListView1.AllowDrop = true;
-            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
-            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView1.Location = new System.Drawing.Point(0, 0);
-            this.imageListView1.Name = "imageListView1";
-            this.imageListView1.PersistentCacheDirectory = "";
-            this.imageListView1.PersistentCacheSize = ((long)(100));
-            this.imageListView1.Size = new System.Drawing.Size(397, 389);
-            this.imageListView1.TabIndex = 0;
-            this.imageListView1.UseWIC = true;
-            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
-            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
-            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
             // 
             // propertyGrid1
             // 
@@ -612,6 +596,30 @@
             this.ofBrowseImage.Multiselect = true;
             this.ofBrowseImage.Title = "Select Images";
             // 
+            // messageTimer
+            // 
+            this.messageTimer.Interval = 3000;
+            this.messageTimer.Tick += new System.EventHandler(this.messageTimer_Tick);
+            // 
+            // imageListView1
+            // 
+            this.imageListView1.AllowDrag = true;
+            this.imageListView1.AllowDrop = true;
+            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
+            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView1.Location = new System.Drawing.Point(0, 0);
+            this.imageListView1.Name = "imageListView1";
+            this.imageListView1.PersistentCacheDirectory = "";
+            this.imageListView1.PersistentCacheSize = ((long)(100));
+            this.imageListView1.Size = new System.Drawing.Size(397, 389);
+            this.imageListView1.TabIndex = 0;
+            this.imageListView1.UseWIC = true;
+            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
+            this.imageListView1.ItemClick += new Manina.Windows.Forms.ItemClickEventHandler(this.imageListView1_ItemClick);
+            this.imageListView1.ItemCheckBoxClick += new Manina.Windows.Forms.ItemCheckBoxClickEventHandler(this.imageListView1_ItemCheckBoxClick);
+            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
+            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
+            // 
             // DemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -702,6 +710,7 @@
         private System.Windows.Forms.OpenFileDialog ofBrowseImage;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem usingWPFWICToolStripMenuItem;
+        private System.Windows.Forms.Timer messageTimer;
     }
 }
 

@@ -1412,6 +1412,7 @@ namespace Manina.Windows.Forms
 
                 int itemIndex = -1;
                 bool checkBoxHit = false;
+                bool fileIconHit = false;
                 int subItemIndex = -1;
 
                 if (showGroups)
@@ -1440,6 +1441,12 @@ namespace Manina.Windows.Forms
                                         Rectangle checkBoxBounds = layoutManager.GetCheckBoxBounds(index);
                                         if (checkBoxBounds.Contains(pt.X + @group.itemBounds.Left, pt.Y + @group.itemBounds.Top))
                                             checkBoxHit = true;
+                                    }
+                                    if (ShowFileIcons)
+                                    {
+                                        Rectangle fileIconBounds = layoutManager.GetIconBounds(index);
+                                        if (fileIconBounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                                            fileIconHit = true;
                                     }
                                 }
 
@@ -1491,6 +1498,12 @@ namespace Manina.Windows.Forms
                                     if (checkBoxBounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
                                         checkBoxHit = true;
                                 }
+                                if (ShowFileIcons)
+                                {
+                                    Rectangle fileIconBounds = layoutManager.GetIconBounds(index);
+                                    if (fileIconBounds.Contains(pt.X + layoutManager.ItemAreaBounds.Left, pt.Y + layoutManager.ItemAreaBounds.Top))
+                                        fileIconHit = true;
+                                }
                             }
                         }
 
@@ -1514,7 +1527,7 @@ namespace Manina.Windows.Forms
                     }
                 }
 
-                hitInfo = new HitInfo(itemIndex, subItemIndex, checkBoxHit);
+                hitInfo = new HitInfo(itemIndex, subItemIndex, checkBoxHit, fileIconHit);
             }
         }
         /// <summary>
