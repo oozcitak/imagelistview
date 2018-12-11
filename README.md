@@ -8,7 +8,7 @@ ImageListView requires .NET framework 3.5 to take advantage of the Windows Imagi
 # Features #
   * Asynchronously loaded image thumbnails
   * [Custom renderers](https://github.com/oozcitak/imagelistview/wiki/ImageListViewRenderer)
-  * [Thumbnails, Gallery, Pane and Details view modes](https://github.com/oozcitak/imagelistview/wiki/ViewModes)
+  * [Thumbnails, Gallery, Pane, Details, HorizontalStrip and VerticalStrip view modes](https://github.com/oozcitak/imagelistview/wiki/ViewModes)
   * Ability to extract embedded thumbnails
   * Drag&drop support
   * Works with .NET 3.5
