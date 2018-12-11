@@ -838,7 +838,7 @@ namespace Manina.Windows.Forms
         /// </summary>
         internal ScrollOrientation ScrollOrientation
         {
-            get { return (mView == View.Gallery ? ScrollOrientation.HorizontalScroll : ScrollOrientation.VerticalScroll); }
+            get { return (mView == View.Gallery || mView == View.HorizontalStrip ? ScrollOrientation.HorizontalScroll : ScrollOrientation.VerticalScroll); }
         }
         /// <summary>
         /// Gets or sets whether the control uses WPF/WIC for thumbnail extraction.

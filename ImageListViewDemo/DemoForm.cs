@@ -149,6 +149,8 @@ namespace Manina.Windows.Forms
             thumbnailsToolStripButton.Checked = (imageListView1.View == View.Thumbnails);
             galleryToolStripButton.Checked = (imageListView1.View == View.Gallery);
             paneToolStripButton.Checked = (imageListView1.View == View.Pane);
+            horizontalStripToolStripButton.Checked = (imageListView1.View == View.HorizontalStrip);
+            verticalStripToolStripButton.Checked = (imageListView1.View == View.VerticalStrip);
 
             integralScrollToolStripMenuItem.Checked = imageListView1.IntegralScroll;
 
@@ -261,6 +263,16 @@ namespace Manina.Windows.Forms
         private void paneToolStripButton_Click(object sender, EventArgs e)
         {
             imageListView1.View = View.Pane;
+        }
+
+        private void horizontalStripToolStripButton_Click(object sender, EventArgs e)
+        {
+            imageListView1.View = View.HorizontalStrip;
+        }
+
+        private void verticalStripToolStripButton_Click(object sender, EventArgs e)
+        {
+            imageListView1.View = View.VerticalStrip;
         }
 
         private void clearThumbsToolStripButton_Click(object sender, EventArgs e)

@@ -345,7 +345,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         Details,
         /// <summary>
-        /// Displays a single row of thumbnails at the bottom.
+        /// Displays a large preview image of the focused item together with
+        /// a single row of thumbnails at the bottom.
         /// The view can be scrolled horizontally.
         /// </summary>
         Gallery,
@@ -359,6 +360,16 @@ namespace Manina.Windows.Forms
         /// scrolled vertically.
         /// </summary>
         Thumbnails,
+        /// <summary>
+        /// Displays a single row of thumbnails.
+        /// The view can be scrolled horizontally.
+        /// </summary>
+        HorizontalStrip,
+        /// <summary>
+        /// Displays a single column of thumbnails.
+        /// The view can be scrolled vertically.
+        /// </summary>
+        VerticalStrip,
     }
     /// <summary>
     /// Specifies how items in a list are sorted.

@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
 namespace Manina.Windows.Forms
@@ -130,7 +130,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             private class ItemDrawOrderComparer : IComparer<DrawItemParams>
             {
-                private ItemDrawOrder mDrawOrder;
+                private readonly ItemDrawOrder mDrawOrder;
 
                 public ItemDrawOrderComparer(ItemDrawOrder drawOrder)
                 {
@@ -365,7 +365,7 @@ namespace Manina.Windows.Forms
                     else
                         g.SetClip(ImageListView.layoutManager.ClientArea);
 
-                    if (ImageListView.View == View.Gallery)
+                    if (ImageListView.View == View.Gallery || ImageListView.View == View.HorizontalStrip)
                     {
                         g.TranslateTransform(group.headerBounds.Left, group.headerBounds.Bottom);
                         g.RotateTransform(270);
@@ -653,6 +653,14 @@ namespace Manina.Windows.Forms
                     if (ImageListView.navigationManager.DropToRight)
                         bounds.Offset(0, ImageListView.layoutManager.ItemSizeWithMargin.Height);
                     bounds.Offset(0, -1);
+                    bounds.Height = 2;
+                }
+                else if (ImageListView.View == View.VerticalStrip)
+                {
+                    if (ImageListView.navigationManager.DropToRight)
+                        bounds.Offset(0, ImageListView.layoutManager.ItemSizeWithMargin.Height);
+                    Size itemMargin = MeasureItemMargin(ImageListView.View);
+                    bounds.Offset(0, -(itemMargin.Height - 2) / 2 - 2);
                     bounds.Height = 2;
                 }
                 else
@@ -983,11 +991,11 @@ namespace Manina.Windows.Forms
                     }
                     else if (ImageListView.BackgroundImageLayout == ImageLayout.Zoom)
                     {
-                        float xscale = (float)bounds.Width / (float)img.Width;
-                        float yscale = (float)bounds.Height / (float)img.Height;
+                        float xscale = bounds.Width / (float)img.Width;
+                        float yscale = bounds.Height / (float)img.Height;
                         float scale = Math.Min(xscale, yscale);
-                        int width = (int)(((float)img.Width) * scale);
-                        int height = (int)(((float)img.Height) * scale);
+                        int width = (int)(img.Width * scale);
+                        int height = (int)(img.Height * scale);
                         int x = bounds.Left + (bounds.Width - width) / 2;
                         int y = bounds.Top + (bounds.Height - height) / 2;
                         g.DrawImage(img, x, y, width, height);
@@ -1306,8 +1314,8 @@ namespace Manina.Windows.Forms
             public virtual void DrawCheckBox(Graphics g, ImageListViewItem item, Rectangle bounds)
             {
                 Size size = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal);
-                PointF pt = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
-                    (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
+                PointF pt = new PointF(bounds.X + (bounds.Width - (float)size.Width) / 2.0f,
+                    bounds.Y + (bounds.Height - (float)size.Height) / 2.0f);
                 CheckBoxState state = CheckBoxState.UncheckedNormal;
                 if (item.Enabled)
                     state = item.Checked ? CheckBoxState.CheckedNormal : CheckBoxState.UncheckedNormal;
@@ -1327,8 +1335,8 @@ namespace Manina.Windows.Forms
                 if (icon != null)
                 {
                     Size size = icon.Size;
-                    PointF ptf = new PointF((float)bounds.X + ((float)bounds.Width - (float)size.Width) / 2.0f,
-                        (float)bounds.Y + ((float)bounds.Height - (float)size.Height) / 2.0f);
+                    PointF ptf = new PointF(bounds.X + (bounds.Width - (float)size.Width) / 2.0f,
+                        bounds.Y + (bounds.Height - (float)size.Height) / 2.0f);
                     Point pt = Point.Round(ptf);
                     g.DrawImage(icon, pt.X, pt.Y);
                 }

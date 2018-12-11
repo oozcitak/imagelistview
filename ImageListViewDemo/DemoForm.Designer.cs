@@ -87,7 +87,9 @@
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ofBrowseImage = new System.Windows.Forms.OpenFileDialog();
             this.messageTimer = new System.Windows.Forms.Timer(this.components);
+            this.horizontalStripToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.imageListView1 = new Manina.Windows.Forms.ImageListView();
+            this.verticalStripToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -237,6 +239,8 @@
             this.galleryToolStripButton,
             this.paneToolStripButton,
             this.detailsToolStripButton,
+            this.horizontalStripToolStripButton,
+            this.verticalStripToolStripButton,
             this.toolStripSeparator3,
             this.clearThumbsToolStripButton,
             this.toolStripDropDownButton1,
@@ -244,7 +248,7 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(611, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(688, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // rendererToolStripLabel
@@ -601,6 +605,16 @@
             this.messageTimer.Interval = 3000;
             this.messageTimer.Tick += new System.EventHandler(this.messageTimer_Tick);
             // 
+            // filmStripToolStripButton
+            // 
+            this.horizontalStripToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.horizontalStripToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("filmStripToolStripButton.Image")));
+            this.horizontalStripToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.horizontalStripToolStripButton.Name = "filmStripToolStripButton";
+            this.horizontalStripToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.horizontalStripToolStripButton.Text = "Horizontal Strip";
+            this.horizontalStripToolStripButton.Click += new System.EventHandler(this.horizontalStripToolStripButton_Click);
+            // 
             // imageListView1
             // 
             this.imageListView1.AllowDrag = true;
@@ -619,6 +633,16 @@
             this.imageListView1.ItemCheckBoxClick += new Manina.Windows.Forms.ItemCheckBoxClickEventHandler(this.imageListView1_ItemCheckBoxClick);
             this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
             this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
+            // 
+            // verticalStripToolStripButton
+            // 
+            this.verticalStripToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.verticalStripToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("verticalStripToolStripButton.Image")));
+            this.verticalStripToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.verticalStripToolStripButton.Name = "verticalStripToolStripButton";
+            this.verticalStripToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.verticalStripToolStripButton.Text = "Vertical Strip";
+            this.verticalStripToolStripButton.Click += new System.EventHandler(this.verticalStripToolStripButton_Click);
             // 
             // DemoForm
             // 
@@ -711,6 +735,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem usingWPFWICToolStripMenuItem;
         private System.Windows.Forms.Timer messageTimer;
+        private System.Windows.Forms.ToolStripButton horizontalStripToolStripButton;
+        private System.Windows.Forms.ToolStripButton verticalStripToolStripButton;
     }
 }
 
