@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FE354FEF-85B4-4A5B-A130-7DD226A9B015}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Documentation</RootNamespace>
+    <AssemblyName>Documentation</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="api\index.md" />
+    <None Include="articles\CustomRenderers.md" />
+    <None Include="articles\Introduction.md" />
+    <None Include="filterConfig.yml" />
+    <None Include="resources\slick\config.rb" />
+    <None Include="resources\slick\fonts\slick.eot" />
+    <None Include="resources\slick\fonts\slick.ttf" />
+    <None Include="resources\slick\fonts\slick.woff" />
+    <None Include="resources\slick\slick-theme.less" />
+    <None Include="resources\slick\slick-theme.scss" />
+    <None Include="resources\slick\slick.less" />
+    <None Include="resources\slick\slick.scss" />
+    <None Include="templates\hero\index.html.tmpl" />
+    <None Include="index.md" />
+    <None Include="articles\MonoSupport.md" />
+    <None Include="articles\toc.yml" />
+    <None Include="articles\ViewModes.md" />
+    <None Include="articles\WICSupport.md" />
+    <None Include="combinedtoc\toc.yml" />
+    <None Include="docfx.json" />
+    <None Include="overwrites\Manina.Windows.Forms.ImageListViewItemAdaptors.md" />
+    <None Include="overwrites\Manina.Windows.Forms.ImageListViewRenderers.md" />
+    <None Include="overwrites\Manina.Windows.Forms.md" />
+    <None Include="packages.config" />
+    <None Include="resources\materialize\LICENSE" />
+    <None Include="resources\materialize\README.md" />
+    <None Include="toc.yml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="resources\images\demo\ImageListView.details.png" />
+    <Content Include="resources\images\demo\ImageListView.gallery.png" />
+    <Content Include="resources\images\demo\ImageListView.noir.png" />
+    <Content Include="resources\images\demo\ImageListView.pane.png" />
+    <Content Include="resources\images\demo\ImageListView.thumbnail.png" />
+    <Content Include="resources\images\demo\ImageListView.tiles.png" />
+    <Content Include="resources\images\demo\ImageListView.xp.png" />
+    <Content Include="resources\slick\ajax-loader.gif" />
+    <Content Include="resources\slick\fonts\slick.svg" />
+    <Content Include="resources\slick\slick-theme.css" />
+    <Content Include="resources\slick\slick.css" />
+    <Content Include="resources\slick\slick.js" />
+    <Content Include="resources\slick\slick.min.js" />
+    <Content Include="templates\hero\styles\main.js" />
+    <Content Include="templates\hero\styles\main.css" />
+    <Content Include="resources\icons\favicon.ico" />
+    <Content Include="resources\icons\logo.png" />
+    <Content Include="resources\images\ImageListView.details.jpg" />
+    <Content Include="resources\images\ImageListView.gallery.jpg" />
+    <Content Include="resources\images\ImageListView.pane.jpg" />
+    <Content Include="resources\images\ImageListView.thumbnails %281%29.jpg" />
+    <Content Include="resources\images\ImageListView.thumbnails.jpg" />
+    <Content Include="resources\images\ImageListViewRenderer.default.jpg" />
+    <Content Include="resources\images\ImageListViewRenderer.noir.jpg" />
+    <Content Include="resources\images\ImageListViewRenderer.tiles.jpg" />
+    <Content Include="resources\images\ImageListViewRenderer.xp.jpg" />
+    <Content Include="resources\images\ImageListViewRenderer.zooming.jpg" />
+    <Content Include="resources\images\MonoSupport.demo.jpg" />
+    <Content Include="resources\materialize\materialize.min.css" />
+    <Content Include="resources\materialize\materialize.min.js" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\docfx.console.2.40.4\build\docfx.console.targets" Condition="Exists('..\packages\docfx.console.2.40.4\build\docfx.console.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\docfx.console.2.40.4\build\docfx.console.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\docfx.console.2.40.4\build\docfx.console.targets'))" />
+  </Target>
+</Project>

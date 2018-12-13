@@ -1,0 +1,29 @@
+﻿{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": "**.csproj",
+          "src": "../ImageListView"
+        }
+      ],
+      "filter": "filterConfig.yml",
+      "dest": "obj/api"
+    }
+  ],
+  "build": {
+    "content": [ "index.md", "combinedtoc/**", "toc.yml", "articles/**.yml", "articles/**.md", "api/**.md", "obj/api/**.yml" ],
+    "resource": [ "resources/images/**", "resources/images/demo/**", "resources/images/demo/thumb/**", "resources/icons/**", "resources/slick/**" ],
+    "overwrite": [ "overwrites/**.md" ],
+    "globalMetadata": {
+      "_appTitle": "ImageListView",
+      "_appFooter": "Copyright © 2018 Özgür Özçıtak",
+      "_appLogoPath": "resources/icons/logo.png",
+      "_appFaviconPath": "resources/icons/favicon.ico",
+      "_disableBreadcrumb": true,
+      "_disableAffix": true
+    },
+    "dest": "_site",
+    "template": [ "default", "templates/hero" ]
+  }
+}

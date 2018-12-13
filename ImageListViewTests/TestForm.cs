@@ -67,7 +67,7 @@ namespace ImageListViewTests
             Application.Idle += new EventHandler(Application_Idle);
 
             adaptor = new CustomAdaptor();
-            uriAdaptor = new ImageListViewItemAdaptors.URIAdaptor();
+            uriAdaptor = new Manina.Windows.Forms.ImageListViewItemAdaptors.URIAdaptor();
 
             string picturePath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             files = Directory.GetFiles(picturePath, "*.jpg");

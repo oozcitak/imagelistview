@@ -1,0 +1,82 @@
+﻿#hero {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+#hero .header {
+    width: 100%;
+    background: linear-gradient(black, #131);
+}
+
+#hero .header .title {
+    font-size: 36pt;
+    color: white;
+    padding-top: 20pt;
+    text-align: center;
+}
+
+#hero .header .info {
+    font-family: serif;
+    font-style: oblique;
+    font-size: 14pt;
+    color: #dfd;
+    text-align: center;
+    padding-bottom: 20pt;
+}
+
+#hero .header .buttons {
+    padding-bottom: 8pt;
+    text-align: center;
+}
+
+#hero .header .doclinks {
+    padding-bottom: 20pt;
+    text-align: center;
+}
+
+#hero .header .doclinks a, #hero .header .doclinks span {
+    color: #dfd;
+    text-decoration: none;
+}
+
+#hero .content {
+    padding-top: 36pt;
+    text-align: center;
+}
+#hero .demo-images {
+    width: 561px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#hero .demo-images button {
+    color: #131;
+}
+#hero .demo-images-caption {
+    text-align: center;
+    color: #131;
+    margin-top: 0.5em;
+    text-shadow: 1px 1px 8px rgba(17,51,17,0.25);
+    font-weight: bold;
+}
+.slick-prev {
+    left: -35px;
+}
+[dir='rtl'] .slick-prev {
+    right: -22px;
+    left: auto;
+}
+.slick-next {
+    right: -22px;
+}
+[dir='rtl'] .slick-next {
+    right: auto;
+    left: -35px;
+}
+.slick-prev:before, .slick-next:before {
+    color: #131;
+    font-size: 33px;
+}
