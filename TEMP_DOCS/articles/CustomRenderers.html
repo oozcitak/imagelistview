@@ -1,0 +1,265 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Custom Renderers | ImageListView </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Custom Renderers | ImageListView ">
+    <meta name="generator" content="docfx 2.40.4.0">
+    
+    <link rel="shortcut icon" href="../resources/icons/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../combinedtoc/toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../resources/icons/logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-12">
+            <article class="content wrap" id="_content" data-uid="Articles.CustomRenderers">
+<h1 id="ıntroduction">Introduction</h1>
+
+<p>The look of ImageListView can be customized with renderers. You can either use one of the built-in custom renderers below, or write your own custom renderer by deriving from <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.ImageListViewRenderer.html">ImageListView.ImageListViewRenderer</a>.</p>
+<h1 id="custom-renderers">Custom renderers</h1>
+<h2 id="built-in-custom-renderers">Built-in custom renderers</h2>
+<p>You can find these renderers in the source code and the latest binaries. To use a built-in custom renderer, use the Manina.Windows.Forms.ImageListView.SetRenderer(Manina.Windows.Forms.ImageListView.ImageListViewRenderer,System.Boolean) method as below:</p>
+<pre><code class="lang-cs">myImageListView.SetRenderer(new ImageListViewRenderers.XPRenderer());
+</code></pre><h3 id="defaultrenderer">DefaultRenderer</h3>
+<p><img src="../resources/images/ImageListViewRenderer.default.jpg" alt="DefaultRenderer"></p>
+<p><em>The default renderer in action. Item states from left-to-right: selected, focused, mouse over.</em></p>
+<h3 id="xprenderer">XPRenderer</h3>
+<p><img src="../resources/images/ImageListViewRenderer.xp.jpg" alt="XPRenderer"></p>
+<p><em>A renderer mimicking the Windows XP look. Item states from left-to-right: selected, focused.</em></p>
+<h3 id="tilesrenderer">TilesRenderer</h3>
+<p>You can set the size of the description area in the constructor.</p>
+<pre><code class="lang-cs">// Create a new TilesRenderer and set the size
+// of the description area to 180 pixels
+myImageListView.SetRenderer(new ImageListViewRenderers.TilesRenderer(180));
+</code></pre><p><img src="../resources/images/ImageListViewRenderer.tiles.jpg" alt="TilesRenderer"></p>
+<p><em>Tiles renderer displays items with more details. Item states from top-to-bottom: selected, focused, mouse over.</em></p>
+<h3 id="zoomingrenderer">ZoomingRenderer</h3>
+<p>You can set the zoom factor in the constructor.</p>
+<pre><code class="lang-cs">// Create a new ZoomingRenderer and set the
+// zoom factor to 50%
+myImageListView.SetRenderer(new ImageListViewRenderers.ZoomingRenderer(0.5f));
+</code></pre><p><img src="../resources/images/ImageListViewRenderer.zooming.jpg" alt="ZoomingRenderer"></p>
+<p><em>Zooming renderer displays large items on mouse over.</em></p>
+<h3 id="noirrenderer">NoirRenderer</h3>
+<p>Displays the control with a dark theme.</p>
+<p><img src="../resources/images/ImageListViewRenderer.noir.jpg" alt="NoirRenderer"></p>
+<p><em>Noir renderer in action.</em></p>
+<h3 id="panelrenderer">PanelRenderer</h3>
+<p>This renderer is obsolete and is no longer included in the source code. The new Pane view mode provides the functionality of <code>PanelRenderer</code>.</p>
+<h2 id="writing-a-custom-renderer">Writing a Custom Renderer</h2>
+<p>In order to write a custom renderer, derive from <code>ImageListViewRenderer</code> and override the virtual functions:</p>
+<pre><code class="lang-cs">public MyCustomRenderer : ImageListView.ImageListViewRenderer
+{
+  // Override virtual functions as required
+}
+</code></pre><h3 id="virtual-functions">Virtual Functions</h3>
+<p>The base renderer class <code>ImageListViewRenderer</code> exposes the following virtual functions.</p>
+<h4 id="ınitializegraphics">InitializeGraphics</h4>
+<p><code>InitializeGraphics</code> performs one time initialization of the Graphics used to draw the control.</p>
+<pre><code class="lang-cs">public virtual void InitializeGraphics(Graphics g)
+{
+    base.InitializeGraphics(g);
+    // Change the InterpolationMode to NearestNeighbor.
+    // This will effect all drawing operations.
+    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+}
+</code></pre><h4 id="measurecolumnheaderheight">MeasureColumnHeaderHeight</h4>
+<p>Returns the height of column headers. The base class returns the pixel height of the header font with a 2 pixel padding added.</p>
+<pre><code class="lang-cs">public virtual int MeasureColumnHeaderHeight()
+{
+    // Add 4 pixel padding to the base font height.
+    return ImageListView.HeaderFont.Height + 8;
+}
+</code></pre><h4 id="measureıtem">MeasureItem</h4>
+<p>Returns the item size for the given view mode. The view mode passed to the function may be different from the current view mode of the control.</p>
+<pre><code class="lang-cs">public virtual Size MeasureItem(View view)
+{
+    if (view == View.Thumbnails)
+    {
+        // Add 4 pixel padding on all sides to the thumbnail size.
+        return new ImageListView.ThumbnailSize + new Size(8, 8);
+    }
+    else if (view == View.Details)
+    {
+        // Revert to base class
+        base.MeasureItem(view)
+    }
+}
+</code></pre><h4 id="drawbackground">DrawBackground</h4>
+<p>Draws the background of the control. The base class clears the background with the background color and draws the background image, if any.</p>
+<pre><code class="lang-cs">public virtual void DrawBackground(Graphics g, Rectangle bounds)
+{
+    base.DrawBackground(g, bounds)
+    // Overlay a custom background image
+    g.DrawImage(myImage, 10, 10);
+}
+</code></pre><h4 id="drawselectionrectangle">DrawSelectionRectangle</h4>
+<p>Draws the selection rectangle.</p>
+<pre><code class="lang-cs">public virtual void DrawSelectionRectangle(Graphics g, Rectangle selection)
+{
+    g.FillRectangle(SystemBrushes.Highlight, selection);
+}
+</code></pre><h4 id="drawıtem">DrawItem</h4>
+<p>Draws an <code>ImageListViewItem</code> on the given graphics. The item state passed to the function may be different from the actual item state.</p>
+<pre><code class="lang-cs">public virtual void DrawItem(Graphics g, ImageListViewItem item, ItemState state, Rectangle bounds)
+{
+    if (ImageListViewItem.View == View.Thumbnails)
+    {
+        if((state &amp; ItemState.Selected) != ItemState.None)
+          g.FillRectangle(SystemBrushes.Highlight, bounds);
+
+        g.DrawImage(item.ThumbnailImage, 4, 4);
+    }
+    else if (ImageListViewItem.View == View.Details)
+    {
+        // Revert to base class
+        base.DrawItem(g, item, state, bounds)
+    }
+}
+</code></pre><h4 id="drawcolumnheader">DrawColumnHeader</h4>
+<p>Draws the column headers.</p>
+<pre><code class="lang-cs">public virtual void DrawColumnHeader(Graphics g, ImageListViewColumnHeader column, ColumnState state, Rectangle bounds)
+{
+    base.DrawColumnHeader(g, column, state, bounds);
+    // Outline the hovered column
+    if((state &amp; ColumnState.Hovered) == ColumnState.Hovered)
+        g.DrawRectangle(Pens.Yellow, bounds);
+}
+</code></pre><h4 id="drawcolumnextender">DrawColumnExtender</h4>
+<p>Draws the extender after the last column.</p>
+<pre><code class="lang-cs">public virtual void DrawColumnExtender(Graphics g, Rectangle bounds)
+{
+    // Do not draw an extender
+    ;
+}
+</code></pre><h4 id="drawgalleryımage">DrawGalleryImage</h4>
+<p>Draws the large preview image of the focused item in Gallery view mode.</p>
+<pre><code class="lang-cs">public virtual void DrawGalleryImage(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
+{
+    base.DrawGalleryImage(g, item, image, bounds);
+    g.DrawRectangle(Pens.Black, bounds);
+}
+</code></pre><h4 id="drawpane">DrawPane</h4>
+<p>Draws the left pane in pane view mode. The base class draws the preview image and image metadata.</p>
+<pre><code class="lang-cs">public virtual void DrawPane(Graphics g, ImageListViewItem item, Image image, Rectangle bounds)
+{
+    ;
+}
+</code></pre><h4 id="drawınsertioncaret">DrawInsertionCaret</h4>
+<p>Draws the insertion caret for drag-and-drop operations.</p>
+<pre><code class="lang-cs">public virtual void DrawInsertionCaret(Graphics g, Rectangle bounds)
+{
+    // Draw a red caret
+    g.FillRectangle(Brushes.Red, bounds);
+}
+</code></pre><h4 id="onlayout">OnLayout</h4>
+<p>Used to affect the size of the item display area before the layout is calculated.</p>
+<pre><code class="lang-cs">public virtual void OnLayout(LayoutEventArgs e)
+{
+    // Add a 10 pixel margin to the 
+    // left of the item display area
+    e.ItemAreaBounds.X += 10;
+    e.ItemAreaBounds.Width -= 10;
+}
+</code></pre><h4 id="dispose">Dispose</h4>
+<p>Releases managed resources. You can override this method to dispose the local managed resources you created.</p>
+<pre><code class="lang-cs">public virtual void Dispose()
+{
+    base.Dispose();
+
+    // Dispose local resources
+    myFont.Dispose();
+    myBrush.Dispose();
+}
+</code></pre><h3 id="properties">Properties</h3>
+<p><code>ImageListViewRenderer</code> also exposes the following public properties:</p>
+<h4 id="columnheaderbounds">ColumnHeaderBounds</h4>
+<p>Returns the extents of the column header area.</p>
+<h4 id="ıtemareabounds">ItemAreaBounds</h4>
+<p>Returns the extents of the item area.</p>
+<h4 id="ımagelistview">ImageListView</h4>
+<p>Returns the instance of the <code>ImageListView</code> control owning the renderer.</p>
+<h4 id="clip">Clip</h4>
+<p>When set to <code>true</code>, Graphics are not clipped when drawing elements. <code>ZoomingRenderer</code> uses this to render mouse-over items outside their bounding boxes. Defaults to <code>false</code>.</p>
+<h4 id="ıtemdraworder">ItemDrawOrder</h4>
+<p>Used to set a particular draw order. Possible values are:</p>
+<ul>
+<li><code>ItemIndex</code>: Draw order is determined by item insertion index. (Default)</li>
+<li><code>ZOrder</code>: Draw order is determined by the <code>ZOrder</code> properties of items.</li>
+<li><code>NormalSelectedHovered</code>: Normal (neither selected nor hovered) items are drawn first, followed by selected items and hovered items.</li>
+<li><code>NormalHoveredSelected</code>: Normal items are drawn first, followed by hovered items and selected items.</li>
+<li><code>SelectedNormalHovered</code>: Selected items are drawn first, followed by normal items and hovered items.</li>
+<li><code>SelectedHoveredNormal</code>: Selected items are drawn first, followed by hovered items and normal items.</li>
+<li><code>HoveredNormalSelected</code>: Hovered items are drawn first, followed by normal items and selected items.</li>
+<li><code>HoveredSelectedNormal</code>: Hovered items are drawn first, followed by selected items and normal items.</li>
+</ul>
+</article>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2018 Özgür Özçıtak
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

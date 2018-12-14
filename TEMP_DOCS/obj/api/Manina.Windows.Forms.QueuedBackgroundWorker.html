@@ -1,0 +1,873 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class QueuedBackgroundWorker
+   | ImageListView </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class QueuedBackgroundWorker
+   | ImageListView ">
+    <meta name="generator" content="docfx 2.40.4.0">
+    
+    <link rel="shortcut icon" href="../../resources/icons/favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="../../combinedtoc/toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../resources/icons/logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-12">
+            <article class="content wrap" id="_content" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker">
+  
+  
+  <h1 id="Manina_Windows_Forms_QueuedBackgroundWorker" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker" class="text-break">Class QueuedBackgroundWorker
+  </h1>
+  <div class="markdown level0 summary"><p>A background worker with a work queue.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">System.MarshalByRefObject</span></div>
+    <div class="level2"><span class="xref">System.ComponentModel.Component</span></div>
+    <div class="level3"><span class="xref">QueuedBackgroundWorker</span></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><span class="xref">System.ComponentModel.IComponent</span></div>
+    <div><span class="xref">System.IDisposable</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.ComponentModel.Component.Dispose()</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.GetService(System.Type)</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.ToString()</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.CanRaiseEvents</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.Events</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.Site</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.Container</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.DesignMode</span>
+    </div>
+    <div>
+      <span class="xref">System.ComponentModel.Component.Disposed</span>
+    </div>
+    <div>
+      <span class="xref">System.MarshalByRefObject.MemberwiseClone(System.Boolean)</span>
+    </div>
+    <div>
+      <span class="xref">System.MarshalByRefObject.GetLifetimeService()</span>
+    </div>
+    <div>
+      <span class="xref">System.MarshalByRefObject.InitializeLifetimeService()</span>
+    </div>
+    <div>
+      <span class="xref">System.MarshalByRefObject.CreateObjRef(System.Type)</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Manina.Windows.Forms.html">Manina.Windows.Forms</a></h6>
+  <h6><strong>Assembly</strong>: ImageListView.dll</h6>
+  <h5 id="Manina_Windows_Forms_QueuedBackgroundWorker_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[ToolboxBitmap(typeof(QueuedBackgroundWorker))]
+public class QueuedBackgroundWorker : Component, IComponent, IDisposable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker__ctor.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.%23ctor%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L41">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker__ctor_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.#ctor*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker__ctor" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.#ctor">QueuedBackgroundWorker()</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="Manina.Windows.Forms.QueuedBackgroundWorker.html">QueuedBackgroundWorker</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public QueuedBackgroundWorker()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_IsBackground.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.IsBackground%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L319">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_IsBackground_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.IsBackground*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_IsBackground" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.IsBackground">IsBackground</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether or not the worker thread is a background thread.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public bool IsBackground { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_PriorityQueues.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.PriorityQueues%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L295">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_PriorityQueues_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.PriorityQueues*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_PriorityQueues" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.PriorityQueues">PriorityQueues</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the number of priority queues. Number of queues
+cannot be changed after any work is added to the work queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public int PriorityQueues { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_ProcessingMode.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.ProcessingMode%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L278">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_ProcessingMode_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.ProcessingMode*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_ProcessingMode" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.ProcessingMode">ProcessingMode</h4>
+  <div class="markdown level1 summary"><p>Represents the mode in which the work items are processed.
+Processing mode cannot be changed after any work is added to the work queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public ProcessingMode ProcessingMode { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Manina.Windows.Forms.ProcessingMode.html">ProcessingMode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_Started.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.Started%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L311">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_Started_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Started*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_Started" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Started">Started</h4>
+  <div class="markdown level1 summary"><p>Determines whether the <a class="xref" href="Manina.Windows.Forms.QueuedBackgroundWorker.html">QueuedBackgroundWorker</a> started working.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(false)]
+public bool Started { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_ThreadName.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.ThreadName%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L375">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_ThreadName_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.ThreadName*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_ThreadName" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.ThreadName">ThreadName</h4>
+  <div class="markdown level1 summary"><p>Represents the name of the worker threads.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public string ThreadName { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_Threads.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.Threads%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L359">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_Threads_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Threads*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_Threads" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Threads">Threads</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the number of worker threads. Number of threads
+cannot be changed after any work is added to the work queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public int Threads { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L416">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync">CancelAsync()</h4>
+  <div class="markdown level1 summary"><p>Cancels all pending operations in all queues.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CancelAsync()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_System_Int32_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync(System.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L429">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_System_Int32_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync(System.Int32)">CancelAsync(Int32)</h4>
+  <div class="markdown level1 summary"><p>Cancels all pending operations in the given queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CancelAsync(int priority)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">priority</span></td>
+        <td><p>A value between 0 and <a class="xref" href="Manina.Windows.Forms.QueuedBackgroundWorker.html#Manina_Windows_Forms_QueuedBackgroundWorker_PriorityQueues">PriorityQueues</a> 
+indicating the priority queue to cancel.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_System_Object_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync(System.Object)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L444">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_CancelAsync_System_Object_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.CancelAsync(System.Object)">CancelAsync(Object)</h4>
+  <div class="markdown level1 summary"><p>Cancels processing the item with the given key.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void CancelAsync(object argument)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument of an asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_Dispose_System_Boolean_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.Dispose(System.Boolean)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L605">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_Dispose_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Dispose*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_Dispose_System_Boolean_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Dispose(System.Boolean)">Dispose(Boolean)</h4>
+  <div class="markdown level1 summary"><p>Releases the unmanaged resources used by the <span class="xref">System.ComponentModel.Component</span> 
+and optionally releases the managed resources.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void Dispose(bool disposing)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">disposing</span></td>
+        <td><p>true to release both managed and unmanaged resources; 
+false to release only unmanaged resources.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><span class="xref">System.ComponentModel.Component.Dispose(System.Boolean)</span></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_GetApartmentState.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.GetApartmentState%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L494">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_GetApartmentState_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.GetApartmentState*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_GetApartmentState" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.GetApartmentState">GetApartmentState()</h4>
+  <div class="markdown level1 summary"><p>Gets the apartment state of worker threads.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ApartmentState GetApartmentState()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Threading.ApartmentState</span></td>
+        <td><p>The apartment state of worker threads.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_OnDoWork_Manina_Windows_Forms_QueuedWorkerDoWorkEventArgs_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.OnDoWork(Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L482">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_OnDoWork_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.OnDoWork*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_OnDoWork_Manina_Windows_Forms_QueuedWorkerDoWorkEventArgs_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.OnDoWork(Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs)">OnDoWork(QueuedWorkerDoWorkEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Raises the DoWork event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnDoWork(QueuedWorkerDoWorkEventArgs e)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs.html">QueuedWorkerDoWorkEventArgs</a></td>
+        <td><span class="parametername">e</span></td>
+        <td><p>A <a class="xref" href="Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs.html">QueuedWorkerDoWorkEventArgs</a> that contains event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_OnRunWorkerCompleted_Manina_Windows_Forms_QueuedWorkerCompletedEventArgs_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.OnRunWorkerCompleted(Manina.Windows.Forms.QueuedWorkerCompletedEventArgs)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L473">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_OnRunWorkerCompleted_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.OnRunWorkerCompleted*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_OnRunWorkerCompleted_Manina_Windows_Forms_QueuedWorkerCompletedEventArgs_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.OnRunWorkerCompleted(Manina.Windows.Forms.QueuedWorkerCompletedEventArgs)">OnRunWorkerCompleted(QueuedWorkerCompletedEventArgs)</h4>
+  <div class="markdown level1 summary"><p>Raises the RunWorkerCompleted event.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual void OnRunWorkerCompleted(QueuedWorkerCompletedEventArgs e)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Manina.Windows.Forms.QueuedWorkerCompletedEventArgs.html">QueuedWorkerCompletedEventArgs</a></td>
+        <td><span class="parametername">e</span></td>
+        <td><p>A <a class="xref" href="Manina.Windows.Forms.QueuedWorkerCompletedEventArgs.html">QueuedWorkerCompletedEventArgs</a> that contains event data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_Pause.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.Pause%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L394">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_Pause_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Pause*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_Pause" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Pause">Pause()</h4>
+  <div class="markdown level1 summary"><p>Pauses the worker.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Pause()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_Resume.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.Resume%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L405">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_Resume_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Resume*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_Resume" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.Resume">Resume()</h4>
+  <div class="markdown level1 summary"><p>Resumes processing pending operations in the work queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Resume()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L120">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync">RunWorkerAsync()</h4>
+  <div class="markdown level1 summary"><p>Starts processing a new background operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RunWorkerAsync()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync(System.Object)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L113">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync(System.Object)">RunWorkerAsync(Object)</h4>
+  <div class="markdown level1 summary"><p>Starts processing a new background operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RunWorkerAsync(object argument)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument of an asynchronous operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_System_Int32_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync(System.Object%2CSystem.Int32)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L105">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_System_Int32_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync(System.Object,System.Int32)">RunWorkerAsync(Object, Int32)</h4>
+  <div class="markdown level1 summary"><p>Starts processing a new background operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RunWorkerAsync(object argument, int priority)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument of an asynchronous operation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">priority</span></td>
+        <td><p>A value between 0 and <a class="xref" href="Manina.Windows.Forms.QueuedBackgroundWorker.html#Manina_Windows_Forms_QueuedBackgroundWorker_PriorityQueues">PriorityQueues</a> indicating the priority of this item.
+An item with a higher priority will be processed before items with lower priority.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_System_Int32_System_Boolean_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync(System.Object%2CSystem.Int32%2CSystem.Boolean)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L74">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_System_Int32_System_Boolean_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerAsync(System.Object,System.Int32,System.Boolean)">RunWorkerAsync(Object, Int32, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Starts processing a new background operation.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RunWorkerAsync(object argument, int priority, bool single)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument of an asynchronous operation.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Int32</span></td>
+        <td><span class="parametername">priority</span></td>
+        <td><p>A value between 0 and <a class="xref" href="Manina.Windows.Forms.QueuedBackgroundWorker.html#Manina_Windows_Forms_QueuedBackgroundWorker_PriorityQueues">PriorityQueues</a> indicating the priority of this item.
+An item with a higher priority will be processed before items with lower priority.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">single</span></td>
+        <td><p>true to run this operation without waiting for queued items; otherwise
+false to add this operatino to th queue.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_SetApartmentState_System_Threading_ApartmentState_.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.SetApartmentState(System.Threading.ApartmentState)%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L503">View Source</a>
+  </span>
+  <a id="Manina_Windows_Forms_QueuedBackgroundWorker_SetApartmentState_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.SetApartmentState*"></a>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_SetApartmentState_System_Threading_ApartmentState_" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.SetApartmentState(System.Threading.ApartmentState)">SetApartmentState(ApartmentState)</h4>
+  <div class="markdown level1 summary"><p>Sets the apartment state of worker threads. The apartment state
+cannot be changed after any work is added to the work queue.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetApartmentState(ApartmentState state)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Threading.ApartmentState</span></td>
+        <td><span class="parametername">state</span></td>
+        <td><p>The new state of worker threads.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="events">Events
+  </h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_DoWork.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.DoWork%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L521">View Source</a>
+  </span>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_DoWork" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.DoWork">DoWork</h4>
+  <div class="markdown level1 summary"><p>Occurs when <a class="xref" href="Manina.Windows.Forms.QueuedBackgroundWorker.html#Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerAsync_System_Object_System_Int32_">RunWorkerAsync(Object, Int32)</a> is called.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public event QueuedWorkerDoWorkEventHandler DoWork</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Manina.Windows.Forms.QueuedWorkerDoWorkEventHandler</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/oozcitak/imagelistview/new/master/apiSpec/new?filename=Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerCompleted.md&amp;value=---%0Auid%3A%20Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerCompleted%0Asummary%3A%20'*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax'%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="https://github.com/oozcitak/imagelistview/blob/master/ImageListView/QueuedBackgroundWorker.cs/#L516">View Source</a>
+  </span>
+  <h4 id="Manina_Windows_Forms_QueuedBackgroundWorker_RunWorkerCompleted" data-uid="Manina.Windows.Forms.QueuedBackgroundWorker.RunWorkerCompleted">RunWorkerCompleted</h4>
+  <div class="markdown level1 summary"><p>Occurs when the background operation of an item has completed,
+has been canceled, or has raised an exception.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Browsable(true)]
+public event RunQueuedWorkerCompletedEventHandler RunWorkerCompleted</code></pre>
+  </div>
+  <h5 class="eventType">Event Type</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Manina.Windows.Forms.RunQueuedWorkerCompletedEventHandler</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <span class="xref">System.ComponentModel.IComponent</span>
+  </div>
+  <div>
+      <span class="xref">System.IDisposable</span>
+  </div>
+</article>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2018 Özgür Özçıtak
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

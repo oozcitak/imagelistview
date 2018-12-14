@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>ImageListView Overview | ImageListView </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="ImageListView Overview | ImageListView ">
+    <meta name="generator" content="docfx 2.40.4.0">
+    
+    <link rel="shortcut icon" href="../resources/icons/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../resources/icons/logo.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-12">
+            <article class="content wrap" id="_content" data-uid="Api.Home">
+<h1 id="ımagelistview-overview">ImageListView Overview</h1>
+
+<p>The ImageListView control displays a list of image files. The list shows image thumbnails and metadata.</p>
+<h2 id="working-with-ımagelistview">Working with ImageListView</h2>
+<p>The ImageListView control supports a number of view modes which can be changed with its <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_View">View</a> property. The default view is the thumbnail view where image thumbnails are laid out as a grid which can be scrolled vertically.</p>
+<p>Image files can be added to the control by using its <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_Items">Items</a> property. Once image files are added; their thumbnails are loaded asynchronously with a separate background thread.</p>
+<p>Items can be selected by the user. If <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_MultiSelect">MultiSelect</a> property is set to <code>true</code>, multiple items can be selected with the mouse and the keyword. Otherwise, only one item can be selected at a time. The list of selected items can be reached with the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_SelectedItems">SelectedItems</a> property.</p>
+<p>Items can display checkboxes and shell icons by using the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_ShowCheckBoxes">ShowCheckBoxes</a> and <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_ShowFileIcons">ShowFileIcons</a> properties respectively.  The list of checked items can be reached with the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_CheckedItems">CheckedItems</a> property.</p>
+<p>In details view mode, the control displays column headers at the top of its client area. The user can click the column headers to sort the items. Items can also be sorted programmatically with the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_SortOrder">SortOrder</a>, <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_SortColumn">SortColumn</a>, <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_GroupOrder">GroupOrder</a> and <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_GroupColumn">GroupColumn</a> properties.</p>
+<p>When an item is clicked, the control raises the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_ItemClick">ItemClick</a> event for that <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListViewItem.html">ImageListViewItem</a>. Other important item related events are <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_ItemDoubleClick">ItemDoubleClick</a>, <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_ItemCheckBoxClick">ItemCheckBoxClick</a> and <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_SelectionChanged">SelectionChanged</a>.</p>
+<h2 id="customizing-ımagelistview">Customizing ImageListView</h2>
+<p>The size of the thumbnails can be customized with the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_ThumbnailSize">ThumbnailSize</a> property. The color theme of the control can be changed with the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_Colors">Colors</a> property. The entire visual style of the control can be changed by using a custom renderer included in the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListViewRenderers.html">Manina.Windows.Forms.ImageListViewRenderers</a> namespace. The control can be further customized by deriving from <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.ImageListViewRenderer.html">ImageListView.ImageListViewRenderer</a> and overriding the virtual functions of the base class. </p>
+<p>The <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.html#Manina_Windows_Forms_ImageListView_SetRenderer_Manina_Windows_Forms_ImageListView_ImageListViewRenderer_System_Boolean_">SetRenderer(ImageListView.ImageListViewRenderer, Boolean)</a> method should be used to assign a custom renderer to the control.</p>
+<h2 id="custom-thumbnail-providers">Custom Thumbnail Providers</h2>
+<p>By default, the control extracts thumbail images from filenames supplied by the user while adding image items. However, it is possible to provide other sources for thumbnail images by using custom adaptors. There are a number of built-in custom adaptors in the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.html">Manina.Windows.Forms.ImageListViewItemAdaptors</a> namespace or a user adaptor can be created by deriving from <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemAdaptor.html">ImageListView.ImageListViewItemAdaptor</a>. </p>
+<p>Adaptors are assigned to each item while adding it to the control with the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemCollection.html#Manina_Windows_Forms_ImageListView_ImageListViewItemCollection_Add_Manina_Windows_Forms_ImageListViewItem_Manina_Windows_Forms_ImageListView_ImageListViewItemAdaptor_">Add(ImageListViewItem, ImageListView.ImageListViewItemAdaptor)</a> method of the <a class="xref" href="../obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemCollection.html">ImageListView.ImageListViewItemCollection</a> class.</p>
+</article>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            Copyright © 2018 Özgür Özçıtak
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

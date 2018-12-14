@@ -1,0 +1,1372 @@
+{
+  "homepages": [],
+  "source_base_path": "C:/Users/PC/Source/Repos/imagelistview/Documentation",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html",
+          "hash": "2DpdWI29ns5AbAovT1g65A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/CustomRenderers.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/CustomRenderers.html",
+          "hash": "TyjI3APv+FrUt2lCZ8ZOCQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/Introduction.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/Introduction.html",
+          "hash": "H2vO2uwanM9OQStOCwnIWQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/MonoSupport.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/MonoSupport.html",
+          "hash": "GEX1qfa6LcnjU8iQYjpSfg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/ViewModes.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/ViewModes.html",
+          "hash": "jxlBxwMuJw+DCFEVPXtYrg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/WICSupport.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/WICSupport.html",
+          "hash": "4iMs8h2uJuguTcVlgZXtTg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "combinedtoc/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "combinedtoc/toc.html",
+          "hash": "s2Q1Dnc6csKeyi3Rm8uSvA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "index",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "0mUllMXHYAox3f19n/dmoA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.CacheErrorEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.CacheErrorEventArgs.html",
+          "hash": "Xp8LotWoL4suKcUZoe44sw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.CacheMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.CacheMode.html",
+          "hash": "4dQi6FrNsVWikeOeBRanNA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.CacheState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.CacheState.html",
+          "hash": "vJNfamnWmUVNMBDoZr2kYA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.CacheThread.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.CacheThread.html",
+          "hash": "7DxfszHwVa7lHvHyFwIC+Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.CachedImageType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.CachedImageType.html",
+          "hash": "9zrU7kJJ5RqVCufsBTSE6A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ColumnClickEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ColumnClickEventArgs.html",
+          "hash": "D7ySiZSsyPP06J0Ha3hn/g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ColumnEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ColumnEventArgs.html",
+          "hash": "JBXY7qk6CdIO5r+UIZ50wg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ColumnHoverEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ColumnHoverEventArgs.html",
+          "hash": "yhVlacUZPZgQ33tP2qPgmg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ColumnState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ColumnState.html",
+          "hash": "vV01+lRQ7GAzchGtGwdL4g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ColumnType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ColumnType.html",
+          "hash": "jIGJt8EQcEubomWPXhUYMg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.DropCompleteEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.DropCompleteEventArgs.html",
+          "hash": "qyasda1tofm+sJ1fDUeY2Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.DropFileEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.DropFileEventArgs.html",
+          "hash": "QpozjFB60cTiFkmbIidRKw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.DropItemEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.DropItemEventArgs.html",
+          "hash": "CgpSYoWTpqnlWS6XXtpibg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.GDIExtractor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.GDIExtractor.html",
+          "hash": "N1EkxQselM1B3APsqjvQKA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.IExtractor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.IExtractor.html",
+          "hash": "VybaoU6WB8t+r5eQa39LMw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.GroupInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.GroupInfo.html",
+          "hash": "maqVDSScwSa6NJqQIDAfcg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.HitInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.HitInfo.html",
+          "hash": "T8HqAeirwZYTuljspV1+Dg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.IGrouper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.IGrouper.html",
+          "hash": "krRdfoSrcNI/42/x+LqJxQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewCheckedItemCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewCheckedItemCollection.html",
+          "hash": "680gdcvdj0CPKWfdgvJSYg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewColumnHeader.html",
+          "hash": "+p1AZXgvxTYQYGeUkQaQkA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewColumnHeaderCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewColumnHeaderCollection.html",
+          "hash": "Ff5UMx6nMi9XZXmfuNthBw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewGroup.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewGroup.html",
+          "hash": "AmxwjFib+PX/mdGTA60V8Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemAdaptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemAdaptor.html",
+          "hash": "fWF65WgpDG+4QqV3MRSE3Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewItemCollection.html",
+          "hash": "2Hg1HRylAQ6VGitb7wZWlA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewRenderer.html",
+          "hash": "QxuRgeuD7hNY4kdRxpJyng=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewSelectedItemCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.ImageListViewSelectedItemCollection.html",
+          "hash": "B9FQskhEEhJ3CseBFO0KPg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListView.html",
+          "hash": "k8MyEpBV7TbfZm4/z2TUbQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewColor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewColor.html",
+          "hash": "x2/aNWxUNVM32VN70dYuTw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItem.html",
+          "hash": "hzGyR5q/iFyrz2oguFhKAw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.FileSystemAdaptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.FileSystemAdaptor.html",
+          "hash": "He2ZseeQqnPszPxKilRLSg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.URIAdaptor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.URIAdaptor.html",
+          "hash": "OA+8wigqQVq1hQijUL2aZw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewItemAdaptors.html",
+          "hash": "ZAXXFM8HcpiDyMFuRrGJ1g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.DefaultRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.DefaultRenderer.html",
+          "hash": "951iv0ci/QkoHDezeCIqBg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.MeerkatRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.MeerkatRenderer.html",
+          "hash": "KY56rGpUKSkWTz6OQhXAFw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.NewYear2010Renderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.NewYear2010Renderer.html",
+          "hash": "S8xsGeBLTHgRExbdDEN9Kg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.NoirRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.NoirRenderer.html",
+          "hash": "jzC0NJqp1ni5bbOx4sGzGg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.ThemeRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.ThemeRenderer.html",
+          "hash": "e+ZiArdHSe8GpEOOX2gFSA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.TilesRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.TilesRenderer.html",
+          "hash": "p/kZUkH9rL7OxkwIjq3nWg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.XPRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.XPRenderer.html",
+          "hash": "rsP1rMKWM3l9dSBO7+b5nQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.ZoomingRenderer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.ZoomingRenderer.html",
+          "hash": "svgjiLs5mrIP2kwBOlyogw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewRenderers.html",
+          "hash": "63+cAONMxzYJJyjoHV38TQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewSubItem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewSubItem.html",
+          "hash": "2it2otqsagQTqG5EP21WRw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ImageListViewSubItemCollection.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ImageListViewSubItemCollection.html",
+          "hash": "5PX31qyeYdNGx/6X0iNbLA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemClickEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemClickEventArgs.html",
+          "hash": "WPAEivi0f8s1ffXC2CQ0Gw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemCollectionChangedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemCollectionChangedEventArgs.html",
+          "hash": "fv2vk9+/NvBAbxe8gTmusA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemDrawOrder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemDrawOrder.html",
+          "hash": "M/YHfyKjhbyQ2Ibflw6i7g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemEventArgs.html",
+          "hash": "1FFG2qC8fv1TpTm6tk+qCg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemHoverEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemHoverEventArgs.html",
+          "hash": "fsnUBe0zVcCUv/FqSHKcnQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemState.html",
+          "hash": "1z/iUvLKGscElcRqiKRERw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ItemVisibility.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ItemVisibility.html",
+          "hash": "Khtccht0MOW6464bI+kw2Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.LayoutEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.LayoutEventArgs.html",
+          "hash": "vCf1Xjej70IVilotiXp6iQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.Metadata.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.Metadata.html",
+          "hash": "b/3OZ2I8xvneJv0HfqgJLA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.PaneResizedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.PaneResizedEventArgs.html",
+          "hash": "Q1PpXPrewf+Vbcgi2mIWBw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.PaneResizingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.PaneResizingEventArgs.html",
+          "hash": "fHeNxuNSG3OyK7vFjDzDrw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ProcessingMode.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ProcessingMode.html",
+          "hash": "uu+gOy/w/iUagadG7H75eg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.QueuedBackgroundWorker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.QueuedBackgroundWorker.html",
+          "hash": "0sO05uGT3BwvVa8RGxwZOg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.QueuedWorkerCompletedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.QueuedWorkerCompletedEventArgs.html",
+          "hash": "qsqDcKPOX+HNGPHFqZ2N2A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs.html",
+          "hash": "dOdoY6BEOKC+x+nr3bQKQw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ShellInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ShellInfo.html",
+          "hash": "n7AVGRAgJ8wajgV1BffdYg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.SortOrder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.SortOrder.html",
+          "hash": "aMgy1djPgZ5MSn883NbmcQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ThumbnailCachedEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ThumbnailCachedEventArgs.html",
+          "hash": "TUAA23Z2UFJKjNNj2V3kTg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.ThumbnailCachingEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.ThumbnailCachingEventArgs.html",
+          "hash": "dhpgXfcM70XHIhkVYBHNgw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.UseEmbeddedThumbnails.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.UseEmbeddedThumbnails.html",
+          "hash": "e59Bhz/CYbM+45KhqloVsQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple-1.html",
+          "hash": "8XEZ0QyQDJHNhuRyly+H6w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple-2.html",
+          "hash": "gHxm62C5LKiByexTDtK1Zg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple-3.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple-3.html",
+          "hash": "778Vu+cCAx8N8z0jK6tRJA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.Utility.Tuple.html",
+          "hash": "SKmfVok4ZdQWlqVbWYCBvg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.Utility.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.Utility.html",
+          "hash": "Rzi87jjul0UJ0Ef4pNLaZg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.View.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.View.html",
+          "hash": "c/hF92CCYy2Po5qQdxL9uQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/Manina.Windows.Forms.yml",
+      "output": {
+        ".html": {
+          "relative_path": "obj/api/Manina.Windows.Forms.html",
+          "hash": "wg1s+TeL9fRgBeoxO3pYtw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/icons/favicon.ico",
+      "output": {
+        "resource": {
+          "relative_path": "resources/icons/favicon.ico"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/icons/logo.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/icons/logo.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListView.details.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListView.details.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListView.gallery.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListView.gallery.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListView.pane.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListView.pane.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListView.thumbnails (1).jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListView.thumbnails (1).jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListView.thumbnails.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListView.thumbnails.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListViewRenderer.default.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListViewRenderer.default.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListViewRenderer.noir.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListViewRenderer.noir.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListViewRenderer.tiles.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListViewRenderer.tiles.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListViewRenderer.xp.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListViewRenderer.xp.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/ImageListViewRenderer.zooming.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/ImageListViewRenderer.zooming.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/MonoSupport.demo.jpg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/MonoSupport.demo.jpg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.details.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.details.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.gallery.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.gallery.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.noir.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.noir.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.pane.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.pane.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.thumbnail.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.thumbnail.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.tiles.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.tiles.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/images/demo/ImageListView.xp.png",
+      "output": {
+        "resource": {
+          "relative_path": "resources/images/demo/ImageListView.xp.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/ajax-loader.gif",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/ajax-loader.gif"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/config.rb",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/config.rb"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/fonts/slick.eot",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/fonts/slick.eot"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/fonts/slick.svg",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/fonts/slick.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/fonts/slick.ttf",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/fonts/slick.ttf"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/fonts/slick.woff",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/fonts/slick.woff"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick-theme.css",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick-theme.css"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick-theme.less",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick-theme.less"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick-theme.scss",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick-theme.scss"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick.css",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick.css"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick.js",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick.js"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick.less",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick.less"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick.min.js",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick.min.js"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "resources/slick/slick.scss",
+      "output": {
+        "resource": {
+          "relative_path": "resources/slick/slick.scss"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "4Ig7L/GenBa2kLzUuDiQbQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Disable incremental build by force rebuild option.",
+        "incrementalPhase": "build"
+      },
+      "processors": {
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build"
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build"
+        },
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build"
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build"
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: it's disabled.",
+        "incrementalPhase": "postProcessing"
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
