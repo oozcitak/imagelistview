@@ -201,4 +201,6 @@ FakesAssemblies/
 /**/packages/
 /**/bin/
 /**/obj/
+TEMP_DOCS/
+log.txt
 _site
