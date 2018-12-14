@@ -21,10 +21,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-/// <summary>
-/// The Manina.Windows.Forms.ImageListViewItemAdaptors namespace 
-/// contains the built-in item adaptors.
-/// </summary>
 namespace Manina.Windows.Forms.ImageListViewItemAdaptors
 {
     #region FileSystemAdaptor

@@ -23,10 +23,6 @@ using System.Linq;
 using System.Resources;
 using System.Windows.Forms;
 
-/// <summary>
-/// The Manina.Windows.Forms namespace contains new and
-/// enhanced windows forms components.
-/// </summary>
 namespace Manina.Windows.Forms
 {
     /// <summary>

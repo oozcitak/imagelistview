@@ -23,10 +23,6 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
-/// <summary>
-/// The Manina.Windows.Forms.ImageListViewRenderers namespace contains
-/// the built-in custom renderers.
-/// </summary>
 namespace Manina.Windows.Forms.ImageListViewRenderers
 {
     #region DefaultRenderer
