@@ -32,17 +32,15 @@
     padding-bottom: 8pt;
     text-align: center;
 }
-
 #hero .header .doclinks {
     padding-bottom: 20pt;
     text-align: center;
+    color: #eee;
 }
-
-#hero .header .doclinks a, #hero .header .doclinks span {
+#hero .header .doclinks a {
     color: #dfd;
     text-decoration: none;
 }
-
 #hero .content {
     padding-top: 36pt;
     text-align: center;

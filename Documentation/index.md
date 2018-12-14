@@ -15,9 +15,7 @@ documentType: index
       [![GitHub](https://img.shields.io/badge/GitHub-Source%20Code-green.svg?logo=github&style=for-the-badge&colorA=7c7&colorB=4a4)](https://github.com/oozcitak/imagelistview)
     </div>
     <div class="doclinks">
-      @Articles.Introduction
-      <span>&nbsp;|&nbsp;</span>
-      @Api.Home
+	  @Articles.Introduction | @Api.Home
     </div>
   </div>
   <div class="content">

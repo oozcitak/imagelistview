@@ -194,3 +194,11 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+# Documentation
+/**/DROP/
+/**/TEMP/
+/**/packages/
+/**/bin/
+/**/obj/
+_site
