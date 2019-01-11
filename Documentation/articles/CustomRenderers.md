@@ -10,7 +10,7 @@ The look of ImageListView can be customized with renderers. You can either use o
 
 ## Built-in custom renderers ##
 
-You can find these renderers in the source code and the latest binaries. To use a built-in custom renderer, use the Manina.Windows.Forms.ImageListView.SetRenderer(Manina.Windows.Forms.ImageListView.ImageListViewRenderer,System.Boolean) method as below:
+You can find these renderers in the source code and the latest binaries. To use a built-in custom renderer, use the `SetRenderer` method as below:
 
 ```cs
 myImageListView.SetRenderer(new ImageListViewRenderers.XPRenderer());
