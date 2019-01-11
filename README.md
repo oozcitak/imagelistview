@@ -21,3 +21,7 @@ ImageListView requires .NET framework 3.5 to take advantage of the Windows Imagi
 If you are using [NuGet](https://nuget.org/) you can install the assembly with:
 
 `PM> Install-Package ImageListView`
+
+# Documentation #
+
+Please visit: http://oozcitak.github.io/imagelistview/
