@@ -7,6 +7,7 @@ $DocsDir = Join-Path -Path $ScriptDir -ChildPath ".\Documentation\_site"
 $TempDir = Join-Path -Path $ScriptDir -ChildPath ".\TEMP_DOCS"
 
 # create a temporary directory
+Set-Location $DocsDir
 if (Test-Path $TempDir) { Remove-Item -Path $TempDir -Recurse -Force; }
 New-Item -Path $TempDir -ItemType Directory -Force
 
@@ -26,4 +27,5 @@ git commit -m "Update generated documentation"
 git push origin gh-pages
 
 # remove temp directory
+Set-Location $DocsDir
 if (Test-Path $TempDir) { Remove-Item -Path $TempDir -Recurse -Force; }
