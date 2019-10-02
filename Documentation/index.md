@@ -10,7 +10,8 @@ documentType: index
     </div>
     <div class="info">a winforms control for image files with asynchronously loaded thumbnails</div>
     <div class="buttons">
-      [![npm](https://img.shields.io/npm/v/npm.svg?logo=npm&style=for-the-badge&colorA=7c7&colorB=4a4)](https://www.nuget.org/packages/ImageListView)
+      [![Nuget](https://img.shields.io/nuget/v/imagelistview.svg?colorA=7c7&colorB=4a4&style=for-the-badge)](https://www.nuget.org/packages/ImageListView)
+	    
       &nbsp;&nbsp;&nbsp;
       [![GitHub](https://img.shields.io/badge/GitHub-Source%20Code-green.svg?logo=github&style=for-the-badge&colorA=7c7&colorB=4a4)](https://github.com/oozcitak/imagelistview)
     </div>
