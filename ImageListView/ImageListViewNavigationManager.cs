@@ -401,7 +401,7 @@ namespace Manina.Windows.Forms
                     ((Math.Abs(e.Location.X - lastMouseDownLocation.X) >  SystemInformation.DragSize.Width ||
                     Math.Abs(e.Location.Y - lastMouseDownLocation.Y) > SystemInformation.DragSize.Height)))
                 {
-                    if (mImageListView.MultiSelect && !lastMouseDownOverItem && HoveredItem == null)
+                    if (mImageListView.MultiSelect && ((!lastMouseDownOverItem && HoveredItem == null) || !mImageListView.AllowItemReorder))
                     {
                         // Start mouse selection
                         MouseSelecting = true;
