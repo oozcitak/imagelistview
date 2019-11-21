@@ -18,9 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Resources;
 using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
@@ -398,17 +395,17 @@ namespace Manina.Windows.Forms
                 else if (!MouseSelecting && !DraggingSeperator && !ResizingPane &&
                     inItemArea && lastMouseDownInItemArea &&
                     (LeftButton || RightButton) &&
-                    ((Math.Abs(e.Location.X - lastMouseDownLocation.X) >  SystemInformation.DragSize.Width ||
+                    ((Math.Abs(e.Location.X - lastMouseDownLocation.X) > SystemInformation.DragSize.Width ||
                     Math.Abs(e.Location.Y - lastMouseDownLocation.Y) > SystemInformation.DragSize.Height)))
                 {
-                    if (mImageListView.MultiSelect && ((!lastMouseDownOverItem && HoveredItem == null) || !mImageListView.AllowItemReorder))
+                    if (mImageListView.MultiSelect && !lastMouseDownOverItem && HoveredItem == null)
                     {
                         // Start mouse selection
                         MouseSelecting = true;
                         SelectionRectangle = new Rectangle(lastMouseDownLocation, new Size(0, 0));
                         mImageListView.Refresh();
                     }
-                    else if (lastMouseDownOverItem && HoveredItem != null && mImageListView.AllowItemReorder)
+                    else if (lastMouseDownOverItem && HoveredItem != null && (mImageListView.AllowItemReorder || mImageListView.AllowDrop))
                     {
                         // Start drag&drop
                         if (!HoveredItem.Selected)
@@ -420,23 +417,27 @@ namespace Manina.Windows.Forms
                             mImageListView.Refresh(true);
                         }
 
-                        // Set drag data
-                        List<string> filenames = new List<string>();
-                        foreach (ImageListViewItem item in mImageListView.SelectedItems)
-                        {
-                            // Get the source image
-                            string sourceFile = item.Adaptor.GetSourceImage(item.VirtualItemKey);
-                            if (!string.IsNullOrEmpty(sourceFile))
-                                filenames.Add(sourceFile);
-                        }
-                        DataObject data = new DataObject(DataFormats.FileDrop, filenames.ToArray());
                         DropTarget = null;
 
                         selfDragging = true;
                         if (mImageListView.AllowDrop)
-                          mImageListView.DoDragDrop(data, DragDropEffects.All);
+                        {
+                            // Set drag data
+                            List<string> filenames = new List<string>();
+                            foreach (ImageListViewItem item in mImageListView.SelectedItems)
+                            {
+                                // Get the source image
+                                string sourceFile = item.Adaptor.GetSourceImage(item.VirtualItemKey);
+                                if (!string.IsNullOrEmpty(sourceFile))
+                                    filenames.Add(sourceFile);
+                            }
+                            DataObject data = new DataObject(DataFormats.FileDrop, filenames.ToArray());
+                            mImageListView.DoDragDrop(data, DragDropEffects.All);
+                        }
                         else
-                          mImageListView.DoDragDrop(new object(), DragDropEffects.Move);
+                        {
+                            mImageListView.DoDragDrop(new object(), DragDropEffects.Move);
+                        }
                         selfDragging = false;
 
                         // Since the MouseUp event will be eaten by DoDragDrop we will not receive
@@ -817,6 +818,11 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Drag and Drop Event Handlers
+            public void GiveFeedback(GiveFeedbackEventArgs gfbevent)
+            {
+
+            }
+
             /// <summary>
             /// Handles control's DragDrop event.
             /// </summary>
@@ -850,9 +856,12 @@ namespace Manina.Windows.Forms
                     if (index > mImageListView.Items.Count)
                         index = mImageListView.Items.Count;
 
-                    string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+                    {
+                        string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                    mImageListView.OnDropFiles(new DropFileEventArgs(index, filenames));
+                        mImageListView.OnDropFiles(new DropFileEventArgs(index, filenames));
+                    }
                 }
 
                 DropTarget = null;
@@ -868,7 +877,7 @@ namespace Manina.Windows.Forms
             {
                 if (selfDragging)
                     e.Effect = DragDropEffects.Move;
-                else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                else if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
                     e.Effect = DragDropEffects.Copy;
                 else
                     e.Effect = DragDropEffects.None;
@@ -878,7 +887,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragOver(DragEventArgs e)
             {
-                if (selfDragging || (mImageListView.AllowDrop  && e.Data.GetDataPresent(DataFormats.FileDrop)))
+                if ((selfDragging && mImageListView.AllowItemReorder) || (!selfDragging && mImageListView.AllowDrop && e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop)))
                 {
                     if (mImageListView.Items.Count == 0)
                     {

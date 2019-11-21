@@ -151,11 +151,6 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Description("Gets or sets whether the user can reorder items by moving them."), DefaultValue(true)]
         public bool AllowItemReorder { get; set; }
         /// <summary>
-        /// Gets or sets whether the user can drag items for drag-and-drop operations.
-        /// </summary>
-        [Category("Behavior"), Description("Gets or sets whether the user can drag items for drag-and-drop operations."), DefaultValue(true), Obsolete("Use AllowItemReorder instead."), EditorBrowsable(EditorBrowsableState.Never)]
-        public bool AllowDrag { get { return AllowItemReorder; } set { AllowItemReorder = value; } }
-        /// <summary>
         /// Gets or sets a value indicating whether the control can accept data that the user drags onto it.
         /// </summary>
         [Category("Behavior"), Description("Gets or sets a value indicating whether the control can accept data that the user drags onto it."), DefaultValue(true)]
