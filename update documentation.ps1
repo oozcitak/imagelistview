@@ -2,7 +2,7 @@ Clear-Host
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-$RepoURL = "https://github.com/oozcitak/imagelistview.git"
+$RepoURL = "https://github.com/oozcitak/exiflibrary.git"
 $DocsDir = Join-Path -Path $ScriptDir -ChildPath ".\Documentation\_site"
 $TempDir = Join-Path -Path $ScriptDir -ChildPath ".\TEMP_DOCS"
 

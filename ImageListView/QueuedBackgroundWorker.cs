@@ -472,8 +472,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A <see cref="QueuedWorkerCompletedEventArgs"/> that contains event data.</param>
         protected virtual void OnRunWorkerCompleted(QueuedWorkerCompletedEventArgs e)
         {
-            if (RunWorkerCompleted != null)
-                RunWorkerCompleted(this, e);
+            RunWorkerCompleted?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the DoWork event.
@@ -481,8 +480,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A <see cref="QueuedWorkerDoWorkEventArgs"/> that contains event data.</param>
         protected virtual void OnDoWork(QueuedWorkerDoWorkEventArgs e)
         {
-            if (DoWork != null)
-                DoWork(this, e);
+            DoWork?.Invoke(this, e);
         }
         #endregion
 

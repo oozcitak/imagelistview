@@ -38,6 +38,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.rendererToolStripLabel = new System.Windows.Forms.ToolStripLabel();
@@ -48,6 +49,8 @@
             this.galleryToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.paneToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.detailsToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.horizontalStripToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.verticalStripToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.clearThumbsToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
@@ -63,7 +66,7 @@
             this.multiSelectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.integralScrollToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
-            this.allowDragToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allowItemReorderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allowDropToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.allowDuplicateFilenamesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
@@ -87,9 +90,6 @@
             this.sortDescendingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ofBrowseImage = new System.Windows.Forms.OpenFileDialog();
             this.messageTimer = new System.Windows.Forms.Timer(this.components);
-            this.horizontalStripToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.imageListView1 = new Manina.Windows.Forms.ImageListView();
-            this.verticalStripToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -218,6 +218,23 @@
             this.imageList1.Images.SetKeyName(2, "folder_open_16.png");
             this.imageList1.Images.SetKeyName(3, "cog.png");
             // 
+            // imageListView1
+            // 
+            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
+            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageListView1.Location = new System.Drawing.Point(0, 0);
+            this.imageListView1.Name = "imageListView1";
+            this.imageListView1.PersistentCacheDirectory = "";
+            this.imageListView1.PersistentCacheSize = ((long)(100));
+            this.imageListView1.Size = new System.Drawing.Size(397, 389);
+            this.imageListView1.TabIndex = 0;
+            this.imageListView1.UseWIC = true;
+            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
+            this.imageListView1.ItemClick += new Manina.Windows.Forms.ItemClickEventHandler(this.imageListView1_ItemClick);
+            this.imageListView1.ItemCheckBoxClick += new Manina.Windows.Forms.ItemCheckBoxClickEventHandler(this.imageListView1_ItemCheckBoxClick);
+            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
+            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
+            // 
             // propertyGrid1
             // 
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -248,7 +265,7 @@
             this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(3, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(688, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(656, 25);
             this.toolStrip1.TabIndex = 0;
             // 
             // rendererToolStripLabel
@@ -316,6 +333,26 @@
             this.detailsToolStripButton.Text = "Details";
             this.detailsToolStripButton.Click += new System.EventHandler(this.detailsToolStripButton_Click);
             // 
+            // horizontalStripToolStripButton
+            // 
+            this.horizontalStripToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.horizontalStripToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("horizontalStripToolStripButton.Image")));
+            this.horizontalStripToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.horizontalStripToolStripButton.Name = "horizontalStripToolStripButton";
+            this.horizontalStripToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.horizontalStripToolStripButton.Text = "Horizontal Strip";
+            this.horizontalStripToolStripButton.Click += new System.EventHandler(this.horizontalStripToolStripButton_Click);
+            // 
+            // verticalStripToolStripButton
+            // 
+            this.verticalStripToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.verticalStripToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("verticalStripToolStripButton.Image")));
+            this.verticalStripToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.verticalStripToolStripButton.Name = "verticalStripToolStripButton";
+            this.verticalStripToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.verticalStripToolStripButton.Text = "Vertical Strip";
+            this.verticalStripToolStripButton.Click += new System.EventHandler(this.verticalStripToolStripButton_Click);
+            // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
@@ -341,27 +378,27 @@
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(101, 22);
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(100, 22);
             this.toolStripDropDownButton1.Text = "Thumbnail Size";
             // 
             // x96ToolStripMenuItem
             // 
             this.x96ToolStripMenuItem.Name = "x96ToolStripMenuItem";
-            this.x96ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.x96ToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.x96ToolStripMenuItem.Text = "96x96";
             this.x96ToolStripMenuItem.Click += new System.EventHandler(this.x96ToolStripMenuItem_Click);
             // 
             // x120ToolStripMenuItem
             // 
             this.x120ToolStripMenuItem.Name = "x120ToolStripMenuItem";
-            this.x120ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.x120ToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.x120ToolStripMenuItem.Text = "120x120";
             this.x120ToolStripMenuItem.Click += new System.EventHandler(this.x120ToolStripMenuItem_Click);
             // 
             // x200ToolStripMenuItem
             // 
             this.x200ToolStripMenuItem.Name = "x200ToolStripMenuItem";
-            this.x200ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.x200ToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.x200ToolStripMenuItem.Text = "200x200";
             this.x200ToolStripMenuItem.Click += new System.EventHandler(this.x200ToolStripMenuItem_Click);
             // 
@@ -381,7 +418,7 @@
             this.multiSelectToolStripMenuItem,
             this.integralScrollToolStripMenuItem,
             this.toolStripMenuItem4,
-            this.allowDragToolStripMenuItem,
+            this.allowItemReorderToolStripMenuItem,
             this.allowDropToolStripMenuItem,
             this.allowDuplicateFilenamesToolStripMenuItem,
             this.toolStripMenuItem2,
@@ -449,10 +486,10 @@
             // 
             // allowDragToolStripMenuItem
             // 
-            this.allowDragToolStripMenuItem.Name = "allowDragToolStripMenuItem";
-            this.allowDragToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.allowDragToolStripMenuItem.Text = "Allow Drag";
-            this.allowDragToolStripMenuItem.Click += new System.EventHandler(this.allowDragToolStripMenuItem_Click);
+            this.allowItemReorderToolStripMenuItem.Name = "allowDragToolStripMenuItem";
+            this.allowItemReorderToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.allowItemReorderToolStripMenuItem.Text = "Allow Item Reorder";
+            this.allowItemReorderToolStripMenuItem.Click += new System.EventHandler(this.allowItemReorderToolStripMenuItem_Click);
             // 
             // allowDropToolStripMenuItem
             // 
@@ -605,45 +642,6 @@
             this.messageTimer.Interval = 3000;
             this.messageTimer.Tick += new System.EventHandler(this.messageTimer_Tick);
             // 
-            // filmStripToolStripButton
-            // 
-            this.horizontalStripToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.horizontalStripToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("filmStripToolStripButton.Image")));
-            this.horizontalStripToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.horizontalStripToolStripButton.Name = "filmStripToolStripButton";
-            this.horizontalStripToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.horizontalStripToolStripButton.Text = "Horizontal Strip";
-            this.horizontalStripToolStripButton.Click += new System.EventHandler(this.horizontalStripToolStripButton_Click);
-            // 
-            // imageListView1
-            // 
-            this.imageListView1.AllowDrag = true;
-            this.imageListView1.AllowDrop = true;
-            this.imageListView1.CheckBoxAlignment = System.Drawing.ContentAlignment.TopLeft;
-            this.imageListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageListView1.Location = new System.Drawing.Point(0, 0);
-            this.imageListView1.Name = "imageListView1";
-            this.imageListView1.PersistentCacheDirectory = "";
-            this.imageListView1.PersistentCacheSize = ((long)(100));
-            this.imageListView1.Size = new System.Drawing.Size(397, 389);
-            this.imageListView1.TabIndex = 0;
-            this.imageListView1.UseWIC = true;
-            this.imageListView1.ColumnClick += new Manina.Windows.Forms.ColumnClickEventHandler(this.imageListView1_ColumnClick);
-            this.imageListView1.ItemClick += new Manina.Windows.Forms.ItemClickEventHandler(this.imageListView1_ItemClick);
-            this.imageListView1.ItemCheckBoxClick += new Manina.Windows.Forms.ItemCheckBoxClickEventHandler(this.imageListView1_ItemCheckBoxClick);
-            this.imageListView1.SelectionChanged += new System.EventHandler(this.imageListView1_SelectionChanged);
-            this.imageListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.imageListView1_KeyDown);
-            // 
-            // verticalStripToolStripButton
-            // 
-            this.verticalStripToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.verticalStripToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("verticalStripToolStripButton.Image")));
-            this.verticalStripToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.verticalStripToolStripButton.Name = "verticalStripToolStripButton";
-            this.verticalStripToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.verticalStripToolStripButton.Text = "Vertical Strip";
-            this.verticalStripToolStripButton.Click += new System.EventHandler(this.verticalStripToolStripButton_Click);
-            // 
             // DemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -710,7 +708,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem continuousCacheModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
-        private System.Windows.Forms.ToolStripMenuItem allowDragToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem allowItemReorderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem allowDropToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem allowDuplicateFilenamesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;

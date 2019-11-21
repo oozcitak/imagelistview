@@ -415,7 +415,7 @@ namespace Manina.Windows.Forms
                         SelectionRectangle = new Rectangle(lastMouseDownLocation, new Size(0, 0));
                         mImageListView.Refresh();
                     }
-                    else if (lastMouseDownOverItem && HoveredItem != null && mImageListView.AllowDrag)
+                    else if (lastMouseDownOverItem && HoveredItem != null && mImageListView.AllowItemReorder)
                     {
                         // Start drag&drop
                         if (!HoveredItem.Selected)
@@ -440,7 +440,10 @@ namespace Manina.Windows.Forms
                         DropTarget = null;
 
                         selfDragging = true;
-                        mImageListView.DoDragDrop(data, DragDropEffects.All);
+                        if (mImageListView.AllowDrop)
+                          mImageListView.DoDragDrop(data, DragDropEffects.All);
+                        else
+                          mImageListView.DoDragDrop(new object(), DragDropEffects.Move);
                         selfDragging = false;
 
                         // Since the MouseUp event will be eaten by DoDragDrop we will not receive
@@ -870,7 +873,9 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragEnter(DragEventArgs e)
             {
-                if (!selfDragging && e.Data.GetDataPresent(DataFormats.FileDrop))
+                if (selfDragging)
+                    e.Effect = DragDropEffects.Move;
+                else if (e.Data.GetDataPresent(DataFormats.FileDrop))
                     e.Effect = DragDropEffects.Copy;
                 else
                     e.Effect = DragDropEffects.None;
@@ -880,8 +885,7 @@ namespace Manina.Windows.Forms
             /// </summary>
             public void DragOver(DragEventArgs e)
             {
-                if (e.Data.GetDataPresent(DataFormats.FileDrop) &&
-                    (mImageListView.AllowDrop || (mImageListView.AllowDrag && selfDragging)))
+                if (selfDragging || (mImageListView.AllowDrop  && e.Data.GetDataPresent(DataFormats.FileDrop)))
                 {
                     if (mImageListView.Items.Count == 0)
                     {

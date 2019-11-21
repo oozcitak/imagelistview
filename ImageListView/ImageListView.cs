@@ -58,6 +58,7 @@ namespace Manina.Windows.Forms
         private bool mRatingImageChanged = false;
         private bool mEmptyRatingImageChanged = false;
         // Properties
+        private bool mAllowDrop;
         private BorderStyle mBorderStyle;
         private CacheMode mCacheMode;
         private int mCacheLimitAsItemCount;
@@ -145,10 +146,31 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Description("Gets or sets whether column headers can be resized with the mouse."), DefaultValue(true)]
         public bool AllowColumnResize { get; set; }
         /// <summary>
+        /// Gets or sets whether the user can reorder items by moving them.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether the user can reorder items by moving them."), DefaultValue(true)]
+        public bool AllowItemReorder { get; set; }
+        /// <summary>
         /// Gets or sets whether the user can drag items for drag-and-drop operations.
         /// </summary>
-        [Category("Behavior"), Description("Gets or sets whether the user can drag items for drag-and-drop operations."), DefaultValue(false)]
-        public bool AllowDrag { get; set; }
+        [Category("Behavior"), Description("Gets or sets whether the user can drag items for drag-and-drop operations."), DefaultValue(true), Obsolete("Use AllowItemReorder instead."), EditorBrowsable(EditorBrowsableState.Never)]
+        public bool AllowDrag { get { return AllowItemReorder; } set { AllowItemReorder = value; } }
+        /// <summary>
+        /// Gets or sets a value indicating whether the control can accept data that the user drags onto it.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets a value indicating whether the control can accept data that the user drags onto it."), DefaultValue(true)]
+        public override bool AllowDrop
+        {
+            get
+            {
+                return mAllowDrop;
+            }
+            set
+            {
+                mAllowDrop = value;
+                base.AllowDrop = mAllowDrop || AllowItemReorder;
+            }
+        }
         /// <summary>
         /// Gets or sets whether duplicate items (image files pointing to the same path 
         /// on the file system) are allowed.
@@ -976,7 +998,8 @@ namespace Manina.Windows.Forms
             AllowCheckBoxClick = true;
             AllowColumnClick = true;
             AllowColumnResize = true;
-            AllowDrag = false;
+            AllowItemReorder = true;
+            AllowDrop = true;
             AllowDuplicateFileNames = false;
             AllowPaneResize = true;
             mBorderStyle = BorderStyle.Fixed3D;
@@ -2057,8 +2080,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A CacheErrorEventArgs that contains event data.</param>
         protected virtual void OnCacheError(CacheErrorEventArgs e)
         {
-            if (CacheError != null)
-                CacheError(this, e);
+            CacheError?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the DropFiles event.
@@ -2066,8 +2088,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A DropFileEventArgs that contains event data.</param>
         protected virtual void OnDropFiles(DropFileEventArgs e)
         {
-            if (DropFiles != null)
-                DropFiles(this, e);
+            DropFiles?.Invoke(this, e);
 
             if (e.Cancel)
                 return;
@@ -2109,8 +2130,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A DropItemEventArgs that contains event data.</param>
         protected virtual void OnDropItems(DropItemEventArgs e)
         {
-            if (DropItems != null)
-                DropItems(this, e);
+            DropItems?.Invoke(this, e);
 
             if (e.Cancel)
                 return;
@@ -2154,8 +2174,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A DropCompleteEventArgs that contains event data.</param>
         protected virtual void OnDropComplete(DropCompleteEventArgs e)
         {
-            if (DropComplete != null)
-                DropComplete(this, e);
+            DropComplete?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ColumnWidthChanged event.
@@ -2163,8 +2182,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ColumnEventArgs that contains event data.</param>
         protected virtual void OnColumnWidthChanged(ColumnEventArgs e)
         {
-            if (ColumnWidthChanged != null)
-                ColumnWidthChanged(this, e);
+            ColumnWidthChanged?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ColumnClick event.
@@ -2172,8 +2190,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ColumnClickEventArgs that contains event data.</param>
         protected virtual void OnColumnClick(ColumnClickEventArgs e)
         {
-            if (ColumnClick != null)
-                ColumnClick(this, e);
+            ColumnClick?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ColumnHover event.
@@ -2181,8 +2198,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ColumnClickEventArgs that contains event data.</param>
         protected virtual void OnColumnHover(ColumnHoverEventArgs e)
         {
-            if (ColumnHover != null)
-                ColumnHover(this, e);
+            ColumnHover?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ItemClick event.
@@ -2190,8 +2206,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ItemClickEventArgs that contains event data.</param>
         protected virtual void OnItemClick(ItemClickEventArgs e)
         {
-            if (ItemClick != null)
-                ItemClick(this, e);
+            ItemClick?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ItemCheckBoxClick event.
@@ -2199,8 +2214,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ItemEventArgs that contains event data.</param>
         protected virtual void OnItemCheckBoxClick(ItemEventArgs e)
         {
-            if (ItemCheckBoxClick != null)
-                ItemCheckBoxClick(this, e);
+            ItemCheckBoxClick?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ItemCheckBoxClick event.
@@ -2216,8 +2230,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ItemClickEventArgs that contains event data.</param>
         protected virtual void OnItemHover(ItemHoverEventArgs e)
         {
-            if (ItemHover != null)
-                ItemHover(this, e);
+            ItemHover?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ItemDoubleClick event.
@@ -2225,8 +2238,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ItemClickEventArgs that contains event data.</param>
         protected virtual void OnItemDoubleClick(ItemClickEventArgs e)
         {
-            if (ItemDoubleClick != null)
-                ItemDoubleClick(this, e);
+            ItemDoubleClick?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the SelectionChanged event.
@@ -2234,8 +2246,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A EventArgs that contains event data.</param>
         protected virtual void OnSelectionChanged(EventArgs e)
         {
-            if (SelectionChanged != null)
-                SelectionChanged(this, e);
+            SelectionChanged?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the SelectionChanged event.
@@ -2250,8 +2261,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ThumbnailCachedEventArgs that contains event data.</param>
         protected virtual void OnThumbnailCached(ThumbnailCachedEventArgs e)
         {
-            if (ThumbnailCached != null)
-                ThumbnailCached(this, e);
+            ThumbnailCached?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the PaneReszied event.
@@ -2259,8 +2269,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A PaneResizedEventArgs that contains event data.</param>
         protected virtual void OnPaneResized(PaneResizedEventArgs e)
         {
-            if (PaneResized != null)
-                PaneResized(this, e);
+            PaneResized?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the PaneResizing event.
@@ -2268,8 +2277,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A PaneResizingEventArgs that contains event data.</param>
         protected virtual void OnPaneResizing(PaneResizingEventArgs e)
         {
-            if (PaneResizing != null)
-                PaneResizing(this, e);
+            PaneResizing?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the CacheError event.
@@ -2326,8 +2334,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ThumbnailCachingEventArgs that contains event data.</param>
         protected virtual void OnThumbnailCaching(ThumbnailCachingEventArgs e)
         {
-            if (ThumbnailCaching != null)
-                ThumbnailCaching(this, e);
+            ThumbnailCaching?.Invoke(this, e);
         }
         /// <summary>
         /// Raises the ItemCollectionChanged event.
@@ -2335,8 +2342,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">A ItemCollectionChangedEventArgs that contains event data.</param>
         protected virtual void OnItemCollectionChanged(ItemCollectionChangedEventArgs e)
         {
-            if (ItemCollectionChanged != null)
-                ItemCollectionChanged(this, e);
+            ItemCollectionChanged?.Invoke(this, e);
         }
         #endregion
 
