@@ -32,13 +32,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         internal class ImageListViewNavigationManager : IDisposable
         {
-            #region Constants
-            /// <summary>
-            /// Selection tolerance in pixels.
-            /// </summary>
-            private const int SelectionTolerance = 5;
-            #endregion
-
             #region Member Variables
             private ImageListView mImageListView;
 
@@ -405,8 +398,8 @@ namespace Manina.Windows.Forms
                 else if (!MouseSelecting && !DraggingSeperator && !ResizingPane &&
                     inItemArea && lastMouseDownInItemArea &&
                     (LeftButton || RightButton) &&
-                    ((Math.Abs(e.Location.X - lastMouseDownLocation.X) > SelectionTolerance ||
-                    Math.Abs(e.Location.Y - lastMouseDownLocation.Y) > SelectionTolerance)))
+                    ((Math.Abs(e.Location.X - lastMouseDownLocation.X) >  SystemInformation.DragSize.Width ||
+                    Math.Abs(e.Location.Y - lastMouseDownLocation.Y) > SystemInformation.DragSize.Height)))
                 {
                     if (mImageListView.MultiSelect && !lastMouseDownOverItem && HoveredItem == null)
                     {
