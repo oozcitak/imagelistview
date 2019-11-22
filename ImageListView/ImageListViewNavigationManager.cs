@@ -420,7 +420,9 @@ namespace Manina.Windows.Forms
                         DropTarget = null;
 
                         selfDragging = true;
-                        if (mImageListView.AllowDrop)
+                        bool oldAllowDrop = mImageListView.AllowDrop;
+                        mImageListView.AllowDrop = true;
+                        if (oldAllowDrop)
                         {
                             // Set drag data
                             List<string> filenames = new List<string>();
@@ -438,6 +440,7 @@ namespace Manina.Windows.Forms
                         {
                             mImageListView.DoDragDrop(new object(), DragDropEffects.Move);
                         }
+                        mImageListView.AllowDrop = oldAllowDrop;
                         selfDragging = false;
 
                         // Since the MouseUp event will be eaten by DoDragDrop we will not receive

@@ -484,9 +484,9 @@
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(210, 6);
             // 
-            // allowDragToolStripMenuItem
+            // allowItemReorderToolStripMenuItem
             // 
-            this.allowItemReorderToolStripMenuItem.Name = "allowDragToolStripMenuItem";
+            this.allowItemReorderToolStripMenuItem.Name = "allowItemReorderToolStripMenuItem";
             this.allowItemReorderToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.allowItemReorderToolStripMenuItem.Text = "Allow Item Reorder";
             this.allowItemReorderToolStripMenuItem.Click += new System.EventHandler(this.allowItemReorderToolStripMenuItem_Click);

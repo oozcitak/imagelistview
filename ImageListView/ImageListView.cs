@@ -58,7 +58,6 @@ namespace Manina.Windows.Forms
         private bool mRatingImageChanged = false;
         private bool mEmptyRatingImageChanged = false;
         // Properties
-        private bool mAllowDrop;
         private BorderStyle mBorderStyle;
         private CacheMode mCacheMode;
         private int mCacheLimitAsItemCount;
@@ -150,22 +149,6 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Behavior"), Description("Gets or sets whether the user can reorder items by moving them."), DefaultValue(true)]
         public bool AllowItemReorder { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether the control can accept data that the user drags onto it.
-        /// </summary>
-        [Category("Behavior"), Description("Gets or sets a value indicating whether the control can accept data that the user drags onto it."), DefaultValue(true)]
-        public override bool AllowDrop
-        {
-            get
-            {
-                return mAllowDrop;
-            }
-            set
-            {
-                mAllowDrop = value;
-                base.AllowDrop = mAllowDrop || AllowItemReorder;
-            }
-        }
         /// <summary>
         /// Gets or sets whether duplicate items (image files pointing to the same path 
         /// on the file system) are allowed.
@@ -994,7 +977,6 @@ namespace Manina.Windows.Forms
             AllowColumnClick = true;
             AllowColumnResize = true;
             AllowItemReorder = true;
-            AllowDrop = true;
             AllowDuplicateFileNames = false;
             AllowPaneResize = true;
             mBorderStyle = BorderStyle.Fixed3D;
