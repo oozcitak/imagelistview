@@ -119,6 +119,7 @@ namespace Manina.Windows.Forms
             imageListView1.Columns.Add(ColumnType.Dimensions);
             imageListView1.Columns.Add(ColumnType.FileSize);
             imageListView1.Columns.Add(ColumnType.FolderName);
+            imageListView1.Columns.Add(ColumnType.DateModified);
             var col = new ImageListView.ImageListViewColumnHeader(ColumnType.Custom, "random", "Random");
             col.Comparer = new RandomColumnComparer();
             imageListView1.Columns.Add(col);
@@ -137,7 +138,7 @@ namespace Manina.Windows.Forms
         {
             public int Compare(ImageListViewItem x, ImageListViewItem y)
             {
-                return int.Parse(x.SubItems["random"].Text.Substring(1, 1)).CompareTo(int.Parse(y.SubItems["random"].Text.Substring(1, 1)));
+                return int.Parse(x.SubItems["random"].Text).CompareTo(int.Parse(y.SubItems["random"].Text));
             }
         }
         #endregion

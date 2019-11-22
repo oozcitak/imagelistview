@@ -821,11 +821,6 @@ namespace Manina.Windows.Forms
             #endregion
 
             #region Drag and Drop Event Handlers
-            public void GiveFeedback(GiveFeedbackEventArgs gfbevent)
-            {
-
-            }
-
             /// <summary>
             /// Handles control's DragDrop event.
             /// </summary>
@@ -841,15 +836,18 @@ namespace Manina.Windows.Forms
                     if (index > mImageListView.Items.Count)
                         index = mImageListView.Items.Count;
 
-                    int i = 0;
-                    ImageListViewItem[] draggedItems = new ImageListViewItem[mImageListView.SelectedItems.Count];
-                    foreach (ImageListViewItem item in mImageListView.SelectedItems)
+                    if (index != -1)
                     {
-                        draggedItems[i] = item;
-                        i++;
-                    }
+                        int i = 0;
+                        ImageListViewItem[] draggedItems = new ImageListViewItem[mImageListView.SelectedItems.Count];
+                        foreach (ImageListViewItem item in mImageListView.SelectedItems)
+                        {
+                            draggedItems[i] = item;
+                            i++;
+                        }
 
-                    mImageListView.OnDropItems(new DropItemEventArgs(index, draggedItems));
+                        mImageListView.OnDropItems(new DropItemEventArgs(index, draggedItems));
+                    }
                 }
                 else
                 {
@@ -859,11 +857,14 @@ namespace Manina.Windows.Forms
                     if (index > mImageListView.Items.Count)
                         index = mImageListView.Items.Count;
 
-                    if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+                    if (index != -1)
                     {
-                        string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                        if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+                        {
+                            string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                        mImageListView.OnDropFiles(new DropFileEventArgs(index, filenames));
+                            mImageListView.OnDropFiles(new DropFileEventArgs(index, filenames));
+                        }
                     }
                 }
 
