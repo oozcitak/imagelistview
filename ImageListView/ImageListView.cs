@@ -150,6 +150,11 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Description("Gets or sets whether the user can reorder items by moving them."), DefaultValue(true)]
         public bool AllowItemReorder { get; set; }
         /// <summary>
+        /// Gets or sets whether items can be dragged out of the control to start a drag and drop operation.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether items can be dragged out of the control to start a drag and drop operation."), DefaultValue(false)]
+        public bool AllowDrag { get; set; }
+        /// <summary>
         /// Gets or sets whether duplicate items (image files pointing to the same path 
         /// on the file system) are allowed.
         /// </summary>
@@ -976,6 +981,7 @@ namespace Manina.Windows.Forms
             AllowCheckBoxClick = true;
             AllowColumnClick = true;
             AllowColumnResize = true;
+            AllowDrag = false;
             AllowItemReorder = true;
             AllowDuplicateFileNames = false;
             AllowPaneResize = true;

@@ -405,7 +405,7 @@ namespace Manina.Windows.Forms
                         SelectionRectangle = new Rectangle(lastMouseDownLocation, new Size(0, 0));
                         mImageListView.Refresh();
                     }
-                    else if (lastMouseDownOverItem && HoveredItem != null && (mImageListView.AllowItemReorder || mImageListView.AllowDrop))
+                    else if (lastMouseDownOverItem && HoveredItem != null && (mImageListView.AllowItemReorder || mImageListView.AllowDrag))
                     {
                         // Start drag&drop
                         if (!HoveredItem.Selected)
@@ -422,7 +422,7 @@ namespace Manina.Windows.Forms
                         selfDragging = true;
                         bool oldAllowDrop = mImageListView.AllowDrop;
                         mImageListView.AllowDrop = true;
-                        if (oldAllowDrop)
+                        if (mImageListView.AllowDrag)
                         {
                             // Set drag data
                             List<string> filenames = new List<string>();
@@ -900,7 +900,7 @@ namespace Manina.Windows.Forms
                         else
                             e.Effect = DragDropEffects.Copy;
                     }
-                    else
+                    else if (mImageListView.AllowItemReorder)
                     {
                         // Calculate the location of the insertion cursor
                         Point pt = new Point(e.X, e.Y);
@@ -986,6 +986,10 @@ namespace Manina.Windows.Forms
                             DropToRight = dragCaretOnRight;
                             mImageListView.Refresh(true);
                         }
+                    }
+                    else
+                    {
+                        e.Effect = DragDropEffects.Copy;
                     }
                 }
                 else
