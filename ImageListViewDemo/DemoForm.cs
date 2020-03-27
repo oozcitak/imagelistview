@@ -120,6 +120,7 @@ namespace Manina.Windows.Forms
             imageListView1.Columns.Add(ColumnType.FileSize);
             imageListView1.Columns.Add(ColumnType.FolderName);
             imageListView1.Columns.Add(ColumnType.DateModified);
+            imageListView1.Columns.Add(ColumnType.FileType);
             var col = new ImageListView.ImageListViewColumnHeader(ColumnType.Custom, "random", "Random");
             col.Comparer = new RandomColumnComparer();
             imageListView1.Columns.Add(col);

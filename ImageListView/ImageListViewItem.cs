@@ -45,7 +45,6 @@ namespace Manina.Windows.Forms
         private DateTime mDateAccessed;
         private DateTime mDateCreated;
         private DateTime mDateModified;
-        private string mFileType;
         private string mFileName;
         private string mFilePath;
         private string mFolderName;
@@ -394,7 +393,35 @@ namespace Manina.Windows.Forms
         /// Gets the shell type of the image file represented by this item.
         /// </summary>
         [Category("File Properties"), Browsable(true), Description("Gets the shell type of the image file represented by this item.")]
-        public string FileType { get { UpdateFileInfo(); return mFileType; } }
+        public string FileType
+        {
+            get
+            {
+                if (mImageListView == null)
+                    throw new InvalidOperationException("Owner control is null.");
+
+                string iconPath = PathForShellIcon();
+                CacheState state = mImageListView.shellInfoCache.GetCacheState(iconPath);
+                if (state == CacheState.Cached)
+                {
+                    return mImageListView.shellInfoCache.GetFileType(iconPath);
+                }
+                else if (state == CacheState.Error)
+                {
+                    if (mImageListView.RetryOnError)
+                    {
+                        mImageListView.shellInfoCache.Remove(iconPath);
+                        mImageListView.shellInfoCache.Add(iconPath);
+                    }
+                    return null;
+                }
+                else
+                {
+                    mImageListView.shellInfoCache.Add(iconPath);
+                    return null;
+                }
+            }
+        }
         /// <summary>
         /// Gets the path of the image file represented by this item.
         /// </summary>        
@@ -675,34 +702,7 @@ namespace Manina.Windows.Forms
                 case ColumnType.FileSize:
                     return Utility.FormatSize(mFileSize);
                 case ColumnType.FileType:
-                    if (!string.IsNullOrEmpty(mFileType))
-                        return mFileType;
-                    if (mImageListView != null)
-                    {
-                        if (!string.IsNullOrEmpty(extension))
-                        {
-                            CacheState state = mImageListView.shellInfoCache.GetCacheState(extension);
-                            if (state == CacheState.Cached)
-                            {
-                                mFileType = mImageListView.shellInfoCache.GetFileType(extension);
-                                return mFileType;
-                            }
-                            else if (state == CacheState.Error)
-                            {
-                                mImageListView.shellInfoCache.Remove(extension);
-                                mImageListView.shellInfoCache.Add(extension);
-                                return "";
-                            }
-                            else
-                            {
-                                mImageListView.shellInfoCache.Add(extension);
-                                return "";
-                            }
-                        }
-                        return "";
-                    }
-                    else
-                        return "";
+                    return FileType;
                 case ColumnType.Dimensions:
                     if (mDimensions == Size.Empty)
                         return "";
@@ -1144,7 +1144,6 @@ namespace Manina.Windows.Forms
             item.mDateAccessed = mDateAccessed;
             item.mDateCreated = mDateCreated;
             item.mDateModified = mDateModified;
-            item.mFileType = mFileType;
             item.mFileName = mFileName;
             item.mFilePath = mFilePath;
             item.mFileSize = mFileSize;
