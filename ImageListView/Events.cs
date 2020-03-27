@@ -99,14 +99,14 @@ namespace Manina.Windows.Forms
     /// Represents the method that will handle the ItemDoubleClick event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
-    /// <param name="e">A ItemClickEventArgs that contains event data.</param>
+    /// <param name="e">An ItemClickEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ItemDoubleClickEventHandler(object sender, ItemClickEventArgs e);
     /// <summary>
     /// Represents the method that will handle the ThumbnailCaching event. 
     /// </summary>
     /// <param name="sender">The ImageListView object that is the source of the event.</param>
-    /// <param name="e">A ItemEventArgs that contains event data.</param>
+    /// <param name="e">A ThumbnailCachingEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ThumbnailCachingEventHandler(object sender, ThumbnailCachingEventArgs e);
     /// <summary>
@@ -116,6 +116,34 @@ namespace Manina.Windows.Forms
     /// <param name="e">A ThumbnailCachedEventArgs that contains event data.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public delegate void ThumbnailCachedEventHandler(object sender, ThumbnailCachedEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the DetailsCaching event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">An ItemEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void DetailsCachingEventHandler(object sender, ItemEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the DetailsCached event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">An ItemEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void DetailsCachedEventHandler(object sender, ItemEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the ShellInfoCachingEventHandler event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A ShellInfoCachingEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void ShellInfoCachingEventHandler(object sender, ShellInfoCachingEventArgs e);
+    /// <summary>
+    /// Represents the method that will handle the ShellInfoCachedEventHandler event. 
+    /// </summary>
+    /// <param name="sender">The ImageListView object that is the source of the event.</param>
+    /// <param name="e">A ShellInfoCachedEventArgs that contains event data.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public delegate void ShellInfoCachedEventHandler(object sender, ShellInfoCachedEventArgs e);
     /// <summary>
     /// Refreshes the owner control.
     /// </summary>
@@ -567,6 +595,64 @@ namespace Manina.Windows.Forms
             Thumbnail = thumbnail;
             Size = size;
             IsThumbnail = thumbnailImage;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for the shell info caching event.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class ShellInfoCachingEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the file extension for which the shell info is requested.
+        /// </summary>
+        public string Extension { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the ShellInfoCachingEventArgs class.
+        /// </summary>
+        /// <param name="extension">The file extension for which the shell info is requested.</param>
+        public ShellInfoCachingEventArgs(string extension)
+        {
+            Extension = extension;
+        }
+    }
+    /// <summary>
+    /// Represents the event arguments for the shell info cached event.
+    /// </summary>
+    [Serializable, ComVisible(true)]
+    public class ShellInfoCachedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the file extension for which the shell info is requested.
+        /// </summary>
+        public string Extension { get; private set; }
+        /// <summary>
+        /// Gets the small shell icon.
+        /// </summary>
+        public Image SmallIcon { get; private set; }
+        /// <summary>
+        /// Gets the large shell icon.
+        /// </summary>
+        public Image LargeIcon { get; private set; }
+        /// <summary>
+        /// Gets the shell file type.
+        /// </summary>
+        public string FileType { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the ShellInfoCachedEventArgs class.
+        /// </summary>
+        /// <param name="extension">The file extension for which the shell info is requested.</param>
+        /// <param name="smallIcon">The small shell icon.</param>
+        /// <param name="largeIcon">The large shell icon.</param>
+        /// <param name="filetype">The shell file type.</param>
+        public ShellInfoCachedEventArgs(string extension, Image smallIcon, Image largeIcon, string filetype)
+        {
+            Extension = extension;
+            SmallIcon = smallIcon;
+            LargeIcon = largeIcon;
+            FileType = filetype;
         }
     }
     /// <summary>

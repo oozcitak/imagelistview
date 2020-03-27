@@ -31,7 +31,7 @@ namespace Manina.Windows.Forms
         #region Member Variables
         private QueuedBackgroundWorker bw;
         private SynchronizationContext context;
-        private SendOrPostCallback checkProcessingCallback;
+        private readonly SendOrPostCallback checkProcessingCallback;
 
         private ImageListView mImageListView;
 
@@ -210,8 +210,7 @@ namespace Manina.Windows.Forms
             bool canProcess = true;
 
             // Is it already cached?
-            CacheItem existing;
-            if (shellCache.TryGetValue(arg.Extension, out existing))
+            if (shellCache.TryGetValue(arg.Extension, out CacheItem existing))
             {
                 if (existing.SmallIcon != null && existing.LargeIcon != null)
                     canProcess = false;
@@ -228,7 +227,7 @@ namespace Manina.Windows.Forms
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Manina.Windows.Forms.QueuedWorkerCompletedEventArgs"/> 
         /// instance containing the event data.</param>
-        void bw_RunWorkerCompleted(object sender, QueuedWorkerCompletedEventArgs e)
+        private void bw_RunWorkerCompleted(object sender, QueuedWorkerCompletedEventArgs e)
         {
             CacheItem result = e.Result as CacheItem;
 
@@ -238,8 +237,7 @@ namespace Manina.Windows.Forms
             // Add to cache
             if (result != null)
             {
-                CacheItem existing = null;
-                if (shellCache.TryGetValue(result.Extension, out existing))
+                if (shellCache.TryGetValue(result.Extension, out CacheItem existing))
                 {
                     existing.Dispose();
                     shellCache.Remove(result.Extension);
@@ -250,14 +248,23 @@ namespace Manina.Windows.Forms
             // Refresh the control lazily
             if (result != null && mImageListView != null)
                 mImageListView.Refresh(false, true);
+
+            // Raise the ShellInfoCached event
+            if (result != null && mImageListView != null)
+                mImageListView.OnShellInfoCached(new ShellInfoCachedEventArgs(result.Extension, result.SmallIcon, result.LargeIcon, result.FileType));
+
+            // Raise the CacheError event
+            if (e.Error != null && mImageListView != null)
+                mImageListView.OnCacheErrorInternal(e.Error, CacheThread.ShellInfo);
         }
+
         /// <summary>
         /// Handles the DoWork event of the queued background worker.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Manina.Windows.Forms.QueuedWorkerDoWorkEventArgs"/> instance 
         /// containing the event data.</param>
-        void bw_DoWork(object sender, QueuedWorkerDoWorkEventArgs e)
+        private void bw_DoWork(object sender, QueuedWorkerDoWorkEventArgs e)
         {
             string extension = e.Argument as string;
 
@@ -307,8 +314,7 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(extension))
                 throw new ArgumentException("extension cannot be null", "extension");
 
-            CacheItem item = null;
-            if (shellCache.TryGetValue(extension, out item))
+            if (shellCache.TryGetValue(extension, out CacheItem item))
                 return item.State;
 
             return CacheState.Unknown;
@@ -342,8 +348,7 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(extension))
                 throw new ArgumentException("extension cannot be null", "extension");
 
-            CacheItem item = null;
-            if (shellCache.TryGetValue(extension, out item))
+            if (shellCache.TryGetValue(extension, out CacheItem item))
             {
                 item.Dispose();
                 shellCache.Remove(extension);
@@ -359,8 +364,7 @@ namespace Manina.Windows.Forms
                 throw new ArgumentException("extension cannot be null", "extension");
 
             // Already cached?
-            CacheItem item = null;
-            if (shellCache.TryGetValue(extension, out item))
+            if (shellCache.TryGetValue(extension, out CacheItem item))
                 return;
 
             // Add to cache queue
@@ -376,8 +380,7 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(extension))
                 throw new ArgumentException("extension cannot be null", "extension");
 
-            CacheItem item = null;
-            if (shellCache.TryGetValue(extension, out item))
+            if (shellCache.TryGetValue(extension, out CacheItem item))
             {
                 return item.SmallIcon;
             }
@@ -393,8 +396,7 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(extension))
                 throw new ArgumentException("extension cannot be null", "extension");
 
-            CacheItem item = null;
-            if (shellCache.TryGetValue(extension, out item))
+            if (shellCache.TryGetValue(extension, out CacheItem item))
             {
                 return item.LargeIcon;
             }
@@ -410,8 +412,7 @@ namespace Manina.Windows.Forms
             if (string.IsNullOrEmpty(extension))
                 throw new ArgumentException("extension cannot be null", "extension");
 
-            CacheItem item = null;
-            if (shellCache.TryGetValue(extension, out item))
+            if (shellCache.TryGetValue(extension, out CacheItem item))
             {
                 return item.FileType;
             }
@@ -435,6 +436,10 @@ namespace Manina.Windows.Forms
                 return;
             else
                 processing.Add(extension, false);
+
+            // Raise the ShellInfoCaching event
+            if (mImageListView != null)
+                mImageListView.OnShellInfoCaching(new ShellInfoCachingEventArgs(extension));
 
             // Add the item to the queue for processing
             bw.RunWorkerAsync(extension);

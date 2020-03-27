@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Manina.Windows.Forms;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -7,7 +8,6 @@ using System.ServiceModel.Syndication;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
-using Manina.Windows.Forms;
 
 namespace ImageListViewTests
 {
@@ -74,6 +74,10 @@ namespace ImageListViewTests
 
             imageListView.ThumbnailCaching += new Manina.Windows.Forms.ThumbnailCachingEventHandler(imageListView1_ThumbnailCaching);
             imageListView.ThumbnailCached += new Manina.Windows.Forms.ThumbnailCachedEventHandler(imageListView1_ThumbnailCached);
+            imageListView.DetailsCaching += imageListView_DetailsCaching;
+            imageListView.DetailsCached += imageListView_DetailsCached;
+            imageListView.ShellInfoCaching += imageListView_ShellInfoCaching;
+            imageListView.ShellInfoCached += imageListView_ShellInfoCached;
             imageListView.CacheError += new Manina.Windows.Forms.CacheErrorEventHandler(imageListView1_CacheError);
             imageListView.ItemCollectionChanged += new ItemCollectionChangedEventHandler(imageListView_ItemCollectionChanged);
             imageListView.KeyPress += new KeyPressEventHandler(imageListView_KeyPress);
@@ -128,7 +132,10 @@ namespace ImageListViewTests
         private void imageListView1_CacheError(object sender, Manina.Windows.Forms.CacheErrorEventArgs e)
         {
             if (!benchMarking && logEventsCheckbox.Checked)
-                LogEvent(string.Format("!!! {0} -> {1}", (e.CacheThread == Manina.Windows.Forms.CacheThread.Thumbnail ? "Thumbnail" : "Details"), e.Error.Message));
+                LogEvent(string.Format("!!! {0} -> {1}",
+                    e.CacheThread == CacheThread.Thumbnail ? "Thumbnail" :
+                    e.CacheThread == CacheThread.ShellInfo ? "Shell Info" : "Details",
+                    e.Error.Message));
         }
 
         // Thumbnail cached
@@ -157,6 +164,48 @@ namespace ImageListViewTests
                 if (e.Item != null)
                     index = e.Item.Index;
                 LogEvent(string.Format("--> {0} ({1})", index, e.Size));
+            }
+        }
+
+        // ShellInfo cached
+        private void imageListView_ShellInfoCached(object sender, ShellInfoCachedEventArgs e)
+        {
+            if (!benchMarking && logEventsCheckbox.Checked)
+            {
+                LogEvent(string.Format("<-- ({0})", e.Extension));
+            }
+        }
+
+        // ShellInfo caching
+        private void imageListView_ShellInfoCaching(object sender, ShellInfoCachingEventArgs e)
+        {
+            if (!benchMarking && logEventsCheckbox.Checked)
+            {
+                LogEvent(string.Format("--> ({0})", e.Extension));
+            }
+        }
+
+        // Details cached
+        private void imageListView_DetailsCached(object sender, ItemEventArgs e)
+        {
+            if (!benchMarking && logEventsCheckbox.Checked)
+            {
+                int index = -1;
+                if (e.Item != null)
+                    index = e.Item.Index;
+                LogEvent(string.Format("<-- {0} (Details)", index));
+            }
+        }
+
+        // Details caching
+        private void imageListView_DetailsCaching(object sender, ItemEventArgs e)
+        {
+            if (!benchMarking && logEventsCheckbox.Checked)
+            {
+                int index = -1;
+                if (e.Item != null)
+                    index = e.Item.Index;
+                LogEvent(string.Format("--> {0} (Details)", index));
             }
         }
 
@@ -362,10 +411,10 @@ namespace ImageListViewTests
         // Cache mode
         private void CacheOnDemand_Click(object sender, EventArgs e)
         {
-            if (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.Continuous)
-                imageListView.CacheMode = Manina.Windows.Forms.CacheMode.OnDemand;
+            if (imageListView.CacheMode == CacheMode.Continuous)
+                imageListView.CacheMode = CacheMode.OnDemand;
             else
-                imageListView.CacheMode = Manina.Windows.Forms.CacheMode.Continuous;
+                imageListView.CacheMode = CacheMode.Continuous;
         }
         // Persistent cache
         private void UsePersistentCache_Click(object sender, EventArgs e)
@@ -435,7 +484,7 @@ namespace ImageListViewTests
             GroupByName.Checked = (imageListView.Columns[0].Grouper == null && imageListView.GroupOrder != Manina.Windows.Forms.SortOrder.None);
             GroupByCustom.Checked = (imageListView.Columns[0].Grouper != null);
 
-            CacheOnDemand.Checked = (imageListView.CacheMode == Manina.Windows.Forms.CacheMode.OnDemand);
+            CacheOnDemand.Checked = (imageListView.CacheMode == CacheMode.OnDemand);
             UsePersistentCache.Checked = (!string.IsNullOrEmpty(imageListView.PersistentCacheDirectory));
             AllowDuplicateFilenames.Checked = imageListView.AllowDuplicateFileNames;
             IntegralScroll.Checked = imageListView.IntegralScroll;
@@ -515,7 +564,7 @@ namespace ImageListViewTests
                 oldCM = imageListView.CacheMode;
 
                 imageListView.Items.Clear();
-                imageListView.CacheMode = Manina.Windows.Forms.CacheMode.Continuous;
+                imageListView.CacheMode = CacheMode.Continuous;
 
                 TestToolStrip.Enabled = false;
                 imageListView.Enabled = false;
