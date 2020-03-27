@@ -2478,22 +2478,22 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Occurs before an item details is cached.
         /// </summary>
-        [Category("Action"), Browsable(true), Description("Occurs before an item details is cached.")]
+        [Category("Behavior"), Browsable(true), Description("Occurs before an item details is cached.")]
         public event DetailsCachingEventHandler DetailsCaching;
         /// <summary>
         /// Occurs after an item details is cached.
         /// </summary>
-        [Category("Action"), Browsable(true), Description("Occurs after an item details is cached.")]
+        [Category("Behavior"), Browsable(true), Description("Occurs after an item details is cached.")]
         public event DetailsCachedEventHandler DetailsCached;
         /// <summary>
         /// Occurs before shell info for a file extension is cached.
         /// </summary>
-        [Category("Action"), Browsable(true), Description("Occurs before shell info for a file extension is cached.")]
+        [Category("Behavior"), Browsable(true), Description("Occurs before shell info for a file extension is cached.")]
         public event ShellInfoCachingEventHandler ShellInfoCaching;
         /// <summary>
         /// Occurs after shell info for a file extension is cached.
         /// </summary>
-        [Category("Action"), Browsable(true), Description("Occurs after shell info for a file extension is cached.")]
+        [Category("Behavior"), Browsable(true), Description("Occurs after shell info for a file extension is cached.")]
         public event ShellInfoCachedEventHandler ShellInfoCached;
         #endregion
     }
