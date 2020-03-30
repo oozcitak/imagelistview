@@ -101,6 +101,10 @@ namespace Manina.Windows.Forms
         /// The cache thread responsible for generating item details.
         /// </summary>
         Details,
+        /// <summary>
+        /// The cache thread responsible for generating shell information.
+        /// </summary>
+        ShellInfo,
     }
     /// <summary>
     /// Represents the visual state of an image list column.

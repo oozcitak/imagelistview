@@ -150,6 +150,11 @@ namespace Manina.Windows.Forms
         [Category("Behavior"), Description("Gets or sets whether the user can reorder items by moving them."), DefaultValue(true)]
         public bool AllowItemReorder { get; set; }
         /// <summary>
+        /// Gets or sets whether items can be dragged out of the control to start a drag and drop operation.
+        /// </summary>
+        [Category("Behavior"), Description("Gets or sets whether items can be dragged out of the control to start a drag and drop operation."), DefaultValue(false)]
+        public bool AllowDrag { get; set; }
+        /// <summary>
         /// Gets or sets whether duplicate items (image files pointing to the same path 
         /// on the file system) are allowed.
         /// </summary>
@@ -976,6 +981,7 @@ namespace Manina.Windows.Forms
             AllowCheckBoxClick = true;
             AllowColumnClick = true;
             AllowColumnResize = true;
+            AllowDrag = false;
             AllowItemReorder = true;
             AllowDuplicateFileNames = false;
             AllowPaneResize = true;
@@ -2257,6 +2263,56 @@ namespace Manina.Windows.Forms
             PaneResizing?.Invoke(this, e);
         }
         /// <summary>
+        /// Raises the DetailsCaching event.
+        /// </summary>
+        /// <param name="e">An ItemEventArgs that contains event data.</param>
+        protected virtual void OnDetailsCaching(ItemEventArgs e)
+        {
+            DetailsCaching?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Raises the DetailsCached event.
+        /// </summary>
+        /// <param name="e">An ItemEventArgs that contains event data.</param>
+        protected virtual void OnDetailsCached(ItemEventArgs e)
+        {
+            DetailsCached?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Raises the DetailsCaching event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        internal virtual void OnDetailsCachingInternal(Guid guid)
+        {
+            if (mItems.TryGetValue(guid, out ImageListViewItem item))
+                OnDetailsCaching(new ItemEventArgs(item));
+        }
+        /// <summary>
+        /// Raises the DetailsCached event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        internal virtual void OnDetailsCachedInternal(Guid guid)
+        {
+            if (mItems.TryGetValue(guid, out ImageListViewItem item))
+                OnDetailsCached(new ItemEventArgs(item));
+        }
+        /// <summary>
+        /// Raises the ShellInfoCaching event.
+        /// </summary>
+        /// <param name="e">A ShellInfoCachingEventArgs that contains event data.</param>
+        protected internal virtual void OnShellInfoCaching(ShellInfoCachingEventArgs e)
+        {
+            ShellInfoCaching?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Raises the ShellInfoCached event.
+        /// </summary>
+        /// <param name="e">A ShellInfoCachedEventArgs that contains event data.</param>
+        protected internal virtual void OnShellInfoCached(ShellInfoCachedEventArgs e)
+        {
+            ShellInfoCached?.Invoke(this, e);
+        }
+        /// <summary>
         /// Raises the CacheError event.
         /// This method is invoked from the thumbnail thread.
         /// </summary>
@@ -2268,6 +2324,16 @@ namespace Manina.Windows.Forms
         {
             mItems.TryGetValue(guid, out ImageListViewItem item);
             OnCacheError(new CacheErrorEventArgs(item, error, cacheThread));
+        }
+        /// <summary>
+        /// Raises the CacheError event.
+        /// This method is invoked from the thumbnail thread.
+        /// </summary>
+        /// <param name="error">The error that occurred during an asynchronous operation.</param>
+        /// <param name="cacheThread">The thread raising the error.</param>
+        internal void OnCacheErrorInternal(Exception error, CacheThread cacheThread)
+        {
+            OnCacheError(new CacheErrorEventArgs(null, error, cacheThread));
         }
         /// <summary>
         /// Raises the ThumbnailCached event.
@@ -2409,6 +2475,26 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Category("Action"), Browsable(true), Description("Occurs while the pane is being resized.")]
         public event PaneResizingEventHandler PaneResizing;
+        /// <summary>
+        /// Occurs before an item details is cached.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs before an item details is cached.")]
+        public event DetailsCachingEventHandler DetailsCaching;
+        /// <summary>
+        /// Occurs after an item details is cached.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs after an item details is cached.")]
+        public event DetailsCachedEventHandler DetailsCached;
+        /// <summary>
+        /// Occurs before shell info for a file extension is cached.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs before shell info for a file extension is cached.")]
+        public event ShellInfoCachingEventHandler ShellInfoCaching;
+        /// <summary>
+        /// Occurs after shell info for a file extension is cached.
+        /// </summary>
+        [Category("Behavior"), Browsable(true), Description("Occurs after shell info for a file extension is cached.")]
+        public event ShellInfoCachedEventHandler ShellInfoCached;
         #endregion
     }
 }

@@ -207,6 +207,10 @@ namespace Manina.Windows.Forms
             if (mImageListView != null && mImageListView.IsItemVisible(request.Guid))
                 mImageListView.Refresh(false, true);
 
+            // Raise the DetailsCached event
+            if (details != null && mImageListView != null)
+                mImageListView.OnDetailsCachedInternal(request.Guid);
+
             // Raise the CacheError event
             if (e.Error != null && mImageListView != null)
                 mImageListView.OnCacheErrorInternal(request.Guid, e.Error, CacheThread.Details);
@@ -317,6 +321,10 @@ namespace Manina.Windows.Forms
                 return;
             else
                 processing.Add(item.Guid, false);
+
+            // Raise the DetailsCaching event
+            if (mImageListView != null)
+                mImageListView.OnDetailsCachingInternal(item.Guid);
 
             // Add the item to the queue for processing
             bw.RunWorkerAsync(item);

@@ -120,6 +120,7 @@ namespace Manina.Windows.Forms
             imageListView1.Columns.Add(ColumnType.FileSize);
             imageListView1.Columns.Add(ColumnType.FolderName);
             imageListView1.Columns.Add(ColumnType.DateModified);
+            imageListView1.Columns.Add(ColumnType.FileType);
             var col = new ImageListView.ImageListViewColumnHeader(ColumnType.Custom, "random", "Random");
             col.Comparer = new RandomColumnComparer();
             imageListView1.Columns.Add(col);
@@ -168,6 +169,7 @@ namespace Manina.Windows.Forms
             allowPaneResizeToolStripMenuItem.Checked = imageListView1.AllowPaneResize;
             multiSelectToolStripMenuItem.Checked = imageListView1.MultiSelect;
             allowItemReorderToolStripMenuItem.Checked = imageListView1.AllowItemReorder;
+            allowDragToolStripMenuItem.Checked = imageListView1.AllowDrag;
             allowDropToolStripMenuItem.Checked = imageListView1.AllowDrop;
             allowDuplicateFilenamesToolStripMenuItem.Checked = imageListView1.AllowDuplicateFileNames;
             continuousCacheModeToolStripMenuItem.Checked = (imageListView1.CacheMode == CacheMode.Continuous);
@@ -334,6 +336,11 @@ namespace Manina.Windows.Forms
         private void allowItemReorderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             imageListView1.AllowItemReorder = !imageListView1.AllowItemReorder;
+        }
+
+        private void allowDragToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            imageListView1.AllowDrag = !imageListView1.AllowDrag;
         }
 
         private void allowDropToolStripMenuItem_Click(object sender, EventArgs e)
