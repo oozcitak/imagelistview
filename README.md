@@ -27,6 +27,6 @@ If you are using [NuGet](https://nuget.org/) you can install the assembly with:
 Please visit: http://oozcitak.github.io/imagelistview/
 
 # Donations #
-Please consider becoming a [backer](https://opencollective.com/imagelistview/contribute/backer-19985/checkout) or [sponsor](https://opencollective.com/imagelistview/contribute/sponsor-19986/checkout) to help support development.
+Please consider becoming a backer or sponsor to help support development.
 
 [<img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" alt="Donate Button" width="300"/>](https://opencollective.com/imagelistview)
