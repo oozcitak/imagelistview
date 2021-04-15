@@ -2533,7 +2533,7 @@ namespace Manina.Windows.Forms.ImageListViewRenderers
                         bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height,
                         ImageListView.ThumbnailSize.Width, szt.Height);
                     TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, foreColor,
-                        TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+                        TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.NoPrefix);
                 }
                 else // if (ImageListView.View == View.Details)
                 {
@@ -2599,7 +2599,7 @@ namespace Manina.Windows.Forms.ImageListViewRenderers
                             }
                             else
                                 TextRenderer.DrawText(g, item.SubItems[column].Text, ImageListView.Font, rt, foreColor,
-                                    TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping);
+                                    TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.NoPrefix);
 
                             rt.X -= iconOffset;
                         }
@@ -2927,7 +2927,7 @@ namespace Manina.Windows.Forms.ImageListViewRenderers
                     }
                     else
                         TextRenderer.DrawText(g, item.SubItems[column].Text, ImageListView.Font, rt, foreColor,
-                            TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping);
+                            TextFormatFlags.EndEllipsis | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.NoPrefix);
 
                     rt.X -= iconOffset;
                     rt.X += column.Width;
@@ -3033,7 +3033,7 @@ namespace Manina.Windows.Forms.ImageListViewRenderers
                 else if (!ImageListView.Focused && (state & ItemState.Selected) != ItemState.None)
                     foreColor = ImageListView.Colors.UnFocusedForeColor;
                 TextRenderer.DrawText(g, item.Text, ImageListView.Font, textBounds, foreColor,
-                    TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping);
+                    TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.PreserveGraphicsClipping | TextFormatFlags.NoPrefix);
 
                 // Focus rectangle
                 if (ImageListView.Focused && ((state & ItemState.Focused) != ItemState.None))
