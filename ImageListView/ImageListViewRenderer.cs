@@ -1123,7 +1123,7 @@ namespace Manina.Windows.Forms
                     Size szt = TextRenderer.MeasureText(item.Text, ImageListView.Font);
                     Rectangle rt = new Rectangle(bounds.Left + itemPadding.Width, bounds.Top + 2 * itemPadding.Height + ImageListView.ThumbnailSize.Height, ImageListView.ThumbnailSize.Width, szt.Height);
                     TextRenderer.DrawText(g, item.Text, ImageListView.Font, rt, foreColor,
-                        TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine);
+                        TextFormatFlags.EndEllipsis | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix);
                 }
                 else // if (ImageListView.View == View.Details)
                 {
