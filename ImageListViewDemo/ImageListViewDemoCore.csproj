@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+    <Compile Remove="Properties\Resources.Designer.cs" />
+    <Compile Remove="Properties\Settings.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Properties\Resources.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Properties\Settings.settings" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImageListView\ImageListViewCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
