@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net35</TargetFramework>
+	<TargetFrameworks>net35;net6.0-windows</TargetFrameworks>
 	<OutputType>Library</OutputType>
 	<RootNamespace>Manina.Windows.Forms</RootNamespace>
   </PropertyGroup>
@@ -39,7 +39,7 @@
 	<WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net35'">
 	<Reference Include="System.Design" />
   </ItemGroup>
 
