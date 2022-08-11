@@ -12,15 +12,17 @@
 	<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 	<DefineConstants>TRACE;DEBUG;BONUSPACK;USEWIC;BENCHMARK</DefineConstants>
-	<DocumentationFile></DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 	<DefineConstants>TRACE;USEWIC</DefineConstants>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
-	<DocumentationFile>bin\Release\ImageListView.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug without WPF|AnyCPU'">
@@ -32,7 +34,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release without WPF|AnyCPU'">
 	<OutputPath>bin\Release without WPF\</OutputPath>
-	<DocumentationFile>bin\Release\ImageListView.xml</DocumentationFile>
 	<Optimize>true</Optimize>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
 	<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
