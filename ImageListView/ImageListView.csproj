@@ -12,7 +12,16 @@
 	<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+  <PropertyGroup>
+	<AnalysisLevel>latest</AnalysisLevel>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net35'">
+	<NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -29,14 +38,12 @@
 	<DebugSymbols>true</DebugSymbols>
 	<OutputPath>bin\Debug without WPF\</OutputPath>
 	<DefineConstants>TRACE;DEBUG;BONUSPACK;BENCHMARK</DefineConstants>
-	<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release without WPF|AnyCPU'">
 	<OutputPath>bin\Release without WPF\</OutputPath>
 	<Optimize>true</Optimize>
 	<UseVSHostingProcess>false</UseVSHostingProcess>
-	<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 	<WarningLevel>0</WarningLevel>
   </PropertyGroup>
 

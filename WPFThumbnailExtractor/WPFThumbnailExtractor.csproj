@@ -12,6 +12,15 @@
 	<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
 
+  <PropertyGroup>
+	<AnalysisLevel>latest</AnalysisLevel>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net35'">
+	<NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
 	<ProjectReference Include="..\ImageListView\ImageListView.csproj" />
   </ItemGroup>
