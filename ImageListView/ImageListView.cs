@@ -1107,6 +1107,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void SelectWhere(Func<ImageListViewItem, bool> predicate)
         {
+            SuspendPaint();
+
             foreach (ImageListViewItem item in Items.Where(predicate))
                 item.mSelected = true;
 
@@ -1120,6 +1122,8 @@ namespace Manina.Windows.Forms
         /// </summary>
         public void UnselectWhere(Func<ImageListViewItem, bool> predicate)
         {
+            SuspendPaint();
+
             foreach (ImageListViewItem item in Items.Where(predicate))
                 item.mSelected = false;
 
