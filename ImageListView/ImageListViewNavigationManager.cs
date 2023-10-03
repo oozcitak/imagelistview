@@ -818,6 +818,15 @@ namespace Manina.Windows.Forms
                 ShiftKey = (e.Modifiers & Keys.Shift) == Keys.Shift;
                 ControlKey = (e.Modifiers & Keys.Control) == Keys.Control;
             }
+
+            /// <summary>
+            /// Handles the LostFocus event.
+            /// </summary>
+            public void LostFocus(EventArgs e)
+            {
+                ShiftKey = false;
+                ControlKey = false;
+            }
             #endregion
 
             #region Drag and Drop Event Handlers

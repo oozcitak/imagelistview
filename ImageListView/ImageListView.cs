@@ -2004,6 +2004,7 @@ namespace Manina.Windows.Forms
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnLostFocus(EventArgs e)
         {
+            navigationManager.LostFocus(e);
             base.OnLostFocus(e);
             Refresh();
         }
