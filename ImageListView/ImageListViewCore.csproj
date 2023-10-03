@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>Manina.Windows.Forms</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\DefaultImage.png" />
+    <None Remove="Resources\DragDropCursor_Copy.cur" />
+    <None Remove="Resources\DragDropCursor_Move.cur" />
+    <None Remove="Resources\DragDropCursor_No.cur" />
+    <None Remove="Resources\EmptyRatingImage.png" />
+    <None Remove="Resources\ErrorImage.png" />
+    <None Remove="Resources\RatingImage.png" />
+    <None Remove="Resources\SortAscending.png" />
+    <None Remove="Resources\SortDescending.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DefaultImage.png" />
+    <EmbeddedResource Include="Resources\DragDropCursor_Copy.cur" />
+    <EmbeddedResource Include="Resources\DragDropCursor_Move.cur" />
+    <EmbeddedResource Include="Resources\DragDropCursor_No.cur" />
+    <EmbeddedResource Include="Resources\EmptyRatingImage.png" />
+    <EmbeddedResource Include="Resources\ErrorImage.png" />
+    <EmbeddedResource Include="Resources\RatingImage.png" />
+    <EmbeddedResource Include="Resources\SortAscending.png" />
+    <EmbeddedResource Include="Resources\SortDescending.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Resources.Extensions" Version="4.7.1" />
+  </ItemGroup>
+
+</Project>
