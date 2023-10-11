@@ -155,7 +155,12 @@ namespace Manina.Windows.Forms
             /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
             void ICollection<ImageListViewItem>.CopyTo(ImageListViewItem[] array, int arrayIndex)
             {
-                throw new NotSupportedException();
+                int i = 0;
+                foreach (ImageListViewItem item in this)
+                {
+                    array[arrayIndex + i] = item;
+                    i++;
+                }
             }
             /// <summary>
             /// Determines the index of a specific item in the <see cref="T:System.Collections.Generic.IList`1"/>.
@@ -164,10 +169,16 @@ namespace Manina.Windows.Forms
             /// <returns>
             /// The index of <paramref name="item"/> if found in the list; otherwise, -1.
             /// </returns>
-            [Obsolete("Use ImageListViewItem.Index property instead.")]
             int IList<ImageListViewItem>.IndexOf(ImageListViewItem item)
             {
-                throw new NotSupportedException();
+                int i = 0;
+                foreach (ImageListViewItem selectedItem in this)
+                {
+                    if (selectedItem == item)
+                        return i;
+                    i++;
+                }
+                return -1;
             }
             /// <summary>
             /// Inserts an item to the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
@@ -204,7 +215,7 @@ namespace Manina.Windows.Forms
             {
                 get
                 {
-                    throw new NotSupportedException();
+                    return this[index];
                 }
                 set
                 {
