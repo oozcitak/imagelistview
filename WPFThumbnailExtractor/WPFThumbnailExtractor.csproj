@@ -1,52 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{819A4362-3A60-4FEA-B193-5BAA2FAFFC3F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Manina.Windows.Forms</RootNamespace>
-    <AssemblyName>WPFThumbnailExtractor</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+	<TargetFrameworks>net35;net6.0-windows</TargetFrameworks>
+	<OutputType>Library</OutputType>
+	<RootNamespace>Manina.Windows.Forms</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup>
+	<UseWPF>true</UseWPF>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup>
+	<AnalysisLevel>latest</AnalysisLevel>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net35'">
+	<NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="WindowsBase" />
+	<ProjectReference Include="..\ImageListView\ImageListView.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="WPFMetadataExtractor.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WPFThumbnailExtractor.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ImageListView\ImageListView.csproj">
-      <Project>{0c295fb8-c6c6-4a40-9f19-05a43f353a04}</Project>
-      <Name>ImageListView</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>
